@@ -72,7 +72,7 @@ public class GridGenerator : MonoBehaviour
 			_grid.SetValue(UtilsClass.GetMouseWorldPosition(), 1);
 
 			//Create a GameObject to the cell position and attached it to 3D parent Transform => need to change the gameobject by the machine that we want to add
-			GameObject go = Instantiate(_objectToInstantiate, _grid.GetWorldPosition(chosenCell.CoordinateX, chosenCell.CoordinateY) + new Vector3(_grid.GetCellSize() / 2, _grid.GetCellSize() / 2,0) , Quaternion.identity, _3DparentTransform);
+			GameObject go = Instantiate(_objectToInstantiate, _grid.GetWorldPosition(chosenCell.CoordinateX, chosenCell.CoordinateY) + new Vector3(_grid.GetCellSize() / 2, _grid.GetCellSize() / 2,  - _objectToInstantiate.transform.localScale.z/2), Quaternion.identity, _3DparentTransform);
 
 			//Add it to a dictinary to track it after
 			_objectsInstantiateDictionary.Add(chosenCell, go);
