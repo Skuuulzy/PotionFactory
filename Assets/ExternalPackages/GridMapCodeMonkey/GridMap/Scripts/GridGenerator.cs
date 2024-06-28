@@ -63,7 +63,7 @@ public class GridGenerator : MonoBehaviour
     private void HandleLeftClick() 
     {
         //Get the cell that player clicked on
-        Cell chosenCell = _grid.GetCellByPosition(UtilsClass.GetMouseWorldPosition());
+        Cell chosenCell = _grid.GetCellByPosition(UtilsClass.GetWorldPositionFromUI_Perspective());
 
 		//Check if the cell is not null and if it isn't contain a machine already
         if(chosenCell != null && chosenCell.AlreadyContainsMachine == false)
@@ -85,7 +85,7 @@ public class GridGenerator : MonoBehaviour
     private void HandleRightClick()
     {
 		//Get the cell that player clicked on
-		Cell chosenCell = _grid.GetCellByPosition(UtilsClass.GetMouseWorldPosition());
+		Cell chosenCell = _grid.GetCellByPosition(UtilsClass.GetWorldPositionFromUI_Perspective());
 
 		//Check if the cell is not null and if it contains a machine already
 		if (chosenCell != null && chosenCell.AlreadyContainsMachine == true)
