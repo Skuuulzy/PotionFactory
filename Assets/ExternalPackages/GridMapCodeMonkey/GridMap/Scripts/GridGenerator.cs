@@ -69,7 +69,7 @@ public class GridGenerator : MonoBehaviour
         if(chosenCell != null && chosenCell.AlreadyContainsMachine == false)
         {
 			//Cell the value of the grid to 1 (useless but nice feedback)
-			_grid.SetValue(UtilsClass.GetMouseWorldPosition(), 1);
+			_grid.SetValue(UtilsClass.GetWorldPositionFromUI_Perspective(), 1);
 
 			//Create a GameObject to the cell position and attached it to 3D parent Transform => need to change the gameobject by the machine that we want to add
 			GameObject go = Instantiate(_objectToInstantiate, _grid.GetWorldPosition(chosenCell.CoordinateX, chosenCell.CoordinateY) + new Vector3(_grid.GetCellSize() / 2, _grid.GetCellSize() / 2,  - _objectToInstantiate.transform.localScale.z/2), Quaternion.identity, _3DparentTransform);
@@ -91,7 +91,7 @@ public class GridGenerator : MonoBehaviour
 		if (chosenCell != null && chosenCell.AlreadyContainsMachine == true)
         {
 			//Cell the value of the grid to 0 (useless but nice feedback)
-			_grid.SetValue(UtilsClass.GetMouseWorldPosition(), 0);
+			_grid.SetValue(UtilsClass.GetWorldPositionFromUI_Perspective(), 0);
 
 			//Destroy the GameObject from the cell position
 			Destroy(_objectsInstantiateDictionary[chosenCell]);
@@ -102,5 +102,17 @@ public class GridGenerator : MonoBehaviour
 		}
 	}
 
+
+	public void ClearGrid()
+	{
+		foreach(var  cell in _objectsInstantiateDictionary)
+		{
+			Destroy(cell.Value);
+			cell.Key.RemoveMachineFromCell();
+		}
+
+		_grid.ResetAllValue();
+		_objectsInstantiateDictionary.Clear();
+	}
 
 }

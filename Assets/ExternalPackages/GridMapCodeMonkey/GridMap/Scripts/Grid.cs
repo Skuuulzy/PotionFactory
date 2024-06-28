@@ -87,6 +87,17 @@ public class Grid {
         SetValue(x, y, value);
     }
 
+    public void ResetAllValue()
+    {
+        for (int x = 0; x < _gridArray.GetLength(0); x++)
+        {
+            for (int y = 0; y < _gridArray.GetLength(1); y++)
+            {
+                SetValue(x, y, 0);
+			}
+        }
+	}
+
     public int GetValue(int x, int y) {
         if (x >= 0 && y >= 0 && x < _width && y < _height) {
             return _gridArray[x, y];
