@@ -18,9 +18,13 @@ public class GridGenerator : MonoBehaviour
     private bool _rightClickIsDraging = false;
     private Dictionary<Cell,GameObject> _objectsInstantiateDictionary = new Dictionary<Cell, GameObject>();
 
+	private int _tickCount = 0;
+
+	private int _tickMax = 10;
+
 	private void Start()
     {
-        _grid = new Grid(_gridXValue, _gridYValue, _cellSize, _startPosition, _parentTransform);
+		_grid = new Grid(_gridXValue, _gridYValue, _cellSize, _startPosition, _parentTransform);
     }
 
     private void Update() 
