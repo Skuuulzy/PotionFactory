@@ -36,9 +36,9 @@ namespace CodeMonkey.MonoBehaviours {
                 transform.position = cameraFollowPosition;
             }
 
-            if (instantZoom) {
-                myCamera.orthographicSize = GetCameraZoomFunc();
-            }
+            //if (instantZoom) {
+            //    myCamera.orthographicSize = GetCameraZoomFunc();
+            //}
         }
 
         private void Start() {
