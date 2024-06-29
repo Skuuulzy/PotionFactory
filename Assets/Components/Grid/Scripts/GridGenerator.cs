@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using CodeMonkey.Utils;
 using System.Collections.Generic;
+using Components.Machines;
 
 namespace Components.Grid
 {
@@ -12,9 +13,10 @@ namespace Components.Grid
         [SerializeField] private float _cellSize = 10;
         [SerializeField] private Vector3 _startPosition = new(0, 0);
         [SerializeField] private bool _showDebug;
-
-        [SerializeField] private GameObject _objectToInstantiate;
-
+        
+        [Header("Prefabs")] 
+        [SerializeField] private MachineController _machineControllerPrefab;
+        
         [Header("Holders")]
         [SerializeField] private Transform _textsHolder;
         [SerializeField] private Transform _objectsHolder;
@@ -63,14 +65,20 @@ namespace Components.Grid
             //Cell the value of the grid to 1 (useless but nice feedback)
             _grid.SetValue(UtilsClass.GetWorldPositionFromUI_Perspective(), 1);
 
-            //Create a GameObject to the cell position and attached it to 3D parent Transform => need to change the game object by the machine that we want to add
-            GameObject go = Instantiate(_objectToInstantiate,
+            //Instantiate a machine controller
+            MachineController machineController = Instantiate(_machineControllerPrefab,
                 _grid.GetWorldPosition(chosenCell.X, chosenCell.Y) +
-                new Vector3(_grid.GetCellSize() / 2, _grid.GetCellSize() / 2, -_objectToInstantiate.transform.localScale.z / 2), Quaternion.identity, _objectsHolder);
+                new Vector3(_grid.GetCellSize() / 2, _grid.GetCellSize() / 2, -_machineControllerPrefab.transform.localScale.z / 2), Quaternion.identity, _objectsHolder);
 
+            // Set up the controller with the correct type;
+            machineController.Init(MachineManager.Instance.SelectedMachine);
+            
             //Add it to a dictionary to track it after
-            _instancedObjects.Add(chosenCell, go);
-
+            _instancedObjects.Add(chosenCell, machineController.gameObject);
+            
+            // Renaming GO for debug purposes
+            machineController.transform.name = $"{MachineManager.Instance.SelectedMachine.Type}_{_instancedObjects.Count}";
+            
             //Set the AlreadyContainsMachine bool to true
             chosenCell.AddMachineToCell();
         }

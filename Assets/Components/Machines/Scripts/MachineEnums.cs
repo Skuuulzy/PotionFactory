@@ -7,6 +7,10 @@
         EAST,
         WEST
     }
-    
-    
+
+    public enum MachineType
+    {
+        CONVEYOR,
+        MIXER
+    }
 }
