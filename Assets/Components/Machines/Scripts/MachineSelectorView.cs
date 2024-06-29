@@ -16,12 +16,12 @@ namespace Components.Machines
         {
             _machine = machine;
 
-            _name.text = machine.Type.ToString();
+            _name.text = machine.Template.Type.ToString();
         }
 
         public void Select()
         {
-            Debug.Log($"[MACHINES] Selected: {_machine.Type}");
+            Debug.Log($"[MACHINES] Selected: {_machine.Template.Type}");
             
             OnSelected?.Invoke(_machine);
         }

@@ -75,7 +75,10 @@ namespace Components.Grid
             
             //Add it to a dictionary to track it after
             _instancedObjects.Add(chosenCell, machineController.gameObject);
-
+            
+            // Renaming GO for debug purposes
+            machineController.transform.name = $"{MachineManager.Instance.SelectedMachine.Template.Type}_{_instancedObjects.Count}";
+            
             //Set the AlreadyContainsMachine bool to true
             chosenCell.AddMachineToCell();
         }

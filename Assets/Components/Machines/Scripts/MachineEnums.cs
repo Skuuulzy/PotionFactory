@@ -10,6 +10,7 @@
 
     public enum MachineType
     {
-        CONVEYOR
+        CONVEYOR,
+        MIXER
     }
 }
