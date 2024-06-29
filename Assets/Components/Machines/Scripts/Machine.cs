@@ -1,24 +1,49 @@
 ﻿using System;
 using System.Collections.Generic;
+using Components.Tick;
 
 namespace Components.Machines
 {
-    public abstract class Machine
+    public class Machine : ITickable
     {
-        public List<Side> InPorts { get; protected set; }
-        public List<Side> OutPorts { get; protected set; }
+        private readonly MachineType _type;
+        private readonly List<Side> _inPorts;
+        private readonly List<Side> _outPorts;
+        private readonly int _maxItemCount;
+        private readonly MachineTemplate _template;
+        
+        public List<Type> Items { get; }
+        public MachineTemplate Template => _template;
+        public MachineType Type => _type;
 
-        public List<Type> Items { get; protected set; }
-        public int MaxItemCount { get; protected set; }
+        public Machine(MachineTemplate template)
+        {
+            _template = template;
+            
+            _type = template.Type;
+            _inPorts = template.InPorts;
+            _outPorts = template.OutPorts;
+            _maxItemCount = template.MaxItemCount;
 
-        public abstract void Tick();
+            Items = new List<Type>();
+            
+            TickSystem.RegisterTickable(this);
+        }
 
-        public abstract void ConstructFromTemplates(MachineTemplate template);
+        ~Machine()
+        {
+            TickSystem.UnregisterTickable(this);
+        }
 
+        public virtual void Tick()
+        {
+            
+        }
+        
         public bool AcceptItem(Type item)
         {
             // There is already too many items in the machine
-            if (Items.Count >= MaxItemCount)
+            if (Items.Count >= _maxItemCount)
                 return false;
             
             Items.Add(item);

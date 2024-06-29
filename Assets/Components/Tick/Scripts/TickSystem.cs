@@ -1,4 +1,4 @@
-using System;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -11,13 +11,12 @@ namespace Components.Tick
         [SerializeField] private float _tickTimerMax = 0.2f;
 
         [SerializeField] private SerializableDictionary<int, TextMeshProUGUI> _timerTextList;
-
-        public static Action<int> OnTick;
-
+        
+        private static readonly List<ITickable> TICKABLES = new();
+        
         private void Update()
         {
             _tickTimer += Time.deltaTime;
-            
             
             while (_tickTimer >= _tickTimerMax)
             {
@@ -25,7 +24,31 @@ namespace Components.Tick
                 _tick++;
                 DisplayTime();
                 
-                OnTick?.Invoke(_tick);
+                TickAll();
+            }
+        }
+        
+        private void TickAll()
+        {
+            foreach (var tickable in TICKABLES)
+            {
+                tickable.Tick();
+            }
+        }
+
+        public static void RegisterTickable(ITickable tickable)
+        {
+            if (!TICKABLES.Contains(tickable))
+            {
+                TICKABLES.Add(tickable);
+            }
+        }
+
+        public static void UnregisterTickable(ITickable tickable)
+        {
+            if (TICKABLES.Contains(tickable))
+            {
+                TICKABLES.Remove(tickable);
             }
         }
 
