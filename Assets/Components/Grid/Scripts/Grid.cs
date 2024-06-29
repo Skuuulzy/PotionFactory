@@ -16,7 +16,7 @@ namespace Components.Grid
         private readonly int[,] _gridArray;
         private readonly List<Cell> _cellsList;
 
-        public Grid(int width, int height, float cellSize, Vector3 originPosition, Transform parentTransform)
+        public Grid(int width, int height, float cellSize, Vector3 originPosition, Transform parentTransform, bool showDebug)
         {
             _width = width;
             _height = height;
@@ -25,7 +25,7 @@ namespace Components.Grid
 
             _gridArray = new int[width, height];
             _cellsList = new List<Cell>();
-            bool showDebug = true;
+            
             if (showDebug)
             {
                 TextMesh[][] debugTextArray = new TextMesh[width][];
@@ -81,7 +81,7 @@ namespace Components.Grid
             return new Vector3(x, y) * _cellSize + _originPosition;
         }
 
-        private void GetXY(Vector3 worldPosition, out int x, out int y)
+        private void GetCellCoordinates(Vector3 worldPosition, out int x, out int y)
         {
             x = Mathf.FloorToInt((worldPosition - _originPosition).x / _cellSize);
             y = Mathf.FloorToInt((worldPosition - _originPosition).y / _cellSize);
@@ -103,7 +103,7 @@ namespace Components.Grid
         public void SetValue(Vector3 worldPosition, int value)
         {
             int x, y;
-            GetXY(worldPosition, out x, out y);
+            GetCellCoordinates(worldPosition, out x, out y);
             SetValue(x, y, value);
         }
 
@@ -133,34 +133,56 @@ namespace Components.Grid
         public int GetValue(Vector3 worldPosition)
         {
             int x, y;
-            GetXY(worldPosition, out x, out y);
+            GetCellCoordinates(worldPosition, out x, out y);
             return GetValue(x, y);
         }
 
         #endregion VALUES
 
-        #region CELLS
+        #region GET CELLS
 
-        public Cell GetCellByPosition(int x, int y)
+        /// <summary>
+        /// From a set of coordinates return a cell if one is found.
+        /// </summary>
+        /// <param name="x">The x coordinate.</param>
+        /// <param name="y">The Y coordinate.</param>
+        /// <param name="foundCell">The cell potentially found on the coordinates.</param>
+        /// <returns>True if a cell is found, otherwise false.</returns>
+        public bool TryGetCellByCoordinates(int x, int y, out Cell foundCell)
         {
             foreach (Cell cell in _cellsList)
             {
                 if (cell.X == x && cell.Y == y)
                 {
-                    return cell;
+                    foundCell = cell;
+                    return true;
                 }
             }
 
-            return null;
+            foundCell = null;
+            return false;
         }
 
-        public Cell GetCellByPosition(Vector3 worldPosition)
+        /// <summary>
+        /// From a world position return a cell if one is found.
+        /// </summary>
+        /// <param name="worldPosition">The position you want to test.</param>
+        /// <param name="foundCell">The cell potentially found on the world position.</param>
+        /// <returns>True if a cell is found, otherwise false.</returns>
+        public bool TryGetCellByPosition(Vector3 worldPosition, out Cell foundCell)
         {
-            int x, y;
-            GetXY(worldPosition, out x, out y);
-            return GetCellByPosition(x, y);
+            GetCellCoordinates(worldPosition, out var x, out var y);
+
+            if (TryGetCellByCoordinates(x, y, out var cell))
+            {
+                foundCell = cell;
+                return true;
+            }
+
+            foundCell = null;
+            return false;
         }
 
-        #endregion CELLS
+        #endregion GET CELLS
     }
 }
