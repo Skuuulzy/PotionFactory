@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Components.Items
 {
-	[CreateAssetMenu(fileName = "ScriptableObjects/ItemTemplate")]
+	[CreateAssetMenu(fileName = "New Item Template", menuName = "Machines/Item Template")]
 	public class ItemTemplate : ScriptableObject
 	{
 
@@ -15,13 +15,11 @@ namespace Components.Items
 		[SerializeField] private string _resourcesName;
 		[SerializeField] private string _typesName;
 
-
 		public List<Resource> Resources => _resources;
 		public List<ItemType> Types => _types;
 		public GameObject Item3DObject => _item3DObject;
 		public string ResourcesName => _resourcesName;
 		public string TypesName => _typesName;
-
 	}
 }
 
