@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Components.Machines.Behaviors;
 using UnityEngine;
 
 namespace Components.Machines
@@ -9,6 +10,7 @@ namespace Components.Machines
         [Header("Definition")]
         [SerializeField] private MachineType _type;
         [SerializeField] private GameObject _3dView;
+        [SerializeField] private MachineBehavior _behavior;
         
         [Header("Ports")]
         [SerializeField] private List<Side> _inPorts;
@@ -19,6 +21,7 @@ namespace Components.Machines
 
         
         public MachineType Type => _type;
+        public MachineBehavior Behavior => _behavior;
 
         public GameObject View => _3dView;
 

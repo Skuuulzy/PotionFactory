@@ -8,20 +8,20 @@ namespace Components.Machines
     {
         [SerializeField] private TMP_Text _name;
 
-        public Action<Machine> OnSelected;
+        public Action<MachineTemplate> OnSelected;
         
-        private Machine _machine;
+        private MachineTemplate _machine;
 
-        public void Init(Machine machine)
+        public void Init(MachineTemplate machine)
         {
             _machine = machine;
 
-            _name.text = machine.Template.Type.ToString();
+            _name.text = machine.Type.ToString();
         }
 
         public void Select()
         {
-            Debug.Log($"[MACHINES] Selected: {_machine.Template.Type}");
+            Debug.Log($"[MACHINES] Selected: {_machine.Type}");
             
             OnSelected?.Invoke(_machine);
         }

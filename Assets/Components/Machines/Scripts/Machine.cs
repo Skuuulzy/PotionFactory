@@ -9,13 +9,15 @@ namespace Components.Machines
         
         public List<Type> Items { get; }
         public MachineTemplate Template => _template;
+        
+        public Machine InNeighbour;
+        public Machine OutNeighbour;
 
         public Machine(MachineTemplate template)
         {
             _template = template;
 
             Items = new List<Type>();
-            
         }
         
         public bool AcceptItem(Type item)

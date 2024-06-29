@@ -1,22 +1,21 @@
-using System;
 using Components.Tick;
 using UnityEngine;
 
 namespace Components.Machines
 {
     public class MachineController : MonoBehaviour, ITickable
-
     {
         [SerializeField] private Transform _3dViewHolder;
 
         private Machine _machine;
 
-        public void Init(Machine machine)
+        public void Init(MachineTemplate machineTemplate)
         {
-            _machine = machine;
+            _machine = new Machine(machineTemplate);
+            
             TickSystem.RegisterTickable(this);
 
-            Instantiate(machine.Template.View, _3dViewHolder);
+            Instantiate(_machine.Template.View, _3dViewHolder);
         }
 
         private void OnDestroy()
@@ -26,6 +25,8 @@ namespace Components.Machines
 
         public void Tick()
         {
+            _machine.Template.Behavior.Process(_machine);
+            
             Debug.Log($"[MACHINES] Ticking {name} on frame {Time.frameCount}");
         }
     }

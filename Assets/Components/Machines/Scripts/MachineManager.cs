@@ -11,10 +11,7 @@ namespace Components.Machines
         [Header("Selector View")]
         [SerializeField] private MachineSelectorView _machineSelectorView;
         [SerializeField] private Transform _machineSelectorViewHolder;
-
-        private readonly List<Machine> _machines = new();
-
-        public Machine SelectedMachine { get; private set; }
+        public MachineTemplate SelectedMachine { get; private set; }
 
         protected override void Awake()
         {
@@ -25,14 +22,8 @@ namespace Components.Machines
                 Debug.LogWarning("[MACHINES] No templates found.");
                 return;
             }
-            
-            foreach (var machineTemplate in _machineTemplates)
-            {
-                var newMachine = new Machine(machineTemplate);
-                _machines.Add(newMachine);
-            }
 
-            foreach (var machine in _machines)
+            foreach (var machine in _machineTemplates)
             {
                 MachineSelectorView selectorView = Instantiate(_machineSelectorView, _machineSelectorViewHolder);
                 selectorView.Init(machine);
@@ -40,10 +31,10 @@ namespace Components.Machines
             }
             
             // Init selected machine has the first 
-            SelectedMachine = _machines[0];
+            SelectedMachine = _machineTemplates[0];
         }
 
-        private void HandleMachineSelected(Machine machine)
+        private void HandleMachineSelected(MachineTemplate machine)
         {
             SelectedMachine = machine;
         }
