@@ -3,22 +3,27 @@ using System.Collections.Generic;
 
 namespace Components.Machines
 {
-    public abstract class Machine
+    public class Machine
     {
-        public List<Side> InPorts { get; protected set; }
-        public List<Side> OutPorts { get; protected set; }
+        private readonly MachineTemplate _template;
+        
+        public List<Type> Items { get; }
+        public MachineTemplate Template => _template;
+        
+        public Machine InNeighbour;
+        public Machine OutNeighbour;
 
-        public List<Type> Items { get; protected set; }
-        public int MaxItemCount { get; protected set; }
+        public Machine(MachineTemplate template)
+        {
+            _template = template;
 
-        public abstract void Tick();
-
-        public abstract void ConstructFromTemplates(MachineTemplate template);
-
+            Items = new List<Type>();
+        }
+        
         public bool AcceptItem(Type item)
         {
             // There is already too many items in the machine
-            if (Items.Count >= MaxItemCount)
+            if (Items.Count >= Template.MaxItemCount)
                 return false;
             
             Items.Add(item);
