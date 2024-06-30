@@ -62,12 +62,6 @@ namespace Components.Grid
             {
                 return;
             }
-            
-            var neighbours = _grid.GetNeighboursByPosition(worldMousePosition,true);
-            foreach (var neighbour in neighbours)
-            {
-                Debug.Log($"Neighbour side: ({neighbour.Key} cell at coordinates: ({neighbour.Value.X},{neighbour.Value.Y})");
-            }
 
             //Instantiate a machine controller
             MachineController machineController = Instantiate(_machineControllerPrefab,
@@ -75,7 +69,7 @@ namespace Components.Grid
                 new Vector3(_grid.GetCellSize() / 2, _grid.GetCellSize() / 2, -_machineControllerPrefab.transform.localScale.z / 2), Quaternion.identity, _objectsHolder);
 
             // Set up the controller with the correct type;
-            machineController.Init(MachineManager.Instance.SelectedMachine);
+            machineController.Init(MachineManager.Instance.SelectedMachine, _grid.GetNeighboursByPosition(worldMousePosition));
             
             //Add it to a dictionary to track it after
             _instancedObjects.Add(chosenCell, machineController.gameObject);
@@ -84,7 +78,7 @@ namespace Components.Grid
             machineController.transform.name = $"{MachineManager.Instance.SelectedMachine.Type}_{_instancedObjects.Count}";
             
             //Set the AlreadyContainsMachine bool to true
-            chosenCell.AddMachineToCell();
+            chosenCell.AddMachineToCell(machineController);
         }
 
         private void RemoveMachineFromGrid()
@@ -133,7 +127,6 @@ namespace Components.Grid
                 cell.Key.RemoveMachineFromCell();
             }
 
-            _grid.ResetAllValue();
             _instancedObjects.Clear();
         }
 

@@ -1,5 +1,10 @@
+using System;
+using Components.Machines;
+using UnityEngine;
+
 namespace Components.Grid
 {
+    [Serializable]
     public class Cell
     {
         public int X { get; }
@@ -7,6 +12,8 @@ namespace Components.Grid
         public float Size { get; }
         public bool ContainsObject { get; private set; }
 
+        [SerializeField] private MachineController _machineController;
+        
         public Cell(int x, int y, float size, bool containsObject)
         {
             X = x;
@@ -15,13 +22,15 @@ namespace Components.Grid
             ContainsObject = containsObject;
         }
 
-        public void AddMachineToCell()
+        public void AddMachineToCell(MachineController machineController)
         {
+            _machineController = machineController;
             ContainsObject = true;
         }
 
         public void RemoveMachineFromCell()
         {
+            _machineController = null;
             ContainsObject = false;
         }
     }

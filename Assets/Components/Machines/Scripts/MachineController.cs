@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using Components.Grid;
 using Components.Tick;
 using UnityEngine;
 
@@ -7,11 +9,11 @@ namespace Components.Machines
     {
         [SerializeField] private Transform _3dViewHolder;
 
-        private Machine _machine;
+        [SerializeField] private Machine _machine;
 
-        public void Init(MachineTemplate machineTemplate)
+        public void Init(MachineTemplate machineTemplate, Dictionary<Side, Cell> neighbours)
         {
-            _machine = new Machine(machineTemplate);
+            _machine = new Machine(machineTemplate, neighbours);
             
             TickSystem.RegisterTickable(this);
 
