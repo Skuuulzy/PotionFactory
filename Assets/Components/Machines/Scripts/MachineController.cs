@@ -11,6 +11,9 @@ namespace Components.Machines
 
         [SerializeField] private Machine _machine;
 
+
+        public Machine Machine => _machine;
+
         public void Init(MachineTemplate machineTemplate, Dictionary<Side, Cell> neighbours)
         {
             _machine = new Machine(machineTemplate, neighbours);

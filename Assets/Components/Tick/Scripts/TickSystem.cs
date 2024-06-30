@@ -40,7 +40,7 @@ namespace Components.Tick
         {
             if (!TICKABLES.Contains(tickable))
             {
-                TICKABLES.Add(tickable);
+                TICKABLES.Insert(0, tickable);
             }
         }
 
