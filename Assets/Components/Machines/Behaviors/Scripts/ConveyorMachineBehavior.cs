@@ -16,7 +16,7 @@ namespace Components.Machines.Behaviors
             {
                 if (outMachine.AcceptItem(machine.Items[0]))
                 {
-                    machine.Items.Clear();
+                    machine.RemoveItem(0);
                 }
             }
         }
