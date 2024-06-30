@@ -11,6 +11,7 @@ namespace Components.Machines
         [Header("Selector View")]
         [SerializeField] private MachineSelectorView _machineSelectorView;
         [SerializeField] private Transform _machineSelectorViewHolder;
+        
         public MachineTemplate SelectedMachine { get; private set; }
 
         protected override void Awake()
