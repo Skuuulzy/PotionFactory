@@ -5,9 +5,9 @@ using Components.Machines;
 
 namespace Components.Grid
 {
-    public class GridGenerator : MonoBehaviour
+    public class GridController : MonoBehaviour
     {
-        private Grid _grid;
+        [Header("Generation Parameters")]
         [SerializeField] private int _gridXValue = 64;
         [SerializeField] private int _gridYValue = 64;
         [SerializeField] private float _cellSize = 10;
@@ -21,6 +21,7 @@ namespace Components.Grid
         [SerializeField] private Transform _textsHolder;
         [SerializeField] private Transform _objectsHolder;
         
+        private Grid _grid;
         private readonly Dictionary<Cell, GameObject> _instancedObjects = new();
 
         #region MONO
@@ -34,11 +35,11 @@ namespace Components.Grid
         {
             if (Input.GetMouseButton(1))
             {
-                HandleRightClick();
+                RemoveMachineFromGrid();
             }
             if (Input.GetMouseButton(0))
             {
-                HandleLeftClick();
+                AddSelectedMachineToGrid();
             }
         }
 
@@ -46,7 +47,7 @@ namespace Components.Grid
 
         #region INPUT HANDLERS
         
-        private void HandleLeftClick()
+        private void AddSelectedMachineToGrid()
         {
             var worldMousePosition = UtilsClass.GetWorldPositionFromUI_Perspective();
             
@@ -55,15 +56,18 @@ namespace Components.Grid
             {
                 return;
             }
-
+            
             // Check if the cell has no object
             if (chosenCell.ContainsObject)
             {
                 return;
             }
-
-            //Cell the value of the grid to 1 (useless but nice feedback)
-            _grid.SetValue(UtilsClass.GetWorldPositionFromUI_Perspective(), 1);
+            
+            var neighbours = _grid.GetNeighboursByPosition(worldMousePosition,true);
+            foreach (var neighbour in neighbours)
+            {
+                Debug.Log($"Neighbour side: ({neighbour.Key} cell at coordinates: ({neighbour.Value.X},{neighbour.Value.Y})");
+            }
 
             //Instantiate a machine controller
             MachineController machineController = Instantiate(_machineControllerPrefab,
@@ -83,7 +87,7 @@ namespace Components.Grid
             chosenCell.AddMachineToCell();
         }
 
-        private void HandleRightClick()
+        private void RemoveMachineFromGrid()
         {
             var worldMousePosition = UtilsClass.GetWorldPositionFromUI_Perspective();
 
@@ -98,9 +102,6 @@ namespace Components.Grid
             {
                 return;
             }
-            
-            //Cell the value of the grid to 0 (useless but nice feedback)
-            _grid.SetValue(UtilsClass.GetWorldPositionFromUI_Perspective(), 0);
 
             //Destroy the GameObject from the cell position
             Destroy(_instancedObjects[chosenCell]);
@@ -114,7 +115,7 @@ namespace Components.Grid
 
         #region GRID METHODS
 
-        public void GenerateGrid()
+        private void GenerateGrid()
         {
             if (_grid != null)
             {

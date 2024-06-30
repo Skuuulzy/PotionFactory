@@ -27,7 +27,7 @@ namespace Components.Machines
         {
             _machine.Template.Behavior.Process(_machine);
             
-            Debug.Log($"[MACHINES] Ticking {name} on frame {Time.frameCount}");
+            //Debug.Log($"[MACHINES] Ticking {name} on frame {Time.frameCount}");
         }
     }
 }

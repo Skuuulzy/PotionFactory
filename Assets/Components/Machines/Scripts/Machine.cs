@@ -6,12 +6,13 @@ namespace Components.Machines
     public class Machine
     {
         private readonly MachineTemplate _template;
-        
-        public List<Type> Items { get; }
         public MachineTemplate Template => _template;
         
         public Machine InNeighbour;
         public Machine OutNeighbour;
+        
+        public List<Type> Items { get; }
+
 
         public Machine(MachineTemplate template)
         {
