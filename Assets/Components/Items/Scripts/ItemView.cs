@@ -12,6 +12,7 @@ namespace Components.Items
 	{
 		[SerializeField] private TextMeshProUGUI _resourcesNameText;
 		[SerializeField] private TextMeshProUGUI _typesNameText;
+		private Item _item;
 
 		public void Init(Item item)
 		{

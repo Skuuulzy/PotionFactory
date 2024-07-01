@@ -16,31 +16,22 @@ namespace Components.Items
 
 		private ItemView _itemView;
 
-		public Item ConstructFromTemplates(ItemTemplate template)
+		public Item (ItemTemplate template)
 		{
-			Item item = new Item();
-			item.Template = template;
-			item.Resources = template.Resources;
-			item.Types = template.Types;
-			item.Item3DObject = template.Item3DObject;
-			item.TypesName = template.TypesName;
-			item.ResourcesName = template.ResourcesName;
+			Template = template;
+			Resources = template.Resources;
+			Types = template.Types;
+			Item3DObject = template.Item3DObject;
+			TypesName = template.TypesName;
+			ResourcesName = template.ResourcesName;
 
-			//item._itemView = item.Item3DObject
-			return item;
 		}
 
 
-		public Item ConstructNewItem(List<Resource> itemResources, List<ItemType> itemTypes,GameObject item3DObject)
+		public Item(List<Resource> itemResources, List<ItemType> itemTypes)
 		{
-			Item item = new Item();
-			item.Resources = itemResources;
-			item.Types = itemTypes;
-			item.Item3DObject = item3DObject;
-			item.ResourcesName = itemResourcesName;
-			item.TypesName = itemTypesName;
-
-			return item;
+			Resources = itemResources;
+			Types = itemTypes;
 		}
 
 		

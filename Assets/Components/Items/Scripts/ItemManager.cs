@@ -8,7 +8,7 @@ namespace Components.Items
 		[SerializeField] private SerializableDictionary<ItemType, GameObject> _itemType3DObjectsDictionary = new SerializableDictionary<ItemType, GameObject>();
 		[SerializeField] private SerializableDictionary<Resource, Sprite> _itemResourceSpriteDictionary = new SerializableDictionary<Resource, Sprite>();
 
-		public GameObject GetTypepresantation(List<ItemType> itemType)
+		public GameObject GetTypeRepresantation(List<ItemType> itemType)
 		{
 			//Only return the first type for now
 			return _itemType3DObjectsDictionary[itemType[0]];
