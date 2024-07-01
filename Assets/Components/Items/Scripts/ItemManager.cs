@@ -5,8 +5,8 @@ namespace Components.Items
 {
 	public class ItemManager : Singleton<ItemManager>
 	{
-		[SerializeField] private SerializableDictionary<ItemType, GameObject> _itemType3DObjectsDictionary = new SerializableDictionary<ItemType, GameObject>();
-		[SerializeField] private SerializableDictionary<Resource, Sprite> _itemResourceSpriteDictionary = new SerializableDictionary<Resource, Sprite>();
+		[SerializeField] private SerializableDictionary<ItemType, GameObject> _itemType3DObjectsDictionary;
+		[SerializeField] private SerializableDictionary<Resource, Sprite> _itemResourceSpriteDictionary;
 
 		public GameObject GetTypeRepresantation(List<ItemType> itemType)
 		{
