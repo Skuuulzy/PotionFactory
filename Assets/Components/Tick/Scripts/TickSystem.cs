@@ -39,25 +39,32 @@ namespace Components.Tick
             }
         }
         
-        public static void RegisterAsNewEndChainElement(ITickable tickable)
+        public static void AddTickable(ITickable tickable)
         {
             TICKABLES.Add(tickable);
         }
-
-        public static void RegisterTickable(ITickable tickable)
+        
+        public static void ReplaceTickable(ITickable previousTickable, ITickable newTickable)
         {
-            if (!TICKABLES.Contains(tickable))
+            if (!TICKABLES.Contains(previousTickable))
             {
-                TICKABLES.Insert(0, tickable);
+                Debug.LogError($"You try to replace a tickable but it was not found in the tickable list.");
+                return;
             }
+
+            int previousTickableIndex = TICKABLES.IndexOf(previousTickable);
+            TICKABLES[previousTickableIndex] = newTickable;
         }
-
-        public static void UnregisterTickable(ITickable tickable)
+        
+        public static void RemoveTickable(ITickable tickableToRemove)
         {
-            if (TICKABLES.Contains(tickable))
+            if (!TICKABLES.Contains(tickableToRemove))
             {
-                TICKABLES.Remove(tickable);
+                Debug.LogError($"You try to remove a tickable but it was not found in the tickable list.");
+                return;
             }
+
+            TICKABLES.Remove(tickableToRemove);
         }
 
         private void DisplayTime()
@@ -92,18 +99,6 @@ namespace Components.Tick
         public void ChangeTimeSpeed(int value)
         {
             Time.timeScale = value;
-        }
-
-        public static void ReplaceEndChainElement(ITickable previousTickable, ITickable newTickable)
-        {
-            if (!TICKABLES.Contains(previousTickable))
-            {
-                Debug.LogError($"You try to replace a tickable but it was not found in the tickable list.");
-                return;
-            }
-
-            int previousTickableIndex = TICKABLES.IndexOf(previousTickable);
-            TICKABLES[previousTickableIndex] = newTickable;
         }
     }
 }
