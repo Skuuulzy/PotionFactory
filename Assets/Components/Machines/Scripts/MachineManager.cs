@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using VComponent.Tools.Singletons;
@@ -13,6 +14,8 @@ namespace Components.Machines
         [SerializeField] private Transform _machineSelectorViewHolder;
         
         public MachineTemplate SelectedMachine { get; private set; }
+
+        public static Action<MachineTemplate> OnChangeSelectedMachine;
 
         protected override void Awake()
         {
@@ -38,6 +41,7 @@ namespace Components.Machines
         private void HandleMachineSelected(MachineTemplate machine)
         {
             SelectedMachine = machine;
+            OnChangeSelectedMachine?.Invoke(machine);
         }
     }
 }

@@ -9,22 +9,20 @@ namespace Components.Machines
     [Serializable]
     public class Machine : ITickable
     {
-        #region DEBUG
-
+        // ------------------------------------------------------------------------- PRIVATE FIELDS -------------------------------------------------------------------------
+        
         [SerializeField] private SerializableDictionary<Side, Cell> _debugNeighbours;
         [SerializeField] private List<int> _items;
-        
-        #endregion DEBUG
         
         private readonly MachineTemplate _template;
         private Dictionary<Side, Cell> _neighbours;
         private int _chainIndex;
         
-        private List<Side> _inPorts;
-        private List<Side> _outPorts;
+        [SerializeField] private List<Side> _inPorts;
+        [SerializeField] private List<Side> _outPorts;
 
-        #region PUBLIC FIELDS
-
+        // ------------------------------------------------------------------------- PUBLIC FIELDS -------------------------------------------------------------------------
+        
         public MachineTemplate Template => _template;
         public List<int> Items => _items;
 
@@ -33,23 +31,23 @@ namespace Components.Machines
         
         public Action OnTick;
         public Action<bool> OnItemAdded;
-
-        #endregion PUBLIC FIELDS
-
-        public Machine(MachineTemplate template, Dictionary<Side, Cell> neighbours)
+        
+        
+        // ------------------------------------------------------------------------- CONSTRUCTORS -------------------------------------------------------------------------
+        
+        public Machine(MachineTemplate template, Dictionary<Side, Cell> neighbours, int rotation)
         {
             _template = template;
             _neighbours = neighbours;
             _debugNeighbours = new SerializableDictionary<Side, Cell>(neighbours);
-            
-            _inPorts = _template.BaseInPorts;
-            _outPorts = _template.BaseOutPorts;
+
+            RotateMachine(rotation, true);
             
             _items = new List<int>();
         }
-
-        #region NEIGHBOURG
-
+        
+        // ------------------------------------------------------------------------- NEIGHBOURS -------------------------------------------------------------------------
+        
         public bool TryGetOutMachine(out Machine connectedMachine)
         {
             if (_neighbours.ContainsKey(OutPorts[0]) && _neighbours[OutPorts[0]].MachineController != null)
@@ -74,10 +72,8 @@ namespace Components.Machines
             return false;
         }
 
-        #endregion NEIGHBOURG
-
-        #region ITEMS
-
+        // ------------------------------------------------------------------------- ITEMS -------------------------------------------------------------------------
+        
         public void AddItem()
         {
             OnItemAdded?.Invoke(true);
@@ -100,10 +96,8 @@ namespace Components.Machines
             Items.RemoveAt(index);
             OnItemAdded?.Invoke(false);
         }
-
-        #endregion ITEMS
-
-        #region PORTS
+        
+        // ------------------------------------------------------------------------- PORTS -------------------------------------------------------------------------
         
         public void RotateMachine(int angle, bool clockwise)
         {
@@ -123,8 +117,8 @@ namespace Components.Machines
             }
             
             var rotationMapping = GetRotationMapping(angle);
-            _inPorts = RotatePorts(_inPorts, rotationMapping);
-            _outPorts = RotatePorts(_outPorts, rotationMapping);
+            _inPorts = RotatePorts(_template.BaseInPorts, rotationMapping);
+            _outPorts = RotatePorts(_template.BaseOutPorts, rotationMapping);
         }
 
         private List<Side> RotatePorts(List<Side> ports, Dictionary<Side, Side> rotationMapping)
@@ -187,15 +181,11 @@ namespace Components.Machines
             }
         }
 
-        #endregion PORTS
-
-        #region TICK
-
+        // ------------------------------------------------------------------------- TICK -------------------------------------------------------------------------
+        
         public void Tick()
         {
             OnTick?.Invoke();
         }
-
-        #endregion TICK
     }
 }

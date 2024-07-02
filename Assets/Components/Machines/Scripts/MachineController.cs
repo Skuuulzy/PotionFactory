@@ -11,11 +11,25 @@ namespace Components.Machines
         [SerializeField] private Machine _machine;
         [SerializeField] private GameObject _debugItem;
         
+        private bool _initialized;
+
         public Machine Machine => _machine;
 
-        public void Init(MachineTemplate machineTemplate, Dictionary<Side, Cell> neighbours)
+        public void InstantiatePreview(MachineTemplate machineTemplate)
         {
-            _machine = new Machine(machineTemplate, neighbours);
+            foreach (Transform obj in _3dViewHolder)
+            {
+                Destroy(obj.gameObject);
+            }
+            
+            Instantiate(machineTemplate.GridView, _3dViewHolder);
+        }
+
+        public void SetGridData(MachineTemplate machineTemplate, Dictionary<Side, Cell> neighbours, int rotation)
+        {
+            _initialized = true;
+            
+            _machine = new Machine(machineTemplate, neighbours, rotation);
             _machine.OnTick += Tick;
             _machine.OnItemAdded += ShowDebugItem;
 
@@ -26,6 +40,11 @@ namespace Components.Machines
 
         private void OnDestroy()
         {
+            if (!_initialized)
+            {
+                return;
+            }
+            
             RemoveMachineFromChain();
             
             _machine.OnTick -= Tick;
@@ -43,8 +62,8 @@ namespace Components.Machines
             }
         }
 
-        #region CHAIN TICKABLE BEHAVIOURS
-
+        // ------------------------------------------------------------------------- CHAIN -------------------------------------------------------------------------
+        
         private void AddMachineToChain()
         {
             bool hasInMachine = _machine.TryGetInMachine(out Machine inMachine);
@@ -91,8 +110,8 @@ namespace Components.Machines
             }
         }
 
-        #endregion CHAIN TICKABLE BEHAVIOURS
-        
+        // ------------------------------------------------------------------------- DEBUG -------------------------------------------------------------------------
+
         private void ShowDebugItem(bool show)
         {
             _debugItem.SetActive(show);
