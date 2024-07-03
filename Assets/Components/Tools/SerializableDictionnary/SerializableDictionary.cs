@@ -13,6 +13,21 @@ public class SerializableDictionary<Key, Value>
 
 	[SerializeField] protected List<SmartDictionaryKeyPairValue> m_Dictionnary = new List<SmartDictionaryKeyPairValue>();
 
+	// Constructor that takes a Dictionary as an argument
+	public SerializableDictionary(Dictionary<Key, Value> dictionary)
+	{
+		foreach (var kvp in dictionary)
+		{
+			SmartDictionaryKeyPairValue pair = new SmartDictionaryKeyPairValue
+			{
+				m_key = kvp.Key,
+				m_value = kvp.Value
+			};
+			
+			m_Dictionnary.Add(pair);
+		}
+	}
+	
 	public Dictionary<Key, Value> ToDictionary()
 	{
 		Dictionary<Key, Value> toReturn = new Dictionary<Key, Value>();

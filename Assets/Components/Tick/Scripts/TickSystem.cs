@@ -1,26 +1,29 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using VComponent.Tools.Singletons;
 
 namespace Components.Tick
 {
-    public class TickSystem : MonoBehaviour
+    public class TickSystem : Singleton<TickSystem>
     {
         private float _tickTimer;
         private int _tick;
-        [SerializeField] private float _tickTimerMax = 0.2f;
+        [SerializeField] private float _tickDuration = 0.2f;
 
         [SerializeField] private SerializableDictionary<int, TextMeshProUGUI> _timerTextList;
         
         private static readonly List<ITickable> TICKABLES = new();
-        
+
+        public float TickDuration => _tickDuration;
+
         private void Update()
         {
             _tickTimer += Time.deltaTime;
             
-            while (_tickTimer >= _tickTimerMax)
+            while (_tickTimer >= _tickDuration)
             {
-                _tickTimer -= _tickTimerMax;
+                _tickTimer -= _tickDuration;
                 _tick++;
                 DisplayTime();
                 
@@ -35,21 +38,33 @@ namespace Components.Tick
                 tickable.Tick();
             }
         }
-
-        public static void RegisterTickable(ITickable tickable)
+        
+        public static void AddTickable(ITickable tickable)
         {
-            if (!TICKABLES.Contains(tickable))
-            {
-                TICKABLES.Add(tickable);
-            }
+            TICKABLES.Add(tickable);
         }
-
-        public static void UnregisterTickable(ITickable tickable)
+        
+        public static void ReplaceTickable(ITickable previousTickable, ITickable newTickable)
         {
-            if (TICKABLES.Contains(tickable))
+            if (!TICKABLES.Contains(previousTickable))
             {
-                TICKABLES.Remove(tickable);
+                Debug.LogError($"You try to replace a tickable but it was not found in the tickable list.");
+                return;
             }
+
+            int previousTickableIndex = TICKABLES.IndexOf(previousTickable);
+            TICKABLES[previousTickableIndex] = newTickable;
+        }
+        
+        public static void RemoveTickable(ITickable tickableToRemove)
+        {
+            if (!TICKABLES.Contains(tickableToRemove))
+            {
+                Debug.LogError($"You try to remove a tickable but it was not found in the tickable list.");
+                return;
+            }
+
+            TICKABLES.Remove(tickableToRemove);
         }
 
         private void DisplayTime()

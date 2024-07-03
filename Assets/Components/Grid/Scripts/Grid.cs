@@ -2,6 +2,7 @@
 using UnityEngine;
 using CodeMonkey.Utils;
 using System.Collections.Generic;
+using Components.Machines;
 
 namespace Components.Grid
 {
@@ -42,8 +43,7 @@ namespace Components.Grid
                         Cell cell = new Cell(x, y, cellSize, false);
                         _cellsList.Add(cell);
 
-                        debugTextArray[x][y] = UtilsClass.CreateWorldText(_gridArray[x, y].ToString(), parentTransform, GetWorldPosition(x, y) + new Vector3(cellSize, cellSize) * .5f, 30, Color.white,
-                            TextAnchor.MiddleCenter);
+                        debugTextArray[x][y] = UtilsClass.CreateWorldText($"({x},{y})", parentTransform, GetWorldPosition(x, y) + new Vector3(cellSize, cellSize) * .5f, 30, Color.white, TextAnchor.MiddleCenter);
                         Debug.DrawLine(GetWorldPosition(x, y), GetWorldPosition(x, y + 1), Color.white, 100f);
                         Debug.DrawLine(GetWorldPosition(x, y), GetWorldPosition(x + 1, y), Color.white, 100f);
                     }
@@ -183,6 +183,68 @@ namespace Components.Grid
             return false;
         }
 
+
+        /// <summary>
+        /// From a world position return all the potential neighbours of the cell.
+        /// </summary>
+        /// <param name="worldPosition">The position of the cell.</param>
+        /// <param name="includeDiagonalNeighbours">Should the diagonal neighbours need to be included.</param>
+        /// <returns>The list of neighbours.</returns>
+        public Dictionary<Side, Cell> GetNeighboursByPosition(Vector3 worldPosition, bool includeDiagonalNeighbours = false)
+        {
+            GetCellCoordinates(worldPosition, out var x, out var y);
+            return GetNeighboursByCoordinates(x, y, includeDiagonalNeighbours);
+        }
+        
+        public Dictionary<Side, Cell> GetNeighboursByCoordinates(int x, int y, bool includeDiagonalNeighbours = false)
+        {
+            Dictionary<Side, Cell> neighbours = new Dictionary<Side, Cell>();
+
+            // Get the relative positions of the desired neighbours
+            var directions = includeDiagonalNeighbours ? FULL_NEIGHBOURS_COORDINATES : NEIGHBOURS_COORDINATES;
+
+            // Iterate through all the possible neighbors
+            foreach (var direction in directions)
+            {
+                int newX = x + direction.Value.Item1;
+                int newY = y + direction.Value.Item2;
+
+                if (newX >= 0 && newY >= 0 && newX < _width && newY < _height)
+                {
+                    if (TryGetCellByCoordinates(newX, newY, out var neighborCell))
+                    {
+                        neighbours[direction.Key] = neighborCell;
+                    }
+                }
+            }
+
+            return neighbours;
+        }
+
         #endregion GET CELLS
+
+        #region DATA
+        
+        private static readonly Dictionary<Side, (int, int)> NEIGHBOURS_COORDINATES = new()
+        {
+            { Side.NORTH,  (  0,  1 ) },
+            { Side.SOUTH,  (  0, -1 ) },
+            { Side.WEST, ( -1,  0 ) },
+            { Side.EAST, (  1,  0 ) }
+        };
+        
+        private static readonly Dictionary<Side, (int, int)> FULL_NEIGHBOURS_COORDINATES = new()
+        {
+            { Side.NORTH,  (  0,  1 ) },
+            { Side.SOUTH,  (  0, -1 ) },
+            { Side.WEST, ( -1,  0 ) },
+            { Side.EAST, (  1,  0 ) },
+            { Side.NORTH_WEST, ( -1, 1 ) },
+            { Side.NORTH_EAST, ( 1,  1 ) },
+            { Side.SOUTH_WEST, (  -1, -1 ) },
+            { Side.SOUTH_EAST, (  1,  -1 ) }
+        };
+
+        #endregion
     }
 }
