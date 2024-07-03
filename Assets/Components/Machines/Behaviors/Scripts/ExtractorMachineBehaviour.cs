@@ -2,12 +2,14 @@ using UnityEngine;
 
 namespace Components.Machines.Behaviors
 {
-    [CreateAssetMenu(fileName = "New Machine Behaviour", menuName = "Machines/Behavior/Conveyor")]
-    public class ConveyorMachineBehavior : MachineBehavior
+    [CreateAssetMenu(fileName = "New Machine Behaviour", menuName = "Machines/Behavior/Extractor")]
+    public class ExtractorMachineBehaviour : MachineBehavior
     {
         public override void Process(Machine machine)
         {
-            if (machine.Items.Count != 1)
+            CurrentTick++;
+
+            if (!CanProcess(CurrentTick))
             {
                 return;
             }
@@ -19,11 +21,8 @@ namespace Components.Machines.Behaviors
                 {
                     return;
                 }
-                
-                if (outMachine.TryGiveItemItem(machine.Items[0]))
-                {
-                    machine.RemoveItem(0);
-                }
+
+                outMachine.TryGiveItemItem(66);
             }
         }
     }

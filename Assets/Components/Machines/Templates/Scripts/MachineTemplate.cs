@@ -8,7 +8,7 @@ namespace Components.Machines
     public class MachineTemplate : ScriptableObject
     {
         [Header("Definition")]
-        [SerializeField] private MachineType _type;
+        [SerializeField] private string _name;
         [SerializeField] private GameObject _gridView;
         [SerializeField] private Sprite _uiView;
         [SerializeField] private MachineBehavior _behavior;
@@ -21,7 +21,7 @@ namespace Components.Machines
         [SerializeField] private int _maxItemCount;
 
         
-        public MachineType Type => _type;
+        public string Name => _name;
         public MachineBehavior Behavior => _behavior;
 
         public GameObject GridView => _gridView;

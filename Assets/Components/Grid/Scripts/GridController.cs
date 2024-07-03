@@ -135,7 +135,7 @@ namespace Components.Grid
             _instancedObjects.Add(chosenCell, machineController.gameObject);
             
             // Renaming GO for debug purposes
-            machineController.transform.name = $"{MachineManager.Instance.SelectedMachine.Type}_{_instancedObjects.Count}";
+            machineController.transform.name = $"{MachineManager.Instance.SelectedMachine.Name}_{_instancedObjects.Count}";
             
             //Set the AlreadyContainsMachine bool to true
             chosenCell.AddMachineToCell(machineController);

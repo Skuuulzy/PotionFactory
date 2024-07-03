@@ -18,13 +18,13 @@ namespace Components.Machines
         {
             _machine = machine;
 
-            _name.text = machine.Type.ToString();
+            _name.text = machine.Name.ToString();
             _background.sprite = machine.UIView;
         }
 
         public void Select()
         {
-            Debug.Log($"[MACHINES] Selected: {_machine.Type}");
+            Debug.Log($"[MACHINES] Selected: {_machine.Name}");
             
             OnSelected?.Invoke(_machine);
         }

@@ -80,15 +80,21 @@ namespace Components.Machines
             Items.Add(66);
         }
         
-        public bool AcceptItem(int item)
+        public bool TryGiveItemItem(int item)
         {
             // There is already too many items in the machine
-            if (Items.Count >= Template.MaxItemCount)
+            if (Template.MaxItemCount != -1 && Items.Count >= Template.MaxItemCount)
                 return false;
             
             Items.Add(item);
             OnItemAdded?.Invoke(true);
             return true;
+        }
+
+        public void RemoveAllItems()
+        {
+            Items.Clear();
+            OnItemAdded?.Invoke(false);
         }
 
         public void RemoveItem(int index)
@@ -144,18 +150,21 @@ namespace Components.Machines
                     mapping[Side.EAST] = Side.SOUTH;
                     mapping[Side.SOUTH] = Side.WEST;
                     mapping[Side.WEST] = Side.NORTH;
+                    mapping[Side.NONE] = Side.NONE;
                     break;
                 case 180:
                     mapping[Side.NORTH] = Side.SOUTH;
                     mapping[Side.EAST] = Side.WEST;
                     mapping[Side.SOUTH] = Side.NORTH;
                     mapping[Side.WEST] = Side.EAST;
+                    mapping[Side.NONE] = Side.NONE;
                     break;
                 case 270:
                     mapping[Side.NORTH] = Side.WEST;
                     mapping[Side.EAST] = Side.NORTH;
                     mapping[Side.SOUTH] = Side.EAST;
                     mapping[Side.WEST] = Side.SOUTH;
+                    mapping[Side.NONE] = Side.NONE;
                     break;
                 default:
                     throw new ArgumentException("Invalid rotation angle. Only 90, 180, and 270 degrees are allowed.");
@@ -176,6 +185,8 @@ namespace Components.Machines
                     return Side.WEST;
                 case Side.WEST:
                     return Side.EAST;
+                case Side.NONE:
+                    return Side.NONE;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
