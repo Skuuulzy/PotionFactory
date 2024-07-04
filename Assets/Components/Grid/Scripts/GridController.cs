@@ -1,7 +1,10 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using CodeMonkey.Utils;
 using System.Collections.Generic;
 using Components.Machines;
+using UnityEngine.InputSystem;
+using UnityEngine.UIElements;
 
 namespace Components.Grid
 {
@@ -24,15 +27,23 @@ namespace Components.Grid
         private Grid _grid;
         private readonly Dictionary<Cell, GameObject> _instancedObjects = new();
 
+        private MachineController _currentMachineController;
+        [SerializeField] private int _currentRotation;
+        private UnityEngine.Camera _camera;
+
         #region MONO
 
         private void Start()
         {
+            _camera = UnityEngine.Camera.main;
+            InstantiateSelection();
             GenerateGrid();
         }
 
         private void Update()
         {
+            MoveSelection();
+            
             if (Input.GetMouseButton(1))
             {
                 RemoveMachineFromGrid();
@@ -41,11 +52,58 @@ namespace Components.Grid
             {
                 AddSelectedMachineToGrid();
             }
+            if (Input.GetMouseButtonDown(2))
+            {
+                RotateSelection();
+            }
         }
 
         #endregion MONO
 
+        // ------------------------------------------------------------------------- SELECTION -------------------------------------------------------------------------
+        
+        private void InstantiateSelection()
+        {
+            _currentMachineController = Instantiate(_machineControllerPrefab);
+            _currentMachineController.InstantiatePreview(MachineManager.Instance.SelectedMachine);
+
+            MachineManager.OnChangeSelectedMachine += UpdateSelectionSelection;
+        }
+        
+        private void UpdateSelectionSelection(MachineTemplate newTemplate)
+        {
+            _currentMachineController.InstantiatePreview(newTemplate);
+            _currentRotation = 0;
+            _currentMachineController.transform.rotation = Quaternion.identity;
+        }
+        
+        private void MoveSelection()
+        {
+            // Get the mouse position in screen space
+            Vector3 mousePosition = Input.mousePosition;
+
+            // Calculate the z-depth based on the object's distance from the camera
+            float zDepth = _camera.WorldToScreenPoint(transform.position).z;
+
+            // Set the z-coordinate for depth
+            mousePosition.z = zDepth;
+
+            // Convert the screen position to world position
+            Vector3 worldPosition = _camera.ScreenToWorldPoint(mousePosition);
+
+            // Update the object's position
+            _currentMachineController.transform.position = worldPosition;
+        }
+        
+        private void RotateSelection()
+        {
+            _currentRotation += 90;
+            _currentRotation %= 360;
+            _currentMachineController.transform.rotation = Quaternion.Euler(new Vector3(0, 0, -_currentRotation));
+        }
+
         #region INPUT HANDLERS
+        
         
         private void AddSelectedMachineToGrid()
         {
@@ -66,16 +124,18 @@ namespace Components.Grid
             //Instantiate a machine controller
             MachineController machineController = Instantiate(_machineControllerPrefab,
                 _grid.GetWorldPosition(chosenCell.X, chosenCell.Y) +
-                new Vector3(_grid.GetCellSize() / 2, _grid.GetCellSize() / 2, -_machineControllerPrefab.transform.localScale.z / 2), Quaternion.identity, _objectsHolder);
+                new Vector3(_grid.GetCellSize() / 2, _grid.GetCellSize() / 2, -_machineControllerPrefab.transform.localScale.z / 2),
+                Quaternion.Euler(new Vector3(0, 0, -_currentRotation)), 
+                _objectsHolder);
 
             // Set up the controller with the correct type;
-            machineController.Init(MachineManager.Instance.SelectedMachine, _grid.GetNeighboursByPosition(worldMousePosition));
+            machineController.SetGridData(MachineManager.Instance.SelectedMachine, _grid.GetNeighboursByPosition(worldMousePosition), _currentRotation);
             
             //Add it to a dictionary to track it after
             _instancedObjects.Add(chosenCell, machineController.gameObject);
             
             // Renaming GO for debug purposes
-            machineController.transform.name = $"{MachineManager.Instance.SelectedMachine.Type}_{_instancedObjects.Count}";
+            machineController.transform.name = $"{MachineManager.Instance.SelectedMachine.Name}_{_instancedObjects.Count}";
             
             //Set the AlreadyContainsMachine bool to true
             chosenCell.AddMachineToCell(machineController);
