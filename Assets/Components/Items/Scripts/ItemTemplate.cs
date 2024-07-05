@@ -10,11 +10,11 @@ namespace Components.Items
 	{
 
 		[SerializeField] private List<Resource> _resources;
-		[SerializeField] private List<ItemType> _types;
+		[SerializeField] private List<ItemState> _types;
 		[SerializeField] private GameObject _3dView;
 
 		public List<Resource> Resources => _resources;
-		public List<ItemType> Types => _types;
+		public List<ItemState> Types => _types;
 		public GameObject View => _3dView;
 
 	}

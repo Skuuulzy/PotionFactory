@@ -20,7 +20,7 @@ namespace Components.Items
 
 		}
 
-		public void Init(List<Resource> resources, List<ItemType> itemTypes)
+		public void Init(List<Resource> resources, List<ItemState> itemTypes)
 		{
 			_item = new Item(resources, itemTypes);
 			Item3DView item3DView = ItemManager.Instance.GetTypeRepresantation(itemTypes[0], resources);

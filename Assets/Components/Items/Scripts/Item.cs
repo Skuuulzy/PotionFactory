@@ -9,7 +9,7 @@ namespace Components.Items
 	{
 		public ItemTemplate Template;
 		public List<Resource> Resources { get; protected set; }
-		public List<ItemType> Types { get; protected set; }
+		public List<ItemState> Types { get; protected set; }
 
 		public Item (ItemTemplate template)
 		{
@@ -19,7 +19,7 @@ namespace Components.Items
 		}
 
 
-		public Item(List<Resource> itemResources, List<ItemType> itemTypes)
+		public Item(List<Resource> itemResources, List<ItemState> itemTypes)
 		{
 			Resources = itemResources;
 			Types = itemTypes;

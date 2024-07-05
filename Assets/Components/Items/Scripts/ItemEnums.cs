@@ -10,7 +10,7 @@ namespace Components.Items
 		TOMATO,
 		APPLE
 	}
-	public enum ItemType
+	public enum ItemState
 	{
 		BASIC,
 		MIXED,

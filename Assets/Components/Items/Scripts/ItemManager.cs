@@ -5,10 +5,10 @@ namespace Components.Items
 {
 	public class ItemManager : Singleton<ItemManager>
 	{
-		[SerializeField] private SerializableDictionary<ItemType, Item3DView> _itemType3DObjectsDictionary;
+		[SerializeField] private SerializableDictionary<ItemState, Item3DView> _itemType3DObjectsDictionary;
 		[SerializeField] private SerializableDictionary<Resource, Sprite> _itemResourceSpriteDictionary;
 
-		public Item3DView GetTypeRepresantation(ItemType itemType, List<Resource> itemResources)
+		public Item3DView GetTypeRepresantation(ItemState itemType, List<Resource> itemResources)
 		{
 			Item3DView item3DView = _itemType3DObjectsDictionary[itemType];
 			List<Sprite> sprites = new List<Sprite>();
