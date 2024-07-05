@@ -1,10 +1,7 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using CodeMonkey.Utils;
 using System.Collections.Generic;
 using Components.Machines;
-using UnityEngine.InputSystem;
-using UnityEngine.UIElements;
 
 namespace Components.Grid
 {
@@ -102,8 +99,7 @@ namespace Components.Grid
             _currentMachineController.transform.rotation = Quaternion.Euler(new Vector3(0, 0, -_currentRotation));
         }
 
-        #region INPUT HANDLERS
-        
+        // ------------------------------------------------------------------------- INPUT HANDLERS -------------------------------------------------------------------------
         
         private void AddSelectedMachineToGrid()
         {
@@ -165,10 +161,8 @@ namespace Components.Grid
             chosenCell.RemoveMachineFromCell();
         }
         
-        #endregion INPUT HANDLERS
-
-        #region GRID METHODS
-
+        // ------------------------------------------------------------------------- GRID METHODS -------------------------------------------------------------------------
+        
         private void GenerateGrid()
         {
             if (_grid != null)
@@ -189,7 +183,5 @@ namespace Components.Grid
 
             _instancedObjects.Clear();
         }
-
-        #endregion
     }
 }

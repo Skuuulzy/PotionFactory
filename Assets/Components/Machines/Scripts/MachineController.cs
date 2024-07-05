@@ -29,7 +29,7 @@ namespace Components.Machines
         {
             _initialized = true;
             
-            _machine = new Machine(machineTemplate, neighbours, rotation);
+            _machine = new Machine(machineTemplate, neighbours, rotation, this);
             _machine.OnTick += Tick;
             _machine.OnItemAdded += ShowDebugItem;
 
@@ -53,7 +53,7 @@ namespace Components.Machines
 
         private void Tick()
         {
-            _machine.Template.Behavior.Process(_machine);
+            _machine.Behavior.Process(_machine);
             
             // Propagate tick
             if (_machine.TryGetInMachine(out Machine previousMachine))
