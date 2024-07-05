@@ -56,6 +56,13 @@ namespace Components.Machines
             if (_neighbours.ContainsKey(OutPorts[0]) && _neighbours[OutPorts[0]].MachineController != null)
             {
                 connectedMachine = _neighbours[OutPorts[0]].MachineController.Machine;
+                
+                // The machines are not aligned.
+                if (connectedMachine.InPorts[0] != GetOppositeConnectionSide(OutPorts[0]))
+                {
+                    return false;
+                }
+                
                 return true;
             }
 
@@ -68,6 +75,13 @@ namespace Components.Machines
             if (_neighbours.ContainsKey(InPorts[0]) && _neighbours[InPorts[0]].MachineController != null)
             {
                 connectedMachine = _neighbours[InPorts[0]].MachineController.Machine;
+                
+                // The machines are not aligned.
+                if (connectedMachine.OutPorts[0] != GetOppositeConnectionSide(InPorts[0]))
+                {
+                    return false;
+                }
+                
                 return true;
             }
 
@@ -185,9 +199,9 @@ namespace Components.Machines
             return mapping;
         }
         
-        public Side GetOppositeOutConnectionPort()
+        public Side GetOppositeConnectionSide(Side side)
         {
-            switch (OutPorts[0])
+            switch (side)
             {
                 case Side.SOUTH:
                     return Side.NORTH;
