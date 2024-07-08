@@ -15,16 +15,6 @@ namespace Components.Machines
 
         public Machine Machine => _machine;
 
-        public void InstantiatePreview(MachineTemplate machineTemplate)
-        {
-            foreach (Transform obj in _3dViewHolder)
-            {
-                Destroy(obj.gameObject);
-            }
-            
-            Instantiate(machineTemplate.GridView, _3dViewHolder);
-        }
-
         public void SetGridData(MachineTemplate machineTemplate, Dictionary<Side, Cell> neighbours, int rotation)
         {
             _initialized = true;

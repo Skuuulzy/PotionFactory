@@ -2,6 +2,7 @@
 using CodeMonkey.Utils;
 using System.Collections.Generic;
 using Components.Machines;
+using Sirenix.OdinInspector;
 
 namespace Components.Grid
 {
@@ -15,17 +16,19 @@ namespace Components.Grid
         [SerializeField] private bool _showDebug;
         
         [Header("Prefabs")] 
+        [SerializeField] private GameObject _groundTile;
         [SerializeField] private MachineController _machineControllerPrefab;
+        [SerializeField] private MachinePreviewController _machinePreviewControllerPrefab;
         
         [Header("Holders")]
-        [SerializeField] private Transform _textsHolder;
+        [SerializeField] private Transform _groundHolder;
         [SerializeField] private Transform _objectsHolder;
         
         private Grid _grid;
         private readonly Dictionary<Cell, GameObject> _instancedObjects = new();
-
-        private MachineController _currentMachineController;
-        [SerializeField] private int _currentRotation;
+        
+        private MachinePreviewController _currentMachinePreviewController;
+        private int _currentRotation;
         private UnityEngine.Camera _camera;
 
         #region MONO
@@ -61,17 +64,17 @@ namespace Components.Grid
         
         private void InstantiateSelection()
         {
-            _currentMachineController = Instantiate(_machineControllerPrefab);
-            _currentMachineController.InstantiatePreview(MachineManager.Instance.SelectedMachine);
+            _currentMachinePreviewController = Instantiate(_machinePreviewControllerPrefab);
+            _currentMachinePreviewController.InstantiatePreview(MachineManager.Instance.SelectedMachine, _cellSize);
 
             MachineManager.OnChangeSelectedMachine += UpdateSelectionSelection;
         }
         
         private void UpdateSelectionSelection(MachineTemplate newTemplate)
         {
-            _currentMachineController.InstantiatePreview(newTemplate);
+            _currentMachinePreviewController.InstantiatePreview(newTemplate, _cellSize);
             _currentRotation = 0;
-            _currentMachineController.transform.rotation = Quaternion.identity;
+            _currentMachinePreviewController.transform.rotation = Quaternion.identity;
         }
         
         private void MoveSelection()
@@ -89,21 +92,25 @@ namespace Components.Grid
             Vector3 worldPosition = _camera.ScreenToWorldPoint(mousePosition);
 
             // Update the object's position
-            _currentMachineController.transform.position = worldPosition;
+            _currentMachinePreviewController.transform.position = worldPosition;
         }
         
         private void RotateSelection()
         {
             _currentRotation += 90;
             _currentRotation %= 360;
-            _currentMachineController.transform.rotation = Quaternion.Euler(new Vector3(0, 0, -_currentRotation));
+            _currentMachinePreviewController.transform.rotation = Quaternion.Euler(new Vector3(0, -_currentRotation, 0));
         }
 
         // ------------------------------------------------------------------------- INPUT HANDLERS -------------------------------------------------------------------------
         
         private void AddSelectedMachineToGrid()
         {
-            var worldMousePosition = UtilsClass.GetWorldPositionFromUI_Perspective();
+            // Try to get the position on the grid.
+            if (!UtilsClass.ScreenToWorldPositionIgnoringUI(Input.mousePosition, _camera, out Vector3 worldMousePosition))
+            {
+                return;
+            }
             
             // Try getting the cell
             if (!_grid.TryGetCellByPosition(worldMousePosition, out Cell chosenCell))
@@ -119,10 +126,10 @@ namespace Components.Grid
 
             //Instantiate a machine controller
             MachineController machineController = Instantiate(_machineControllerPrefab,
-                _grid.GetWorldPosition(chosenCell.X, chosenCell.Y) +
-                new Vector3(_grid.GetCellSize() / 2, _grid.GetCellSize() / 2, -_machineControllerPrefab.transform.localScale.z / 2),
-                Quaternion.Euler(new Vector3(0, 0, -_currentRotation)), 
+                _grid.GetWorldPosition(chosenCell.X, chosenCell.Y),
+                Quaternion.Euler(new Vector3(0, -_currentRotation, 0)), 
                 _objectsHolder);
+            machineController.transform.localScale = new Vector3(_cellSize, _cellSize, _cellSize);
 
             // Set up the controller with the correct type;
             machineController.SetGridData(MachineManager.Instance.SelectedMachine, _grid.GetNeighboursByPosition(worldMousePosition), _currentRotation);
@@ -139,7 +146,11 @@ namespace Components.Grid
 
         private void RemoveMachineFromGrid()
         {
-            var worldMousePosition = UtilsClass.GetWorldPositionFromUI_Perspective();
+            // Try to get the world position.
+            if (!UtilsClass.ScreenToWorldPositionIgnoringUI(Input.mousePosition, _camera, out Vector3 worldMousePosition))
+            {
+                return;
+            }
 
             // Try getting the cell
             if (!_grid.TryGetCellByPosition(worldMousePosition, out Cell chosenCell))
@@ -163,6 +174,7 @@ namespace Components.Grid
         
         // ------------------------------------------------------------------------- GRID METHODS -------------------------------------------------------------------------
         
+        [PropertySpace ,Button(ButtonSizes.Medium)]
         private void GenerateGrid()
         {
             if (_grid != null)
@@ -170,7 +182,17 @@ namespace Components.Grid
                 ClearGrid();
             }
             
-            _grid = new Grid(_gridXValue, _gridYValue, _cellSize, _startPosition, _textsHolder, _showDebug);
+            _grid = new Grid(_gridXValue, _gridYValue, _cellSize, _startPosition, _groundHolder, _showDebug);
+
+            // Instantiate ground blocks
+            for (int x = 0; x < _grid.GetWidth(); x++)
+            {
+                for (int z = 0; z < _grid.GetHeight(); z++)
+                {
+                    var tile = Instantiate(_groundTile, _grid.GetWorldPosition(x, z), Quaternion.identity, _groundHolder);
+                    tile.transform.localScale = new Vector3(_cellSize, _cellSize, _cellSize);
+                }
+            }
         }
         
         public void ClearGrid()
@@ -182,6 +204,11 @@ namespace Components.Grid
             }
 
             _instancedObjects.Clear();
+
+            foreach (Transform groundTile in _groundHolder)
+            {
+                Destroy(groundTile.gameObject);
+            }
         }
     }
 }

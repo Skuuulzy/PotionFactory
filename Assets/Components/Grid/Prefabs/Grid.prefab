@@ -81,10 +81,14 @@ MonoBehaviour:
   _gridYValue: 32
   _cellSize: 10
   _startPosition: {x: 0, y: 0, z: 0}
-  _showDebug: 1
+  _showDebug: 0
+  _groundTile: {fileID: 4022955696050659557, guid: 60a08e49e059bc84185cdabb3e1be25a,
+    type: 3}
   _machineControllerPrefab: {fileID: 2567407675386972328, guid: 859503caaa5f96242b5ba83dccd721c9,
     type: 3}
-  _textsHolder: {fileID: 3378976111399413885}
+  _machinePreviewControllerPrefab: {fileID: 6386158893697936347, guid: 093bb9d24028b664380f7e20bb1bd87f,
+    type: 3}
+  _groundHolder: {fileID: 3378976111399413885}
   _objectsHolder: {fileID: 5446604651869953757}
 --- !u!1 &8183943097451288754
 GameObject:
@@ -96,7 +100,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3378976111399413885}
   m_Layer: 0
-  m_Name: Texts
+  m_Name: Ground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
