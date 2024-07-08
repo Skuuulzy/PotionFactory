@@ -122,19 +122,16 @@ namespace Components.Grid
             machineController.transform.position = _grid.GetWorldPosition(chosenCell.X, chosenCell.Y) + new Vector3(_cellSize / 2, 0, _cellSize / 2);
             machineController.transform.localScale = new Vector3(_cellSize, _cellSize, _cellSize);
             machineController.transform.localRotation = Quaternion.Euler(new Vector3(0, -_currentRotation, 0));
-
+            machineController.transform.name = $"{MachineManager.Instance.SelectedMachine.Name}_{_instancedObjects.Count}";
+            
             // Set up the controller with the correct type;
             machineController.SetGridData(MachineManager.Instance.SelectedMachine, _grid.GetNeighboursByPosition(worldMousePosition), _currentRotation);
             
             //Add it to a dictionary to track it after
             _instancedObjects.Add(chosenCell, machineController.gameObject);
             
-            // Renaming GO for debug purposes
-            machineController.transform.name = $"{MachineManager.Instance.SelectedMachine.Name}_{_instancedObjects.Count}";
-            
             //Set the AlreadyContainsMachine bool to true
             chosenCell.AddMachineToCell(machineController);
-            Debug.Log($"Adding object on: Cell ({chosenCell.X}, {chosenCell.Y})");
         }
 
         private void RemoveMachineFromGrid()
@@ -154,7 +151,6 @@ namespace Components.Grid
             // Check if the cell has an object
             if (!chosenCell.ContainsObject)
             {
-                Debug.Log($"No object on: Cell ({chosenCell.X}, {chosenCell.Y})");
                 return;
             }
 

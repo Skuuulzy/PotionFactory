@@ -44,7 +44,7 @@ namespace Components.Machines
             _neighbours = neighbours;
             _controller = controller;
 
-            CalculatePortsViaRotation(rotation, true);
+            CalculatePortsViaRotation(rotation, false);
             
             _items = new List<int>();
         }
