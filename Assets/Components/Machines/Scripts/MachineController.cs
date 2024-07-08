@@ -25,7 +25,7 @@ namespace Components.Machines
 
             AddMachineToChain();
 
-            Instantiate(_machine.Template.GridView, _3dViewHolder);
+            var gridView = Instantiate(_machine.Template.GridView, _3dViewHolder);
         }
 
         private void OnDestroy()

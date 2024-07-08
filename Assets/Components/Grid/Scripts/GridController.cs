@@ -79,20 +79,13 @@ namespace Components.Grid
         
         private void MoveSelection()
         {
-            // Get the mouse position in screen space
-            Vector3 mousePosition = Input.mousePosition;
-
-            // Calculate the z-depth based on the object's distance from the camera
-            float zDepth = _camera.WorldToScreenPoint(transform.position).z;
-
-            // Set the z-coordinate for depth
-            mousePosition.z = zDepth;
-
-            // Convert the screen position to world position
-            Vector3 worldPosition = _camera.ScreenToWorldPoint(mousePosition);
+            if (!UtilsClass.ScreenToWorldPositionIgnoringUI(Input.mousePosition, _camera, out Vector3 worldMousePosition))
+            {
+                return;
+            }
 
             // Update the object's position
-            _currentMachinePreviewController.transform.position = worldPosition;
+            _currentMachinePreviewController.transform.position = worldMousePosition;
         }
         
         private void RotateSelection()
@@ -125,11 +118,10 @@ namespace Components.Grid
             }
 
             //Instantiate a machine controller
-            MachineController machineController = Instantiate(_machineControllerPrefab,
-                _grid.GetWorldPosition(chosenCell.X, chosenCell.Y),
-                Quaternion.Euler(new Vector3(0, -_currentRotation, 0)), 
-                _objectsHolder);
+            MachineController machineController = Instantiate(_machineControllerPrefab, _objectsHolder);
+            machineController.transform.position = _grid.GetWorldPosition(chosenCell.X, chosenCell.Y) + new Vector3(_cellSize / 2, 0, _cellSize / 2);
             machineController.transform.localScale = new Vector3(_cellSize, _cellSize, _cellSize);
+            machineController.transform.localRotation = Quaternion.Euler(new Vector3(0, -_currentRotation, 0));
 
             // Set up the controller with the correct type;
             machineController.SetGridData(MachineManager.Instance.SelectedMachine, _grid.GetNeighboursByPosition(worldMousePosition), _currentRotation);
@@ -142,6 +134,7 @@ namespace Components.Grid
             
             //Set the AlreadyContainsMachine bool to true
             chosenCell.AddMachineToCell(machineController);
+            Debug.Log($"Adding object on: Cell ({chosenCell.X}, {chosenCell.Y})");
         }
 
         private void RemoveMachineFromGrid()
@@ -161,6 +154,7 @@ namespace Components.Grid
             // Check if the cell has an object
             if (!chosenCell.ContainsObject)
             {
+                Debug.Log($"No object on: Cell ({chosenCell.X}, {chosenCell.Y})");
                 return;
             }
 
@@ -191,6 +185,7 @@ namespace Components.Grid
                 {
                     var tile = Instantiate(_groundTile, _grid.GetWorldPosition(x, z), Quaternion.identity, _groundHolder);
                     tile.transform.localScale = new Vector3(_cellSize, _cellSize, _cellSize);
+                    tile.name = $"Cell ({x}, {z})";
                 }
             }
         }
