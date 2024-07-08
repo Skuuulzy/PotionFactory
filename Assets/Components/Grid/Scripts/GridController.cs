@@ -67,10 +67,10 @@ namespace Components.Grid
             _currentMachinePreviewController = Instantiate(_machinePreviewControllerPrefab);
             _currentMachinePreviewController.InstantiatePreview(MachineManager.Instance.SelectedMachine, _cellSize);
 
-            MachineManager.OnChangeSelectedMachine += UpdateSelectionSelection;
+            MachineManager.OnChangeSelectedMachine += UpdateSelection;
         }
         
-        private void UpdateSelectionSelection(MachineTemplate newTemplate)
+        private void UpdateSelection(MachineTemplate newTemplate)
         {
             _currentMachinePreviewController.InstantiatePreview(newTemplate, _cellSize);
             _currentRotation = 0;

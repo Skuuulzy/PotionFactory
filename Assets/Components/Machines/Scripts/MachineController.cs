@@ -61,20 +61,17 @@ namespace Components.Machines
             // The machine is not connected to any chain, create a new one.
             if (!hasInMachine && !hasOutMachine)
             {
-                Debug.Log($"Adding {_machine.Controller.name} to tickables");
                 TickSystem.AddTickable(_machine);
             }
             // The machine only has an IN, it is now the end of the chain.
             if (hasInMachine && !hasOutMachine)
             {
-                Debug.Log($"Replacing: {inMachine.Controller.name} by  {_machine.Controller.name} to tickables");
                 TickSystem.ReplaceTickable(inMachine, _machine);
             }
             // The machine has an IN and an OUT, it makes a link between two existing chains,
             // remove the IN tickable since the out chain already has a tickable.
             if (hasInMachine && hasOutMachine)
             {
-                Debug.Log($"Removing {inMachine.Controller.name} to tickables");
                 TickSystem.RemoveTickable(inMachine);
             }
         }
@@ -87,20 +84,17 @@ namespace Components.Machines
             // The machine is not connected to any chain, create a new one.
             if (!hasInMachine && !hasOutMachine)
             {
-                Debug.Log($"Removing {_machine.Controller.name} to tickables");
                 TickSystem.RemoveTickable(_machine);
             }
             // The machine only has an IN, it is now the end of the chain.
             if (hasInMachine && !hasOutMachine)
             {
-                Debug.Log($"Replacing: {_machine.Controller.name} by  {inMachine.Controller.name} to tickables");
                 TickSystem.ReplaceTickable(_machine, inMachine);
             }
             // The machine has an IN and an OUT, it makes a link between two existing chains,
             // remove the IN tickable since the out chain already has a tickable.
             if (hasInMachine && hasOutMachine)
             {
-                Debug.Log($"Adding {inMachine.Controller.name} to tickables");
                 TickSystem.AddTickable(inMachine);
             }
         }

@@ -12,7 +12,7 @@ public class MachinePreviewController : MonoBehaviour
             Destroy(obj.gameObject);
         }
             
-        var preview = Instantiate(machineTemplate.GridView, _3dViewHolder);
-        preview.transform.localScale = new Vector3(scale, scale, scale);
+        Instantiate(machineTemplate.GridView, _3dViewHolder);
+        transform.localScale = new Vector3(scale, scale, scale);
     }
 }
