@@ -8,8 +8,6 @@ namespace Components.Grid
 {
     public class Grid
     {
-        public readonly Action<int,int> OnCellValueChanged;
-
         private readonly int _width;
         private readonly int _height;
         private readonly float _cellSize;
@@ -26,36 +24,20 @@ namespace Components.Grid
 
             _gridArray = new int[width, height];
             _cellsList = new List<Cell>();
-            
+
+            for (int x = 0; x < _gridArray.GetLength(0); x++)
+            {
+                for (int y = 0; y < _gridArray.GetLength(1); y++)
+                {
+                    //Create a new cell and add it to cell list
+                    Cell cell = new Cell(x, y, cellSize, false);
+                    _cellsList.Add(cell);
+                }
+            }
+
             if (showDebug)
             {
-                TextMesh[][] debugTextArray = new TextMesh[width][];
-                for (int index = 0; index < width; index++)
-                {
-                    debugTextArray[index] = new TextMesh[height];
-                }
-
-                for (int x = 0; x < _gridArray.GetLength(0); x++)
-                {
-                    for (int y = 0; y < _gridArray.GetLength(1); y++)
-                    {
-                        //Create a new cell and add it to cellLList
-                        Cell cell = new Cell(x, y, cellSize, false);
-                        _cellsList.Add(cell);
-
-                        debugTextArray[x][y] = UtilsClass.CreateWorldText($"({x},{y})", parentTransform, GetWorldPosition(x, y) + new Vector3(cellSize, cellSize) * .5f, 30, Color.white, TextAnchor.MiddleCenter);
-                        Debug.DrawLine(GetWorldPosition(x, y), GetWorldPosition(x, y + 1), Color.white, 100f);
-                        Debug.DrawLine(GetWorldPosition(x, y), GetWorldPosition(x + 1, y), Color.white, 100f);
-                    }
-                }
-
-                Debug.DrawLine(GetWorldPosition(0, height), GetWorldPosition(width, height), Color.white, 100f);
-                Debug.DrawLine(GetWorldPosition(width, 0), GetWorldPosition(width, height), Color.white, 100f);
-
-                OnCellValueChanged += (x, y) =>
-                {
-                    debugTextArray[x][y].text = _gridArray[x, y].ToString();
-                };
+                DrawGridDebug(width, height, cellSize, parentTransform);
             }
         }
 
@@ -78,13 +60,13 @@ namespace Components.Grid
 
         public Vector3 GetWorldPosition(int x, int y)
         {
-            return new Vector3(x, y) * _cellSize + _originPosition;
+            return new Vector3(x, 0, y) * _cellSize + _originPosition;
         }
 
         private void GetCellCoordinates(Vector3 worldPosition, out int x, out int y)
         {
             x = Mathf.FloorToInt((worldPosition - _originPosition).x / _cellSize);
-            y = Mathf.FloorToInt((worldPosition - _originPosition).y / _cellSize);
+            y = Mathf.FloorToInt((worldPosition - _originPosition).z / _cellSize);
         }
 
         #endregion HELPERS
@@ -96,7 +78,6 @@ namespace Components.Grid
             if (x >= 0 && y >= 0 && x < _width && y < _height)
             {
                 _gridArray[x, y] = value;
-                OnCellValueChanged?.Invoke(x,y);
             }
         }
 
@@ -246,5 +227,31 @@ namespace Components.Grid
         };
 
         #endregion
+
+        private void DrawGridDebug(int width, int height, float cellSize, Transform parentTransform)
+        {
+            TextMesh[][] debugTextArray = new TextMesh[width][];
+            for (int index = 0; index < width; index++)
+            {
+                debugTextArray[index] = new TextMesh[height];
+            }
+
+            for (int x = 0; x < _gridArray.GetLength(0); x++)
+            {
+                for (int y = 0; y < _gridArray.GetLength(1); y++)
+                {
+                    //Create a new cell and add it to cellLList
+                    Cell cell = new Cell(x, y, cellSize, false);
+                    _cellsList.Add(cell);
+
+                    debugTextArray[x][y] = UtilsClass.CreateWorldText($"({x},{y})", parentTransform, GetWorldPosition(x, y) + new Vector3(cellSize, cellSize) * .5f, 30, Color.white, TextAnchor.MiddleCenter);
+                    Debug.DrawLine(GetWorldPosition(x, y), GetWorldPosition(x, y + 1), Color.white, float.PositiveInfinity);
+                    Debug.DrawLine(GetWorldPosition(x, y), GetWorldPosition(x + 1, y), Color.white, float.PositiveInfinity);
+                }
+            }
+
+            Debug.DrawLine(GetWorldPosition(0, height), GetWorldPosition(width, height), Color.white, float.PositiveInfinity);
+            Debug.DrawLine(GetWorldPosition(width, 0), GetWorldPosition(width, height), Color.white, float.PositiveInfinity);
+        }
     }
 }

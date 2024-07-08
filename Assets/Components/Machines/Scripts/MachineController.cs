@@ -15,26 +15,15 @@ namespace Components.Machines
 
         public Machine Machine => _machine;
 
-        public void InstantiatePreview(MachineTemplate machineTemplate)
-        {
-            foreach (Transform obj in _3dViewHolder)
-            {
-                Destroy(obj.gameObject);
-            }
-            
-            Instantiate(machineTemplate.GridView, _3dViewHolder);
-        }
-
         public void SetGridData(MachineTemplate machineTemplate, Dictionary<Side, Cell> neighbours, int rotation)
         {
             _initialized = true;
             
-            _machine = new Machine(machineTemplate, neighbours, rotation);
+            _machine = new Machine(machineTemplate, neighbours, rotation, this);
             _machine.OnTick += Tick;
             _machine.OnItemAdded += ShowDebugItem;
 
             AddMachineToChain();
-
             Instantiate(_machine.Template.GridView, _3dViewHolder);
         }
 
@@ -53,7 +42,7 @@ namespace Components.Machines
 
         private void Tick()
         {
-            _machine.Template.Behavior.Process(_machine);
+            _machine.Behavior.Process(_machine);
             
             // Propagate tick
             if (_machine.TryGetInMachine(out Machine previousMachine))

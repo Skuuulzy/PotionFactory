@@ -19,16 +19,19 @@ namespace Components.Machines
         
         [Header("Parameters")]
         [SerializeField] private int _maxItemCount;
-
         
         public string Name => _name;
-        public MachineBehavior Behavior => _behavior;
-
+        
         public GameObject GridView => _gridView;
         public Sprite UIView => _uiView;
 
         public List<Side> BaseInPorts => _baseInPorts;
         public List<Side> BaseOutPorts => _baseOutPorts;
         public int MaxItemCount => _maxItemCount;
+
+        public MachineBehavior GetBehaviorClone()
+        {
+            return _behavior.Clone();
+        }
     }
 }
