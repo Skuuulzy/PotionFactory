@@ -13,7 +13,6 @@ namespace Components.Grid
         public bool ContainsObject { get; private set; }
 
         [SerializeField] private MachineController _machineController;
-
         public MachineController MachineController => _machineController;
 
         public Cell(int x, int y, float size, bool containsObject)

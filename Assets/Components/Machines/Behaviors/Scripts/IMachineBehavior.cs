@@ -14,5 +14,10 @@ namespace Components.Machines.Behaviors
         {
             return CurrentTick % _processTime == 0;
         }
+        
+        public MachineBehavior Clone()
+        {
+            return Instantiate(this);
+        }
     }
 }

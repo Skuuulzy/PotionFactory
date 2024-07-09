@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
 using VComponent.Tools.Singletons;
@@ -13,6 +14,7 @@ namespace Components.Tick
 
         [SerializeField] private SerializableDictionary<int, TextMeshProUGUI> _timerTextList;
         
+        [ShowInInspector]
         private static readonly List<ITickable> TICKABLES = new();
 
         public float TickDuration => _tickDuration;

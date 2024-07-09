@@ -12,10 +12,4 @@
         SOUTH_EAST,
         NONE
     }
-
-    public enum MachineType
-    {
-        CONVEYOR,
-        MIXER
-    }
 }

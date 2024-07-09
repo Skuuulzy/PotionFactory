@@ -24,8 +24,6 @@ namespace Components.Machines
 
         public void Select()
         {
-            Debug.Log($"[MACHINES] Selected: {_machine.Name}");
-            
             OnSelected?.Invoke(_machine);
         }
     }

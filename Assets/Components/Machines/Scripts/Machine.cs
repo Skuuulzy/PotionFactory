@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using Components.Grid;
+using Components.Machines.Behaviors;
 using Components.Tick;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Components.Machines
@@ -11,19 +13,20 @@ namespace Components.Machines
     {
         // ------------------------------------------------------------------------- PRIVATE FIELDS -------------------------------------------------------------------------
         
-        [SerializeField] private SerializableDictionary<Side, Cell> _debugNeighbours;
-        [SerializeField] private List<int> _items;
-        
         private readonly MachineTemplate _template;
-        private Dictionary<Side, Cell> _neighbours;
-        private int _chainIndex;
         
+        [ShowInInspector] private Dictionary<Side, Cell> _neighbours;
+        [SerializeField] private List<int> _items;
         [SerializeField] private List<Side> _inPorts;
         [SerializeField] private List<Side> _outPorts;
+        [SerializeField] private MachineController _controller;
+        [SerializeField] private MachineBehavior _behavior;
 
         // ------------------------------------------------------------------------- PUBLIC FIELDS -------------------------------------------------------------------------
         
         public MachineTemplate Template => _template;
+        public MachineController Controller => _controller;
+        public MachineBehavior Behavior => _behavior;
         public List<int> Items => _items;
 
         public virtual List<Side> InPorts => _inPorts;
@@ -32,16 +35,16 @@ namespace Components.Machines
         public Action OnTick;
         public Action<bool> OnItemAdded;
         
-        
         // ------------------------------------------------------------------------- CONSTRUCTORS -------------------------------------------------------------------------
         
-        public Machine(MachineTemplate template, Dictionary<Side, Cell> neighbours, int rotation)
+        public Machine(MachineTemplate template, Dictionary<Side, Cell> neighbours, int rotation, MachineController controller)
         {
             _template = template;
+            _behavior = template.GetBehaviorClone();
             _neighbours = neighbours;
-            _debugNeighbours = new SerializableDictionary<Side, Cell>(neighbours);
+            _controller = controller;
 
-            RotateMachine(rotation, true);
+            CalculatePortsViaRotation(rotation, false);
             
             _items = new List<int>();
         }
@@ -53,6 +56,13 @@ namespace Components.Machines
             if (_neighbours.ContainsKey(OutPorts[0]) && _neighbours[OutPorts[0]].MachineController != null)
             {
                 connectedMachine = _neighbours[OutPorts[0]].MachineController.Machine;
+                
+                // The machines are not aligned.
+                if (connectedMachine.InPorts[0] != GetOppositeConnectionSide(OutPorts[0]))
+                {
+                    return false;
+                }
+                
                 return true;
             }
 
@@ -65,6 +75,13 @@ namespace Components.Machines
             if (_neighbours.ContainsKey(InPorts[0]) && _neighbours[InPorts[0]].MachineController != null)
             {
                 connectedMachine = _neighbours[InPorts[0]].MachineController.Machine;
+                
+                // The machines are not aligned.
+                if (connectedMachine.OutPorts[0] != GetOppositeConnectionSide(InPorts[0]))
+                {
+                    return false;
+                }
+                
                 return true;
             }
 
@@ -102,10 +119,17 @@ namespace Components.Machines
             Items.RemoveAt(index);
             OnItemAdded?.Invoke(false);
         }
+
+        // ------------------------------------------------------------------------- TICK -------------------------------------------------------------------------
         
-        // ------------------------------------------------------------------------- PORTS -------------------------------------------------------------------------
+        public void Tick()
+        {
+            OnTick?.Invoke();
+        }
         
-        public void RotateMachine(int angle, bool clockwise)
+        // ------------------------------------------------------------------------- PORTS & ROTATIONS -------------------------------------------------------------------------
+        
+        public void CalculatePortsViaRotation(int angle, bool clockwise)
         {
             if (!clockwise)
             {
@@ -114,6 +138,7 @@ namespace Components.Machines
 
             angle %= 360;
 
+            // The machine has no rotation so the ports are the base one.
             if (angle == 0)
             {
                 _inPorts = _template.BaseInPorts;
@@ -123,11 +148,12 @@ namespace Components.Machines
             }
             
             var rotationMapping = GetRotationMapping(angle);
-            _inPorts = RotatePorts(_template.BaseInPorts, rotationMapping);
-            _outPorts = RotatePorts(_template.BaseOutPorts, rotationMapping);
+            
+            _inPorts = GetPortFromRotation(_template.BaseInPorts, rotationMapping);
+            _outPorts = GetPortFromRotation(_template.BaseOutPorts, rotationMapping);
         }
 
-        private List<Side> RotatePorts(List<Side> ports, Dictionary<Side, Side> rotationMapping)
+        private List<Side> GetPortFromRotation(List<Side> ports, Dictionary<Side, Side> rotationMapping)
         {
             var rotatedPorts = new List<Side>();
 
@@ -173,9 +199,9 @@ namespace Components.Machines
             return mapping;
         }
         
-        public Side GetOppositeOutConnectionPort()
+        public Side GetOppositeConnectionSide(Side side)
         {
-            switch (OutPorts[0])
+            switch (side)
             {
                 case Side.SOUTH:
                     return Side.NORTH;
@@ -190,13 +216,6 @@ namespace Components.Machines
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-        }
-
-        // ------------------------------------------------------------------------- TICK -------------------------------------------------------------------------
-        
-        public void Tick()
-        {
-            OnTick?.Invoke();
         }
     }
 }
