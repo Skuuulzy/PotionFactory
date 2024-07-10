@@ -7,7 +7,8 @@ namespace Components.Machines.Behaviors
         [SerializeField] protected int _processTime;
 
         protected int CurrentTick;
-        
+
+        public int ProcessTime => _processTime;
         public abstract void Process(Machine machine);
 
         protected virtual bool CanProcess(int currentTick)

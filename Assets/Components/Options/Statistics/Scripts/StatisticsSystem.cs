@@ -11,15 +11,20 @@ public class StatisticsSystem : MonoBehaviour
     [SerializeField] private GridController _gridController;
     private Dictionary<string, int> _machineStatsDictionary;
 
-    public Action<string, int> OnMachineAddedToStat;
-    public Action<string, int> OnMachineRemovedToStat;
+    public Action<string, int, int> OnMachineAddedToStat;
+    public Action<string, int, int> OnMachineRemovedToStat;
 
     void Start()
     {
         _machineStatsDictionary = new Dictionary<string, int>();
         _gridController.OnMachineAdded += AddMachineToDictionary;
         _gridController.OnMachineRemoved += RemoveMachineToDictionary;
+    }
 
+	private void OnDestroy()
+	{
+        _gridController.OnMachineAdded -= AddMachineToDictionary;
+        _gridController.OnMachineRemoved -= RemoveMachineToDictionary;
     }
 
     private void AddMachineToDictionary(Machine machine)
@@ -34,7 +39,7 @@ public class StatisticsSystem : MonoBehaviour
             _machineStatsDictionary.Add(machine.Template.Name, 1);
         }
         Debug.Log(_machineStatsDictionary[machine.Template.Name]);
-        OnMachineAddedToStat?.Invoke(machine.Template.Name, _machineStatsDictionary[machine.Template.Name]);
+        OnMachineAddedToStat?.Invoke(machine.Template.Name, _machineStatsDictionary[machine.Template.Name], machine.Behavior.ProcessTime);
     }
 
     private void RemoveMachineToDictionary(Machine machine)
@@ -46,7 +51,7 @@ public class StatisticsSystem : MonoBehaviour
 
         _machineStatsDictionary[machine.Template.Name]--;
         Debug.Log(_machineStatsDictionary[machine.Template.Name]);
-        OnMachineRemovedToStat?.Invoke(machine.Template.Name, _machineStatsDictionary[machine.Template.Name]);
+        OnMachineRemovedToStat?.Invoke(machine.Template.Name, _machineStatsDictionary[machine.Template.Name], machine.Behavior.ProcessTime);
 
     }
 }
