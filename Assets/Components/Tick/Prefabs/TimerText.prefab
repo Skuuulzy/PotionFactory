@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9090403137610224836}
   - component: {fileID: 2438475499450972033}
+  - component: {fileID: 9180691260515570626}
   - component: {fileID: 5794488699804220088}
   m_Layer: 5
   m_Name: TimerText
@@ -45,6 +46,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5340764509447174016}
   m_CullTransparentMesh: 1
+--- !u!114 &9180691260515570626
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5340764509447174016}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f545fcde4d338cd459b9621ffbb35006, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _tickText: {fileID: 5794488699804220088}
+  _moduloNumber: 1
 --- !u!114 &5794488699804220088
 MonoBehaviour:
   m_ObjectHideFlags: 0
