@@ -33,6 +33,7 @@ namespace Components.Machines
         public virtual List<Side> OutPorts => _outPorts;
         
         public Action OnTick;
+
         public Action<bool> OnItemAdded;
         
         // ------------------------------------------------------------------------- CONSTRUCTORS -------------------------------------------------------------------------

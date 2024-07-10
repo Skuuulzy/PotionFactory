@@ -3,6 +3,7 @@ using CodeMonkey.Utils;
 using System.Collections.Generic;
 using Components.Machines;
 using Sirenix.OdinInspector;
+using System;
 
 namespace Components.Grid
 {
@@ -30,6 +31,10 @@ namespace Components.Grid
         private MachinePreviewController _currentMachinePreviewController;
         private int _currentRotation;
         private UnityEngine.Camera _camera;
+
+
+        public Action<Machine> OnMachineAdded;
+        public Action<Machine> OnMachineRemoved;
 
         #region MONO
 
@@ -132,6 +137,9 @@ namespace Components.Grid
             
             //Set the AlreadyContainsMachine bool to true
             chosenCell.AddMachineToCell(machineController);
+
+            //Call AddedMachine action
+            OnMachineAdded?.Invoke(machineController.Machine);
         }
 
         private void RemoveMachineFromGrid()
@@ -154,12 +162,16 @@ namespace Components.Grid
                 return;
             }
 
+            //Call RemovedMachine action
+            OnMachineRemoved?.Invoke(chosenCell.MachineController.Machine);
+
             //Destroy the GameObject from the cell position
             Destroy(_instancedObjects[chosenCell]);
             _instancedObjects.Remove(chosenCell);
 
             //Reset cell state
             chosenCell.RemoveMachineFromCell();
+            
         }
         
         // ------------------------------------------------------------------------- GRID METHODS -------------------------------------------------------------------------
