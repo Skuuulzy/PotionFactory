@@ -52,10 +52,12 @@ namespace Components.Grid
             if (Input.GetMouseButton(1))
             {
                 RemoveMachineFromGrid();
+
             }
             if (Input.GetMouseButton(0))
             {
                 AddSelectedMachineToGrid();
+                
             }
             if (Input.GetMouseButtonDown(2))
             {
@@ -81,6 +83,11 @@ namespace Components.Grid
             _currentRotation = 0;
             _currentMachinePreviewController.transform.rotation = Quaternion.identity;
         }
+
+        private void DeleteSelection()
+        {
+            _currentMachinePreviewController.DeletePreview();
+		}
         
         private void MoveSelection()
         {
@@ -104,6 +111,7 @@ namespace Components.Grid
         
         private void AddSelectedMachineToGrid()
         {
+            
             // Try to get the position on the grid.
             if (!UtilsClass.ScreenToWorldPositionIgnoringUI(Input.mousePosition, _camera, out Vector3 worldMousePosition))
             {
@@ -144,8 +152,9 @@ namespace Components.Grid
 
         private void RemoveMachineFromGrid()
         {
-            // Try to get the world position.
-            if (!UtilsClass.ScreenToWorldPositionIgnoringUI(Input.mousePosition, _camera, out Vector3 worldMousePosition))
+			DeleteSelection();
+			// Try to get the world position.
+			if (!UtilsClass.ScreenToWorldPositionIgnoringUI(Input.mousePosition, _camera, out Vector3 worldMousePosition))
             {
                 return;
             }
