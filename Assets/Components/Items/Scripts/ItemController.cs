@@ -9,9 +9,10 @@ namespace Components.Items
 	{
 		[SerializeField] private Transform _3dViewHolder;
 		[SerializeField] private Item _item;
-
+		private Item3DView _item3DView; 
 		public Item Item => _item;
 
+		private Item3DView temporaryItem;
 		public void Init(ItemTemplate itemTemplate)
 		{
 			_item = new Item(itemTemplate);
@@ -23,8 +24,14 @@ namespace Components.Items
 		public void Init(List<Resource> resources, List<ItemState> itemTypes)
 		{
 			_item = new Item(resources, itemTypes);
-			Item3DView item3DView = ItemManager.Instance.GetTypeRepresantation(itemTypes[0], resources);
-			Instantiate(item3DView, _3dViewHolder);
+			_item3DView = new Item3DView();
+			_item3DView = ItemManager.Instance.GetTypeRepresantation(itemTypes[0], resources);
+			temporaryItem = Instantiate(_item3DView, _3dViewHolder);
+		}
+
+		public void DestructItem()
+		{
+			Destroy(temporaryItem);
 		}
 	}
 }

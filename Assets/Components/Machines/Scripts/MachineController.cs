@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Components.Grid;
+using Components.Items;
 using Components.Tick;
 using UnityEngine;
 
@@ -9,8 +10,8 @@ namespace Components.Machines
     {
         [SerializeField] private Transform _3dViewHolder;
         [SerializeField] private Machine _machine;
-        [SerializeField] private GameObject _debugItem;
-        
+        [SerializeField] private ItemController _itemController;
+
         private bool _initialized;
 
         public Machine Machine => _machine;
@@ -103,7 +104,14 @@ namespace Components.Machines
 
         private void ShowDebugItem(bool show)
         {
-            _debugItem.SetActive(show);
-        }
+            if (show)
+            {
+                _itemController.Init(_machine.Items[0].Resources, _machine.Items[0].Types);
+            }
+            else
+            {
+                _itemController.DestructItem();
+            }
+		}
     }
 }

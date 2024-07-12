@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Components.Grid;
+using Components.Items;
 using Components.Machines.Behaviors;
 using Components.Tick;
 using Sirenix.OdinInspector;
@@ -16,7 +17,7 @@ namespace Components.Machines
         private readonly MachineTemplate _template;
         
         [ShowInInspector] private Dictionary<Side, Cell> _neighbours;
-        [SerializeField] private List<int> _items;
+        [SerializeField] private List<Item> _items;
         [SerializeField] private List<Side> _inPorts;
         [SerializeField] private List<Side> _outPorts;
         [SerializeField] private MachineController _controller;
@@ -27,7 +28,7 @@ namespace Components.Machines
         public MachineTemplate Template => _template;
         public MachineController Controller => _controller;
         public MachineBehavior Behavior => _behavior;
-        public List<int> Items => _items;
+        public List<Item> Items => _items;
 
         public virtual List<Side> InPorts => _inPorts;
         public virtual List<Side> OutPorts => _outPorts;
@@ -47,7 +48,7 @@ namespace Components.Machines
 
             CalculatePortsViaRotation(rotation, false);
             
-            _items = new List<int>();
+            _items = new List<Item>();
         }
         
         // ------------------------------------------------------------------------- NEIGHBOURS -------------------------------------------------------------------------
@@ -95,10 +96,10 @@ namespace Components.Machines
         public void AddItem()
         {
             OnItemAdded?.Invoke(true);
-            Items.Add(66);
+            //Items.Add(66);
         }
         
-        public bool TryGiveItemItem(int item)
+        public bool TryGiveItemItem(Item item)
         {
             // There is already too many items in the machine
             if (Template.MaxItemCount != -1 && Items.Count >= Template.MaxItemCount)
