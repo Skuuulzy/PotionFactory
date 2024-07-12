@@ -12,6 +12,7 @@ public class Item3DView : MonoBehaviour
         for(int i = 0; i < sprites.Count; i++)
 		{
 			_images[i].sprite = sprites[i];
+			_images[i].gameObject.SetActive(true);
 		}
 	}
 }

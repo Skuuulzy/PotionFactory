@@ -270,6 +270,10 @@ namespace Components.Grid
                     ItemTemplate itemTemplate = _itemTemplateList[UnityEngine.Random.Range(0, _itemTemplateList.Count)];
 					(machineController.Machine.Behavior as ExtractorMachineBehaviour).Init(itemTemplate);
                     _itemTemplateList.Remove(itemTemplate);
+
+                    //Reset current rotation
+                    _currentRotation = 0; 
+                    return true;
 				}
 			}
 			return false;
