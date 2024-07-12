@@ -25,13 +25,12 @@ namespace Components.Items
 		{
 			_item = new Item(resources, itemTypes);
 			_item3DView = new Item3DView();
-			_item3DView = ItemManager.Instance.GetTypeRepresantation(itemTypes[0], resources);
-			temporaryItem = Instantiate(_item3DView, _3dViewHolder);
+			_item3DView = Instantiate(ItemManager.Instance.GetTypeRepresantation(itemTypes[0], resources), _3dViewHolder);
 		}
 
 		public void DestructItem()
 		{
-			Destroy(temporaryItem);
+			Destroy(_item3DView);
 		}
 	}
 }
