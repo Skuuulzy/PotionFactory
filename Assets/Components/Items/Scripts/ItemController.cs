@@ -24,13 +24,19 @@ namespace Components.Items
 		public void Init(List<Resource> resources, List<ItemState> itemTypes)
 		{
 			_item = new Item(resources, itemTypes);
-			_item3DView = new Item3DView();
+
+			if(_item3DView != null)
+			{
+				DestructItem();
+			}
+
 			_item3DView = Instantiate(ItemManager.Instance.GetTypeRepresantation(itemTypes[0], resources), _3dViewHolder);
 		}
 
 		public void DestructItem()
 		{
-			Destroy(_item3DView);
+			_item = null;
+			Destroy(_item3DView.gameObject);
 		}
 	}
 }

@@ -110,7 +110,11 @@ namespace Components.Machines
             }
             else
             {
-                _itemController.DestructItem();
+                if(_itemController.Item != null)
+                {
+					_itemController.DestructItem();
+				}
+                
             }
 		}
     }
