@@ -24,6 +24,12 @@ namespace Components.Grid
         [Header("Holders")]
         [SerializeField] private Transform _groundHolder;
         [SerializeField] private Transform _objectsHolder;
+        [SerializeField] private Transform _obstacleHolder;
+
+        [Header("Obstacles")]
+        [SerializeField] private GameObject[] _obstacleList;
+        [SerializeField] private float _obstacleGenerationProbability;
+
         
         private Grid _grid;
         private readonly Dictionary<Cell, GameObject> _instancedObjects = new();
@@ -203,6 +209,10 @@ namespace Components.Grid
                     var tile = Instantiate(_groundTile, _grid.GetWorldPosition(x, z), Quaternion.identity, _groundHolder);
                     tile.transform.localScale = new Vector3(_cellSize, _cellSize, _cellSize);
                     tile.name = $"Cell ({x}, {z})";
+
+                    //Instantiate Obstacle
+                    GenerateObstacle(x, z);
+
                 }
             }
         }
@@ -222,5 +232,19 @@ namespace Components.Grid
             //    Destroy(groundTile.gameObject);
             //}
         }
+
+        public void GenerateObstacle(int x, int z)
+        {
+			float rand = UnityEngine.Random.value;
+			if (rand <= _obstacleGenerationProbability)
+			{
+				_grid.TryGetCellByCoordinates(x, z, out var cell);
+				var obstacle = Instantiate(_obstacleList[UnityEngine.Random.Range(0, _obstacleList.Length)], _obstacleHolder);
+				obstacle.transform.position = _grid.GetWorldPosition(cell.X, cell.Y) + new Vector3(_cellSize / 2, 0, _cellSize / 2);
+				obstacle.transform.localScale = new Vector3(_cellSize, _cellSize, _cellSize);
+				obstacle.transform.localRotation = Quaternion.Euler(new Vector3(0, -_currentRotation, 0));
+				cell.AddObstacleToCell(obstacle);
+			}
+		}
     }
 }
