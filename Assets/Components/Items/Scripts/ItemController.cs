@@ -12,7 +12,7 @@ namespace Components.Items
 		private Item3DView _item3DView; 
 		public Item Item => _item;
 
-		private Item3DView temporaryItem;
+		public Item3DView Item3DView => _item3DView;
 		public void Init(ItemTemplate itemTemplate)
 		{
 			_item = new Item(itemTemplate);

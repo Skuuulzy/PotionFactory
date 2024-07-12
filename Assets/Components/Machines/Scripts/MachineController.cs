@@ -110,7 +110,7 @@ namespace Components.Machines
             }
             else
             {
-                if(_itemController.Item != null)
+                if(_itemController.Item3DView != null)
                 {
 					_itemController.DestructItem();
 				}
