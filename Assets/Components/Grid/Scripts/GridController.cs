@@ -217,10 +217,10 @@ namespace Components.Grid
 
             _instancedObjects.Clear();
 
-            foreach (Transform groundTile in _groundHolder)
-            {
-                Destroy(groundTile.gameObject);
-            }
+            //foreach (Transform groundTile in _groundHolder)
+            //{
+            //    Destroy(groundTile.gameObject);
+            //}
         }
     }
 }
