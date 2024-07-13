@@ -56,7 +56,7 @@ namespace Components.Machines
                 connectedMachine = _neighbours[OutPorts[0].Side].MachineController.Machine;
                 
                 // The machines are not aligned.
-                if (connectedMachine.InPorts[0].Side != GetOppositeConnectionSide(OutPorts[0].Side))
+                if (connectedMachine.InPorts[0].Side != OutPorts[0].Side.Opposite())
                 {
                     return false;
                 }
@@ -75,7 +75,7 @@ namespace Components.Machines
                 connectedMachine = _neighbours[InPorts[0].Side].MachineController.Machine;
                 
                 // The machines are not aligned.
-                if (connectedMachine.OutPorts[0].Side != GetOppositeConnectionSide(InPorts[0].Side))
+                if (connectedMachine.OutPorts[0].Side != InPorts[0].Side.Opposite())
                 {
                     return false;
                 }
@@ -142,104 +142,8 @@ namespace Components.Machines
                 return;
             }
             
-            var rotationMapping = GetRotationMapping(angle);
-
-            _inPorts = RotatePorts(_template.BaseInPorts, rotationMapping, angle, Template.Dimension);
-            _outPorts = RotatePorts(_template.BaseOutPorts, rotationMapping, angle, Template.Dimension);
-        }
-        
-        private List<Port> RotatePorts(List<Port> ports, Dictionary<Side, Side> rotationMapping, int angle, Vector2Int dimensions)
-        {
-            var rotatedPorts = new List<Port>();
-
-            foreach (var port in ports)
-            {
-                var newPosition = RotatePosition(port.Position, angle, dimensions);
-                var newSide = rotationMapping[port.Side];
-                rotatedPorts.Add(new Port(newSide, newPosition));
-            }
-
-            return rotatedPorts;
-        }
-        
-        private Vector2Int RotatePosition(Vector2Int position, int angle, Vector2Int dimensions)
-        {
-            switch (angle)
-            {
-                case 90:
-                    return new Vector2Int(dimensions.y - position.y - 1, position.x);
-                case 180:
-                    return new Vector2Int(dimensions.x - position.x - 1, dimensions.y - position.y - 1);
-                case 270:
-                    return new Vector2Int(position.y, dimensions.x - position.x - 1);
-                default:
-                    throw new ArgumentException("Invalid rotation angle. Only 90, 180, and 270 degrees are allowed.");
-            }
-        }
-
-        private List<Side> GetPortFromRotation(List<Side> ports, Dictionary<Side, Side> rotationMapping)
-        {
-            var rotatedPorts = new List<Side>();
-
-            foreach (var port in ports)
-            {
-                rotatedPorts.Add(rotationMapping[port]);
-            }
-
-            return rotatedPorts;
-        }
-
-        private static Dictionary<Side, Side> GetRotationMapping(int angle)
-        {
-            var mapping = new Dictionary<Side, Side>();
-
-            switch (angle)
-            {
-                case 90:
-                    mapping[Side.UP] = Side.RIGHT;
-                    mapping[Side.RIGHT] = Side.DOWN;
-                    mapping[Side.DOWN] = Side.LEFT;
-                    mapping[Side.LEFT] = Side.UP;
-                    mapping[Side.NONE] = Side.NONE;
-                    break;
-                case 180:
-                    mapping[Side.UP] = Side.DOWN;
-                    mapping[Side.RIGHT] = Side.LEFT;
-                    mapping[Side.DOWN] = Side.UP;
-                    mapping[Side.LEFT] = Side.RIGHT;
-                    mapping[Side.NONE] = Side.NONE;
-                    break;
-                case 270:
-                    mapping[Side.UP] = Side.LEFT;
-                    mapping[Side.RIGHT] = Side.UP;
-                    mapping[Side.DOWN] = Side.RIGHT;
-                    mapping[Side.LEFT] = Side.DOWN;
-                    mapping[Side.NONE] = Side.NONE;
-                    break;
-                default:
-                    throw new ArgumentException("Invalid rotation angle. Only 90, 180, and 270 degrees are allowed.");
-            }
-
-            return mapping;
-        }
-        
-        public Side GetOppositeConnectionSide(Side side)
-        {
-            switch (side)
-            {
-                case Side.DOWN:
-                    return Side.UP;
-                case Side.UP:
-                    return Side.DOWN;
-                case Side.RIGHT:
-                    return Side.LEFT;
-                case Side.LEFT:
-                    return Side.RIGHT;
-                case Side.NONE:
-                    return Side.NONE;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            _inPorts = _template.BaseInPorts.RotatePorts(angle, Template.Dimension);
+            _outPorts = _template.BaseOutPorts.RotatePorts(angle, Template.Dimension);
         }
     }
 }
