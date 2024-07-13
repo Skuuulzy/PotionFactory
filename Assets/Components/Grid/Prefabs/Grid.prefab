@@ -94,9 +94,17 @@ MonoBehaviour:
   _obstacleHolder: {fileID: 6655841398313873587}
   _obstacleList:
   - {fileID: 7144884219995379288, guid: bd47d58079bfb0845bb33f29ff41f415, type: 3}
-  - {fileID: 5861167472483498634, guid: 1c00149d59240b4438aa728f918bb58d, type: 3}
   - {fileID: 2828430125197228198, guid: 23fca0550dc156a4786b0656e550fb06, type: 3}
+  - {fileID: 5861167472483498634, guid: 1c00149d59240b4438aa728f918bb58d, type: 3}
   _obstacleGenerationProbability: 0.02
+  _extractorMachine: {fileID: 11400000, guid: d676a07d3bcf31d4fbb44eeab5b325c5, type: 2}
+  _itemTemplateList:
+  - {fileID: 11400000, guid: 98ebfc979facba846b1110a0c2c42492, type: 2}
+  - {fileID: 11400000, guid: 5998c1f9426bc474aa5530a8b348e0fb, type: 2}
+  - {fileID: 11400000, guid: 11be2af5791454c4f9d5a3fbbebc81f7, type: 2}
+  - {fileID: 11400000, guid: 4fcba209563364945bde39e37a3071e2, type: 2}
+  - {fileID: 11400000, guid: 3004566fae36dae429d5bc489e101726, type: 2}
+  _extractorGenerationProbability: 0.1
 --- !u!1 &3142047636322267640
 GameObject:
   m_ObjectHideFlags: 0

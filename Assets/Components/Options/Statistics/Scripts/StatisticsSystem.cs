@@ -1,8 +1,6 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Components.Machines;
-using Components.Machines.Behaviors;
 using Components.Grid;
 using System;
 
@@ -14,7 +12,7 @@ public class StatisticsSystem : MonoBehaviour
     public Action<string, int, int> OnMachineAddedToStat;
     public Action<string, int, int> OnMachineRemovedToStat;
 
-    void Start()
+    private void Start()
     {
         _machineStatsDictionary = new Dictionary<string, int>();
         _gridController.OnMachineAdded += AddMachineToDictionary;
@@ -29,16 +27,11 @@ public class StatisticsSystem : MonoBehaviour
 
     private void AddMachineToDictionary(Machine machine)
     {
-        if (_machineStatsDictionary.ContainsKey(machine.Template.Name))
+        if (!_machineStatsDictionary.TryAdd(machine.Template.Name, 1))
         {
             _machineStatsDictionary[machine.Template.Name]++;
-            
         }
-        else
-        {
-            _machineStatsDictionary.Add(machine.Template.Name, 1);
-        }
-        Debug.Log(_machineStatsDictionary[machine.Template.Name]);
+
         OnMachineAddedToStat?.Invoke(machine.Template.Name, _machineStatsDictionary[machine.Template.Name], machine.Behavior.ProcessTime);
     }
 
@@ -48,10 +41,8 @@ public class StatisticsSystem : MonoBehaviour
 		{
             Debug.LogError("Try to remove this machine : " + machine.Template.Name + " but it should not");
 		}
-
         _machineStatsDictionary[machine.Template.Name]--;
-        Debug.Log(_machineStatsDictionary[machine.Template.Name]);
+        
         OnMachineRemovedToStat?.Invoke(machine.Template.Name, _machineStatsDictionary[machine.Template.Name], machine.Behavior.ProcessTime);
-
     }
 }

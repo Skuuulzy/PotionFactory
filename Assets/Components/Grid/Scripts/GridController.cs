@@ -37,21 +37,18 @@ namespace Components.Grid
         [SerializeField] private List<ItemTemplate> _itemTemplateList;
 		[SerializeField] private float _extractorGenerationProbability;
 
-
-
 		private Grid _grid;
         private readonly Dictionary<Cell, GameObject> _instancedObjects = new();
         
         private MachinePreviewController _currentMachinePreviewController;
         private int _currentRotation;
         private UnityEngine.Camera _camera;
-
-
+        
         public Action<Machine> OnMachineAdded;
         public Action<Machine> OnMachineRemoved;
-
-        #region MONO
-
+        
+        // ------------------------------------------------------------------------- MONO -------------------------------------------------------------------------
+        
         private void Start()
         {
             _camera = UnityEngine.Camera.main;
@@ -78,9 +75,7 @@ namespace Components.Grid
                 RotateSelection();
             }
         }
-
-        #endregion MONO
-
+        
         // ------------------------------------------------------------------------- SELECTION -------------------------------------------------------------------------
         
         private void InstantiateSelection()
@@ -250,11 +245,6 @@ namespace Components.Grid
             }
 
             _instancedObjects.Clear();
-
-            //foreach (Transform groundTile in _groundHolder)
-            //{
-            //    Destroy(groundTile.gameObject);
-            //}
         }
 
         private bool GenerateExtractor(int x, int z)
@@ -265,6 +255,7 @@ namespace Components.Grid
                 ManageRotation(x, z);
 				_grid.TryGetCellByCoordinates(x, z, out var cell);
 				MachineController machineController = AddMachineToGrid(_extractorMachine, cell);
+				
                 if(machineController.Machine.Behavior is ExtractorMachineBehaviour)
                 {
                     ItemTemplate itemTemplate = _itemTemplateList[UnityEngine.Random.Range(0, _itemTemplateList.Count)];

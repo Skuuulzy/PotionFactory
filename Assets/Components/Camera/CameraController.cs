@@ -16,25 +16,26 @@ namespace Components.Camera
 
         private void HandleInputs()
         {
+            float cameraSpeed = 100f;
 
             if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
             {
-                _cameraPosition += new Vector3(-1, 0, 0) * (_movementSpeed * Time.deltaTime);
+                _cameraPosition += new Vector3(-1, 0, 0) * (cameraSpeed * Time.deltaTime);
             }
 
             if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
             {
-                _cameraPosition += new Vector3(+1, 0, 0) * (_movementSpeed * Time.deltaTime);
+                _cameraPosition += new Vector3(+1, 0, 0) * (cameraSpeed * Time.deltaTime);
             }
 
             if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
             {
-                _cameraPosition += new Vector3(0, 0, +1) * (_movementSpeed * Time.deltaTime);
+                _cameraPosition += new Vector3(0, 0, +1) * (cameraSpeed * Time.deltaTime);
             }
 
             if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
             {
-                _cameraPosition += new Vector3(0, 0, -1) * (_movementSpeed * Time.deltaTime);
+                _cameraPosition += new Vector3(0, 0, -1) * (cameraSpeed * Time.deltaTime);
             }
         }
 
