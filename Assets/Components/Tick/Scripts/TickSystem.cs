@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
-using TMPro;
 using UnityEngine;
 using VComponent.Tools.Singletons;
 
@@ -8,14 +7,10 @@ namespace Components.Tick
 {
     public class TickSystem : Singleton<TickSystem>
     {
-        private float _tickTimer;
-        private int _tick;
         [SerializeField] private float _tickDuration = 0.2f;
+        [ShowInInspector] private static readonly List<ITickable> TICKABLES = new();
         
-        [ShowInInspector]
-        private static readonly List<ITickable> TICKABLES = new();
-
-        public float TickDuration => _tickDuration;
+        private float _tickTimer;
 
         private void Update()
         {
@@ -24,7 +19,6 @@ namespace Components.Tick
             while (_tickTimer >= _tickDuration)
             {
                 _tickTimer -= _tickDuration;
-                _tick++;
                 
                 TickAll();
             }

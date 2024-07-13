@@ -37,18 +37,20 @@ namespace Components.Grid
         [SerializeField] private List<ItemTemplate> _itemTemplateList;
 		[SerializeField] private float _extractorGenerationProbability;
 
+		// Grid
 		private Grid _grid;
         private readonly Dictionary<Cell, GameObject> _instancedObjects = new();
         
+        // Preview
         private MachinePreviewController _currentMachinePreviewController;
         private int _currentRotation;
         private UnityEngine.Camera _camera;
         
+        // Actions
         public Action<Machine> OnMachineAdded;
         public Action<Machine> OnMachineRemoved;
         
         // ------------------------------------------------------------------------- MONO -------------------------------------------------------------------------
-        
         private void Start()
         {
             _camera = UnityEngine.Camera.main;
@@ -77,7 +79,6 @@ namespace Components.Grid
         }
         
         // ------------------------------------------------------------------------- SELECTION -------------------------------------------------------------------------
-        
         private void InstantiateSelection()
         {
             _currentMachinePreviewController = Instantiate(_machinePreviewControllerPrefab);
@@ -198,7 +199,6 @@ namespace Components.Grid
         }
         
         // ------------------------------------------------------------------------- GRID METHODS -------------------------------------------------------------------------
-        
         [PropertySpace ,Button(ButtonSizes.Medium)]
         private void GenerateGrid()
         {
@@ -222,7 +222,6 @@ namespace Components.Grid
 
 					if (x == 0 || x == _grid.GetWidth() - 1 || z == 0 || z == _grid.GetHeight() - 1)
                     {
-
 					    isExtractor = GenerateExtractor(x, z);
                     }
 
@@ -249,63 +248,66 @@ namespace Components.Grid
 
         private bool GenerateExtractor(int x, int z)
         {
-			float rand = UnityEngine.Random.value;
-			if (rand <= _extractorGenerationProbability && _itemTemplateList.Count != 0)
-            {
-                ManageRotation(x, z);
-				_grid.TryGetCellByCoordinates(x, z, out var cell);
-				MachineController machineController = AddMachineToGrid(_extractorMachine, cell);
-				
-                if(machineController.Machine.Behavior is ExtractorMachineBehaviour)
-                {
-                    ItemTemplate itemTemplate = _itemTemplateList[UnityEngine.Random.Range(0, _itemTemplateList.Count)];
-					(machineController.Machine.Behavior as ExtractorMachineBehaviour).Init(itemTemplate);
-                    _itemTemplateList.Remove(itemTemplate);
+	        if (!(UnityEngine.Random.value <= _extractorGenerationProbability) || _itemTemplateList.Count == 0)
+	        {
+		        return false;
+	        }
 
-                    //Reset current rotation
-                    _currentRotation = 0; 
-                    return true;
-				}
-			}
-			return false;
+	        ManageRotation(x, z);
+	        _grid.TryGetCellByCoordinates(x, z, out var cell);
+	        MachineController machineController = AddMachineToGrid(_extractorMachine, cell);
+
+	        if (machineController.Machine.Behavior is ExtractorMachineBehaviour extractor)
+	        {
+		        ItemTemplate itemTemplate = _itemTemplateList[UnityEngine.Random.Range(0, _itemTemplateList.Count)];
+		        extractor.Init(itemTemplate);
+		        _itemTemplateList.Remove(itemTemplate);
+
+		        //Reset current rotation
+		        _currentRotation = 0;
+		        return true;
+	        }
+
+	        return false;
+        }
+        
+        private void GenerateObstacle(int x, int z)
+        {
+	        if (!(UnityEngine.Random.value <= _obstacleGenerationProbability))
+	        {
+		        return;
+	        }
+	        
+	        _grid.TryGetCellByCoordinates(x, z, out var cell);
+				
+	        var obstacle = Instantiate(_obstacleList[UnityEngine.Random.Range(0, _obstacleList.Count)], _obstacleHolder);
+	        obstacle.transform.position = _grid.GetWorldPosition(cell.X, cell.Y) + new Vector3(_cellSize / 2, 0, _cellSize / 2);
+	        obstacle.transform.localScale = new Vector3(_cellSize, _cellSize, _cellSize);
+	        obstacle.transform.localRotation = Quaternion.Euler(new Vector3(0, -_currentRotation, 0));
+				
+	        cell.AddObstacleToCell(obstacle);
         }
 
         private void ManageRotation(int x, int z)
         {
-            if(x == 0)
-            {
-				_currentRotation = 0;
-
-			}
-			else if (x == _grid.GetWidth() - 1)
-			{
-				_currentRotation = 180;
-			}
-			else if (z == 0)
-            {
-				_currentRotation = 90;
-				
-			}
-            else if( z == _grid.GetHeight() - 1 )
-            {
-				_currentRotation = 270;
-			}
+	        if (x == 0)
+	        {
+		        _currentRotation = 0;
+	        }
+	        else if (x == _grid.GetWidth() - 1)
+	        {
+		        _currentRotation = 180;
+	        }
+	        else if (z == 0)
+	        {
+		        _currentRotation = 90;
+	        }
+	        else if (z == _grid.GetHeight() - 1)
+	        {
+		        _currentRotation = 270;
+	        }
 
 			_currentRotation %= 360;
-		}
-
-		private void GenerateObstacle(int x, int z)
-        {
-			float rand = UnityEngine.Random.value;
-			if (rand <= _obstacleGenerationProbability)
-			{
-				_grid.TryGetCellByCoordinates(x, z, out var cell);
-				var obstacle = Instantiate(_obstacleList[UnityEngine.Random.Range(0, _obstacleList.Count)], _obstacleHolder);
-				obstacle.transform.position = _grid.GetWorldPosition(cell.X, cell.Y) + new Vector3(_cellSize / 2, 0, _cellSize / 2);
-				obstacle.transform.localScale = new Vector3(_cellSize, _cellSize, _cellSize);
-				obstacle.transform.localRotation = Quaternion.Euler(new Vector3(0, -_currentRotation, 0));
-				cell.AddObstacleToCell(obstacle);
-			}
 		}
     }
 }

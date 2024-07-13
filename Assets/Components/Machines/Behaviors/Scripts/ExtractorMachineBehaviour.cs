@@ -7,13 +7,13 @@ namespace Components.Machines.Behaviors
     [CreateAssetMenu(fileName = "New Machine Behaviour", menuName = "Machines/Behavior/Extractor")]
     public class ExtractorMachineBehaviour : MachineBehavior
     {
-
-
         private ItemTemplate _itemTemplate;
+        
 		public void Init(ItemTemplate itemTemplate)
 		{
             _itemTemplate = itemTemplate;
 		}
+        
 		public override void Process(Machine machine)
         {
             CurrentTick++;
