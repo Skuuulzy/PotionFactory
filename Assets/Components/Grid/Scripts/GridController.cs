@@ -31,6 +31,7 @@ namespace Components.Grid
         [Header("Obstacles")]
         [SerializeField] private List<GameObject> _obstacleList;
         [SerializeField] private float _obstacleGenerationProbability;
+        [SerializeField] private float _randomBonusProbability;
 
         [Header("Extractor")]
         [SerializeField] private MachineTemplate _extractorMachine;
@@ -275,18 +276,18 @@ namespace Components.Grid
         
         private void GenerateObstacle(int x, int z)
         {
-            float randomBonusProbability = 0.0f;
+			_randomBonusProbability = 0.0f;
 			_grid.TryGetCellByCoordinates(x, z, out var chosenCell);
             Dictionary<Side,Cell> neighboursCells = _grid.GetNeighboursByPosition(chosenCell);
             foreach(Cell cell in neighboursCells.Values)
             {
                 if(cell.Obstacle != null)
                 {
-                    randomBonusProbability += 0.3f;
+					_randomBonusProbability += 0.4f;
                 }
             }
 
-			if (!(UnityEngine.Random.value <= _obstacleGenerationProbability + randomBonusProbability))
+			if (!(UnityEngine.Random.value <= _obstacleGenerationProbability + _randomBonusProbability))
 	        {
 		        return;
 	        }
