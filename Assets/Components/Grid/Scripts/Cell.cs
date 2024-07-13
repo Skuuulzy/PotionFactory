@@ -13,7 +13,10 @@ namespace Components.Grid
         public bool ContainsObject { get; private set; }
 
         [SerializeField] private MachineController _machineController;
+		[SerializeField] private GameObject _obstacle; 
+       
         public MachineController MachineController => _machineController;
+        public GameObject Obstacle => _obstacle;  
 
         public Cell(int x, int y, float size, bool containsObject)
         {
@@ -34,5 +37,18 @@ namespace Components.Grid
             _machineController = null;
             ContainsObject = false;
         }
+
+        public void AddObstacleToCell(GameObject obstacle)
+        {
+            _obstacle = obstacle;
+            ContainsObject = true;
+        }
+
+        public void RemoveObstacleFromCell()
+        {
+            _obstacle = null;
+            ContainsObject = false;
+        }
+
     }
 }

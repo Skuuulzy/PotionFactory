@@ -4,7 +4,8 @@ namespace Components.Camera
 {
     public class CameraController : MonoBehaviour
     {
-        [SerializeField] private float _movementSpeed;
+        [SerializeField] private float _responsiveness = 3f;
+        [SerializeField] private float _cameraSpeed = 150f;
 
         private Vector3 _cameraPosition;
 
@@ -16,26 +17,24 @@ namespace Components.Camera
 
         private void HandleInputs()
         {
-            float cameraSpeed = 100f;
-
             if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
             {
-                _cameraPosition += new Vector3(-1, 0, 0) * (cameraSpeed * Time.deltaTime);
+                _cameraPosition += new Vector3(-1, 0, 0) * (_cameraSpeed * Time.deltaTime);
             }
 
             if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
             {
-                _cameraPosition += new Vector3(+1, 0, 0) * (cameraSpeed * Time.deltaTime);
+                _cameraPosition += new Vector3(+1, 0, 0) * (_cameraSpeed * Time.deltaTime);
             }
 
             if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
             {
-                _cameraPosition += new Vector3(0, 0, +1) * (cameraSpeed * Time.deltaTime);
+                _cameraPosition += new Vector3(0, 0, +1) * (_cameraSpeed * Time.deltaTime);
             }
 
             if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
             {
-                _cameraPosition += new Vector3(0, 0, -1) * (cameraSpeed * Time.deltaTime);
+                _cameraPosition += new Vector3(0, 0, -1) * (_cameraSpeed * Time.deltaTime);
             }
         }
 
@@ -48,7 +47,7 @@ namespace Components.Camera
 
             if (distance > 0)
             {
-                Vector3 newCameraPosition = transform.position + cameraMoveDir * (distance * _movementSpeed * Time.deltaTime);
+                Vector3 newCameraPosition = transform.position + cameraMoveDir * (distance * _responsiveness * Time.deltaTime);
 
                 float distanceAfterMoving = Vector3.Distance(newCameraPosition, _cameraPosition);
 

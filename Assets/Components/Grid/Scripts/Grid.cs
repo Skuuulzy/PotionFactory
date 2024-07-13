@@ -171,10 +171,10 @@ namespace Components.Grid
         /// <param name="worldPosition">The position of the cell.</param>
         /// <param name="includeDiagonalNeighbours">Should the diagonal neighbours need to be included.</param>
         /// <returns>The list of neighbours.</returns>
-        public Dictionary<Side, Cell> GetNeighboursByPosition(Vector3 worldPosition, bool includeDiagonalNeighbours = false)
+        public Dictionary<Side, Cell> GetNeighboursByPosition(Cell cell, bool includeDiagonalNeighbours = false)
         {
-            GetCellCoordinates(worldPosition, out var x, out var y);
-            return GetNeighboursByCoordinates(x, y, includeDiagonalNeighbours);
+            ;
+            return GetNeighboursByCoordinates(cell.X, cell.Y, includeDiagonalNeighbours);
         }
         
         public Dictionary<Side, Cell> GetNeighboursByCoordinates(int x, int y, bool includeDiagonalNeighbours = false)

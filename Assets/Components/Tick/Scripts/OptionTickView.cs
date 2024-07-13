@@ -11,12 +11,14 @@ namespace Components.Tick
         [SerializeField] private int _moduloNumber;
 
         private int _tickCount;
+        
         // Start is called before the first frame update
         void Start()
         {
             _tickText.text = "Tick : " + _tickCount + " modulo " + _moduloNumber;
             TickSystem.AddTickable(this);
         }
+        
         public void Tick()
 		{
 			_tickCount++;

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Components.Grid;
+using Components.Items;
 using Components.Tick;
 using UnityEngine;
 
@@ -9,19 +10,20 @@ namespace Components.Machines
     {
         [SerializeField] private Transform _3dViewHolder;
         [SerializeField] private Machine _machine;
-        [SerializeField] private GameObject _debugItem;
+        [SerializeField] private ItemController _itemController;
         
-        private bool _initialized;
-
         public Machine Machine => _machine;
 
+        private bool _initialized;
+        
+        // ------------------------------------------------------------------------- INIT -------------------------------------------------------------------------
         public void SetGridData(MachineTemplate machineTemplate, Dictionary<Side, Cell> neighbours, int rotation)
         {
             _initialized = true;
             
             _machine = new Machine(machineTemplate, neighbours, rotation, this);
             _machine.OnTick += Tick;
-            _machine.OnItemAdded += ShowDebugItem;
+            _machine.OnItemAdded += ShowItem;
 
             AddMachineToChain();
             Instantiate(_machine.Template.GridView, _3dViewHolder);
@@ -37,7 +39,7 @@ namespace Components.Machines
             RemoveMachineFromChain();
             
             _machine.OnTick -= Tick;
-            _machine.OnItemAdded -= ShowDebugItem;
+            _machine.OnItemAdded -= ShowItem;
         }
 
         private void Tick()
@@ -52,7 +54,6 @@ namespace Components.Machines
         }
 
         // ------------------------------------------------------------------------- CHAIN -------------------------------------------------------------------------
-        
         private void AddMachineToChain()
         {
             bool hasInMachine = _machine.TryGetInMachine(out Machine inMachine);
@@ -99,11 +100,17 @@ namespace Components.Machines
             }
         }
 
-        // ------------------------------------------------------------------------- DEBUG -------------------------------------------------------------------------
-
-        private void ShowDebugItem(bool show)
+        // ------------------------------------------------------------------------- ITEM -------------------------------------------------------------------------
+        private void ShowItem(bool show)
         {
-            _debugItem.SetActive(show);
+            if (show)
+            {
+                _itemController.CreateRepresentationWith(_machine.Items[0].Resources, _machine.Items[0].Types);
+            }
+            else
+            {
+                _itemController.DestroyRepresentation();
+            }
         }
     }
 }
