@@ -208,22 +208,18 @@ namespace Components.Grid
         
         private static readonly Dictionary<Side, (int, int)> NEIGHBOURS_COORDINATES = new()
         {
-            { Side.NORTH,  (  0,  1 ) },
-            { Side.SOUTH,  (  0, -1 ) },
-            { Side.WEST, ( -1,  0 ) },
-            { Side.EAST, (  1,  0 ) }
+            { Side.UP,  (  0,  1 ) },
+            { Side.DOWN,  (  0, -1 ) },
+            { Side.LEFT, ( -1,  0 ) },
+            { Side.RIGHT, (  1,  0 ) }
         };
         
         private static readonly Dictionary<Side, (int, int)> FULL_NEIGHBOURS_COORDINATES = new()
         {
-            { Side.NORTH,  (  0,  1 ) },
-            { Side.SOUTH,  (  0, -1 ) },
-            { Side.WEST, ( -1,  0 ) },
-            { Side.EAST, (  1,  0 ) },
-            { Side.NORTH_WEST, ( -1, 1 ) },
-            { Side.NORTH_EAST, ( 1,  1 ) },
-            { Side.SOUTH_WEST, (  -1, -1 ) },
-            { Side.SOUTH_EAST, (  1,  -1 ) }
+            { Side.UP,  (  0,  1 ) },
+            { Side.DOWN,  (  0, -1 ) },
+            { Side.LEFT, ( -1,  0 ) },
+            { Side.RIGHT, (  1,  0 ) },
         };
 
         #endregion

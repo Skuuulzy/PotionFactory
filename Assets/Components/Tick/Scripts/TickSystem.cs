@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -23,7 +24,17 @@ namespace Components.Tick
                 TickAll();
             }
         }
-        
+
+        private void OnDestroy()
+        {
+            if (TICKABLES.Count == 0)
+            {
+                return;
+            }
+            
+            TICKABLES.Clear();
+        }
+
         private void TickAll()
         {
             foreach (var tickable in TICKABLES)

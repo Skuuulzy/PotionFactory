@@ -26,7 +26,7 @@ namespace Components.Machines.Behaviors
             if (machine.TryGetOutMachine(out Machine outMachine))
             {
                 // Detect if the port in is connected to the out .
-                if (machine.GetOppositeConnectionSide(machine.OutPorts[0]) != outMachine.InPorts[0])
+                if (machine.GetOppositeConnectionSide(machine.OutPorts[0].Side) != outMachine.InPorts[0].Side)
                 {
                     return;
                 }

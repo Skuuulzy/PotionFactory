@@ -13,9 +13,10 @@ namespace Components.Machines
         [SerializeField] private Sprite _uiView;
         [SerializeField] private MachineBehavior _behavior;
         
-        [Header("Ports")]
-        [SerializeField] private List<Side> _baseInPorts;
-        [SerializeField] private  List<Side> _baseOutPorts;
+        [Header("Structure")]
+        [SerializeField] private Vector2Int _dimension;
+        [SerializeField] private List<Port> _baseInPorts;
+        [SerializeField] private  List<Port> _baseOutPorts;
         
         [Header("Parameters")]
         [SerializeField] private int _maxItemCount;
@@ -25,9 +26,10 @@ namespace Components.Machines
         public GameObject GridView => _gridView;
         public Sprite UIView => _uiView;
 
-        public List<Side> BaseInPorts => _baseInPorts;
-        public List<Side> BaseOutPorts => _baseOutPorts;
+        public List<Port> BaseInPorts => _baseInPorts;
+        public List<Port> BaseOutPorts => _baseOutPorts;
         public int MaxItemCount => _maxItemCount;
+        public Vector2Int Dimension => _dimension;
 
         public MachineBehavior GetBehaviorClone()
         {
