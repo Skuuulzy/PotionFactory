@@ -3,6 +3,9 @@ using CodeMonkey.Utils;
 using System.Collections.Generic;
 using Components.Machines;
 using Sirenix.OdinInspector;
+using System;
+using Components.Items;
+using Components.Machines.Behaviors;
 
 namespace Components.Grid
 {
@@ -23,16 +26,31 @@ namespace Components.Grid
         [Header("Holders")]
         [SerializeField] private Transform _groundHolder;
         [SerializeField] private Transform _objectsHolder;
-        
-        private Grid _grid;
+        [SerializeField] private Transform _obstacleHolder;
+
+        [Header("Obstacles")]
+        [SerializeField] private List<GameObject> _obstacleList;
+        [SerializeField] private float _obstacleGenerationProbability;
+
+        [Header("Extractor")]
+        [SerializeField] private MachineTemplate _extractorMachine;
+        [SerializeField] private List<ItemTemplate> _itemTemplateList;
+		[SerializeField] private float _extractorGenerationProbability;
+
+		// Grid
+		private Grid _grid;
         private readonly Dictionary<Cell, GameObject> _instancedObjects = new();
         
+        // Preview
         private MachinePreviewController _currentMachinePreviewController;
         private int _currentRotation;
         private UnityEngine.Camera _camera;
-
-        #region MONO
-
+        
+        // Actions
+        public Action<Machine> OnMachineAdded;
+        public Action<Machine> OnMachineRemoved;
+        
+        // ------------------------------------------------------------------------- MONO -------------------------------------------------------------------------
         private void Start()
         {
             _camera = UnityEngine.Camera.main;
@@ -47,21 +65,20 @@ namespace Components.Grid
             if (Input.GetMouseButton(1))
             {
                 RemoveMachineFromGrid();
+
             }
             if (Input.GetMouseButton(0))
             {
                 AddSelectedMachineToGrid();
+                
             }
             if (Input.GetMouseButtonDown(2))
             {
                 RotateSelection();
             }
         }
-
-        #endregion MONO
-
-        // ------------------------------------------------------------------------- SELECTION -------------------------------------------------------------------------
         
+        // ------------------------------------------------------------------------- SELECTION -------------------------------------------------------------------------
         private void InstantiateSelection()
         {
             _currentMachinePreviewController = Instantiate(_machinePreviewControllerPrefab);
@@ -76,6 +93,11 @@ namespace Components.Grid
             _currentRotation = 0;
             _currentMachinePreviewController.transform.rotation = Quaternion.identity;
         }
+
+        private void DeleteSelection()
+        {
+            _currentMachinePreviewController.DeletePreview();
+		}
         
         private void MoveSelection()
         {
@@ -96,48 +118,58 @@ namespace Components.Grid
         }
 
         // ------------------------------------------------------------------------- INPUT HANDLERS -------------------------------------------------------------------------
-        
         private void AddSelectedMachineToGrid()
         {
-            // Try to get the position on the grid.
-            if (!UtilsClass.ScreenToWorldPositionIgnoringUI(Input.mousePosition, _camera, out Vector3 worldMousePosition))
-            {
-                return;
-            }
-            
-            // Try getting the cell
-            if (!_grid.TryGetCellByPosition(worldMousePosition, out Cell chosenCell))
-            {
-                return;
-            }
-            
-            // Check if the cell has no object
-            if (chosenCell.ContainsObject)
-            {
-                return;
-            }
+			// Try to get the position on the grid.
+			if (!UtilsClass.ScreenToWorldPositionIgnoringUI(Input.mousePosition, _camera, out Vector3 worldMousePosition))
+			{
+				return;
+			}
+
+			// Try getting the cell
+			if (!_grid.TryGetCellByPosition(worldMousePosition, out Cell chosenCell))
+			{
+				return;
+			}
+
+			// Check if the cell has no object
+			if (chosenCell.ContainsObject)
+			{
+				return;
+			}
+			AddMachineToGrid(MachineManager.Instance.SelectedMachine, chosenCell);
+        }
+
+        private MachineController AddMachineToGrid(MachineTemplate machine, Cell chosenCell)
+        {
 
             //Instantiate a machine controller
             MachineController machineController = Instantiate(_machineControllerPrefab, _objectsHolder);
             machineController.transform.position = _grid.GetWorldPosition(chosenCell.X, chosenCell.Y) + new Vector3(_cellSize / 2, 0, _cellSize / 2);
             machineController.transform.localScale = new Vector3(_cellSize, _cellSize, _cellSize);
             machineController.transform.localRotation = Quaternion.Euler(new Vector3(0, -_currentRotation, 0));
-            machineController.transform.name = $"{MachineManager.Instance.SelectedMachine.Name}_{_instancedObjects.Count}";
+            machineController.transform.name = $"{machine.Name}_{_instancedObjects.Count}";
             
             // Set up the controller with the correct type;
-            machineController.SetGridData(MachineManager.Instance.SelectedMachine, _grid.GetNeighboursByPosition(worldMousePosition), _currentRotation);
+            machineController.SetGridData(machine, _grid.GetNeighboursByPosition(chosenCell), _currentRotation);
             
             //Add it to a dictionary to track it after
             _instancedObjects.Add(chosenCell, machineController.gameObject);
             
             //Set the AlreadyContainsMachine bool to true
             chosenCell.AddMachineToCell(machineController);
+
+            //Call AddedMachine action
+            OnMachineAdded?.Invoke(machineController.Machine);
+
+            return machineController;
         }
 
         private void RemoveMachineFromGrid()
         {
-            // Try to get the world position.
-            if (!UtilsClass.ScreenToWorldPositionIgnoringUI(Input.mousePosition, _camera, out Vector3 worldMousePosition))
+			DeleteSelection();
+			// Try to get the world position.
+			if (!UtilsClass.ScreenToWorldPositionIgnoringUI(Input.mousePosition, _camera, out Vector3 worldMousePosition))
             {
                 return;
             }
@@ -154,16 +186,19 @@ namespace Components.Grid
                 return;
             }
 
+            //Call RemovedMachine action
+            OnMachineRemoved?.Invoke(chosenCell.MachineController.Machine);
+
             //Destroy the GameObject from the cell position
             Destroy(_instancedObjects[chosenCell]);
             _instancedObjects.Remove(chosenCell);
 
             //Reset cell state
             chosenCell.RemoveMachineFromCell();
+            
         }
         
         // ------------------------------------------------------------------------- GRID METHODS -------------------------------------------------------------------------
-        
         [PropertySpace ,Button(ButtonSizes.Medium)]
         private void GenerateGrid()
         {
@@ -182,6 +217,20 @@ namespace Components.Grid
                     var tile = Instantiate(_groundTile, _grid.GetWorldPosition(x, z), Quaternion.identity, _groundHolder);
                     tile.transform.localScale = new Vector3(_cellSize, _cellSize, _cellSize);
                     tile.name = $"Cell ({x}, {z})";
+
+                    bool isExtractor = false;
+
+					if (x == 0 || x == _grid.GetWidth() - 1 || z == 0 || z == _grid.GetHeight() - 1)
+                    {
+					    isExtractor = GenerateExtractor(x, z);
+                    }
+
+                    if (!isExtractor)
+                    {
+						//Instantiate Obstacle
+						GenerateObstacle(x, z);
+					}
+                    
                 }
             }
         }
@@ -195,11 +244,70 @@ namespace Components.Grid
             }
 
             _instancedObjects.Clear();
-
-            foreach (Transform groundTile in _groundHolder)
-            {
-                Destroy(groundTile.gameObject);
-            }
         }
+
+        private bool GenerateExtractor(int x, int z)
+        {
+	        if (!(UnityEngine.Random.value <= _extractorGenerationProbability) || _itemTemplateList.Count == 0)
+	        {
+		        return false;
+	        }
+
+	        ManageRotation(x, z);
+	        _grid.TryGetCellByCoordinates(x, z, out var cell);
+	        MachineController machineController = AddMachineToGrid(_extractorMachine, cell);
+
+	        if (machineController.Machine.Behavior is ExtractorMachineBehaviour extractor)
+	        {
+		        ItemTemplate itemTemplate = _itemTemplateList[UnityEngine.Random.Range(0, _itemTemplateList.Count)];
+		        extractor.Init(itemTemplate);
+		        _itemTemplateList.Remove(itemTemplate);
+
+		        //Reset current rotation
+		        _currentRotation = 0;
+		        return true;
+	        }
+
+	        return false;
+        }
+        
+        private void GenerateObstacle(int x, int z)
+        {
+	        if (!(UnityEngine.Random.value <= _obstacleGenerationProbability))
+	        {
+		        return;
+	        }
+	        
+	        _grid.TryGetCellByCoordinates(x, z, out var cell);
+				
+	        var obstacle = Instantiate(_obstacleList[UnityEngine.Random.Range(0, _obstacleList.Count)], _obstacleHolder);
+	        obstacle.transform.position = _grid.GetWorldPosition(cell.X, cell.Y) + new Vector3(_cellSize / 2, 0, _cellSize / 2);
+	        obstacle.transform.localScale = new Vector3(_cellSize, _cellSize, _cellSize);
+	        obstacle.transform.localRotation = Quaternion.Euler(new Vector3(0, -_currentRotation, 0));
+				
+	        cell.AddObstacleToCell(obstacle);
+        }
+
+        private void ManageRotation(int x, int z)
+        {
+	        if (x == 0)
+	        {
+		        _currentRotation = 0;
+	        }
+	        else if (x == _grid.GetWidth() - 1)
+	        {
+		        _currentRotation = 180;
+	        }
+	        else if (z == 0)
+	        {
+		        _currentRotation = 90;
+	        }
+	        else if (z == _grid.GetHeight() - 1)
+	        {
+		        _currentRotation = 270;
+	        }
+
+			_currentRotation %= 360;
+		}
     }
 }

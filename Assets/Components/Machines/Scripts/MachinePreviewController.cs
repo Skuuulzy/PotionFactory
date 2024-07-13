@@ -7,12 +7,17 @@ public class MachinePreviewController : MonoBehaviour
     
     public void InstantiatePreview(MachineTemplate machineTemplate, float scale)
     {
-        foreach (Transform obj in _3dViewHolder)
-        {
-            Destroy(obj.gameObject);
-        }
+        DeletePreview();
             
         Instantiate(machineTemplate.GridView, _3dViewHolder);
         transform.localScale = new Vector3(scale, scale, scale);
     }
+
+    public void DeletePreview()
+    {
+		foreach (Transform obj in _3dViewHolder)
+		{
+			Destroy(obj.gameObject);
+		}
+	}
 }

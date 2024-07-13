@@ -1,3 +1,5 @@
+using Components.Items;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Components.Machines.Behaviors
@@ -5,7 +7,14 @@ namespace Components.Machines.Behaviors
     [CreateAssetMenu(fileName = "New Machine Behaviour", menuName = "Machines/Behavior/Extractor")]
     public class ExtractorMachineBehaviour : MachineBehavior
     {
-        public override void Process(Machine machine)
+        private ItemTemplate _itemTemplate;
+        
+		public void Init(ItemTemplate itemTemplate)
+		{
+            _itemTemplate = itemTemplate;
+		}
+        
+		public override void Process(Machine machine)
         {
             CurrentTick++;
 
@@ -22,7 +31,7 @@ namespace Components.Machines.Behaviors
                     return;
                 }
 
-                outMachine.TryGiveItemItem(66);
+                outMachine.TryGiveItemItem(new Item(_itemTemplate));
             }
         }
     }
