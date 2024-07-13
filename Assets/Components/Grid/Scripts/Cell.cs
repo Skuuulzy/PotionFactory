@@ -11,6 +11,7 @@ namespace Components.Grid
         public int Y { get; }
         public float Size { get; }
         public bool ContainsObject { get; private set; }
+        public bool ContainsObstacle { get; private set; }
 
         [SerializeField] private MachineController _machineController;
 		[SerializeField] private GameObject _obstacle; 
@@ -42,12 +43,14 @@ namespace Components.Grid
         {
             _obstacle = obstacle;
             ContainsObject = true;
+			ContainsObstacle = true;
         }
 
         public void RemoveObstacleFromCell()
         {
             _obstacle = null;
             ContainsObject = false;
+			ContainsObstacle = false;
         }
 
     }

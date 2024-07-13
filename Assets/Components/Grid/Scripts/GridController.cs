@@ -181,7 +181,7 @@ namespace Components.Grid
             }
 
             // Check if the cell has an object
-            if (!chosenCell.ContainsObject)
+            if (!chosenCell.ContainsObject || chosenCell.ContainsObstacle)
             {
                 return;
             }
@@ -268,24 +268,37 @@ namespace Components.Grid
 		        return true;
 	        }
 
-	        return false;
+			//Reset current rotation
+			_currentRotation = 0;
+			return false;
         }
         
         private void GenerateObstacle(int x, int z)
         {
-	        if (!(UnityEngine.Random.value <= _obstacleGenerationProbability))
+            float randomBonusProbability = 0.0f;
+			_grid.TryGetCellByCoordinates(x, z, out var chosenCell);
+            Dictionary<Side,Cell> neighboursCells = _grid.GetNeighboursByPosition(chosenCell);
+            foreach(Cell cell in neighboursCells.Values)
+            {
+                if(cell.Obstacle != null)
+                {
+                    randomBonusProbability += 0.3f;
+                }
+            }
+
+			if (!(UnityEngine.Random.value <= _obstacleGenerationProbability + randomBonusProbability))
 	        {
 		        return;
 	        }
 	        
-	        _grid.TryGetCellByCoordinates(x, z, out var cell);
+	        
 				
 	        var obstacle = Instantiate(_obstacleList[UnityEngine.Random.Range(0, _obstacleList.Count)], _obstacleHolder);
-	        obstacle.transform.position = _grid.GetWorldPosition(cell.X, cell.Y) + new Vector3(_cellSize / 2, 0, _cellSize / 2);
+	        obstacle.transform.position = _grid.GetWorldPosition(chosenCell.X, chosenCell.Y) + new Vector3(_cellSize / 2, 0, _cellSize / 2);
 	        obstacle.transform.localScale = new Vector3(_cellSize, _cellSize, _cellSize);
 	        obstacle.transform.localRotation = Quaternion.Euler(new Vector3(0, -_currentRotation, 0));
-				
-	        cell.AddObstacleToCell(obstacle);
+
+			chosenCell.AddObstacleToCell(obstacle);
         }
 
         private void ManageRotation(int x, int z)
