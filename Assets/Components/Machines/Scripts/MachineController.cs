@@ -11,18 +11,19 @@ namespace Components.Machines
         [SerializeField] private Transform _3dViewHolder;
         [SerializeField] private Machine _machine;
         [SerializeField] private ItemController _itemController;
-
-        private bool _initialized;
-
+        
         public Machine Machine => _machine;
 
+        private bool _initialized;
+        
+        // ------------------------------------------------------------------------- INIT -------------------------------------------------------------------------
         public void SetGridData(MachineTemplate machineTemplate, Dictionary<Side, Cell> neighbours, int rotation)
         {
             _initialized = true;
             
             _machine = new Machine(machineTemplate, neighbours, rotation, this);
             _machine.OnTick += Tick;
-            _machine.OnItemAdded += ShowDebugItem;
+            _machine.OnItemAdded += ShowItem;
 
             AddMachineToChain();
             Instantiate(_machine.Template.GridView, _3dViewHolder);
@@ -38,7 +39,7 @@ namespace Components.Machines
             RemoveMachineFromChain();
             
             _machine.OnTick -= Tick;
-            _machine.OnItemAdded -= ShowDebugItem;
+            _machine.OnItemAdded -= ShowItem;
         }
 
         private void Tick()
@@ -53,7 +54,6 @@ namespace Components.Machines
         }
 
         // ------------------------------------------------------------------------- CHAIN -------------------------------------------------------------------------
-        
         private void AddMachineToChain()
         {
             bool hasInMachine = _machine.TryGetInMachine(out Machine inMachine);
@@ -100,22 +100,17 @@ namespace Components.Machines
             }
         }
 
-        // ------------------------------------------------------------------------- DEBUG -------------------------------------------------------------------------
-
-        private void ShowDebugItem(bool show)
+        // ------------------------------------------------------------------------- ITEM -------------------------------------------------------------------------
+        private void ShowItem(bool show)
         {
             if (show)
             {
-                _itemController.Init(_machine.Items[0].Resources, _machine.Items[0].Types);
+                _itemController.CreateRepresentationWith(_machine.Items[0].Resources, _machine.Items[0].Types);
             }
             else
             {
-                if(_itemController.Item3DView != null)
-                {
-					_itemController.DestructItem();
-				}
-                
+                _itemController.DestroyRepresentation();
             }
-		}
+        }
     }
 }

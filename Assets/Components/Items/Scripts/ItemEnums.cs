@@ -1,5 +1,3 @@
-
-
 namespace Components.Items
 {
 	public enum Resource

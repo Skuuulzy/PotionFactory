@@ -1,6 +1,4 @@
-using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 
 namespace Components.Items
@@ -8,36 +6,36 @@ namespace Components.Items
 	public class ItemController : MonoBehaviour
 	{
 		[SerializeField] private Transform _3dViewHolder;
-		[SerializeField] private Item _item;
-		private Item3DView _item3DView; 
-		public Item Item => _item;
-
-		public Item3DView Item3DView => _item3DView;
-		public void Init(ItemTemplate itemTemplate)
+		
+		private Item _item;
+		private Item3DView _itemInstance; 
+		
+		public void CreateRepresentationFromTemplate(ItemTemplate itemTemplate)
 		{
 			_item = new Item(itemTemplate);
-
 			Instantiate(_item.Template.View, _3dViewHolder);
-
 		}
 
-		public void Init(List<Resource> resources, List<ItemState> itemTypes)
+		public void CreateRepresentationWith(List<Resource> resources, List<ItemState> itemTypes)
 		{
-			_item = new Item(resources, itemTypes);
-
-			if(_item3DView != null)
+			if(_itemInstance)
 			{
-				DestructItem();
+				DestroyRepresentation();
 			}
-
-			_item3DView = Instantiate(ItemManager.Instance.GetTypeRepresantation(itemTypes[0], resources), _3dViewHolder);
+			
+			_item = new Item(resources, itemTypes);
+			_itemInstance = Instantiate(ItemManager.Instance.GetTemplateWith(itemTypes[0], resources), _3dViewHolder);
 		}
 
-		public void DestructItem()
+		public void DestroyRepresentation()
 		{
+			if (!_itemInstance)
+			{
+				return;
+			}
+			
 			_item = null;
-			Destroy(_item3DView.gameObject);
+			Destroy(_itemInstance.gameObject);
 		}
 	}
 }
-	
