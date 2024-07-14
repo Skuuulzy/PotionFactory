@@ -4,43 +4,46 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RecipeManager : ScriptableObject
+namespace Components.Recipes
 {
-    [SerializeField] private List<RecipeTemplate> _recipeTemplatesList;
-    
-    public ItemTemplate FindTheRecipe(MachineTemplate machineTemplate, List<ItemTemplate> items)
+	public class RecipeManager : ScriptableObject
 	{
-        foreach(RecipeTemplate recipeTemplate in _recipeTemplatesList)
+		[SerializeField] private List<RecipeTemplate> _recipeTemplatesList;
+		public ItemTemplate FindTheRecipe(MachineTemplate machineTemplate, List<ItemTemplate> items)
 		{
-			if(recipeTemplate.Machine == machineTemplate)
+			foreach (RecipeTemplate recipeTemplate in _recipeTemplatesList)
 			{
-				bool found = false;
-				foreach (ItemTemplate itemTemplate in items)
+				if (recipeTemplate.Machine == machineTemplate)
 				{
-					found = IsItemMatch(itemTemplate, recipeTemplate.ItemsUsedInRecipe.ToDictionary());
-					if(found == false)
+					bool found = false;
+					foreach (ItemTemplate itemTemplate in items)
 					{
-						break;
+						found = IsItemMatch(itemTemplate, recipeTemplate.ItemsUsedInRecipe.ToDictionary());
+						if (found == false)
+						{
+							break;
+						}
+					}
+
+					if (found == true)
+					{
+						return recipeTemplate.OutItemTemplate;
 					}
 				}
-
-				if(found == true)
-				{
-					return recipeTemplate.OutItemTemplate;
-				}
 			}
+
+			//We don't find any recipes so we create a new items  with a debug 3D representation
+			return new ItemTemplate(items);
 		}
 
-		//We don't find any recipes so we create a new items  with a debug 3D representation
-		return new ItemTemplate(items);
-	}
-
-	private bool IsItemMatch(ItemTemplate item, Dictionary<ItemTemplate,int> item2)
-	{
-		if(item2.ContainsKey(item) == false)
+		private bool IsItemMatch(ItemTemplate item, Dictionary<ItemTemplate, int> item2)
 		{
-			return false;
+			if (item2.ContainsKey(item) == false)
+			{
+				return false;
+			}
+			return true;
 		}
-		return true;
 	}
 }
+
