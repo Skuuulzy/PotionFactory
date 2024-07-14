@@ -1,3 +1,4 @@
+using System;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -7,15 +8,20 @@ namespace Components.Machines
     public class Port
     {
         [SerializeField] private Side _side;
-        [SerializeField] private Type _type;
-        [ShowInInspector] private Port _connectedPort;
+        [SerializeField] private Way _way;
+        [ShowInInspector, ReadOnly] private Port _connectedPort;
 
-        public Side Side => _side;
+        [NonSerialized] private Node _node;
         
+        public Side Side => _side;
+        public Way Way => _way;
+        public Node Node => _node;
+        public Port ConnectedPort => _connectedPort;
+
         public Port(Port copy)
         {
             _side = copy._side;
-            _type = copy._type;
+            _way = copy._way;
             _connectedPort = copy._connectedPort;
         }
 
@@ -23,16 +29,25 @@ namespace Components.Machines
         {
             _side = newSide;
         }
+        
+        public void SetNode(Node node)
+        {
+            _node = node;
+        }
 
         public void SetConnectedPort(Port connectedPort)
         {
+            // The two port have the same connection type
+            if (_way == connectedPort.Way || _connectedPort == connectedPort)
+            {
+                return;
+            }
+            
             _connectedPort = connectedPort;
+            // Tell to the other port too.
+            connectedPort.SetConnectedPort(this);
         }
 
-        public enum Type
-        {
-            IN,
-            OUT
-        }
+
     }
 }

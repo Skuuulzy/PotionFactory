@@ -11,15 +11,9 @@ namespace Components.Machines.Behaviors
             {
                 return;
             }
-            
+
             if (machine.TryGetOutMachine(out Machine outMachine))
             {
-                // Detect if the port in is connected to the out .
-                if (machine.OutPorts[0].Side.Opposite() != outMachine.InPorts[0].Side)
-                {
-                    return;
-                }
-                
                 if (outMachine.TryGiveItemItem(machine.Items[0]))
                 {
                     machine.RemoveItem(0);

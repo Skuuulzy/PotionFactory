@@ -17,11 +17,10 @@ MonoBehaviour:
     type: 3}
   _uiView: {fileID: 21300000, guid: 1a4f25f54f85e0e40a0d9d85454d33df, type: 3}
   _behavior: {fileID: 11400000, guid: bc35d351eb022d044a11687a9cd4c735, type: 2}
-  _dimension: {x: 1, y: 1}
-  _baseInPorts:
-  - _side: 4
-    _position: {x: 0, y: 0}
-  _baseOutPorts:
-  - _side: 2
-    _position: {x: 0, y: 0}
+  _nodes:
+  - _localPosition: {x: 0, y: 0}
+    _debugWorldPosition: {x: 0, y: 0}
+    _ports:
+    - _side: 2
+      _way: 1
   _maxItemCount: 0

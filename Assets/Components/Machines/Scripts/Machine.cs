@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using Components.Grid;
 using Components.Items;
 using Components.Machines.Behaviors;
 using Components.Tick;
-using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Components.Machines
@@ -12,32 +10,26 @@ namespace Components.Machines
     [Serializable]
     public class Machine : ITickable
     {
-        // ------------------------------------------------------------------------- PRIVATE FIELDS -------------------------------------------------------------------------
-        private readonly MachineTemplate _template;
-        
-        [ShowInInspector] private Dictionary<Side, Cell> _neighbours;
+        // ----------------------------------------------------------------------- PRIVATE FIELDS -------------------------------------------------------------------------
         [SerializeField] private List<Item> _items;
-        [SerializeField] private List<Node> _inPorts;
-        [SerializeField] private List<Node> _outPorts;
         [SerializeField] private List<Node> _nodes;
         [SerializeField] private MachineController _controller;
         [SerializeField] private MachineBehavior _behavior;
-
-        // ------------------------------------------------------------------------- PUBLIC FIELDS -------------------------------------------------------------------------
+        
+        private readonly MachineTemplate _template;
+        
+        // ----------------------------------------------------------------------- PUBLIC FIELDS -------------------------------------------------------------------------
         public MachineTemplate Template => _template;
         public MachineController Controller => _controller;
         public MachineBehavior Behavior => _behavior;
         public List<Item> Items => _items;
-        
         public virtual List<Node> Nodes => _nodes;
-        public virtual List<Node> InPorts => _inPorts;
-        public virtual List<Node> OutPorts => _outPorts;
         
+        // ------------------------------------------------------------------------- ACTIONS -------------------------------------------------------------------------
         public Action OnTick;
-
         public Action<bool> OnItemAdded;
         
-        // ------------------------------------------------------------------------- CONSTRUCTORS -------------------------------------------------------------------------
+        // --------------------------------------------------------------------- INITIALISATION -------------------------------------------------------------------------
         public Machine(MachineTemplate template, MachineController controller)
         {
             _template = template;
@@ -59,20 +51,30 @@ namespace Components.Machines
             
         }
         
-        // ------------------------------------------------------------------------- NEIGHBOURS -------------------------------------------------------------------------
+        // ------------------------------------------------------------------------- NODES -------------------------------------------------------------------------
+        public void LinkNodeData()
+        {
+            foreach (var node in Nodes)
+            {
+                node.SetMachine(this);
+            }
+        }
+        
         public bool TryGetOutMachine(out Machine connectedMachine)
         {
-            if (_neighbours.ContainsKey(OutPorts[0].Side) && _neighbours[OutPorts[0].Side].MachineController != null)
+            foreach (var node in Nodes)
             {
-                connectedMachine = _neighbours[OutPorts[0].Side].MachineController.Machine;
-                
-                // The machines are not aligned.
-                if (connectedMachine.InPorts[0].Side != OutPorts[0].Side.Opposite())
+                foreach (var port in node.Ports)
                 {
-                    return false;
+                    if (port.Way != Way.OUT || port.ConnectedPort == null)
+                    {
+                        continue;
+                    }
+                    
+                    // Get the other machine by the connected port.
+                    connectedMachine = port.ConnectedPort.Node.Machine;
+                    return true;
                 }
-                
-                return true;
             }
 
             connectedMachine = null;
@@ -81,17 +83,19 @@ namespace Components.Machines
         
         public bool TryGetInMachine(out Machine connectedMachine)
         {
-            if (_neighbours.ContainsKey(InPorts[0].Side) && _neighbours[InPorts[0].Side].MachineController != null)
+            foreach (var node in Nodes)
             {
-                connectedMachine = _neighbours[InPorts[0].Side].MachineController.Machine;
-                
-                // The machines are not aligned.
-                if (connectedMachine.OutPorts[0].Side != InPorts[0].Side.Opposite())
+                foreach (var port in node.Ports)
                 {
-                    return false;
+                    if (port.Way != Way.IN || port.ConnectedPort == null)
+                    {
+                        continue;
+                    }
+                    
+                    // Get the other machine by the connected port.
+                    connectedMachine = port.ConnectedPort.Node.Machine;
+                    return true;
                 }
-                
-                return true;
             }
 
             connectedMachine = null;
@@ -134,7 +138,7 @@ namespace Components.Machines
             OnTick?.Invoke();
         }
         
-        // ------------------------------------------------------------------------- PORTS & ROTATIONS -------------------------------------------------------------------------
+        // ------------------------------------------------------------------- PORTS & ROTATIONS -------------------------------------------------------------------------
         public void ReplaceNodesViaRotation(int angle, bool clockwise)
         {
             if (!clockwise)
@@ -148,16 +152,11 @@ namespace Components.Machines
             if (angle == 0)
             {
                 _nodes = _template.Nodes;
-                _inPorts = _template.BaseInPorts;
-                _outPorts = _template.BaseOutPorts;
                 
                 return;
             }
 
             _nodes = Template.Nodes.RotateNodes(angle);
-            
-            _inPorts = _template.BaseInPorts.RotateNodes(angle);
-            _outPorts = _template.BaseOutPorts.RotateNodes(angle);
         }
     }
 }

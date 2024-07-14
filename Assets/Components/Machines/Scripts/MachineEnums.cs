@@ -8,4 +8,10 @@
         LEFT,
         NONE
     }
+    
+    public enum Way
+    {
+        IN,
+        OUT
+    }
 }

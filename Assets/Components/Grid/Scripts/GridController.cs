@@ -71,7 +71,6 @@ namespace Components.Grid
             if (Input.GetMouseButton(0))
             {
                 AddSelectedMachineToGrid();
-                
             }
             if (Input.GetMouseButtonDown(2))
             {
@@ -200,6 +199,8 @@ namespace Components.Grid
 
             //Call AddedMachine action
             OnMachineAdded?.Invoke(_currentMachineController.Machine);
+            
+            _currentMachineController.ConfirmPlacement();
             
             InstantiateNewPreview();
         }

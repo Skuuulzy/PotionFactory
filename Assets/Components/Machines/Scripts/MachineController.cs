@@ -9,6 +9,7 @@ namespace Components.Machines
         [SerializeField] private Transform _3dViewHolder;
         [SerializeField] private Machine _machine;
         [SerializeField] private ItemController _itemController;
+        [SerializeField] private GameObject _debugItem;
         
         public Machine Machine => _machine;
 
@@ -37,7 +38,8 @@ namespace Components.Machines
             
             _machine.OnTick += Tick;
             _machine.OnItemAdded += ShowItem;
-
+            _machine.LinkNodeData();
+            
             AddMachineToChain();
         }
 
@@ -115,6 +117,9 @@ namespace Components.Machines
         // ------------------------------------------------------------------------- ITEM -------------------------------------------------------------------------
         private void ShowItem(bool show)
         {
+            _debugItem.SetActive(show);
+            return;
+            
             if (show)
             {
                 _itemController.CreateRepresentationWith(_machine.Items[0].Resources, _machine.Items[0].Types);
