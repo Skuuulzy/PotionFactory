@@ -61,7 +61,7 @@ namespace Components.Grid
         {
             _camera = UnityEngine.Camera.main;
 
-            _groundTile = _groundTilesList[UnityEngine.Random.Range(0, _groundTilesList.Count)];
+
             InstantiateSelection();
             GenerateGrid();
         }
@@ -208,8 +208,10 @@ namespace Components.Grid
         
         // ------------------------------------------------------------------------- GRID METHODS -------------------------------------------------------------------------
         [PropertySpace ,Button(ButtonSizes.Medium)]
-        private void GenerateGrid()
+        public void GenerateGrid()
         {
+            _groundTile = _groundTilesList[UnityEngine.Random.Range(0, _groundTilesList.Count)];
+
             if (_grid != null)
             {
                 ClearGrid();
@@ -250,15 +252,34 @@ namespace Components.Grid
         }
         
 
-        public void ClearGrid()
+        private void ClearGrid()
         {
+            ClearAllMachines();
+
+            foreach (Transform groundTile in _groundHolder)
+			{
+				Destroy(groundTile.gameObject);
+			}
+            foreach (Transform obstacleTile in _obstacleHolder)
+            {
+                Destroy(obstacleTile.gameObject);
+            }
+            foreach (Transform objectTile in _objectsHolder)
+            {
+                Destroy(objectTile.gameObject);
+            }
+
+
+            _instancedObjects.Clear();
+        }
+
+        public void ClearAllMachines()
+		{
             foreach (var cell in _instancedObjects)
             {
                 Destroy(cell.Value);
                 cell.Key.RemoveMachineFromCell();
             }
-
-            _instancedObjects.Clear();
         }
 
         private bool GenerateTile(int x, int z)
