@@ -51,7 +51,7 @@ namespace Components.Machines
 
         public void UpdateNodesRotation(int rotation)
         {
-            ReplaceNodesViaRotation(rotation, false);
+            ReplaceNodesViaRotation(rotation, true);
         }
 
         public void SetNodeData()

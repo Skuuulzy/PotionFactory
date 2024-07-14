@@ -13,7 +13,7 @@ namespace Components.Machines
             foreach (var node in nodes)
             {
                 // Update the local position of the node.
-                var newPosition = RotatePosition(node.Position, angle);
+                var newPosition = RotatePosition(node.LocalPosition, angle);
                 node.UpdateLocalPosition(newPosition);
 
                 // Update the direction of the ports.
@@ -38,11 +38,11 @@ namespace Components.Machines
             switch (angle)
             {
                 case 90:
-                    return new Vector2Int(-position.y, position.x);
+                    return new Vector2Int(position.y, -position.x);
                 case 180:
                     return new Vector2Int(-position.x, -position.y);
                 case 270:
-                    return new Vector2Int(position.y, -position.x);
+                    return new Vector2Int(-position.y, position.x);
                 default:
                     throw new ArgumentException("Invalid rotation angle. Only 90, 180, and 270 degrees are allowed.");
             }

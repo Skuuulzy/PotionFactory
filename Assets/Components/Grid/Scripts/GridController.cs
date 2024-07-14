@@ -5,7 +5,6 @@ using Components.Machines;
 using Sirenix.OdinInspector;
 using System;
 using Components.Items;
-using Components.Machines.Behaviors;
 
 namespace Components.Grid
 {
@@ -56,7 +55,7 @@ namespace Components.Grid
         private void Start()
         {
             _camera = UnityEngine.Camera.main;
-            InstantiateSelection();
+            InstantiateNewPreview();
             GenerateGrid();
         }
 
@@ -81,7 +80,7 @@ namespace Components.Grid
         }
         
         // ------------------------------------------------------------------------- SELECTION -------------------------------------------------------------------------
-        private void InstantiateSelection()
+        private void InstantiateNewPreview()
         {
             _currentMachineController = Instantiate(_machineControllerPrefab);
             _currentMachineController.InstantiatePreview(MachineManager.Instance.SelectedMachine, _cellSize);
@@ -136,57 +135,92 @@ namespace Components.Grid
 			{
 				return;
 			}
-
+			
 			// Check if the machine can be placed on the grid.
 			foreach (var node in _currentMachineController.Machine.Nodes)
 			{
 				var nodeGridPosition = node.GridPosition(new Vector2Int(chosenCell.X, chosenCell.Y));
-				Debug.Log($"Testing grid position: {nodeGridPosition}");
 
 				// One node does not overlap a constructable cell.
 				if (!_grid.TryGetCellByCoordinates(nodeGridPosition.x, nodeGridPosition.y, out Cell overlapCell))
 				{
-					Debug.Log($"One node does not overlap a constructable cell.");
 					return;
 				}
 					
 				// One node of the machine overlap a cell that already contain an object.
 				if (overlapCell.ContainsObject)
 				{
-					Debug.Log($"One node of the machine overlap a cell that already contain an object.");
 					return;
 				}
 			}
 			
-			Debug.Log("The machine can be placed.");
-			
-			//AddMachineToGrid(MachineManager.Instance.SelectedMachine, chosenCell);
+			AddMachineToGrid(MachineManager.Instance.SelectedMachine, chosenCell);
         }
 
-        private MachineController AddMachineToGrid(MachineTemplate machine, Cell chosenCell)
+        private void AddMachineToGrid(MachineTemplate machine, Cell originCell)
         {
-            //Instantiate a machine controller
-            MachineController machineController = Instantiate(_machineControllerPrefab, _objectsHolder);
-            machineController.transform.position = _grid.GetWorldPosition(chosenCell.X, chosenCell.Y) + new Vector3(_cellSize / 2, 0, _cellSize / 2);
-            machineController.transform.localScale = new Vector3(_cellSize, _cellSize, _cellSize);
-            machineController.transform.localRotation = Quaternion.Euler(new Vector3(0, -_currentRotation, 0));
-            machineController.transform.name = $"{machine.Name}_{_instancedObjects.Count}";
+            _currentMachineController.transform.position = _grid.GetWorldPosition(originCell.X, originCell.Y) + new Vector3(_cellSize / 2, 0, _cellSize / 2);
+            _currentMachineController.transform.name = $"{machine.Name}_{_instancedObjects.Count}";
+            _currentMachineController.transform.parent = _objectsHolder;
             
-            // Set up the controller with the correct type;
-            //machineController.ConfirmPlacement(machine, _grid.GetNeighboursByPosition(chosenCell), _currentRotation);
-            
-            //Add it to a dictionary to track it after
-            _instancedObjects.Add(chosenCell, machineController.gameObject);
-            
-            //Set the AlreadyContainsMachine bool to true
-            chosenCell.AddMachineToCell(machineController);
+            // Adding nodes to the cells
+            foreach (var node in _currentMachineController.Machine.Nodes)
+            {
+	            var nodeGridPosition = node.GridPosition(new Vector2Int(originCell.X, originCell.Y));
+	            
+	            if (_grid.TryGetCellByCoordinates(nodeGridPosition.x, nodeGridPosition.y, out Cell overlapCell))
+	            {
+		            overlapCell.AddNodeToCell(node);
+		            
+		            // Add potential connected ports
+		            foreach (var port in node.Ports)
+		            {
+			            switch (port.Side)
+			            {
+				            case Side.DOWN:
+					            TryBindConnectedPort(port, new Vector2Int(nodeGridPosition.x, nodeGridPosition.y - 1));
+					            break;
+				            case Side.UP:
+					            TryBindConnectedPort(port, new Vector2Int(nodeGridPosition.x, nodeGridPosition.y + 1));
+					            break;
+				            case Side.RIGHT:
+					            TryBindConnectedPort(port, new Vector2Int(nodeGridPosition.x + 1, nodeGridPosition.y));
+					            break;
+				            case Side.LEFT:
+					            TryBindConnectedPort(port, new Vector2Int(nodeGridPosition.x - 1, nodeGridPosition.y));
+					            break;
+				            case Side.NONE:
+					            break;
+				            default:
+					            throw new ArgumentOutOfRangeException();
+			            }
+		            }
+	            }
+            }
 
             //Call AddedMachine action
-            OnMachineAdded?.Invoke(machineController.Machine);
-
-            return machineController;
+            OnMachineAdded?.Invoke(_currentMachineController.Machine);
+            
+            InstantiateNewPreview();
         }
 
+        private void TryBindConnectedPort(Port port, Vector2Int neighbourPosition)
+        {
+	        if (_grid.TryGetCellByCoordinates(neighbourPosition.x , neighbourPosition.y, out Cell neighbourCell))
+	        {
+		        if (neighbourCell.ContainsObject)
+		        {
+			        foreach (var potentialPort in neighbourCell.Node.Ports)
+			        {
+				        if (potentialPort.Side == port.Side.Opposite())
+				        {
+					        port.SetConnectedPort(potentialPort);
+				        }
+			        }
+		        }
+	        }
+        }
+        
         private void RemoveMachineFromGrid()
         {
 			DeleteSelection();
@@ -274,25 +308,25 @@ namespace Components.Grid
 
         private bool GenerateExtractor(int x, int z)
         {
-	        if (!(UnityEngine.Random.value <= _extractorGenerationProbability) || _itemTemplateList.Count == 0)
-	        {
-		        return false;
-	        }
-
-	        ManageRotation(x, z);
-	        _grid.TryGetCellByCoordinates(x, z, out var cell);
-	        MachineController machineController = AddMachineToGrid(_extractorMachine, cell);
-
-	        if (machineController.Machine.Behavior is ExtractorMachineBehaviour extractor)
-	        {
-		        ItemTemplate itemTemplate = _itemTemplateList[UnityEngine.Random.Range(0, _itemTemplateList.Count)];
-		        extractor.Init(itemTemplate);
-		        _itemTemplateList.Remove(itemTemplate);
-
-		        //Reset current rotation
-		        _currentRotation = 0;
-		        return true;
-	        }
+	        // if (!(UnityEngine.Random.value <= _extractorGenerationProbability) || _itemTemplateList.Count == 0)
+	        // {
+		       //  return false;
+	        // }
+	        //
+	        // ManageRotation(x, z);
+	        // _grid.TryGetCellByCoordinates(x, z, out var cell);
+	        // MachineController machineController = AddMachineToGrid(_extractorMachine, cell);
+	        //
+	        // if (machineController.Machine.Behavior is ExtractorMachineBehaviour extractor)
+	        // {
+		       //  ItemTemplate itemTemplate = _itemTemplateList[UnityEngine.Random.Range(0, _itemTemplateList.Count)];
+		       //  extractor.Init(itemTemplate);
+		       //  _itemTemplateList.Remove(itemTemplate);
+	        //
+		       //  //Reset current rotation
+		       //  _currentRotation = 0;
+		       //  return true;
+	        // }
 
 	        return false;
         }

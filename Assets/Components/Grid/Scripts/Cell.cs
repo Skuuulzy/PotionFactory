@@ -14,9 +14,11 @@ namespace Components.Grid
 
         [SerializeField] private MachineController _machineController;
 		[SerializeField] private GameObject _obstacle; 
+		[SerializeField] private Node _node; 
        
         public MachineController MachineController => _machineController;
         public GameObject Obstacle => _obstacle;  
+        public Node Node => _node;  
 
         public Cell(int x, int y, float size, bool containsObject)
         {
@@ -50,5 +52,10 @@ namespace Components.Grid
             ContainsObject = false;
         }
 
+        public void AddNodeToCell(Node node)
+        {
+            ContainsObject = true;
+            _node = node;
+        }
     }
 }

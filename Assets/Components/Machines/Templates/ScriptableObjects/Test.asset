@@ -17,30 +17,29 @@ MonoBehaviour:
     type: 3}
   _uiView: {fileID: 21300000, guid: 789f2bfb929b0a74cbae6b0a22bb8fb1, type: 3}
   _behavior: {fileID: 11400000, guid: f3d403794d898ac40b5d56bac13fe50c, type: 2}
-  _dimension: {x: 2, y: 3}
   _baseInPorts:
-  - _side: 3
-    _position: {x: 0, y: -2}
+  - _localPosition: {x: 0, y: 0}
+    _debugWorldPosition: {x: 0, y: 0}
     _ports: []
   _baseOutPorts:
-  - _side: 0
-    _position: {x: -1, y: 0}
+  - _localPosition: {x: 0, y: 0}
+    _debugWorldPosition: {x: 0, y: 0}
     _ports: []
   _nodes:
-  - _side: 0
-    _position: {x: 0, y: 0}
+  - _localPosition: {x: 0, y: 0}
+    _debugWorldPosition: {x: 4, y: 3}
     _ports: []
-  - _side: 0
-    _position: {x: -1, y: 0}
+  - _localPosition: {x: 1, y: 0}
+    _debugWorldPosition: {x: 4, y: 2}
     _ports:
     - _side: 2
       _type: 1
-  - _side: 0
-    _position: {x: 0, y: 1}
+  - _localPosition: {x: 0, y: -1}
+    _debugWorldPosition: {x: 3, y: 3}
     _ports: []
-  - _side: 0
-    _position: {x: 0, y: 2}
+  - _localPosition: {x: 0, y: -2}
+    _debugWorldPosition: {x: 2, y: 3}
     _ports:
-    - _side: 2
+    - _side: 0
       _type: 0
   _maxItemCount: 0
