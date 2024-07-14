@@ -5085,6 +5085,17 @@ PrefabInstance:
       propertyPath: _machineSelectorViewHolder
       value: 
       objectReference: {fileID: 811147901}
+    - target: {fileID: 5005348551661390984, guid: 00a714b3d8b50be45995daf2ebd07a8f,
+        type: 3}
+      propertyPath: _machineTemplates.Array.size
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 5005348551661390984, guid: 00a714b3d8b50be45995daf2ebd07a8f,
+        type: 3}
+      propertyPath: _machineTemplates.Array.data[5]
+      value: 
+      objectReference: {fileID: 11400000, guid: a8537385e1b8cb8458deab9ee8a55a7a,
+        type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -5170,6 +5181,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Grid
+      objectReference: {fileID: 0}
+    - target: {fileID: 2922091601394712576, guid: 0ef98c6108f43c54c81c54882a4836ec,
+        type: 3}
+      propertyPath: _showDebug
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8261476641421578247, guid: 0ef98c6108f43c54c81c54882a4836ec,
         type: 3}

@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using Components.Grid;
 using Components.Items;
 using Components.Tick;
 using UnityEngine;
@@ -15,18 +13,32 @@ namespace Components.Machines
         public Machine Machine => _machine;
 
         private bool _initialized;
+
+        private GameObject _view;
         
         // ------------------------------------------------------------------------- INIT -------------------------------------------------------------------------
-        public void SetGridData(MachineTemplate machineTemplate, Dictionary<Side, Cell> neighbours, int rotation)
+
+        public void InstantiatePreview(MachineTemplate machineTemplate, float scale)
+        {
+            _view = Instantiate(machineTemplate.GridView, _3dViewHolder);
+            _machine = new Machine(machineTemplate, this);
+            _view.transform.localScale = new Vector3(scale, scale, scale);
+        }
+
+        public void RotatePreview(int angle)
+        {
+            _view.transform.rotation = Quaternion.Euler(new Vector3(0, angle, 0));
+            _machine.UpdateNodesRotation(angle);
+        }
+        
+        public void ConfirmPlacement()
         {
             _initialized = true;
             
-            _machine = new Machine(machineTemplate, neighbours, rotation, this);
             _machine.OnTick += Tick;
             _machine.OnItemAdded += ShowItem;
 
             AddMachineToChain();
-            Instantiate(_machine.Template.GridView, _3dViewHolder);
         }
 
         private void OnDestroy()

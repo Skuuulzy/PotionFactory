@@ -33,6 +33,7 @@ namespace Components.Grid
         [SerializeField] private float _obstacleGenerationProbability;
 
         [Header("Extractor")]
+        [SerializeField] private bool _addRandomExtractor;
         [SerializeField] private MachineTemplate _extractorMachine;
         [SerializeField] private List<ItemTemplate> _itemTemplateList;
 		[SerializeField] private float _extractorGenerationProbability;
@@ -42,7 +43,7 @@ namespace Components.Grid
         private readonly Dictionary<Cell, GameObject> _instancedObjects = new();
         
         // Preview
-        private MachinePreviewController _currentMachinePreviewController;
+        private MachineController _currentMachineController;
         private int _currentRotation;
         private UnityEngine.Camera _camera;
         
@@ -50,6 +51,7 @@ namespace Components.Grid
         public Action<Machine> OnMachineAdded;
         public Action<Machine> OnMachineRemoved;
         
+
         // ------------------------------------------------------------------------- MONO -------------------------------------------------------------------------
         private void Start()
         {
@@ -81,22 +83,25 @@ namespace Components.Grid
         // ------------------------------------------------------------------------- SELECTION -------------------------------------------------------------------------
         private void InstantiateSelection()
         {
-            _currentMachinePreviewController = Instantiate(_machinePreviewControllerPrefab);
-            _currentMachinePreviewController.InstantiatePreview(MachineManager.Instance.SelectedMachine, _cellSize);
+            _currentMachineController = Instantiate(_machineControllerPrefab);
+            _currentMachineController.InstantiatePreview(MachineManager.Instance.SelectedMachine, _cellSize);
 
             MachineManager.OnChangeSelectedMachine += UpdateSelection;
         }
         
         private void UpdateSelection(MachineTemplate newTemplate)
         {
-            _currentMachinePreviewController.InstantiatePreview(newTemplate, _cellSize);
+	        Destroy(_currentMachineController.gameObject);
+	        
+            _currentMachineController = Instantiate(_machineControllerPrefab);
+            _currentMachineController.InstantiatePreview(newTemplate, _cellSize);
+
             _currentRotation = 0;
-            _currentMachinePreviewController.transform.rotation = Quaternion.identity;
         }
 
         private void DeleteSelection()
         {
-            _currentMachinePreviewController.DeletePreview();
+           //_currentMachineController.DeletePreview();
 		}
         
         private void MoveSelection()
@@ -107,14 +112,14 @@ namespace Components.Grid
             }
 
             // Update the object's position
-            _currentMachinePreviewController.transform.position = worldMousePosition;
+            _currentMachineController.transform.position = worldMousePosition;
         }
         
         private void RotateSelection()
         {
             _currentRotation += 90;
             _currentRotation %= 360;
-            _currentMachinePreviewController.transform.rotation = Quaternion.Euler(new Vector3(0, -_currentRotation, 0));
+            _currentMachineController.RotatePreview(_currentRotation);
         }
 
         // ------------------------------------------------------------------------- INPUT HANDLERS -------------------------------------------------------------------------
@@ -132,17 +137,34 @@ namespace Components.Grid
 				return;
 			}
 
-			// Check if the cell has no object
-			if (chosenCell.ContainsObject)
+			// Check if the machine can be placed on the grid.
+			foreach (var node in _currentMachineController.Machine.Nodes)
 			{
-				return;
+				var nodeGridPosition = node.GridPosition(new Vector2Int(chosenCell.X, chosenCell.Y));
+				Debug.Log($"Testing grid position: {nodeGridPosition}");
+
+				// One node does not overlap a constructable cell.
+				if (!_grid.TryGetCellByCoordinates(nodeGridPosition.x, nodeGridPosition.y, out Cell overlapCell))
+				{
+					Debug.Log($"One node does not overlap a constructable cell.");
+					return;
+				}
+					
+				// One node of the machine overlap a cell that already contain an object.
+				if (overlapCell.ContainsObject)
+				{
+					Debug.Log($"One node of the machine overlap a cell that already contain an object.");
+					return;
+				}
 			}
-			AddMachineToGrid(MachineManager.Instance.SelectedMachine, chosenCell);
+			
+			Debug.Log("The machine can be placed.");
+			
+			//AddMachineToGrid(MachineManager.Instance.SelectedMachine, chosenCell);
         }
 
         private MachineController AddMachineToGrid(MachineTemplate machine, Cell chosenCell)
         {
-
             //Instantiate a machine controller
             MachineController machineController = Instantiate(_machineControllerPrefab, _objectsHolder);
             machineController.transform.position = _grid.GetWorldPosition(chosenCell.X, chosenCell.Y) + new Vector3(_cellSize / 2, 0, _cellSize / 2);
@@ -151,7 +173,7 @@ namespace Components.Grid
             machineController.transform.name = $"{machine.Name}_{_instancedObjects.Count}";
             
             // Set up the controller with the correct type;
-            machineController.SetGridData(machine, _grid.GetNeighboursByPosition(chosenCell), _currentRotation);
+            //machineController.ConfirmPlacement(machine, _grid.GetNeighboursByPosition(chosenCell), _currentRotation);
             
             //Add it to a dictionary to track it after
             _instancedObjects.Add(chosenCell, machineController.gameObject);
@@ -195,7 +217,6 @@ namespace Components.Grid
 
             //Reset cell state
             chosenCell.RemoveMachineFromCell();
-            
         }
         
         // ------------------------------------------------------------------------- GRID METHODS -------------------------------------------------------------------------
@@ -218,6 +239,11 @@ namespace Components.Grid
                     tile.transform.localScale = new Vector3(_cellSize, _cellSize, _cellSize);
                     tile.name = $"Cell ({x}, {z})";
 
+                    if (!_addRandomExtractor)
+                    {
+	                    continue;
+                    }
+                    
                     bool isExtractor = false;
 
 					if (x == 0 || x == _grid.GetWidth() - 1 || z == 0 || z == _grid.GetHeight() - 1)

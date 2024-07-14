@@ -6,16 +6,16 @@ namespace Components.Machines
 {
     public static class ExtensionsMethods
     {
-        public static List<Port> RotatePorts(this List<Port> ports, int angle, Vector2Int dimensions)
+        public static List<Node> RotateNodes(this List<Node> ports, int angle, Vector2Int dimensions)
         {
             var rotationMapping = GetRotationMapping(angle);
-            var rotatedPorts = new List<Port>();
+            var rotatedPorts = new List<Node>();
 
             foreach (var port in ports)
             {
                 var newPosition = RotatePosition(port.Position, angle, dimensions);
                 var newSide = rotationMapping[port.Side];
-                rotatedPorts.Add(new Port(newSide, newPosition));
+                rotatedPorts.Add(new Node(newSide, newPosition));
             }
 
             return rotatedPorts;
@@ -26,11 +26,11 @@ namespace Components.Machines
             switch (angle)
             {
                 case 90:
-                    return new Vector2Int(dimensions.y - position.y - 1, position.x);
+                    return new Vector2Int(-position.y, position.x);
                 case 180:
-                    return new Vector2Int(dimensions.x - position.x - 1, dimensions.y - position.y - 1);
+                    return new Vector2Int(-position.x, -position.y);
                 case 270:
-                    return new Vector2Int(position.y, dimensions.x - position.x - 1);
+                    return new Vector2Int(position.y, -position.x);
                 default:
                     throw new ArgumentException("Invalid rotation angle. Only 90, 180, and 270 degrees are allowed.");
             }

@@ -1,21 +1,19 @@
-using System;
 using UnityEngine;
 
 namespace Components.Machines
 {
-    [Serializable]
-    public struct Port
+    [System.Serializable]
+    public class Port
     {
         [SerializeField] private Side _side;
-        [SerializeField] private Vector2Int _position;
+        [SerializeField] private Type _type;
 
         public Side Side => _side;
-        public Vector2Int Position => _position;
-        
-        public Port(Side side, Vector2Int position)
+
+        public enum Type
         {
-            _side = side;
-            _position = position;
+            IN,
+            OUT
         }
     }
 }

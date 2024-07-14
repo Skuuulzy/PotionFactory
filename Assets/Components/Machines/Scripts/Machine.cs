@@ -17,8 +17,9 @@ namespace Components.Machines
         
         [ShowInInspector] private Dictionary<Side, Cell> _neighbours;
         [SerializeField] private List<Item> _items;
-        [SerializeField] private List<Port> _inPorts;
-        [SerializeField] private List<Port> _outPorts;
+        [SerializeField] private List<Node> _inPorts;
+        [SerializeField] private List<Node> _outPorts;
+        [SerializeField] private List<Node> _nodes;
         [SerializeField] private MachineController _controller;
         [SerializeField] private MachineBehavior _behavior;
 
@@ -27,25 +28,35 @@ namespace Components.Machines
         public MachineController Controller => _controller;
         public MachineBehavior Behavior => _behavior;
         public List<Item> Items => _items;
-
-        public virtual List<Port> InPorts => _inPorts;
-        public virtual List<Port> OutPorts => _outPorts;
+        
+        public virtual List<Node> Nodes => _nodes;
+        public virtual List<Node> InPorts => _inPorts;
+        public virtual List<Node> OutPorts => _outPorts;
         
         public Action OnTick;
 
         public Action<bool> OnItemAdded;
         
         // ------------------------------------------------------------------------- CONSTRUCTORS -------------------------------------------------------------------------
-        public Machine(MachineTemplate template, Dictionary<Side, Cell> neighbours, int rotation, MachineController controller)
+        public Machine(MachineTemplate template, MachineController controller)
         {
             _template = template;
             _behavior = template.GetBehaviorClone();
-            _neighbours = neighbours;
             _controller = controller;
 
-            CalculatePortsViaRotation(rotation, false);
+            UpdateNodesRotation(0);
             
             _items = new List<Item>();
+        }
+
+        public void UpdateNodesRotation(int rotation)
+        {
+            ReplaceNodesViaRotation(rotation, false);
+        }
+
+        public void SetNodeData()
+        {
+            
         }
         
         // ------------------------------------------------------------------------- NEIGHBOURS -------------------------------------------------------------------------
@@ -124,7 +135,7 @@ namespace Components.Machines
         }
         
         // ------------------------------------------------------------------------- PORTS & ROTATIONS -------------------------------------------------------------------------
-        public void CalculatePortsViaRotation(int angle, bool clockwise)
+        public void ReplaceNodesViaRotation(int angle, bool clockwise)
         {
             if (!clockwise)
             {
@@ -136,14 +147,17 @@ namespace Components.Machines
             // The machine has no rotation so the ports are the base one.
             if (angle == 0)
             {
+                _nodes = _template.Nodes;
                 _inPorts = _template.BaseInPorts;
                 _outPorts = _template.BaseOutPorts;
                 
                 return;
             }
+
+            _nodes = Template.Nodes.RotateNodes(angle, Template.Dimension);
             
-            _inPorts = _template.BaseInPorts.RotatePorts(angle, Template.Dimension);
-            _outPorts = _template.BaseOutPorts.RotatePorts(angle, Template.Dimension);
+            _inPorts = _template.BaseInPorts.RotateNodes(angle, Template.Dimension);
+            _outPorts = _template.BaseOutPorts.RotateNodes(angle, Template.Dimension);
         }
     }
 }

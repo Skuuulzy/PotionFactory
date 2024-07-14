@@ -173,7 +173,6 @@ namespace Components.Grid
         /// <returns>The list of neighbours.</returns>
         public Dictionary<Side, Cell> GetNeighboursByPosition(Cell cell, bool includeDiagonalNeighbours = false)
         {
-            ;
             return GetNeighboursByCoordinates(cell.X, cell.Y, includeDiagonalNeighbours);
         }
         
@@ -240,7 +239,10 @@ namespace Components.Grid
                     Cell cell = new Cell(x, y, cellSize, false);
                     _cellsList.Add(cell);
 
-                    debugTextArray[x][y] = UtilsClass.CreateWorldText($"({x},{y})", parentTransform, GetWorldPosition(x, y) + new Vector3(cellSize, cellSize) * .5f, 30, Color.white, TextAnchor.MiddleCenter);
+                    var worldPosition = GetWorldPosition(x, y) + new Vector3(_cellSize / 2, 0, _cellSize / 2);
+
+                    debugTextArray[x][y] = UtilsClass.CreateWorldText($"({x},{y})", parentTransform, worldPosition, 60, Color.white, TextAnchor.MiddleCenter);
+                    debugTextArray[x][y].transform.rotation = Quaternion.Euler(90, 0, 0);
                     Debug.DrawLine(GetWorldPosition(x, y), GetWorldPosition(x, y + 1), Color.white, float.PositiveInfinity);
                     Debug.DrawLine(GetWorldPosition(x, y), GetWorldPosition(x + 1, y), Color.white, float.PositiveInfinity);
                 }
