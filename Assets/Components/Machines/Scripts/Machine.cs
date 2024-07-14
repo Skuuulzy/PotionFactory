@@ -154,10 +154,10 @@ namespace Components.Machines
                 return;
             }
 
-            _nodes = Template.Nodes.RotateNodes(angle, Template.Dimension);
+            _nodes = Template.Nodes.RotateNodes(angle);
             
-            _inPorts = _template.BaseInPorts.RotateNodes(angle, Template.Dimension);
-            _outPorts = _template.BaseOutPorts.RotateNodes(angle, Template.Dimension);
+            _inPorts = _template.BaseInPorts.RotateNodes(angle);
+            _outPorts = _template.BaseOutPorts.RotateNodes(angle);
         }
     }
 }

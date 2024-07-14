@@ -6,22 +6,34 @@ namespace Components.Machines
 {
     public static class ExtensionsMethods
     {
-        public static List<Node> RotateNodes(this List<Node> ports, int angle, Vector2Int dimensions)
+        public static List<Node> RotateNodes(this List<Node> nodes, int angle)
         {
             var rotationMapping = GetRotationMapping(angle);
-            var rotatedPorts = new List<Node>();
 
-            foreach (var port in ports)
+            foreach (var node in nodes)
             {
-                var newPosition = RotatePosition(port.Position, angle, dimensions);
-                var newSide = rotationMapping[port.Side];
-                rotatedPorts.Add(new Node(newSide, newPosition));
+                // Update the local position of the node.
+                var newPosition = RotatePosition(node.Position, angle);
+                node.UpdateLocalPosition(newPosition);
+
+                // Update the direction of the ports.
+                foreach (var port in node.Ports)
+                {
+                    var newSide = rotationMapping[port.Side];
+                    port.UpdateSide(newSide);
+                }
             }
 
-            return rotatedPorts;
+            return nodes;
         }
         
-        private static Vector2Int RotatePosition(Vector2Int position, int angle, Vector2Int dimensions)
+        /// <summary>
+        /// Rotate the local position of the node around is origin.
+        /// </summary>
+        /// <example>
+        /// I have a matrices 2x2 with the coordinates are: [(0,0), (1,0), (0,-1), (1,-1)], now if a rotation of 90° is applied, the matrice is now: [(0,0), (0,-1), (-1,0),(-1,-1)]
+        /// </example>
+        private static Vector2Int RotatePosition(Vector2Int position, int angle)
         {
             switch (angle)
             {

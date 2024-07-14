@@ -16,12 +16,19 @@ namespace Components.Machines
         public Vector2Int Position => _position;
         public Node ConnectedNode => _connectedNode;
 
+        public List<Port> Ports => _ports;
+
         public Node(Side side, Vector2Int position)
         {
             _side = side;
             _position = position;
         }
 
+        public void UpdateLocalPosition(Vector2Int newPosition)
+        {
+            _position = newPosition;
+        }
+        
         public void SetConnectedPort(Node connectedNode)
         {
             _connectedNode = connectedNode;
