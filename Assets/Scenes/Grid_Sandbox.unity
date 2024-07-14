@@ -4139,6 +4139,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2922091601394712576, guid: 0ef98c6108f43c54c81c54882a4836ec,
         type: 3}
+      propertyPath: _waterTile
+      value: 
+      objectReference: {fileID: 5098640816377893079, guid: 8ebe8fcb5637c8e4687b5e5aca85e655,
+        type: 3}
+    - target: {fileID: 2922091601394712576, guid: 0ef98c6108f43c54c81c54882a4836ec,
+        type: 3}
       propertyPath: _gridXValue
       value: 24
       objectReference: {fileID: 0}
@@ -4156,6 +4162,63 @@ PrefabInstance:
         type: 3}
       propertyPath: _randomBonusProbability
       value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2922091601394712576, guid: 0ef98c6108f43c54c81c54882a4836ec,
+        type: 3}
+      propertyPath: _obstacleList.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 2922091601394712576, guid: 0ef98c6108f43c54c81c54882a4836ec,
+        type: 3}
+      propertyPath: _groundTilesList.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 2922091601394712576, guid: 0ef98c6108f43c54c81c54882a4836ec,
+        type: 3}
+      propertyPath: _obstacleList.Array.data[2]
+      value: 
+      objectReference: {fileID: 1369166025250707419, guid: 3e26b1cf608e2ab448a8dd4955c6a40a,
+        type: 3}
+    - target: {fileID: 2922091601394712576, guid: 0ef98c6108f43c54c81c54882a4836ec,
+        type: 3}
+      propertyPath: _obstacleList.Array.data[3]
+      value: 
+      objectReference: {fileID: 2512936555244556357, guid: 35cf2cbec93c4c448b68c2487219dfa9,
+        type: 3}
+    - target: {fileID: 2922091601394712576, guid: 0ef98c6108f43c54c81c54882a4836ec,
+        type: 3}
+      propertyPath: _obstacleList.Array.data[4]
+      value: 
+      objectReference: {fileID: 2512936555244556357, guid: 35cf2cbec93c4c448b68c2487219dfa9,
+        type: 3}
+    - target: {fileID: 2922091601394712576, guid: 0ef98c6108f43c54c81c54882a4836ec,
+        type: 3}
+      propertyPath: _groundTilesList.Array.data[0]
+      value: 
+      objectReference: {fileID: 4022955696050659557, guid: 60a08e49e059bc84185cdabb3e1be25a,
+        type: 3}
+    - target: {fileID: 2922091601394712576, guid: 0ef98c6108f43c54c81c54882a4836ec,
+        type: 3}
+      propertyPath: _groundTilesList.Array.data[1]
+      value: 
+      objectReference: {fileID: 594745835813537016, guid: 1995d4c7102fe9a4a94ec98a6831caeb,
+        type: 3}
+    - target: {fileID: 2922091601394712576, guid: 0ef98c6108f43c54c81c54882a4836ec,
+        type: 3}
+      propertyPath: _groundTilesList.Array.data[2]
+      value: 
+      objectReference: {fileID: 4762144622729139892, guid: 7910dd0bfdbd5184cbdfdb4f83f3b626,
+        type: 3}
+    - target: {fileID: 2922091601394712576, guid: 0ef98c6108f43c54c81c54882a4836ec,
+        type: 3}
+      propertyPath: _groundTilesList.Array.data[3]
+      value: 
+      objectReference: {fileID: 6451787547792733909, guid: 8642debfc9522434aa21b253f060b00d,
+        type: 3}
+    - target: {fileID: 2922091601394712576, guid: 0ef98c6108f43c54c81c54882a4836ec,
+        type: 3}
+      propertyPath: _waterTileGenerationProbability
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8261476641421578247, guid: 0ef98c6108f43c54c81c54882a4836ec,
         type: 3}

@@ -10,6 +10,7 @@ namespace Components.Grid
         public int X { get; }
         public int Y { get; }
         public float Size { get; }
+        public bool IsWater { get; private set; }
         public bool ContainsObject { get; private set; }
         public bool ContainsObstacle { get; private set; }
 
@@ -52,6 +53,11 @@ namespace Components.Grid
             ContainsObject = false;
 			ContainsObstacle = false;
         }
+
+        public void DefineCellAsWaterCell()
+		{
+            IsWater = true;
+		}
 
     }
 }

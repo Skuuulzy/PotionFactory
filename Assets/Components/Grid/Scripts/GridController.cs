@@ -19,10 +19,15 @@ namespace Components.Grid
         [SerializeField] private bool _showDebug;
         
         [Header("Prefabs")] 
-        [SerializeField] private GameObject _groundTile;
         [SerializeField] private MachineController _machineControllerPrefab;
         [SerializeField] private MachinePreviewController _machinePreviewControllerPrefab;
         
+        [Header("Tiles")]
+        [SerializeField] private List<GameObject> _groundTilesList;
+        private GameObject _groundTile;
+        [SerializeField] private GameObject _waterTile;
+		[SerializeField] private float _waterTileGenerationProbability;
+
         [Header("Holders")]
         [SerializeField] private Transform _groundHolder;
         [SerializeField] private Transform _objectsHolder;
@@ -55,6 +60,8 @@ namespace Components.Grid
         private void Start()
         {
             _camera = UnityEngine.Camera.main;
+
+            _groundTile = _groundTilesList[UnityEngine.Random.Range(0, _groundTilesList.Count)];
             InstantiateSelection();
             GenerateGrid();
         }
@@ -215,15 +222,18 @@ namespace Components.Grid
             {
                 for (int z = 0; z < _grid.GetHeight(); z++)
                 {
-                    var tile = Instantiate(_groundTile, _grid.GetWorldPosition(x, z), Quaternion.identity, _groundHolder);
-                    tile.transform.localScale = new Vector3(_cellSize, _cellSize, _cellSize);
-                    tile.name = $"Cell ({x}, {z})";
+                    bool cellIsWater = GenerateTile(x, z);
+
+					if (cellIsWater)
+					{
+                        //No need to place anything else on this cell because it is water
+                        continue;
+					}
 
                     bool isExtractor = false;
-
 					if (x == 0 || x == _grid.GetWidth() - 1 || z == 0 || z == _grid.GetHeight() - 1)
                     {
-					    isExtractor = GenerateExtractor(x, z);
+                        isExtractor = GenerateExtractor(x, z);
                     }
 
                     if (!isExtractor)
@@ -239,6 +249,7 @@ namespace Components.Grid
             }
         }
         
+
         public void ClearGrid()
         {
             foreach (var cell in _instancedObjects)
@@ -249,6 +260,30 @@ namespace Components.Grid
 
             _instancedObjects.Clear();
         }
+
+        private bool GenerateTile(int x, int z)
+		{
+            if (!(UnityEngine.Random.value <= _waterTileGenerationProbability) )
+            {
+                var tile = Instantiate(_groundTile, _grid.GetWorldPosition(x, z), Quaternion.identity, _groundHolder);
+                tile.transform.localScale = new Vector3(_cellSize, _cellSize, _cellSize);
+                tile.name = $"Cell ({x}, {z})";
+                return false;
+            }
+			else
+			{
+                var tile = Instantiate(_waterTile, _grid.GetWorldPosition(x, z), Quaternion.identity, _groundHolder);
+                tile.transform.localScale = new Vector3(_cellSize, _cellSize, _cellSize);
+                tile.name = $"Cell ({x}, {z})";
+                _grid.TryGetCellByCoordinates(x, z, out var cell);
+                cell.DefineCellAsWaterCell();
+
+                return true;
+            }
+
+
+        }
+
 
         private bool GenerateExtractor(int x, int z)
         {
