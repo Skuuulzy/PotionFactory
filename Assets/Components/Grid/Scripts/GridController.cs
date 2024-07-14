@@ -228,8 +228,11 @@ namespace Components.Grid
 
                     if (!isExtractor)
                     {
-						//Instantiate Obstacle
-						GenerateObstacle(x, z);
+                        if(x != 1 && x != _grid.GetWidth() - 2 && z != 1 && z != _grid.GetHeight() - 2)
+						{
+                            //Instantiate Obstacle
+                            GenerateObstacle(x, z);
+                        }
 					}
                     
                 }
