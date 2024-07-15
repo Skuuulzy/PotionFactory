@@ -9,19 +9,21 @@ namespace Components.Machines
     public class Node
     {
         [SerializeField] private Vector2Int _localPosition;
-        [SerializeField, ReadOnly] private Vector2Int _debugWorldPosition;
+        [SerializeField, ReadOnly] private Vector2Int _gridPosition;
         [SerializeField] private List<Port> _ports;
 
         [NonSerialized] private Machine _machine;
         
         public Vector2Int LocalPosition => _localPosition;
+        public Vector2Int GridPosition => _gridPosition;
+
         public List<Port> Ports => _ports;
         public Machine Machine => _machine;
 
         public Node(Node copy)
         {
             _localPosition = copy._localPosition;
-            _debugWorldPosition = copy._debugWorldPosition;
+            _gridPosition = copy._gridPosition;
 
             List<Port> ports = new List<Port>();
             foreach (var port in copy._ports)
@@ -46,10 +48,10 @@ namespace Components.Machines
             _localPosition = newPosition;
         }
 
-        public Vector2Int GridPosition(Vector2Int originCoordinates)
+        public Vector2Int SetGridPosition(Vector2Int originCoordinates)
         {
-            _debugWorldPosition = originCoordinates + _localPosition;
-            return originCoordinates + _localPosition;
+            _gridPosition = originCoordinates + _localPosition;
+            return _gridPosition;
         }
     }
 }

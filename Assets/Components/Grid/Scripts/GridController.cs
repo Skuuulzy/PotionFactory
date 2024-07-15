@@ -20,7 +20,6 @@ namespace Components.Grid
         [Header("Prefabs")] 
         [SerializeField] private GameObject _groundTile;
         [SerializeField] private MachineController _machineControllerPrefab;
-        [SerializeField] private MachinePreviewController _machinePreviewControllerPrefab;
         
         [Header("Holders")]
         [SerializeField] private Transform _groundHolder;
@@ -39,8 +38,8 @@ namespace Components.Grid
 
 		// Grid
 		private Grid _grid;
-        private readonly Dictionary<Cell, GameObject> _instancedObjects = new();
-        
+		private readonly List<MachineController> _instancedObjects = new ();
+		
         // Preview
         private MachineController _currentMachineController;
         private int _currentRotation;
@@ -83,6 +82,7 @@ namespace Components.Grid
         {
             _currentMachineController = Instantiate(_machineControllerPrefab);
             _currentMachineController.InstantiatePreview(MachineManager.Instance.SelectedMachine, _cellSize);
+            _currentMachineController.RotatePreview(_currentRotation);
 
             MachineManager.OnChangeSelectedMachine += UpdateSelection;
         }
@@ -90,8 +90,8 @@ namespace Components.Grid
         private void UpdateSelection(MachineTemplate newTemplate)
         {
 	        Destroy(_currentMachineController.gameObject);
-	        
-            _currentMachineController = Instantiate(_machineControllerPrefab);
+
+	        _currentMachineController = Instantiate(_machineControllerPrefab);
             _currentMachineController.InstantiatePreview(newTemplate, _cellSize);
 
             _currentRotation = 0;
@@ -138,7 +138,7 @@ namespace Components.Grid
 			// Check if the machine can be placed on the grid.
 			foreach (var node in _currentMachineController.Machine.Nodes)
 			{
-				var nodeGridPosition = node.GridPosition(new Vector2Int(chosenCell.X, chosenCell.Y));
+				var nodeGridPosition = node.SetGridPosition(new Vector2Int(chosenCell.X, chosenCell.Y));
 
 				// One node does not overlap a constructable cell.
 				if (!_grid.TryGetCellByCoordinates(nodeGridPosition.x, nodeGridPosition.y, out Cell overlapCell))
@@ -158,6 +158,8 @@ namespace Components.Grid
 
         private void AddMachineToGrid(MachineTemplate machine, Cell originCell)
         {
+	        _instancedObjects.Add(_currentMachineController);
+	        
             _currentMachineController.transform.position = _grid.GetWorldPosition(originCell.X, originCell.Y) + new Vector3(_cellSize / 2, 0, _cellSize / 2);
             _currentMachineController.transform.name = $"{machine.Name}_{_instancedObjects.Count}";
             _currentMachineController.transform.parent = _objectsHolder;
@@ -165,7 +167,7 @@ namespace Components.Grid
             // Adding nodes to the cells
             foreach (var node in _currentMachineController.Machine.Nodes)
             {
-	            var nodeGridPosition = node.GridPosition(new Vector2Int(originCell.X, originCell.Y));
+	            var nodeGridPosition = node.SetGridPosition(new Vector2Int(originCell.X, originCell.Y));
 	            
 	            if (_grid.TryGetCellByCoordinates(nodeGridPosition.x, nodeGridPosition.y, out Cell overlapCell))
 	            {
@@ -196,9 +198,6 @@ namespace Components.Grid
 		            }
 	            }
             }
-
-            //Call AddedMachine action
-            OnMachineAdded?.Invoke(_currentMachineController.Machine);
             
             _currentMachineController.ConfirmPlacement();
             
@@ -242,16 +241,23 @@ namespace Components.Grid
             {
                 return;
             }
+            
+            //Destroy the machine associated to the node
+            var machineToDestroy = chosenCell.Node.Machine;
 
-            //Call RemovedMachine action
-            OnMachineRemoved?.Invoke(chosenCell.MachineController.Machine);
-
-            //Destroy the GameObject from the cell position
-            Destroy(_instancedObjects[chosenCell]);
-            _instancedObjects.Remove(chosenCell);
-
-            //Reset cell state
-            chosenCell.RemoveMachineFromCell();
+            //Reset all cell linked to the machine.
+            foreach (var node in chosenCell.Node.Machine.Nodes)
+            {
+	            if (!_grid.TryGetCellByCoordinates(node.GridPosition.x, node.GridPosition.y, out Cell linkedCell))
+	            {
+		            continue;
+	            }
+	            
+	            linkedCell.RemoveNodeFromCell();
+            }
+            
+            _instancedObjects.Remove(machineToDestroy.Controller);
+            Destroy(machineToDestroy.Controller.gameObject);
         }
         
         // ------------------------------------------------------------------------- GRID METHODS -------------------------------------------------------------------------
@@ -298,12 +304,12 @@ namespace Components.Grid
         
         public void ClearGrid()
         {
-            foreach (var cell in _instancedObjects)
+            foreach (var machineController in _instancedObjects)
             {
-                Destroy(cell.Value);
-                cell.Key.RemoveMachineFromCell();
+                Destroy(machineController.gameObject);
             }
-
+            
+            _grid.ClearCellsData();
             _instancedObjects.Clear();
         }
 

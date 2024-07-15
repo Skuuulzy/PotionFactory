@@ -1,8 +1,6 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using CodeMonkey.Utils;
 using System.Collections.Generic;
-using Components.Machines;
 
 namespace Components.Grid
 {
@@ -13,8 +11,9 @@ namespace Components.Grid
         private readonly float _cellSize;
         private readonly Vector3 _originPosition;
         private readonly int[,] _gridArray;
-        private readonly List<Cell> _cellsList;
-
+        private readonly List<Cell> _cells;
+        
+        // ------------------------------------------------------------------------- CONSTRUCTOR -------------------------------------------------------------------------
         public Grid(int width, int height, float cellSize, Vector3 originPosition, Transform parentTransform, bool showDebug)
         {
             _width = width;
@@ -23,7 +22,7 @@ namespace Components.Grid
             _originPosition = originPosition;
 
             _gridArray = new int[width, height];
-            _cellsList = new List<Cell>();
+            _cells = new List<Cell>();
 
             for (int x = 0; x < _gridArray.GetLength(0); x++)
             {
@@ -31,7 +30,7 @@ namespace Components.Grid
                 {
                     //Create a new cell and add it to cell list
                     Cell cell = new Cell(x, y, cellSize, false);
-                    _cellsList.Add(cell);
+                    _cells.Add(cell);
                 }
             }
 
@@ -41,8 +40,7 @@ namespace Components.Grid
             }
         }
 
-        #region HELPERS
-
+        // ------------------------------------------------------------------------- GRID INFOS -------------------------------------------------------------------------
         public int GetWidth()
         {
             return _width;
@@ -68,60 +66,8 @@ namespace Components.Grid
             x = Mathf.FloorToInt((worldPosition - _originPosition).x / _cellSize);
             y = Mathf.FloorToInt((worldPosition - _originPosition).z / _cellSize);
         }
-
-        #endregion HELPERS
-
-        #region VALUES
-
-        public void SetValue(int x, int y, int value)
-        {
-            if (x >= 0 && y >= 0 && x < _width && y < _height)
-            {
-                _gridArray[x, y] = value;
-            }
-        }
-
-        public void SetValue(Vector3 worldPosition, int value)
-        {
-            int x, y;
-            GetCellCoordinates(worldPosition, out x, out y);
-            SetValue(x, y, value);
-        }
-
-        public void ResetAllValue()
-        {
-            for (int x = 0; x < _gridArray.GetLength(0); x++)
-            {
-                for (int y = 0; y < _gridArray.GetLength(1); y++)
-                {
-                    SetValue(x, y, 0);
-                }
-            }
-        }
-
-        public int GetValue(int x, int y)
-        {
-            if (x >= 0 && y >= 0 && x < _width && y < _height)
-            {
-                return _gridArray[x, y];
-            }
-            else
-            {
-                return 0;
-            }
-        }
-
-        public int GetValue(Vector3 worldPosition)
-        {
-            int x, y;
-            GetCellCoordinates(worldPosition, out x, out y);
-            return GetValue(x, y);
-        }
-
-        #endregion VALUES
-
-        #region GET CELLS
-
+        
+        // ------------------------------------------------------------------------- CELLS -------------------------------------------------------------------------
         /// <summary>
         /// From a set of coordinates return a cell if one is found.
         /// </summary>
@@ -131,7 +77,7 @@ namespace Components.Grid
         /// <returns>True if a cell is found, otherwise false.</returns>
         public bool TryGetCellByCoordinates(int x, int y, out Cell foundCell)
         {
-            foreach (Cell cell in _cellsList)
+            foreach (Cell cell in _cells)
             {
                 if (cell.X == x && cell.Y == y)
                 {
@@ -164,65 +110,16 @@ namespace Components.Grid
             return false;
         }
 
-
-        /// <summary>
-        /// From a world position return all the potential neighbours of the cell.
-        /// </summary>
-        /// <param name="worldPosition">The position of the cell.</param>
-        /// <param name="includeDiagonalNeighbours">Should the diagonal neighbours need to be included.</param>
-        /// <returns>The list of neighbours.</returns>
-        public Dictionary<Side, Cell> GetNeighboursByPosition(Cell cell, bool includeDiagonalNeighbours = false)
+        public void ClearCellsData()
         {
-            return GetNeighboursByCoordinates(cell.X, cell.Y, includeDiagonalNeighbours);
-        }
-        
-        public Dictionary<Side, Cell> GetNeighboursByCoordinates(int x, int y, bool includeDiagonalNeighbours = false)
-        {
-            Dictionary<Side, Cell> neighbours = new Dictionary<Side, Cell>();
-
-            // Get the relative positions of the desired neighbours
-            var directions = includeDiagonalNeighbours ? FULL_NEIGHBOURS_COORDINATES : NEIGHBOURS_COORDINATES;
-
-            // Iterate through all the possible neighbors
-            foreach (var direction in directions)
+            foreach (var cell in _cells)
             {
-                int newX = x + direction.Value.Item1;
-                int newY = y + direction.Value.Item2;
-
-                if (newX >= 0 && newY >= 0 && newX < _width && newY < _height)
-                {
-                    if (TryGetCellByCoordinates(newX, newY, out var neighborCell))
-                    {
-                        neighbours[direction.Key] = neighborCell;
-                    }
-                }
+                cell.RemoveNodeFromCell();
+                cell.RemoveObstacleFromCell();
             }
-
-            return neighbours;
         }
-
-        #endregion GET CELLS
-
-        #region DATA
         
-        private static readonly Dictionary<Side, (int, int)> NEIGHBOURS_COORDINATES = new()
-        {
-            { Side.UP,  (  0,  1 ) },
-            { Side.DOWN,  (  0, -1 ) },
-            { Side.LEFT, ( -1,  0 ) },
-            { Side.RIGHT, (  1,  0 ) }
-        };
-        
-        private static readonly Dictionary<Side, (int, int)> FULL_NEIGHBOURS_COORDINATES = new()
-        {
-            { Side.UP,  (  0,  1 ) },
-            { Side.DOWN,  (  0, -1 ) },
-            { Side.LEFT, ( -1,  0 ) },
-            { Side.RIGHT, (  1,  0 ) },
-        };
-
-        #endregion
-
+        // ------------------------------------------------------------------------- DEBUG -------------------------------------------------------------------------
         private void DrawGridDebug(int width, int height, float cellSize, Transform parentTransform)
         {
             TextMesh[][] debugTextArray = new TextMesh[width][];
@@ -237,7 +134,7 @@ namespace Components.Grid
                 {
                     //Create a new cell and add it to cellLList
                     Cell cell = new Cell(x, y, cellSize, false);
-                    _cellsList.Add(cell);
+                    _cells.Add(cell);
 
                     var worldPosition = GetWorldPosition(x, y) + new Vector3(_cellSize / 2, 0, _cellSize / 2);
 

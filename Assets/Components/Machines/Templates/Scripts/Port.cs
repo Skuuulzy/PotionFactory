@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Components.Machines
 {
-    [System.Serializable]
+    [Serializable]
     public class Port
     {
         [SerializeField] private Side _side;
@@ -47,7 +47,5 @@ namespace Components.Machines
             // Tell to the other port too.
             connectedPort.SetConnectedPort(this);
         }
-
-
     }
 }

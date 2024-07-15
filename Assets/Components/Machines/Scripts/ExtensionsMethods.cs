@@ -6,6 +6,7 @@ namespace Components.Machines
 {
     public static class ExtensionsMethods
     {
+        // ------------------------------------------------------------------------- NODE ROTATION -------------------------------------------------------------------------
         public static List<Node> RotateNodes(this List<Node> nodes, int angle)
         {
             var rotationMapping = GetRotationMapping(angle);
@@ -82,6 +83,7 @@ namespace Components.Machines
             return mapping;
         }
         
+        // ------------------------------------------------------------------------- SIDE -------------------------------------------------------------------------
         public static Side Opposite(this Side side)
         {
             switch (side)
