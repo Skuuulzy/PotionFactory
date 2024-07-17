@@ -6,12 +6,22 @@ namespace Components.Items
 	[CreateAssetMenu(fileName = "New Item Template", menuName = "Machines/Item Template")]
 	public class ItemTemplate : ScriptableObject
 	{
+		[SerializeField] private int _price;
+		[SerializeField] private string _itemName;
+		[SerializeField] private bool _isLiquid;
+		[SerializeField] private float _executionTimeModifier;
+
 		[SerializeField] private List<Resource> _resources;
 		[SerializeField] private List<ItemState> _types;
 		[SerializeField] private GameObject _3dView;
 
 		[Header("Debug")]
-		[SerializeField] private GameObject _debug3DView; 
+		[SerializeField] private GameObject _debug3DView;
+
+		public int Price => _price;
+		public string ItemName => _itemName;
+		public bool IsLiquid => _isLiquid;
+		public float ExecutionTimeModifier => _executionTimeModifier;
 		public List<Resource> Resources => _resources;
 		public List<ItemState> Types => _types;
 		public GameObject View => _3dView;
