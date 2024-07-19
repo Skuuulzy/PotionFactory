@@ -155,9 +155,9 @@ namespace Components.Grid
             
             // Set up the controller with the correct type;
             machineController.SetGridData(machine, _grid.GetNeighboursByPosition(chosenCell), _currentRotation);
-            
-            //Add it to a dictionary to track it after
-            _instancedObjects.Add(chosenCell, machineController.gameObject);
+
+			//Add it to a dictionary to track it after
+			_instancedObjects.Add(chosenCell, machineController.gameObject);
             
             //Set the AlreadyContainsMachine bool to true
             chosenCell.AddMachineToCell(machineController);
@@ -213,9 +213,9 @@ namespace Components.Grid
             
             _grid = new Grid(_gridXValue, _gridYValue, _cellSize, _startPosition, _groundHolder, _showDebug);
             _tileController.SelectATileType();
-
-            // Instantiate ground blocks
-            for (int x = 0; x < _grid.GetWidth(); x++)
+			List<ItemTemplate> itemTemplateListTemporary = _itemTemplateList;
+			// Instantiate ground blocks
+			for (int x = 0; x < _grid.GetWidth(); x++)
             {
                 for (int z = 0; z < _grid.GetHeight(); z++)
                 {
@@ -230,7 +230,9 @@ namespace Components.Grid
                     bool isExtractor = false;
 					if (x == 0 || x == _grid.GetWidth() - 1 || z == 0 || z == _grid.GetHeight() - 1)
                     {
-                        isExtractor = GenerateExtractor(x, z);
+
+
+						isExtractor = GenerateExtractor(x, z, itemTemplateListTemporary);
                     }
 
                     if (!isExtractor)
@@ -279,7 +281,7 @@ namespace Components.Grid
 
 
 
-        private bool GenerateExtractor(int x, int z)
+        private bool GenerateExtractor(int x, int z, List<ItemTemplate> itemTemplateListTemporary)
         {
 	        if (!(UnityEngine.Random.value <= _extractorGenerationProbability) || _itemTemplateList.Count == 0)
 	        {
@@ -292,9 +294,9 @@ namespace Components.Grid
 
 	        if (machineController.Machine.Behavior is ExtractorMachineBehaviour extractor)
 	        {
-		        ItemTemplate itemTemplate = _itemTemplateList[UnityEngine.Random.Range(0, _itemTemplateList.Count)];
+		        ItemTemplate itemTemplate = itemTemplateListTemporary[UnityEngine.Random.Range(0, _itemTemplateList.Count)];
 		        extractor.Init(itemTemplate);
-		        _itemTemplateList.Remove(itemTemplate);
+				itemTemplateListTemporary.Remove(itemTemplate);
 
 		        //Reset current rotation
 		        _currentRotation = 0;
