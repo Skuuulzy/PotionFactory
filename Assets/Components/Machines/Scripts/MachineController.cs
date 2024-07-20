@@ -18,7 +18,6 @@ namespace Components.Machines
         private GameObject _view;
         
         // ------------------------------------------------------------------------- INIT -------------------------------------------------------------------------
-
         public void InstantiatePreview(MachineTemplate machineTemplate, float scale)
         {
             _view = Instantiate(machineTemplate.GridView, _3dViewHolder);

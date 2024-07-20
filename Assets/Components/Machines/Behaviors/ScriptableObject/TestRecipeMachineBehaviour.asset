@@ -9,9 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4bf94c88d3c8170499f96abf561bf98b, type: 3}
-  m_Name: RecipeManager
+  m_Script: {fileID: 11500000, guid: 1290924458784ff7a492324a348e9fb4, type: 3}
+  m_Name: TestRecipeMachineBehaviour
   m_EditorClassIdentifier: 
-  _recipeTemplatesList:
-  - {fileID: 11400000, guid: 364f90983f6a2f24cab4d8aa6febb88b, type: 2}
-  _unknownItemRecipe: {fileID: 0}
+  _processTime: 2
+  _recipeManager: {fileID: 11400000, guid: 169d8e651ece1c745bd9dbd94a75f48f, type: 2}

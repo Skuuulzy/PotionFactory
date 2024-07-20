@@ -302,7 +302,7 @@ namespace Components.Grid
             }
         }
         
-        public void ClearGrid()
+        private void ClearGrid()
         {
             foreach (var machineController in _instancedObjects)
             {

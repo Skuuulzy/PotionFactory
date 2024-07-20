@@ -11,7 +11,7 @@ namespace Components.Machines
     public class Machine : ITickable
     {
         // ----------------------------------------------------------------------- PRIVATE FIELDS -------------------------------------------------------------------------
-        [SerializeField] private List<Item> _items;
+        [SerializeField] private List<ItemTemplate> _items;
         [SerializeField] private List<Node> _nodes;
         [SerializeField] private MachineController _controller;
         [SerializeField] private MachineBehavior _behavior;
@@ -22,7 +22,7 @@ namespace Components.Machines
         public MachineTemplate Template => _template;
         public MachineController Controller => _controller;
         public MachineBehavior Behavior => _behavior;
-        public List<Item> Items => _items;
+        public List<ItemTemplate> Items => _items;
         public virtual List<Node> Nodes => _nodes;
         
         // ------------------------------------------------------------------------- ACTIONS -------------------------------------------------------------------------
@@ -38,7 +38,7 @@ namespace Components.Machines
 
             UpdateNodesRotation(0);
             
-            _items = new List<Item>();
+            _items = new List<ItemTemplate>();
         }
 
         public void UpdateNodesRotation(int rotation)
@@ -106,10 +106,9 @@ namespace Components.Machines
         public void AddItem()
         {
             OnItemAdded?.Invoke(true);
-            //Items.Add(66);
         }
         
-        public bool TryGiveItemItem(Item item)
+        public bool TryGiveItemItem(ItemTemplate item)
         {
             // There is already too many items in the machine
             if (Template.MaxItemCount != -1 && Items.Count >= Template.MaxItemCount)
@@ -129,6 +128,12 @@ namespace Components.Machines
         public void RemoveItem(int index)
         {
             Items.RemoveAt(index);
+            OnItemAdded?.Invoke(false);
+        }
+        
+        public void ClearItems()
+        {
+            Items.Clear();
             OnItemAdded?.Invoke(false);
         }
 

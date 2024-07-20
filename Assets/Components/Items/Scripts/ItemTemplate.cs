@@ -3,11 +3,11 @@ using UnityEngine;
 
 namespace Components.Items
 {
-	[CreateAssetMenu(fileName = "New Item Template", menuName = "Machines/Item Template")]
+	[CreateAssetMenu(fileName = "New Item Template", menuName = "Items/Item Template")]
 	public class ItemTemplate : ScriptableObject
 	{
+		[SerializeField] private string _name;
 		[SerializeField] private int _price;
-		[SerializeField] private string _itemName;
 		[SerializeField] private bool _isLiquid;
 		[SerializeField] private float _executionTimeModifier;
 
@@ -19,14 +19,14 @@ namespace Components.Items
 		[SerializeField] private GameObject _debug3DView;
 
 		public int Price => _price;
-		public string ItemName => _itemName;
+		public string Name => _name;
 		public bool IsLiquid => _isLiquid;
 		public float ExecutionTimeModifier => _executionTimeModifier;
 		public List<Resource> Resources => _resources;
 		public List<ItemState> Types => _types;
 		public GameObject View => _3dView;
 
-		public ItemTemplate(List<ItemTemplate> itemsTemplateUsedToCreate)
+		public void CreateItemWithoutRecipe(List<ItemTemplate> itemsTemplateUsedToCreate)
 		{
 			foreach(ItemTemplate itemTemplate in itemsTemplateUsedToCreate)
 			{

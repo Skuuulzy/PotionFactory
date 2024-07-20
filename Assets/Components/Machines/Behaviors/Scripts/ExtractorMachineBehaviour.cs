@@ -24,7 +24,7 @@ namespace Components.Machines.Behaviors
             
             if (machine.TryGetOutMachine(out Machine outMachine))
             {
-                outMachine.TryGiveItemItem(new Item(_itemTemplate));
+                outMachine.TryGiveItemItem(_itemTemplate);
             }
         }
     }
