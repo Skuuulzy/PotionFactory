@@ -7,10 +7,10 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 255456526c8846fbbd7e3ca6f7def55c, type: 3}
-  m_Name: ExtractorBehavior
+  m_Script: {fileID: 11500000, guid: 1290924458784ff7a492324a348e9fb4, type: 3}
+  m_Name: TestRecipeMachineBehaviour
   m_EditorClassIdentifier: 
-  _processTime: 3
-  _itemTemplate: {fileID: 11400000, guid: 98ebfc979facba846b1110a0c2c42492, type: 2}
+  _processTime: 2
+  _recipeManager: {fileID: 11400000, guid: 169d8e651ece1c745bd9dbd94a75f48f, type: 2}
