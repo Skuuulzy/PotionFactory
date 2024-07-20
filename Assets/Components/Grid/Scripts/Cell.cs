@@ -10,7 +10,9 @@ namespace Components.Grid
         public int X { get; }
         public int Y { get; }
         public float Size { get; }
+        public bool IsWater { get; private set; }
         public bool ContainsObject { get; private set; }
+        public bool ContainsObstacle { get; private set; }
 
 		[SerializeField] private GameObject _obstacle; 
 		[SerializeField] private Node _node; 
@@ -30,24 +32,29 @@ namespace Components.Grid
         {
             _obstacle = obstacle;
             ContainsObject = true;
+            ContainsObstacle = true;
         }
 
         public void RemoveObstacleFromCell()
         {
             _obstacle = null;
             ContainsObject = false;
+            ContainsObstacle = false;
         }
 
         public void AddNodeToCell(Node node)
         {
             ContainsObject = true;
-            _node = node;
         }
 
         public void RemoveNodeFromCell()
         {
             ContainsObject = false;
-            _node = null;
         }
+
+        public void DefineCellAsWaterCell()
+		{
+            IsWater = true;
+		}
     }
 }

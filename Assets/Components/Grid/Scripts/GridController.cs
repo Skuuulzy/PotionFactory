@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using CodeMonkey.Utils;
 using System.Collections.Generic;
 using Components.Machines;
@@ -18,9 +18,14 @@ namespace Components.Grid
         [SerializeField] private bool _showDebug;
         
         [Header("Prefabs")] 
-        [SerializeField] private GameObject _groundTile;
         [SerializeField] private MachineController _machineControllerPrefab;
         
+        [Header("Tiles")]
+        [SerializeField] private List<GameObject> _groundTilesList;
+        private GameObject _groundTile;
+        [SerializeField] private GameObject _waterTile;
+		[SerializeField] private float _waterTileGenerationProbability;
+
         [Header("Holders")]
         [SerializeField] private Transform _groundHolder;
         [SerializeField] private Transform _objectsHolder;
@@ -29,6 +34,7 @@ namespace Components.Grid
         [Header("Obstacles")]
         [SerializeField] private List<GameObject> _obstacleList;
         [SerializeField] private float _obstacleGenerationProbability;
+        [SerializeField] private float _randomBonusProbability;
 
         [Header("Extractor")]
         [SerializeField] private bool _addRandomExtractor;
@@ -237,7 +243,7 @@ namespace Components.Grid
             }
 
             // Check if the cell has an object
-            if (!chosenCell.ContainsObject)
+            if (!chosenCell.ContainsObject || chosenCell.ContainsObstacle)
             {
                 return;
             }
@@ -262,8 +268,10 @@ namespace Components.Grid
         
         // ------------------------------------------------------------------------- GRID METHODS -------------------------------------------------------------------------
         [PropertySpace ,Button(ButtonSizes.Medium)]
-        private void GenerateGrid()
+        public void GenerateGrid()
         {
+            _groundTile = _groundTilesList[UnityEngine.Random.Range(0, _groundTilesList.Count)];
+
             if (_grid != null)
             {
                 ClearGrid();
@@ -276,9 +284,7 @@ namespace Components.Grid
             {
                 for (int z = 0; z < _grid.GetHeight(); z++)
                 {
-                    var tile = Instantiate(_groundTile, _grid.GetWorldPosition(x, z), Quaternion.identity, _groundHolder);
-                    tile.transform.localScale = new Vector3(_cellSize, _cellSize, _cellSize);
-                    tile.name = $"Cell ({x}, {z})";
+                    bool cellIsWater = GenerateTile(x, z);
 
                     if (!_addRandomExtractor)
                     {
@@ -286,23 +292,26 @@ namespace Components.Grid
                     }
                     
                     bool isExtractor = false;
-
 					if (x == 0 || x == _grid.GetWidth() - 1 || z == 0 || z == _grid.GetHeight() - 1)
                     {
-					    isExtractor = GenerateExtractor(x, z);
+                        isExtractor = GenerateExtractor(x, z);
                     }
 
                     if (!isExtractor)
                     {
-						//Instantiate Obstacle
-						GenerateObstacle(x, z);
+                        if(x != 1 && x != _grid.GetWidth() - 2 && z != 1 && z != _grid.GetHeight() - 2)
+						{
+                            //Instantiate Obstacle
+                            GenerateObstacle(x, z);
+                        }
 					}
                     
                 }
             }
         }
         
-        public void ClearGrid()
+
+        private void ClearGrid()
         {
             foreach (var machineController in _instancedObjects)
             {
@@ -312,6 +321,7 @@ namespace Components.Grid
             _grid.ClearCellsData();
             _instancedObjects.Clear();
         }
+
 
         private bool GenerateExtractor(int x, int z)
         {
@@ -340,19 +350,30 @@ namespace Components.Grid
         
         private void GenerateObstacle(int x, int z)
         {
-	        if (!(UnityEngine.Random.value <= _obstacleGenerationProbability))
+			_randomBonusProbability = 0.0f;
+			_grid.TryGetCellByCoordinates(x, z, out var chosenCell);
+            Dictionary<Side,Cell> neighboursCells = _grid.GetNeighboursByPosition(chosenCell);
+            foreach(Cell cell in neighboursCells.Values)
+            {
+                if(cell.Obstacle != null)
+                {
+					_randomBonusProbability += 0.4f;
+                }
+            }
+
+			if (!(UnityEngine.Random.value <= _obstacleGenerationProbability + _randomBonusProbability))
 	        {
 		        return;
 	        }
 	        
-	        _grid.TryGetCellByCoordinates(x, z, out var cell);
+	        
 				
 	        var obstacle = Instantiate(_obstacleList[UnityEngine.Random.Range(0, _obstacleList.Count)], _obstacleHolder);
-	        obstacle.transform.position = _grid.GetWorldPosition(cell.X, cell.Y) + new Vector3(_cellSize / 2, 0, _cellSize / 2);
+	        obstacle.transform.position = _grid.GetWorldPosition(chosenCell.X, chosenCell.Y) + new Vector3(_cellSize / 2, 0, _cellSize / 2);
 	        obstacle.transform.localScale = new Vector3(_cellSize, _cellSize, _cellSize);
 	        obstacle.transform.localRotation = Quaternion.Euler(new Vector3(0, -_currentRotation, 0));
-				
-	        cell.AddObstacleToCell(obstacle);
+
+			chosenCell.AddObstacleToCell(obstacle);
         }
 
         private void ManageRotation(int x, int z)
