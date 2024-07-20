@@ -36,7 +36,7 @@ namespace Components.Machines.Behaviors
             {
                 if (outMachine.TryGiveItemItem(_currentRecipe.OutItemTemplate))
                 {
-                    Debug.Log($"Machine: {machine.Controller.name} outputting: {_currentRecipe.OutItemTemplate} to: {outMachine.Controller.name}.");
+                    Debug.Log($"Machine: {machine.Controller.name} outputting: {_currentRecipe.OutItemTemplate.name} to: {outMachine.Controller.name}.");
                     
                     _currentRecipe = null;
                     _currentProcessTime = 0;
