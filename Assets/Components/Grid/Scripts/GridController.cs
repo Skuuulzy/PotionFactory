@@ -5,7 +5,6 @@ using Components.Machines;
 using Sirenix.OdinInspector;
 using System;
 using Components.Items;
-using Components.Machines.Behaviors;
 
 namespace Components.Grid
 {
@@ -19,15 +18,9 @@ namespace Components.Grid
         [SerializeField] private bool _showDebug;
         
         [Header("Prefabs")] 
+        [SerializeField] private GameObject _groundTile;
         [SerializeField] private MachineController _machineControllerPrefab;
-        [SerializeField] private MachinePreviewController _machinePreviewControllerPrefab;
         
-        [Header("Tiles")]
-        [SerializeField] private List<GameObject> _groundTilesList;
-        private GameObject _groundTile;
-        [SerializeField] private GameObject _waterTile;
-		[SerializeField] private float _waterTileGenerationProbability;
-
         [Header("Holders")]
         [SerializeField] private Transform _groundHolder;
         [SerializeField] private Transform _objectsHolder;
@@ -36,19 +29,19 @@ namespace Components.Grid
         [Header("Obstacles")]
         [SerializeField] private List<GameObject> _obstacleList;
         [SerializeField] private float _obstacleGenerationProbability;
-        [SerializeField] private float _randomBonusProbability;
 
         [Header("Extractor")]
+        [SerializeField] private bool _addRandomExtractor;
         [SerializeField] private MachineTemplate _extractorMachine;
         [SerializeField] private List<ItemTemplate> _itemTemplateList;
 		[SerializeField] private float _extractorGenerationProbability;
 
 		// Grid
 		private Grid _grid;
-        private readonly Dictionary<Cell, GameObject> _instancedObjects = new();
-        
+		private readonly List<MachineController> _instancedObjects = new ();
+		
         // Preview
-        private MachinePreviewController _currentMachinePreviewController;
+        private MachineController _currentMachineController;
         private int _currentRotation;
         private UnityEngine.Camera _camera;
         
@@ -56,13 +49,12 @@ namespace Components.Grid
         public Action<Machine> OnMachineAdded;
         public Action<Machine> OnMachineRemoved;
         
+
         // ------------------------------------------------------------------------- MONO -------------------------------------------------------------------------
         private void Start()
         {
             _camera = UnityEngine.Camera.main;
-
-
-            InstantiateSelection();
+            InstantiateNewPreview();
             GenerateGrid();
         }
 
@@ -78,7 +70,6 @@ namespace Components.Grid
             if (Input.GetMouseButton(0))
             {
                 AddSelectedMachineToGrid();
-                
             }
             if (Input.GetMouseButtonDown(2))
             {
@@ -87,24 +78,28 @@ namespace Components.Grid
         }
         
         // ------------------------------------------------------------------------- SELECTION -------------------------------------------------------------------------
-        private void InstantiateSelection()
+        private void InstantiateNewPreview()
         {
-            _currentMachinePreviewController = Instantiate(_machinePreviewControllerPrefab);
-            _currentMachinePreviewController.InstantiatePreview(MachineManager.Instance.SelectedMachine, _cellSize);
+            _currentMachineController = Instantiate(_machineControllerPrefab);
+            _currentMachineController.InstantiatePreview(MachineManager.Instance.SelectedMachine, _cellSize);
+            _currentMachineController.RotatePreview(_currentRotation);
 
             MachineManager.OnChangeSelectedMachine += UpdateSelection;
         }
         
         private void UpdateSelection(MachineTemplate newTemplate)
         {
-            _currentMachinePreviewController.InstantiatePreview(newTemplate, _cellSize);
+	        Destroy(_currentMachineController.gameObject);
+
+	        _currentMachineController = Instantiate(_machineControllerPrefab);
+            _currentMachineController.InstantiatePreview(newTemplate, _cellSize);
+
             _currentRotation = 0;
-            _currentMachinePreviewController.transform.rotation = Quaternion.identity;
         }
 
         private void DeleteSelection()
         {
-            _currentMachinePreviewController.DeletePreview();
+           //_currentMachineController.DeletePreview();
 		}
         
         private void MoveSelection()
@@ -115,14 +110,14 @@ namespace Components.Grid
             }
 
             // Update the object's position
-            _currentMachinePreviewController.transform.position = worldMousePosition;
+            _currentMachineController.transform.position = worldMousePosition;
         }
         
         private void RotateSelection()
         {
             _currentRotation += 90;
             _currentRotation %= 360;
-            _currentMachinePreviewController.transform.rotation = Quaternion.Euler(new Vector3(0, -_currentRotation, 0));
+            _currentMachineController.RotatePreview(_currentRotation);
         }
 
         // ------------------------------------------------------------------------- INPUT HANDLERS -------------------------------------------------------------------------
@@ -139,40 +134,93 @@ namespace Components.Grid
 			{
 				return;
 			}
-
-			// Check if the cell has no object
-			if (chosenCell.ContainsObject)
+			
+			// Check if the machine can be placed on the grid.
+			foreach (var node in _currentMachineController.Machine.Nodes)
 			{
-				return;
+				var nodeGridPosition = node.SetGridPosition(new Vector2Int(chosenCell.X, chosenCell.Y));
+
+				// One node does not overlap a constructable cell.
+				if (!_grid.TryGetCellByCoordinates(nodeGridPosition.x, nodeGridPosition.y, out Cell overlapCell))
+				{
+					return;
+				}
+					
+				// One node of the machine overlap a cell that already contain an object.
+				if (overlapCell.ContainsObject)
+				{
+					return;
+				}
 			}
+			
 			AddMachineToGrid(MachineManager.Instance.SelectedMachine, chosenCell);
         }
 
-        private MachineController AddMachineToGrid(MachineTemplate machine, Cell chosenCell)
+        private void AddMachineToGrid(MachineTemplate machine, Cell originCell)
         {
-
-            //Instantiate a machine controller
-            MachineController machineController = Instantiate(_machineControllerPrefab, _objectsHolder);
-            machineController.transform.position = _grid.GetWorldPosition(chosenCell.X, chosenCell.Y) + new Vector3(_cellSize / 2, 0, _cellSize / 2);
-            machineController.transform.localScale = new Vector3(_cellSize, _cellSize, _cellSize);
-            machineController.transform.localRotation = Quaternion.Euler(new Vector3(0, -_currentRotation, 0));
-            machineController.transform.name = $"{machine.Name}_{_instancedObjects.Count}";
+	        _instancedObjects.Add(_currentMachineController);
+	        
+            _currentMachineController.transform.position = _grid.GetWorldPosition(originCell.X, originCell.Y) + new Vector3(_cellSize / 2, 0, _cellSize / 2);
+            _currentMachineController.transform.name = $"{machine.Name}_{_instancedObjects.Count}";
+            _currentMachineController.transform.parent = _objectsHolder;
             
-            // Set up the controller with the correct type;
-            machineController.SetGridData(machine, _grid.GetNeighboursByPosition(chosenCell), _currentRotation);
+            // Adding nodes to the cells
+            foreach (var node in _currentMachineController.Machine.Nodes)
+            {
+	            var nodeGridPosition = node.SetGridPosition(new Vector2Int(originCell.X, originCell.Y));
+	            
+	            if (_grid.TryGetCellByCoordinates(nodeGridPosition.x, nodeGridPosition.y, out Cell overlapCell))
+	            {
+		            overlapCell.AddNodeToCell(node);
+		            
+		            // Add potential connected ports
+		            foreach (var port in node.Ports)
+		            {
+			            switch (port.Side)
+			            {
+				            case Side.DOWN:
+					            TryBindConnectedPort(port, new Vector2Int(nodeGridPosition.x, nodeGridPosition.y - 1));
+					            break;
+				            case Side.UP:
+					            TryBindConnectedPort(port, new Vector2Int(nodeGridPosition.x, nodeGridPosition.y + 1));
+					            break;
+				            case Side.RIGHT:
+					            TryBindConnectedPort(port, new Vector2Int(nodeGridPosition.x + 1, nodeGridPosition.y));
+					            break;
+				            case Side.LEFT:
+					            TryBindConnectedPort(port, new Vector2Int(nodeGridPosition.x - 1, nodeGridPosition.y));
+					            break;
+				            case Side.NONE:
+					            break;
+				            default:
+					            throw new ArgumentOutOfRangeException();
+			            }
+		            }
+	            }
+            }
             
-            //Add it to a dictionary to track it after
-            _instancedObjects.Add(chosenCell, machineController.gameObject);
+            _currentMachineController.ConfirmPlacement();
             
-            //Set the AlreadyContainsMachine bool to true
-            chosenCell.AddMachineToCell(machineController);
-
-            //Call AddedMachine action
-            OnMachineAdded?.Invoke(machineController.Machine);
-
-            return machineController;
+            InstantiateNewPreview();
         }
 
+        private void TryBindConnectedPort(Port port, Vector2Int neighbourPosition)
+        {
+	        if (_grid.TryGetCellByCoordinates(neighbourPosition.x , neighbourPosition.y, out Cell neighbourCell))
+	        {
+		        if (neighbourCell.ContainsObject)
+		        {
+			        foreach (var potentialPort in neighbourCell.Node.Ports)
+			        {
+				        if (potentialPort.Side == port.Side.Opposite())
+				        {
+					        port.SetConnectedPort(potentialPort);
+				        }
+			        }
+		        }
+	        }
+        }
+        
         private void RemoveMachineFromGrid()
         {
 			DeleteSelection();
@@ -189,29 +237,33 @@ namespace Components.Grid
             }
 
             // Check if the cell has an object
-            if (!chosenCell.ContainsObject || chosenCell.ContainsObstacle)
+            if (!chosenCell.ContainsObject)
             {
                 return;
             }
-
-            //Call RemovedMachine action
-            OnMachineRemoved?.Invoke(chosenCell.MachineController.Machine);
-
-            //Destroy the GameObject from the cell position
-            Destroy(_instancedObjects[chosenCell]);
-            _instancedObjects.Remove(chosenCell);
-
-            //Reset cell state
-            chosenCell.RemoveMachineFromCell();
             
+            //Destroy the machine associated to the node
+            var machineToDestroy = chosenCell.Node.Machine;
+
+            //Reset all cell linked to the machine.
+            foreach (var node in chosenCell.Node.Machine.Nodes)
+            {
+	            if (!_grid.TryGetCellByCoordinates(node.GridPosition.x, node.GridPosition.y, out Cell linkedCell))
+	            {
+		            continue;
+	            }
+	            
+	            linkedCell.RemoveNodeFromCell();
+            }
+            
+            _instancedObjects.Remove(machineToDestroy.Controller);
+            Destroy(machineToDestroy.Controller.gameObject);
         }
         
         // ------------------------------------------------------------------------- GRID METHODS -------------------------------------------------------------------------
         [PropertySpace ,Button(ButtonSizes.Medium)]
-        public void GenerateGrid()
+        private void GenerateGrid()
         {
-            _groundTile = _groundTilesList[UnityEngine.Random.Range(0, _groundTilesList.Count)];
-
             if (_grid != null)
             {
                 ClearGrid();
@@ -224,141 +276,83 @@ namespace Components.Grid
             {
                 for (int z = 0; z < _grid.GetHeight(); z++)
                 {
-                    bool cellIsWater = GenerateTile(x, z);
+                    var tile = Instantiate(_groundTile, _grid.GetWorldPosition(x, z), Quaternion.identity, _groundHolder);
+                    tile.transform.localScale = new Vector3(_cellSize, _cellSize, _cellSize);
+                    tile.name = $"Cell ({x}, {z})";
 
-					if (cellIsWater)
-					{
-                        //No need to place anything else on this cell because it is water
-                        continue;
-					}
-
+                    if (!_addRandomExtractor)
+                    {
+	                    continue;
+                    }
+                    
                     bool isExtractor = false;
+
 					if (x == 0 || x == _grid.GetWidth() - 1 || z == 0 || z == _grid.GetHeight() - 1)
                     {
-                        isExtractor = GenerateExtractor(x, z);
+					    isExtractor = GenerateExtractor(x, z);
                     }
 
                     if (!isExtractor)
                     {
-                        if(x != 1 && x != _grid.GetWidth() - 2 && z != 1 && z != _grid.GetHeight() - 2)
-						{
-                            //Instantiate Obstacle
-                            GenerateObstacle(x, z);
-                        }
+						//Instantiate Obstacle
+						GenerateObstacle(x, z);
 					}
                     
                 }
             }
         }
         
-
         private void ClearGrid()
         {
-            ClearAllMachines();
-
-            foreach (Transform groundTile in _groundHolder)
-			{
-				Destroy(groundTile.gameObject);
-			}
-            foreach (Transform obstacleTile in _obstacleHolder)
+            foreach (var machineController in _instancedObjects)
             {
-                Destroy(obstacleTile.gameObject);
+                Destroy(machineController.gameObject);
             }
-            foreach (Transform objectTile in _objectsHolder)
-            {
-                Destroy(objectTile.gameObject);
-            }
-
-
+            
+            _grid.ClearCellsData();
             _instancedObjects.Clear();
         }
 
-        public void ClearAllMachines()
-		{
-            foreach (var cell in _instancedObjects)
-            {
-                Destroy(cell.Value);
-                cell.Key.RemoveMachineFromCell();
-            }
-        }
-
-        private bool GenerateTile(int x, int z)
-		{
-            if (!(UnityEngine.Random.value <= _waterTileGenerationProbability) )
-            {
-                var tile = Instantiate(_groundTile, _grid.GetWorldPosition(x, z), Quaternion.identity, _groundHolder);
-                tile.transform.localScale = new Vector3(_cellSize, _cellSize, _cellSize);
-                tile.name = $"Cell ({x}, {z})";
-                return false;
-            }
-			else
-			{
-                var tile = Instantiate(_waterTile, _grid.GetWorldPosition(x, z), Quaternion.identity, _groundHolder);
-                tile.transform.localScale = new Vector3(_cellSize, _cellSize, _cellSize);
-                tile.name = $"Cell ({x}, {z})";
-                _grid.TryGetCellByCoordinates(x, z, out var cell);
-                cell.DefineCellAsWaterCell();
-
-                return true;
-            }
-
-
-        }
-
-
         private bool GenerateExtractor(int x, int z)
         {
-	        if (!(UnityEngine.Random.value <= _extractorGenerationProbability) || _itemTemplateList.Count == 0)
-	        {
-		        return false;
-	        }
+	        // if (!(UnityEngine.Random.value <= _extractorGenerationProbability) || _itemTemplateList.Count == 0)
+	        // {
+		       //  return false;
+	        // }
+	        //
+	        // ManageRotation(x, z);
+	        // _grid.TryGetCellByCoordinates(x, z, out var cell);
+	        // MachineController machineController = AddMachineToGrid(_extractorMachine, cell);
+	        //
+	        // if (machineController.Machine.Behavior is ExtractorMachineBehaviour extractor)
+	        // {
+		       //  ItemTemplate itemTemplate = _itemTemplateList[UnityEngine.Random.Range(0, _itemTemplateList.Count)];
+		       //  extractor.Init(itemTemplate);
+		       //  _itemTemplateList.Remove(itemTemplate);
+	        //
+		       //  //Reset current rotation
+		       //  _currentRotation = 0;
+		       //  return true;
+	        // }
 
-	        ManageRotation(x, z);
-	        _grid.TryGetCellByCoordinates(x, z, out var cell);
-	        MachineController machineController = AddMachineToGrid(_extractorMachine, cell);
-
-	        if (machineController.Machine.Behavior is ExtractorMachineBehaviour extractor)
-	        {
-		        ItemTemplate itemTemplate = _itemTemplateList[UnityEngine.Random.Range(0, _itemTemplateList.Count)];
-		        extractor.Init(itemTemplate);
-		        _itemTemplateList.Remove(itemTemplate);
-
-		        //Reset current rotation
-		        _currentRotation = 0;
-		        return true;
-	        }
-
-			//Reset current rotation
-			_currentRotation = 0;
-			return false;
+	        return false;
         }
         
         private void GenerateObstacle(int x, int z)
         {
-			_randomBonusProbability = 0.0f;
-			_grid.TryGetCellByCoordinates(x, z, out var chosenCell);
-            Dictionary<Side,Cell> neighboursCells = _grid.GetNeighboursByPosition(chosenCell);
-            foreach(Cell cell in neighboursCells.Values)
-            {
-                if(cell.Obstacle != null)
-                {
-					_randomBonusProbability += 0.4f;
-                }
-            }
-
-			if (!(UnityEngine.Random.value <= _obstacleGenerationProbability + _randomBonusProbability))
+	        if (!(UnityEngine.Random.value <= _obstacleGenerationProbability))
 	        {
 		        return;
 	        }
 	        
-	        
+	        _grid.TryGetCellByCoordinates(x, z, out var cell);
 				
 	        var obstacle = Instantiate(_obstacleList[UnityEngine.Random.Range(0, _obstacleList.Count)], _obstacleHolder);
-	        obstacle.transform.position = _grid.GetWorldPosition(chosenCell.X, chosenCell.Y) + new Vector3(_cellSize / 2, 0, _cellSize / 2);
+	        obstacle.transform.position = _grid.GetWorldPosition(cell.X, cell.Y) + new Vector3(_cellSize / 2, 0, _cellSize / 2);
 	        obstacle.transform.localScale = new Vector3(_cellSize, _cellSize, _cellSize);
 	        obstacle.transform.localRotation = Quaternion.Euler(new Vector3(0, -_currentRotation, 0));
-
-			chosenCell.AddObstacleToCell(obstacle);
+				
+	        cell.AddObstacleToCell(obstacle);
         }
 
         private void ManageRotation(int x, int z)

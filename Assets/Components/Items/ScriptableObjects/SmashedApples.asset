@@ -7,10 +7,16 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 255456526c8846fbbd7e3ca6f7def55c, type: 3}
-  m_Name: ExtractorBehavior
+  m_Script: {fileID: 11500000, guid: 3686ee114200bb74992aade14f2b832b, type: 3}
+  m_Name: SmashedApples
   m_EditorClassIdentifier: 
-  _processTime: 3
-  _itemTemplate: {fileID: 11400000, guid: 98ebfc979facba846b1110a0c2c42492, type: 2}
+  _name: 
+  _price: 0
+  _isLiquid: 0
+  _executionTimeModifier: 0
+  _resources: 
+  _types: 
+  _3dView: {fileID: 0}
+  _debug3DView: {fileID: 0}

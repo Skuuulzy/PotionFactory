@@ -1,6 +1,5 @@
 using Components.Items;
 using Components.Machines;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,41 +8,35 @@ namespace Components.Recipes
 	public class RecipeManager : ScriptableObject
 	{
 		[SerializeField] private List<RecipeTemplate> _recipeTemplatesList;
-		public ItemTemplate FindTheRecipe(MachineTemplate machineTemplate, List<ItemTemplate> items)
+		[SerializeField] private RecipeTemplate _unknownItemRecipe;
+		
+		public bool TryFindRecipe(MachineTemplate machineTemplate, List<ItemTemplate> inputsItems, out RecipeTemplate recipe)
 		{
 			foreach (RecipeTemplate recipeTemplate in _recipeTemplatesList)
 			{
-				if (recipeTemplate.Machine == machineTemplate)
+				if (recipeTemplate.Machine != machineTemplate) 
+					continue;
+				
+				foreach (ItemTemplate itemTemplate in inputsItems)
 				{
-					bool found = false;
-					foreach (ItemTemplate itemTemplate in items)
+					if (!IsItemMatch(itemTemplate, recipeTemplate.ItemsUsedInRecipe.ToDictionary()))
 					{
-						found = IsItemMatch(itemTemplate, recipeTemplate.ItemsUsedInRecipe.ToDictionary());
-						if (found == false)
-						{
-							break;
-						}
+						continue;
 					}
-
-					if (found == true)
-					{
-						return recipeTemplate.OutItemTemplate;
-					}
+					
+					recipe = recipeTemplate;
+					return true;
 				}
 			}
 
-			//We don't find any recipes so we create a new items  with a debug 3D representation
-			return new ItemTemplate(items);
+			//We don't find any recipes SO we return an unknown item recipe.
+			recipe = _unknownItemRecipe;
+			return false;
 		}
 
 		private bool IsItemMatch(ItemTemplate item, Dictionary<ItemTemplate, int> item2)
 		{
-			if (item2.ContainsKey(item) == false)
-			{
-				return false;
-			}
-			return true;
+			return item2.ContainsKey(item);
 		}
 	}
 }
-

@@ -27,6 +27,8 @@ public class StatisticsSystem : MonoBehaviour
 
     private void AddMachineToDictionary(Machine machine)
     {
+        return;
+        
         if (!_machineStatsDictionary.TryAdd(machine.Template.Name, 1))
         {
             _machineStatsDictionary[machine.Template.Name]++;

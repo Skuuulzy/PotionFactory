@@ -14,11 +14,11 @@ namespace Components.Grid
         public bool ContainsObject { get; private set; }
         public bool ContainsObstacle { get; private set; }
 
-        [SerializeField] private MachineController _machineController;
 		[SerializeField] private GameObject _obstacle; 
+		[SerializeField] private Node _node; 
        
-        public MachineController MachineController => _machineController;
         public GameObject Obstacle => _obstacle;  
+        public Node Node => _node;
 
         public Cell(int x, int y, float size, bool containsObject)
         {
@@ -28,36 +28,35 @@ namespace Components.Grid
             ContainsObject = containsObject;
         }
 
-        public void AddMachineToCell(MachineController machineController)
-        {
-            _machineController = machineController;
-            ContainsObject = true;
-        }
-
-        public void RemoveMachineFromCell()
-        {
-            _machineController = null;
-            ContainsObject = false;
-        }
-
         public void AddObstacleToCell(GameObject obstacle)
         {
             _obstacle = obstacle;
             ContainsObject = true;
-			ContainsObstacle = true;
+            ContainsObstacle = true;
         }
 
         public void RemoveObstacleFromCell()
         {
             _obstacle = null;
             ContainsObject = false;
-			ContainsObstacle = false;
+            ContainsObstacle = false;
+        }
+
+        public void AddNodeToCell(Node node)
+        {
+            ContainsObject = true;
+            _node = node;
+        }
+
+        public void RemoveNodeFromCell()
+        {
+            ContainsObject = false;
+            _node = null;
         }
 
         public void DefineCellAsWaterCell()
 		{
             IsWater = true;
 		}
-
     }
 }
