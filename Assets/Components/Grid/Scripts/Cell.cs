@@ -45,11 +45,13 @@ namespace Components.Grid
         public void AddNodeToCell(Node node)
         {
             ContainsObject = true;
+            _node = node;
         }
 
         public void RemoveNodeFromCell()
         {
             ContainsObject = false;
+            _node = null;
         }
 
         public void DefineCellAsWaterCell()

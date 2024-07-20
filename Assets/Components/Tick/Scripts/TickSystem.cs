@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -13,6 +12,18 @@ namespace Components.Tick
         
         private float _tickTimer;
 
+        protected override void Awake()
+        {
+            base.Awake();
+            
+            if (TICKABLES.Count == 0)
+            {
+                return;
+            }
+            
+            TICKABLES.Clear();
+        }
+
         private void Update()
         {
             _tickTimer += Time.deltaTime;
@@ -23,16 +34,6 @@ namespace Components.Tick
                 
                 TickAll();
             }
-        }
-
-        private void OnDestroy()
-        {
-            if (TICKABLES.Count == 0)
-            {
-                return;
-            }
-            
-            TICKABLES.Clear();
         }
 
         private void TickAll()
