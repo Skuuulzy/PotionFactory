@@ -1,3 +1,4 @@
+using Components.Items;
 using UnityEngine;
 
 namespace Components.Machines.Behaviors
@@ -5,7 +6,14 @@ namespace Components.Machines.Behaviors
     [CreateAssetMenu(fileName = "New Machine Behaviour", menuName = "Machines/Behavior/Extractor")]
     public class ExtractorMachineBehaviour : MachineBehavior
     {
-        public override void Process(Machine machine)
+        [SerializeField] private ItemTemplate _itemTemplate;
+        
+		public void Init(ItemTemplate itemTemplate)
+		{
+            _itemTemplate = itemTemplate;
+		}
+        
+		public override void Process(Machine machine)
         {
             CurrentTick++;
 
@@ -16,13 +24,7 @@ namespace Components.Machines.Behaviors
             
             if (machine.TryGetOutMachine(out Machine outMachine))
             {
-                // Detect if the port in is connected to the out .
-                if (machine.GetOppositeOutConnectionPort() != outMachine.InPorts[0])
-                {
-                    return;
-                }
-
-                outMachine.TryGiveItemItem(66);
+                outMachine.TryGiveItemItem(_itemTemplate);
             }
         }
     }

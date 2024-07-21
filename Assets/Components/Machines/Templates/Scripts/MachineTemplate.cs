@@ -7,28 +7,43 @@ namespace Components.Machines
     [CreateAssetMenu(fileName = "New Machine Template", menuName = "Machines/Machine Template")]
     public class MachineTemplate : ScriptableObject
     {
-        [Header("Definition")]
+        [Header("Definition")] 
         [SerializeField] private string _name;
+
         [SerializeField] private GameObject _gridView;
         [SerializeField] private Sprite _uiView;
         [SerializeField] private MachineBehavior _behavior;
-        
-        [Header("Ports")]
-        [SerializeField] private List<Side> _baseInPorts;
-        [SerializeField] private  List<Side> _baseOutPorts;
-        
-        [Header("Parameters")]
+
+        [Header("Structure")] 
+        [SerializeField] private List<Node> _nodes;
+
+        [Header("Parameters")] 
         [SerializeField] private int _maxItemCount;
 
-        
         public string Name => _name;
-        public MachineBehavior Behavior => _behavior;
 
         public GameObject GridView => _gridView;
         public Sprite UIView => _uiView;
 
-        public List<Side> BaseInPorts => _baseInPorts;
-        public List<Side> BaseOutPorts => _baseOutPorts;
+        public List<Node> Nodes => GetNodeInstance();
         public int MaxItemCount => _maxItemCount;
+        
+        private List<Node> GetNodeInstance()
+        {
+            List<Node> result = new List<Node>();
+            
+            foreach (var node in _nodes)
+            {
+                Node newNode = new Node(node);
+                result.Add(newNode);
+            }
+
+            return result;
+        }
+        
+        public MachineBehavior GetBehaviorClone()
+        {
+            return _behavior.Clone();
+        }
     }
 }
