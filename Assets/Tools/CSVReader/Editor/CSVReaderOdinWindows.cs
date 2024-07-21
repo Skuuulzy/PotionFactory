@@ -117,8 +117,12 @@ namespace VComponent.Tools.CSVReader
                     }
                     
                     ingredientTemplate.CreateFromCSV(name, price, isLiquid, executionTimeModifier);
+                    
+                    // Mark the asset as dirty to ensure Unity knows it has been modified
+                    EditorUtility.SetDirty(ingredientTemplate);
                 }
                 
+                AssetDatabase.Refresh();
                 AssetDatabase.SaveAssets();
             }
 
