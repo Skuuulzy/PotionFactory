@@ -7,9 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Stone_MAT
-  m_Shader: {fileID: -6465566751694194690, guid: 98ff573a916826c44b2271ee685e23da,
-    type: 3}
+  m_Name: Cuivre_MAT
+  m_Shader: {fileID: 4800000, guid: 933532a4fcc9baf4fa0491de14d08ed7, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -18,7 +17,8 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
+  stringTagMap:
+    RenderType: Opaque
   disabledShaderPasses: []
   m_LockedProperties: 
   m_SavedProperties:
@@ -108,12 +108,10 @@ Material:
     - _Parallax: 0.005
     - _Pattern_Power: 1
     - _Pattern_Size: 0.5
-    - _Position_Variation_Intensity: 1
-    - _Position_Variation_Seed: 1
     - _QueueControl: 0
     - _QueueOffset: 0
     - _ReceiveShadows: 1
-    - _Smoothness: 0.4
+    - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
@@ -122,10 +120,10 @@ Material:
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
-    - _BaseColor: {r: 0.754717, g: 0.7479214, b: 0.7226771, a: 1}
-    - _Color: {r: 0.75471693, g: 0.7479214, b: 0.7226771, a: 1}
-    - _Color_01: {r: 0.8867924, g: 0.872477, b: 0.8491456, a: 0}
-    - _Color_02: {r: 0.7735849, g: 0.7574739, b: 0.748042, a: 0}
+    - _BaseColor: {r: 0.41509432, g: 0.24662127, b: 0.17034532, a: 1}
+    - _Color: {r: 0.4150943, g: 0.24662119, b: 0.17034528, a: 1}
+    - _Color_01: {r: 0.46364364, g: 0.53600943, b: 0.6509434, a: 0}
+    - _Color_02: {r: 0.46274513, g: 0.5372549, b: 0.6509804, a: 0}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []
