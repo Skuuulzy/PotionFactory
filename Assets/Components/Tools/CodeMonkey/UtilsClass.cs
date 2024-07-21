@@ -563,23 +563,31 @@ namespace CodeMonkey.Utils
             return worldPosition;
         }
 
-        public static Vector3 GetWorldPositionFromUI_Perspective()
+        public static bool ScreenToWorldPositionIgnoringUI(Vector3 screenPosition, Camera worldCamera, out Vector3 gridPosition)
         {
-            return GetWorldPositionFromUI_Perspective(Input.mousePosition, Camera.main);
-        }
-
-        public static Vector3 GetWorldPositionFromUI_Perspective(Camera worldCamera)
-        {
-            return GetWorldPositionFromUI_Perspective(Input.mousePosition, worldCamera);
-        }
-
-        public static Vector3 GetWorldPositionFromUI_Perspective(Vector3 screenPosition, Camera worldCamera)
-        {
+            // Checking if the cursor is not over the UI.
+            if (EventSystem.current.IsPointerOverGameObject())
+            {
+                gridPosition = Vector3.zero;
+                return false;
+            }
+            
+            // Create a ray from the screen point
             Ray ray = worldCamera.ScreenPointToRay(screenPosition);
-            Plane xy = new Plane(Vector3.forward, new Vector3(0, 0, 0f));
-            float distance;
-            xy.Raycast(ray, out distance);
-            return ray.GetPoint(distance);
+
+            // Define a plane perpendicular to the y-axis at y = 0
+            Plane xzPlane = new Plane(Vector3.up, new Vector3(0, 0, 0));
+
+            if (xzPlane.Raycast(ray, out var enterDistance))
+            {
+                // Get the point of intersection
+                gridPosition = ray.GetPoint(enterDistance);
+                return true;
+            }
+
+            // If the ray doesn't intersect with the plane, return false.
+            gridPosition = Vector3.zero;
+            return false;
         }
 
 

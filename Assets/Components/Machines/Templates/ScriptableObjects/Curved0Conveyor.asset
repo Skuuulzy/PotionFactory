@@ -13,10 +13,16 @@ MonoBehaviour:
   m_Name: Curved0Conveyor
   m_EditorClassIdentifier: 
   _name: Conveyor
-  _gridView: {fileID: 5776661972514393347, guid: 3bb394753f62e7143bafc1dad6bd2410,
+  _gridView: {fileID: 1691528847705169943, guid: 113670807ae43d94d9e624eb601fbbe4,
     type: 3}
   _uiView: {fileID: 21300000, guid: a609b6f25385e9f439a61b99345f64d3, type: 3}
   _behavior: {fileID: 11400000, guid: f3d403794d898ac40b5d56bac13fe50c, type: 2}
-  _baseInPorts: 03000000
-  _baseOutPorts: 01000000
+  _nodes:
+  - _localPosition: {x: 0, y: 0}
+    _debugWorldPosition: {x: 0, y: 0}
+    _ports:
+    - _side: 3
+      _way: 0
+    - _side: 1
+      _way: 1
   _maxItemCount: 1

@@ -9,6 +9,7 @@ namespace Components.Machines
     {
         [SerializeField] private TMP_Text _name;
         [SerializeField] private Image _background;
+        [SerializeField] private TextMeshProUGUI _numberOfAvailableMAchineText;
 
         public Action<MachineTemplate> OnSelected;
         
@@ -18,15 +19,18 @@ namespace Components.Machines
         {
             _machine = machine;
 
-            _name.text = machine.Name.ToString();
+            _name.text = machine.Name;
             _background.sprite = machine.UIView;
         }
 
         public void Select()
         {
-            Debug.Log($"[MACHINES] Selected: {_machine.Name}");
-            
             OnSelected?.Invoke(_machine);
         }
-    }
+
+		public void UpdateNumberOfAvailableMachine(int number)
+		{
+            _numberOfAvailableMAchineText.text = number.ToString();
+		}
+	}
 }
