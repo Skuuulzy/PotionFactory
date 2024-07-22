@@ -34,9 +34,9 @@ namespace Components.Machines.Behaviors
             // Try to give the item to the next machine.
             if (machine.TryGetOutMachine(out Machine outMachine))
             {
-                if (outMachine.TryGiveItemItem(_currentRecipe.OutIngredientTemplate))
+                if (outMachine.TryGiveItemItem(_currentRecipe.OutIngredient))
                 {
-                    Debug.Log($"Machine: {machine.Controller.name} outputting: {_currentRecipe.OutIngredientTemplate.name} to: {outMachine.Controller.name}.");
+                    Debug.Log($"Machine: {machine.Controller.name} outputting: {_currentRecipe.OutIngredient.name} to: {outMachine.Controller.name}.");
                     
                     _currentRecipe = null;
                     _currentProcessTime = 0;

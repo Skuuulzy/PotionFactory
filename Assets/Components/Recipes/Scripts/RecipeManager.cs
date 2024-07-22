@@ -19,7 +19,7 @@ namespace Components.Recipes
 				
 				foreach (IngredientTemplate itemTemplate in inputsItems)
 				{
-					if (!IsItemMatch(itemTemplate, recipeTemplate.ItemsUsedInRecipe.ToDictionary()))
+					if (!IsItemMatch(itemTemplate, recipeTemplate.Ingredients))
 					{
 						continue;
 					}
