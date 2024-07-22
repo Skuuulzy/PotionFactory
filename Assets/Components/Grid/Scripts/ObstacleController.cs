@@ -9,7 +9,7 @@ public class ObstacleController : ScriptableObject
     [SerializeField] private float _obstacleGenerationProbability;
     [SerializeField] private float _randomBonusProbability;
 
-	public void GenerateObstacle(Components.Grid.Grid grid, Cell chosenCell, Transform obstacleHolder, float cellSize, float currentRotation)
+	public void GenerateObstacle(Components.Grid.Grid grid, Cell chosenCell, Transform obstacleHolder, float cellSize)
 	{
 		_randomBonusProbability = 0.0f;
 
@@ -31,7 +31,6 @@ public class ObstacleController : ScriptableObject
 		var obstacle = Instantiate(_obstacleList[UnityEngine.Random.Range(0, _obstacleList.Count)], obstacleHolder);
 		obstacle.transform.position = grid.GetWorldPosition(chosenCell.X, chosenCell.Y) + new Vector3(cellSize / 2, 0, cellSize / 2);
 		obstacle.transform.localScale = new Vector3(cellSize, cellSize, cellSize);
-		obstacle.transform.localRotation = Quaternion.Euler(new Vector3(0, -currentRotation, 0));
 
 		chosenCell.AddObstacleToCell(obstacle);
 	}

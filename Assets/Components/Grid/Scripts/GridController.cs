@@ -284,7 +284,7 @@ namespace Components.Grid
 					{
 						//Instantiate Obstacle
 						_grid.TryGetCellByCoordinates(x, z, out var chosenCell);
-						_obstacleController.GenerateObstacle(_grid, chosenCell, _obstacleHolder, _cellSize, _currentRotation);
+						_obstacleController.GenerateObstacle(_grid, chosenCell, _obstacleHolder, _cellSize);
 					}
 
                     
