@@ -4339,13 +4339,19 @@ PrefabInstance:
     - target: {fileID: 5005348551661390984, guid: 00a714b3d8b50be45995daf2ebd07a8f,
         type: 3}
       propertyPath: _machineTemplates.Array.size
-      value: 4
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 5005348551661390984, guid: 00a714b3d8b50be45995daf2ebd07a8f,
         type: 3}
-      propertyPath: _machineTemplates.Array.data[3]
+      propertyPath: _machineTemplates.Array.data[5]
       value: 
-      objectReference: {fileID: 11400000, guid: 591ee0e3af850f940b6bd4f5ed4ef617,
+      objectReference: {fileID: 11400000, guid: a8537385e1b8cb8458deab9ee8a55a7a,
+        type: 2}
+    - target: {fileID: 5005348551661390984, guid: 00a714b3d8b50be45995daf2ebd07a8f,
+        type: 3}
+      propertyPath: _machineTemplates.Array.data[6]
+      value: 
+      objectReference: {fileID: 11400000, guid: a8537385e1b8cb8458deab9ee8a55a7a,
         type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

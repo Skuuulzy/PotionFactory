@@ -19,7 +19,7 @@ namespace Components.Machines
         {
             _machine = machine;
 
-            _name.text = machine.Name.ToString();
+            _name.text = machine.Name;
             _background.sprite = machine.UIView;
         }
 
