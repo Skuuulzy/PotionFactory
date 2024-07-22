@@ -5,6 +5,7 @@ using Components.Machines;
 using Sirenix.OdinInspector;
 using System;
 using Components.Items;
+using Components.Grid.Tile;
 
 namespace Components.Grid
 {
@@ -27,7 +28,7 @@ namespace Components.Grid
         [SerializeField] private Transform _obstacleHolder;
 
 		[Header("Tiles")]
-		[SerializeField] private TileController _tileController;
+		[SerializeField] private AllTilesController _tileController;
 
 		[Header("Obstacles")]
 		[SerializeField] private ObstacleController _obstacleController;

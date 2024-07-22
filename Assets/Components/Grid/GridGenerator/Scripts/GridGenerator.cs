@@ -1,5 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
+using CodeMonkey.Utils;
+using Components.Grid.Tile;
+using System;
 using UnityEngine;
 
 namespace Components.Grid.Generator
@@ -12,18 +13,23 @@ namespace Components.Grid.Generator
 		[SerializeField] private float _cellSize = 10;
 		[SerializeField] private Vector3 _startPosition = new(0, 0);
 
+		[Header("Prefabs")]
+		[SerializeField] private TileController _groundTilePrefab;
+
 		[Header("Holders")]
 		[SerializeField] private Transform _groundHolder;
 		[SerializeField] private Transform _obstacleHolder;
 
 		[Header("Tiles")]
-		[SerializeField] private TileController _tileController;
+		[SerializeField] private AllTilesController _tileController;
 
 		[Header("Obstacles")]
 		[SerializeField] private ObstacleController _obstacleController;
 
 		// Grid
 		private Grid _grid;
+		// Preview
+		private TileController _currentTileController;
 
 		private UnityEngine.Camera _camera;
 
@@ -32,8 +38,70 @@ namespace Components.Grid.Generator
 		{
 			_camera = UnityEngine.Camera.main;
 			GenerateGrid();
+			InstantiateNewPreview();
 		}
 
+		private void Update()
+		{
+			MoveSelection();
+
+			//if (Input.GetMouseButton(1))
+			//{
+			//	RemoveMachineFromGrid();
+
+			//}
+			if (Input.GetMouseButton(0))
+			{
+				AddSelectedTileToGrid();
+			}
+
+		}
+
+
+
+		// ------------------------------------------------------------------------- SELECTION -------------------------------------------------------------------------
+		private void InstantiateNewPreview()
+		{
+			_currentTileController = Instantiate(_groundTilePrefab);
+			TileManager.OnChangeSelectedTile += UpdateSelection;
+		}
+
+		private void UpdateSelection(TileTemplate newTemplate)
+		{
+			Destroy(_currentTileController.gameObject);
+
+			_currentTileController = Instantiate(_groundTilePrefab);
+			_currentTileController.InstantiatePreview(newTemplate, _cellSize);
+
+		}
+		private void MoveSelection()
+		{
+			if (!UtilsClass.ScreenToWorldPositionIgnoringUI(Input.mousePosition, _camera, out Vector3 worldMousePosition))
+			{
+				return;
+			}
+
+			// Update the object's position
+			_currentTileController.transform.position = worldMousePosition;
+		}
+
+		// ------------------------------------------------------------------------- INPUT HANDLERS -------------------------------------------------------------------------
+		private void AddSelectedTileToGrid()
+		{
+			// Try to get the position on the grid.
+			if (!UtilsClass.ScreenToWorldPositionIgnoringUI(Input.mousePosition, _camera, out Vector3 worldMousePosition))
+			{
+				return;
+			}
+
+			// Try getting the cell
+			if (!_grid.TryGetCellByPosition(worldMousePosition, out Cell chosenCell))
+			{
+				return;
+			}
+		}
+
+		// ------------------------------------------------------------------------- GENERATE GRID -------------------------------------------------------------------------
 		public void GenerateGrid()
 		{
 			if (_grid != null)
