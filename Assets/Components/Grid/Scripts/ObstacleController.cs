@@ -13,14 +13,14 @@ public class ObstacleController : ScriptableObject
 	{
 		_randomBonusProbability = 0.0f;
 
-		Dictionary<Side, Cell> neighboursCells = grid.GetNeighboursByPosition(chosenCell);
-		foreach (Cell cell in neighboursCells.Values)
-		{
-			if (cell.Obstacle != null)
-			{
-				_randomBonusProbability += 0.4f;
-			}
-		}
+		//Dictionary<Side, Cell> neighboursCells = grid.GetNeighboursByPosition(chosenCell);
+		//foreach (Cell cell in neighboursCells.Values)
+		//{
+		//	if (cell.Obstacle != null)
+		//	{
+		//		_randomBonusProbability += 0.4f;
+		//	}
+		//}
 
 		if (!(Random.value <= _obstacleGenerationProbability + _randomBonusProbability))
 		{

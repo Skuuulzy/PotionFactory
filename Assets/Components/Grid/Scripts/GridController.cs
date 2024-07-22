@@ -26,18 +26,11 @@ namespace Components.Grid
         [SerializeField] private Transform _objectsHolder;
         [SerializeField] private Transform _obstacleHolder;
 
-        [Header("Tiles")]
-        [SerializeField] private TileController _tileController;
+		[Header("Tiles")]
+		[SerializeField] private TileController _tileController;
 
-        [Header("Obstacles")]
-        [SerializeField] private List<GameObject> _obstacleList;
-        [SerializeField] private float _obstacleGenerationProbability;
-
-        [Header("Extractor")]
-        [SerializeField] private bool _addRandomExtractor;
-        [SerializeField] private MachineTemplate _extractorMachine;
-        [SerializeField] private List<ItemTemplate> _itemTemplateList;
-		[SerializeField] private float _extractorGenerationProbability;
+		[Header("Obstacles")]
+		[SerializeField] private ObstacleController _obstacleController;
 
 		// Grid
 		private Grid _grid;
@@ -274,33 +267,26 @@ namespace Components.Grid
             
             _grid = new Grid(_gridXValue, _gridYValue, _cellSize, _startPosition, _groundHolder, _showDebug);
             _tileController.SelectATileType();
-			List<ItemTemplate> itemTemplateListTemporary = _itemTemplateList;
+
 			// Instantiate ground blocks
 			for (int x = 0; x < _grid.GetWidth(); x++)
             {
                 for (int z = 0; z < _grid.GetHeight(); z++)
                 {
-                    var tile = Instantiate(_groundTile, _grid.GetWorldPosition(x, z), Quaternion.identity, _groundHolder);
-                    tile.transform.localScale = new Vector3(_cellSize, _cellSize, _cellSize);
-                    tile.name = $"Cell ({x}, {z})";
-
-                    if (!_addRandomExtractor)
-                    {
-	                    continue;
-                    }
-                    
-                    bool isExtractor = false;
-
-					if (x == 0 || x == _grid.GetWidth() - 1 || z == 0 || z == _grid.GetHeight() - 1)
-                    {
-					    isExtractor = GenerateExtractor(x, z);
-                    }
-
-                    if (!isExtractor)
-                    {
-						//Instantiate Obstacle
-						GenerateObstacle(x, z);
+					bool cellIsWater = _tileController.GenerateTile(x, z, _grid, _groundHolder, _cellSize);
+					if (cellIsWater)
+					{
+						//No need to place anything else on this cell because it is water
+						continue;
 					}
+
+					if (x != 1 && x != _grid.GetWidth() - 2 && z != 1 && z != _grid.GetHeight() - 2)
+					{
+						//Instantiate Obstacle
+						_grid.TryGetCellByCoordinates(x, z, out var chosenCell);
+						_obstacleController.GenerateObstacle(_grid, chosenCell, _obstacleHolder, _cellSize, _currentRotation);
+					}
+
                     
                 }
             }
@@ -312,73 +298,24 @@ namespace Components.Grid
             {
                 Destroy(machineController.gameObject);
             }
-            
-            _grid.ClearCellsData();
+
+			foreach (Transform groundTile in _groundHolder)
+			{
+				Destroy(groundTile.gameObject);
+			}
+			foreach (Transform obstacleTile in _obstacleHolder)
+			{
+				Destroy(obstacleTile.gameObject);
+			}
+			foreach (Transform objectTile in _objectsHolder)
+			{
+				Destroy(objectTile.gameObject);
+			}
+
+			_grid.ClearCellsData();
             _instancedObjects.Clear();
         }
 
-        private bool GenerateExtractor(int x, int z)
-        {
-	        // if (!(UnityEngine.Random.value <= _extractorGenerationProbability) || _itemTemplateList.Count == 0)
-	        // {
-		       //  return false;
-	        // }
-	        //
-	        // ManageRotation(x, z);
-	        // _grid.TryGetCellByCoordinates(x, z, out var cell);
-	        // MachineController machineController = AddMachineToGrid(_extractorMachine, cell);
-	        //
-	        // if (machineController.Machine.Behavior is ExtractorMachineBehaviour extractor)
-	        // {
-		       //  ItemTemplate itemTemplate = _itemTemplateList[UnityEngine.Random.Range(0, _itemTemplateList.Count)];
-		       //  extractor.Init(itemTemplate);
-		       //  _itemTemplateList.Remove(itemTemplate);
-	        //
-		       //  //Reset current rotation
-		       //  _currentRotation = 0;
-		       //  return true;
-	        // }
-
-	        return false;
-        }
         
-        private void GenerateObstacle(int x, int z)
-        {
-	        if (!(UnityEngine.Random.value <= _obstacleGenerationProbability))
-	        {
-		        return;
-	        }
-	        
-	        _grid.TryGetCellByCoordinates(x, z, out var cell);
-				
-	        var obstacle = Instantiate(_obstacleList[UnityEngine.Random.Range(0, _obstacleList.Count)], _obstacleHolder);
-	        obstacle.transform.position = _grid.GetWorldPosition(cell.X, cell.Y) + new Vector3(_cellSize / 2, 0, _cellSize / 2);
-	        obstacle.transform.localScale = new Vector3(_cellSize, _cellSize, _cellSize);
-	        obstacle.transform.localRotation = Quaternion.Euler(new Vector3(0, -_currentRotation, 0));
-				
-	        cell.AddObstacleToCell(obstacle);
-        }
-
-        private void ManageRotation(int x, int z)
-        {
-	        if (x == 0)
-	        {
-		        _currentRotation = 0;
-	        }
-	        else if (x == _grid.GetWidth() - 1)
-	        {
-		        _currentRotation = 180;
-	        }
-	        else if (z == 0)
-	        {
-		        _currentRotation = 90;
-	        }
-	        else if (z == _grid.GetHeight() - 1)
-	        {
-		        _currentRotation = 270;
-	        }
-
-			_currentRotation %= 360;
-		}
     }
 }
