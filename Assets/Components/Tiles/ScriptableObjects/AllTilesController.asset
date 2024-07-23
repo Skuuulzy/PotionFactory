@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4c96c6dd1b832fb4cb5f5f1808b67811, type: 3}
-  m_Name: TileController
+  m_Name: AllTilesController
   m_EditorClassIdentifier: 
   _groundTilesList:
-  - {fileID: 4022955696050659557, guid: 60a08e49e059bc84185cdabb3e1be25a, type: 3}
-  - {fileID: 6451787547792733909, guid: 8642debfc9522434aa21b253f060b00d, type: 3}
-  - {fileID: 594745835813537016, guid: 1995d4c7102fe9a4a94ec98a6831caeb, type: 3}
-  - {fileID: 4762144622729139892, guid: 7910dd0bfdbd5184cbdfdb4f83f3b626, type: 3}
-  _waterTile: {fileID: 5098640816377893079, guid: 8ebe8fcb5637c8e4687b5e5aca85e655,
+  - {fileID: 8980534838031880519, guid: 29ac3fa80022eca449ff53807b9a44f1, type: 3}
+  - {fileID: 8980534838031880519, guid: 596747ea9b32cf144b94515aabed9598, type: 3}
+  - {fileID: 8980534838031880519, guid: 199816236cb553b498a7449667f1393e, type: 3}
+  - {fileID: 8980534838031880519, guid: a6ff5ec942550cc4e952ce2984eb9491, type: 3}
+  _waterTile: {fileID: 8980534838031880519, guid: 4d2e4d65570cb7049bc177e742241595,
     type: 3}
   _waterTileGenerationProbability: 0.02

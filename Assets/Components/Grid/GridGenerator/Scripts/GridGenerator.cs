@@ -1,6 +1,7 @@
 using CodeMonkey.Utils;
 using Components.Grid.Tile;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Components.Grid.Generator
@@ -21,10 +22,12 @@ namespace Components.Grid.Generator
 		[SerializeField] private Transform _obstacleHolder;
 
 		[Header("Tiles")]
-		[SerializeField] private AllTilesController _tileController;
+		[SerializeField] private AllTilesController _allTilesController;
 
 		[Header("Obstacles")]
 		[SerializeField] private ObstacleController _obstacleController;
+
+		private List<TileController> _tileInstantiateList;
 
 		// Grid
 		private Grid _grid;
@@ -99,6 +102,21 @@ namespace Components.Grid.Generator
 			{
 				return;
 			}
+
+			foreach(TileController tile in _tileInstantiateList)
+			{
+				if(tile.TileCoordinate[0] == chosenCell.X && tile.TileCoordinate[1] == chosenCell.Y)
+				{
+					TileController tileInstantiate = _allTilesController.GenerateTileByPrefab(chosenCell.X, chosenCell.Y, _grid, _groundHolder, _cellSize, _currentTileController);
+					_tileInstantiateList.Add(tileInstantiate);
+
+					_tileInstantiateList.Remove(tile);
+					Destroy(tile.gameObject);
+					return;
+				}
+			}
+
+
 		}
 
 		// ------------------------------------------------------------------------- GENERATE GRID -------------------------------------------------------------------------
@@ -110,20 +128,24 @@ namespace Components.Grid.Generator
 			}
 
 			_grid = new Grid(_gridXValue, _gridYValue, _cellSize, _startPosition, _groundHolder, false);
-			_tileController.SelectATileType();
+			_tileInstantiateList = new List<TileController>();
+			_allTilesController.SelectATileType();
 
 			// Instantiate ground blocks
 			for (int x = 0; x < _grid.GetWidth(); x++)
 			{
 				for (int z = 0; z < _grid.GetHeight(); z++)
 				{
-					bool cellIsWater = _tileController.GenerateTile(x, z, _grid, _groundHolder, _cellSize);
-
-					if (x != 1 && x != _grid.GetWidth() - 2 && z != 1 && z != _grid.GetHeight() - 2)
+					TileController tile = _allTilesController.GenerateTile(x, z, _grid, _groundHolder, _cellSize);
+					_tileInstantiateList.Add(tile);
+					if (tile.IsWater == false)
 					{
-						//Instantiate Obstacle
-						_grid.TryGetCellByCoordinates(x, z, out var chosenCell);
-						_obstacleController.GenerateObstacle(_grid, chosenCell, _obstacleHolder, _cellSize);
+						if (x != 1 && x != _grid.GetWidth() - 2 && z != 1 && z != _grid.GetHeight() - 2)
+						{
+							//Instantiate Obstacle
+							_grid.TryGetCellByCoordinates(x, z, out var chosenCell);
+							_obstacleController.GenerateObstacle(_grid, chosenCell, _obstacleHolder, _cellSize);
+						}
 					}
 				}
 			}

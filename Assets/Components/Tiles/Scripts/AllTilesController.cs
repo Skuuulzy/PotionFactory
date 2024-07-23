@@ -7,37 +7,50 @@ namespace Components.Grid.Tile
 {
     public class AllTilesController : ScriptableObject
     {
-        [SerializeField] private List<GameObject> _groundTilesList;
-        private GameObject _groundTile;
-        [SerializeField] private GameObject _waterTile;
+        [SerializeField] private List<TileController> _groundTilesList;
+        private TileController _groundTile;
+        [SerializeField] private TileController _waterTile;
         [SerializeField] private float _waterTileGenerationProbability;
 
-        public bool GenerateTile(int x, int z, Components.Grid.Grid grid, Transform groundHolder, float cellSize)
+        public TileController GenerateTile(int x, int z, Grid grid, Transform groundHolder, float cellSize)
         {
             if (!(Random.value <= _waterTileGenerationProbability))
             {
-                var tile = Instantiate(_groundTile, grid.GetWorldPosition(x, z), Quaternion.identity, groundHolder);
+                TileController tile = Instantiate(_groundTile, grid.GetWorldPosition(x, z), Quaternion.identity, groundHolder);
                 tile.transform.localScale = new Vector3(cellSize, cellSize, cellSize);
                 tile.name = $"Cell ({x}, {z})";
-                return false;
+                tile.TileIsWater(false);
+                tile.SetCoordinate(x, z);
+                return tile;
             }
             else
             {
-                var tile = Instantiate(_waterTile, grid.GetWorldPosition(x, z), Quaternion.identity, groundHolder);
+                TileController tile = Instantiate(_waterTile, grid.GetWorldPosition(x, z), Quaternion.identity, groundHolder);
                 tile.transform.localScale = new Vector3(cellSize, cellSize, cellSize);
                 tile.name = $"Cell ({x}, {z})";
+                tile.SetCoordinate(x, z);
+                tile.TileIsWater(true);
                 grid.TryGetCellByCoordinates(x, z, out var cell);
                 cell.DefineCellAsWaterCell();
 
-                return true;
+                return tile;
             }
 
+        }
+
+        public TileController GenerateTileByPrefab(int x, int z, Grid grid, Transform groundHolder, float cellSize, TileController tileController)
+		{
+            TileController tile = Instantiate(tileController, grid.GetWorldPosition(x, z), Quaternion.identity, groundHolder);
+            //tile.transform.localScale = new Vector3(cellSize, cellSize, cellSize);
+            tile.name = $"Cell ({x}, {z})";
+            tile.TileIsWater(false);
+            tile.SetCoordinate(x, z);
+            return tile;
         }
 
         public void SelectATileType()
         {
             _groundTile = _groundTilesList[Random.Range(0, _groundTilesList.Count)];
-
         }
     }
 }

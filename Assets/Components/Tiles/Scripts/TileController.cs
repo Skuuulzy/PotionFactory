@@ -10,6 +10,13 @@ namespace Components.Grid.Tile
         [SerializeField] private Transform _3dViewHolder;
 
         private GameObject _view;
+        private int[] _tileCoordinate;
+        private bool _isWater;
+
+        public int[] TileCoordinate => _tileCoordinate;
+        public bool IsWater => _isWater;
+
+
 
         // ------------------------------------------------------------------------- INIT -------------------------------------------------------------------------
         public void InstantiatePreview(TileTemplate tileTemplate, float scale)
@@ -18,5 +25,15 @@ namespace Components.Grid.Tile
            
             _view.transform.localScale = new Vector3(scale, scale, scale);
         }
-    }
+
+		public void SetCoordinate(int x, int z)
+		{
+			_tileCoordinate = new int[2] { x, z };
+		}
+
+        public void TileIsWater(bool isWater)
+		{
+            _isWater = isWater;
+		}
+	}
 }
