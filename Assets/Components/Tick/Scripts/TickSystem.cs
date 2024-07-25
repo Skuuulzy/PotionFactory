@@ -12,6 +12,18 @@ namespace Components.Tick
         
         private float _tickTimer;
 
+        protected override void Awake()
+        {
+            base.Awake();
+            
+            if (TICKABLES.Count == 0)
+            {
+                return;
+            }
+            
+            TICKABLES.Clear();
+        }
+
         private void Update()
         {
             _tickTimer += Time.deltaTime;
@@ -23,7 +35,7 @@ namespace Components.Tick
                 TickAll();
             }
         }
-        
+
         private void TickAll()
         {
             foreach (var tickable in TICKABLES)

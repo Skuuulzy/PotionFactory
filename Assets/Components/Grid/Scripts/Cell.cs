@@ -1,4 +1,6 @@
 using System;
+using Components.Grid.Obstacle;
+using Components.Grid.Tile;
 using Components.Machines;
 using UnityEngine;
 
@@ -10,15 +12,17 @@ namespace Components.Grid
         public int X { get; }
         public int Y { get; }
         public float Size { get; }
-        public bool IsWater { get; private set; }
         public bool ContainsObject { get; private set; }
         public bool ContainsObstacle { get; private set; }
+        public bool ContainsTile { get; private set; }
 
-        [SerializeField] private MachineController _machineController;
-		[SerializeField] private GameObject _obstacle; 
+		[SerializeField] private ObstacleController _obstacleController; 
+		[SerializeField] private TileController _tileController; 
+		[SerializeField] private Node _node; 
        
-        public MachineController MachineController => _machineController;
-        public GameObject Obstacle => _obstacle;  
+        public ObstacleController ObstacleController => _obstacleController;  
+        public TileController TileController => _tileController;  
+        public Node Node => _node;
 
         public Cell(int x, int y, float size, bool containsObject)
         {
@@ -28,36 +32,45 @@ namespace Components.Grid
             ContainsObject = containsObject;
         }
 
-        public void AddMachineToCell(MachineController machineController)
+        public void AddObstacleToCell(ObstacleController obstacle)
         {
-            _machineController = machineController;
+            _obstacleController = obstacle;
             ContainsObject = true;
-        }
-
-        public void RemoveMachineFromCell()
-        {
-            _machineController = null;
-            ContainsObject = false;
-        }
-
-        public void AddObstacleToCell(GameObject obstacle)
-        {
-            _obstacle = obstacle;
-            ContainsObject = true;
-			ContainsObstacle = true;
+            ContainsObstacle = true;
         }
 
         public void RemoveObstacleFromCell()
         {
-            _obstacle = null;
+            _obstacleController = null;
             ContainsObject = false;
-			ContainsObstacle = false;
+            ContainsObstacle = false;
         }
 
-        public void DefineCellAsWaterCell()
+		public void AddTileToCell(TileController tile)
 		{
-            IsWater = true;
+			_tileController = tile;
+			ContainsTile = true;
 		}
+
+		public void RemoveTileFromCell()
+		{
+			_tileController = null;
+			ContainsTile = false;
+		}
+
+
+		public void AddNodeToCell(Node node)
+        {
+            ContainsObject = true;
+            _node = node;
+        }
+
+        public void RemoveNodeFromCell()
+        {
+            ContainsObject = false;
+            _node = null;
+        }
+
 
     }
 }
