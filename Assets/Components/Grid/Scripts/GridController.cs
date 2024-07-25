@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using Components.Machines;
 using Sirenix.OdinInspector;
 using System;
-using Components.Items;
 using Components.Grid.Tile;
 using Components.Grid.Obstacle;
 
@@ -133,6 +132,8 @@ namespace Components.Grid
 				return;
 			}
 			
+			Debug.Log($"Clicking cell: {chosenCell.X}, {chosenCell.Y}, on position {worldMousePosition}");
+			
 			// Check if the machine can be placed on the grid.
 			foreach (var node in _currentMachineController.Machine.Nodes)
 			{
@@ -157,8 +158,8 @@ namespace Components.Grid
         private void AddMachineToGrid(MachineTemplate machine, Cell originCell)
         {
 	        _instancedObjects.Add(_currentMachineController);
-	        
-            _currentMachineController.transform.position = _grid.GetWorldPosition(originCell.X, originCell.Y) + new Vector3(_cellSize / 2, 0, _cellSize / 2);
+
+	        _currentMachineController.transform.position = _grid.GetWorldPosition(originCell.X, originCell.Y) + new Vector3(_cellSize / 2, 0, _cellSize / 2);
             _currentMachineController.transform.name = $"{machine.Name}_{_instancedObjects.Count}";
             _currentMachineController.transform.parent = _objectsHolder;
             
@@ -314,7 +315,5 @@ namespace Components.Grid
 			_grid.ClearCellsData();
             _instancedObjects.Clear();
         }
-
-        
     }
 }

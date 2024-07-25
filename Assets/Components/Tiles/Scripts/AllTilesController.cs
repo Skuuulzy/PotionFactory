@@ -1,7 +1,5 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 
 namespace Components.Grid.Tile
 {
@@ -16,7 +14,8 @@ namespace Components.Grid.Tile
         {
             if (!(Random.value <= _waterTileGenerationProbability))
             {
-                TileController tile = Instantiate(_groundTile, grid.GetWorldPosition(cell.X, cell.Y), Quaternion.identity, groundHolder);
+                TileController tile = Instantiate(_groundTile, groundHolder);
+                tile.transform.position = grid.GetWorldPosition(cell.X, cell.Y) + new Vector3(cellSize / 2, 0, cellSize / 2);
                 tile.transform.localScale = new Vector3(cellSize, cellSize, cellSize);
                 tile.name = $"Cell ({cell})";
                 tile.SetTileType(_groundTile.TileType);
@@ -25,7 +24,8 @@ namespace Components.Grid.Tile
             }
             else
             {
-                TileController tile = Instantiate(_waterTile, grid.GetWorldPosition(cell.X, cell.Y), Quaternion.identity, groundHolder);
+                TileController tile = Instantiate(_waterTile, groundHolder);
+                tile.transform.position = grid.GetWorldPosition(cell.X, cell.Y) + new Vector3(cellSize / 2, 0, cellSize / 2);
                 tile.transform.localScale = new Vector3(cellSize, cellSize, cellSize);
                 tile.name = $"Cell ({cell})";
                 tile.SetTileType(TileType.WATER);
@@ -37,11 +37,11 @@ namespace Components.Grid.Tile
 
         public TileController GenerateTileFromPrefab(Cell cell, Grid grid, Transform groundHolder, float cellSize, TileController tileController)
 		{
-            TileController tile = Instantiate(tileController, grid.GetWorldPosition(cell.X, cell.Y), Quaternion.identity, groundHolder);
+            TileController tile = Instantiate(tileController, groundHolder);
+            tile.transform.position = grid.GetWorldPosition(cell.X, cell.Y) + new Vector3(cellSize / 2, 0, cellSize / 2);
             //tile.transform.localScale = new Vector3(cellSize, cellSize, cellSize);
             tile.name = $"Cell ({cell})";
             tile.SetTileType(tileController.TileType);
-			cell.AddTileToCell(tile);
 			return tile;
         }
 
