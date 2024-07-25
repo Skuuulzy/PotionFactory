@@ -1,7 +1,9 @@
 using CodeMonkey.Utils;
 using Components.Grid.Tile;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Components.Grid.Generator
@@ -27,6 +29,7 @@ namespace Components.Grid.Generator
 		[Header("Obstacles")]
 		[SerializeField] private ObstacleController _obstacleController;
 
+		[Header("TilesGenerated")]
 		private List<TileController> _tileInstantiateList;
 
 		// Grid
@@ -35,6 +38,8 @@ namespace Components.Grid.Generator
 		private TileController _currentTileController;
 
 		private UnityEngine.Camera _camera;
+
+		private string _jsonString;
 
 		// ------------------------------------------------------------------------- MONO -------------------------------------------------------------------------
 		private void Start()
@@ -105,7 +110,7 @@ namespace Components.Grid.Generator
 
 			foreach(TileController tile in _tileInstantiateList)
 			{
-				if(tile.TileCoordinate[0] == chosenCell.X && tile.TileCoordinate[1] == chosenCell.Y)
+				if(tile.TileCoordinateX == chosenCell.X && tile.TileCoordinateZ == chosenCell.Y)
 				{
 					TileController tileInstantiate = _allTilesController.GenerateTileByPrefab(chosenCell.X, chosenCell.Y, _grid, _groundHolder, _cellSize, _currentTileController);
 					_tileInstantiateList.Add(tileInstantiate);
@@ -138,7 +143,7 @@ namespace Components.Grid.Generator
 				{
 					TileController tile = _allTilesController.GenerateTile(x, z, _grid, _groundHolder, _cellSize);
 					_tileInstantiateList.Add(tile);
-					if (tile.IsWater == false)
+					if (tile.TileType != TileType.WATER)
 					{
 						if (x != 1 && x != _grid.GetWidth() - 2 && z != 1 && z != _grid.GetHeight() - 2)
 						{
@@ -148,6 +153,20 @@ namespace Components.Grid.Generator
 						}
 					}
 				}
+			}
+		}
+
+		private void GenerateGridFromTemplate(List<TileController> tileControllerList)
+		{
+			if (_grid != null)
+			{
+				ClearGrid();
+			}
+			_grid = new Grid(_gridXValue, _gridYValue, _cellSize, _startPosition, _groundHolder, false);
+			_tileInstantiateList = tileControllerList;
+			foreach(TileController tile in tileControllerList)
+			{
+				_allTilesController.GenerateTileByPrefab(tile.TileCoordinateX, tile.TileCoordinateZ, _grid, _groundHolder, _cellSize, tile);
 			}
 		}
 
@@ -164,5 +183,22 @@ namespace Components.Grid.Generator
 
 			_grid.ClearCellsData();
 		}
+
+		// ------------------------------------------------------------------------ SAVE AND LOAD MAP -------------------------------------------------------------
+		public void SaveMap()
+		{
+
+			_jsonString = JsonHelper.ToJson(_tileInstantiateList.ToArray(), true);
+			Debug.Log(Application.persistentDataPath);
+			System.IO.File.WriteAllText(Application.persistentDataPath + "/Map.json", _jsonString);
+		}
+
+		public void LoadMap()
+		{
+			TileController[] tileControllerArray = JsonHelper.FromJson<TileController>(System.IO.File.ReadAllText(Application.persistentDataPath + "/Map.json"));
+			Debug.Log(tileControllerArray[0]);
+			GenerateGridFromTemplate(tileControllerArray.ToList());
+		}
 	}
+
 }

@@ -10,11 +10,13 @@ namespace Components.Grid.Tile
 	{
 		[Header("Definition")]
 		[SerializeField] private string _name;
+		[SerializeField] private TileType _tileType;
 
 		[SerializeField] private GameObject _gridView;
 		[SerializeField] private Sprite _uiView;
 
 		public string Name => _name;
+		public TileType TileType => _tileType;
 
 		public GameObject GridView => _gridView;
 		public Sprite UIView => _uiView;

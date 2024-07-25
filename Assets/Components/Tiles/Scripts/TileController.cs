@@ -5,16 +5,17 @@ using UnityEngine;
 
 namespace Components.Grid.Tile
 {
+    [System.Serializable]
     public class TileController : MonoBehaviour
     {
         [SerializeField] private Transform _3dViewHolder;
+        [SerializeField] public TileType TileType;
+        [SerializeField] public int TileCoordinateX;
+        [SerializeField] public int TileCoordinateZ;
 
         private GameObject _view;
-        private int[] _tileCoordinate;
-        private bool _isWater;
 
-        public int[] TileCoordinate => _tileCoordinate;
-        public bool IsWater => _isWater;
+
 
 
 
@@ -28,12 +29,22 @@ namespace Components.Grid.Tile
 
 		public void SetCoordinate(int x, int z)
 		{
-			_tileCoordinate = new int[2] { x, z };
+            TileCoordinateX = x;
+            TileCoordinateZ = z;
 		}
 
-        public void TileIsWater(bool isWater)
+        public void SetTileType(TileType tileType)
 		{
-            _isWater = isWater;
+            TileType = tileType;
 		}
+	}
+
+    public enum TileType
+	{
+        GRASS,
+        SAND,
+        STONE,
+        DIRT,
+        WATER
 	}
 }

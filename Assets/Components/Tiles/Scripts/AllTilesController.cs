@@ -19,7 +19,7 @@ namespace Components.Grid.Tile
                 TileController tile = Instantiate(_groundTile, grid.GetWorldPosition(x, z), Quaternion.identity, groundHolder);
                 tile.transform.localScale = new Vector3(cellSize, cellSize, cellSize);
                 tile.name = $"Cell ({x}, {z})";
-                tile.TileIsWater(false);
+                tile.SetTileType(_groundTile.TileType);
                 tile.SetCoordinate(x, z);
                 return tile;
             }
@@ -29,7 +29,7 @@ namespace Components.Grid.Tile
                 tile.transform.localScale = new Vector3(cellSize, cellSize, cellSize);
                 tile.name = $"Cell ({x}, {z})";
                 tile.SetCoordinate(x, z);
-                tile.TileIsWater(true);
+                tile.SetTileType(TileType.WATER);
                 grid.TryGetCellByCoordinates(x, z, out var cell);
                 cell.DefineCellAsWaterCell();
 
@@ -43,7 +43,7 @@ namespace Components.Grid.Tile
             TileController tile = Instantiate(tileController, grid.GetWorldPosition(x, z), Quaternion.identity, groundHolder);
             //tile.transform.localScale = new Vector3(cellSize, cellSize, cellSize);
             tile.name = $"Cell ({x}, {z})";
-            tile.TileIsWater(false);
+            tile.SetTileType(tileController.TileType);
             tile.SetCoordinate(x, z);
             return tile;
         }
