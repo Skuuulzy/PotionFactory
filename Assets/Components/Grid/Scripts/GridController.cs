@@ -6,6 +6,7 @@ using Sirenix.OdinInspector;
 using System;
 using Components.Items;
 using Components.Grid.Tile;
+using Components.Grid.Obstacle;
 
 namespace Components.Grid
 {
@@ -31,7 +32,7 @@ namespace Components.Grid
 		[SerializeField] private AllTilesController _tileController;
 
 		[Header("Obstacles")]
-		[SerializeField] private ObstacleController _obstacleController;
+		[SerializeField] private AllObstaclesController _obstacleController;
 
 		// Grid
 		private Grid _grid;
@@ -274,8 +275,9 @@ namespace Components.Grid
             {
                 for (int z = 0; z < _grid.GetHeight(); z++)
                 {
-					bool cellIsWater = _tileController.GenerateTile(x, z, _grid, _groundHolder, _cellSize);
-					if (cellIsWater)
+					_grid.TryGetCellByCoordinates(x, z, out var chosenCell);
+					TileController tile = _tileController.GenerateTile(chosenCell, _grid, _groundHolder, _cellSize);
+					if (tile.TileType == TileType.WATER)
 					{
 						//No need to place anything else on this cell because it is water
 						continue;
@@ -283,12 +285,8 @@ namespace Components.Grid
 
 					if (x != 1 && x != _grid.GetWidth() - 2 && z != 1 && z != _grid.GetHeight() - 2)
 					{
-						//Instantiate Obstacle
-						_grid.TryGetCellByCoordinates(x, z, out var chosenCell);
 						_obstacleController.GenerateObstacle(_grid, chosenCell, _obstacleHolder, _cellSize);
 					}
-
-                    
                 }
             }
         }

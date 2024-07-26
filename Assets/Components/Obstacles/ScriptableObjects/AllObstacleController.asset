@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6fce628821c3fdc42a105148618f93c3, type: 3}
-  m_Name: ObstacleController
+  m_Name: AllObstacleController
   m_EditorClassIdentifier: 
   _obstacleList:
-  - {fileID: 2618415534329680461, guid: 531569000dfcd6d4dbc40320fee01b6b, type: 3}
-  - {fileID: 6572264004440287484, guid: 8c12ea84ea5f61b458d16410b0c1e550, type: 3}
-  - {fileID: 1369166025250707419, guid: 3e26b1cf608e2ab448a8dd4955c6a40a, type: 3}
-  - {fileID: 2512936555244556357, guid: 35cf2cbec93c4c448b68c2487219dfa9, type: 3}
+  - {fileID: 1293170947892249730, guid: 4b1318ad45146a4409d764d575318687, type: 3}
+  - {fileID: 1293170947892249730, guid: daec42603b469e74cb3a6bdea6f51f1c, type: 3}
+  - {fileID: 1293170947892249730, guid: 50621478095d0aa45b7b2beb08d05acf, type: 3}
+  - {fileID: 1293170947892249730, guid: 7f8f09b05c001794f9924dfc20b8f65a, type: 3}
   _obstacleGenerationProbability: 0.02
   _randomBonusProbability: 0.1

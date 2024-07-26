@@ -1,4 +1,5 @@
 using System;
+using Components.Grid.Obstacle;
 using Components.Machines;
 using UnityEngine;
 
@@ -14,10 +15,10 @@ namespace Components.Grid
         public bool ContainsObject { get; private set; }
         public bool ContainsObstacle { get; private set; }
 
-		[SerializeField] private GameObject _obstacle; 
+		[SerializeField] private ObstacleController _obstacle; 
 		[SerializeField] private Node _node; 
        
-        public GameObject Obstacle => _obstacle;  
+        public ObstacleController Obstacle => _obstacle;  
         public Node Node => _node;
 
         public Cell(int x, int y, float size, bool containsObject)
@@ -28,7 +29,7 @@ namespace Components.Grid
             ContainsObject = containsObject;
         }
 
-        public void AddObstacleToCell(GameObject obstacle)
+        public void AddObstacleToCell(ObstacleController obstacle)
         {
             _obstacle = obstacle;
             ContainsObject = true;

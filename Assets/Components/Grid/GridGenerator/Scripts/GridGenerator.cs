@@ -1,4 +1,5 @@
 using CodeMonkey.Utils;
+using Components.Grid.Obstacle;
 using Components.Grid.Tile;
 using Newtonsoft.Json;
 using System;
@@ -17,7 +18,8 @@ namespace Components.Grid.Generator
 		[SerializeField] private Vector3 _startPosition = new(0, 0);
 
 		[Header("Prefabs")]
-		[SerializeField] private TileController _groundTilePrefab;
+		[SerializeField] private TileController _tilePrefab;
+		[SerializeField] private ObstacleController _obstaclePrefab;
 
 		[Header("Holders")]
 		[SerializeField] private Transform _groundHolder;
@@ -27,15 +29,17 @@ namespace Components.Grid.Generator
 		[SerializeField] private AllTilesController _allTilesController;
 
 		[Header("Obstacles")]
-		[SerializeField] private ObstacleController _obstacleController;
+		[SerializeField] private AllObstaclesController _allObstacleController;
 
 		[Header("TilesGenerated")]
 		private List<TileController> _tileInstantiateList;
+		private List<ObstacleController> _obstacleInstantiateList;
 
 		// Grid
 		private Grid _grid;
 		// Preview
 		private TileController _currentTileController;
+		private ObstacleController _currentObstacleController;
 
 		private UnityEngine.Camera _camera;
 
@@ -70,18 +74,31 @@ namespace Components.Grid.Generator
 		// ------------------------------------------------------------------------- SELECTION -------------------------------------------------------------------------
 		private void InstantiateNewPreview()
 		{
-			_currentTileController = Instantiate(_groundTilePrefab);
-			TileManager.OnChangeSelectedTile += UpdateSelection;
+			_currentTileController = Instantiate(_tilePrefab);
+			TileManager.OnChangeSelectedTile += UpdateTileSelection;
+			ObstacleManager.OnChangeSelectedObstacle += UpdateObstacleSelection;
+
 		}
 
-		private void UpdateSelection(TileTemplate newTemplate)
+		private void UpdateTileSelection(TileTemplate tileTemplate)
 		{
 			Destroy(_currentTileController.gameObject);
+			Destroy(_currentObstacleController.gameObject);
 
-			_currentTileController = Instantiate(_groundTilePrefab);
-			_currentTileController.InstantiatePreview(newTemplate, _cellSize);
+			_currentTileController = Instantiate(_tilePrefab);
+			_currentTileController.InstantiatePreview(tileTemplate, _cellSize);
 
 		}
+
+		private void UpdateObstacleSelection(ObstacleTemplate obstacleTemplate)
+		{
+			Destroy(_currentTileController.gameObject);
+			Destroy(_currentObstacleController.gameObject);
+
+			_currentObstacleController = Instantiate(_obstaclePrefab);
+			_currentObstacleController.InstantiatePreview(obstacleTemplate, _cellSize);
+		}
+
 		private void MoveSelection()
 		{
 			if (!UtilsClass.ScreenToWorldPositionIgnoringUI(Input.mousePosition, _camera, out Vector3 worldMousePosition))
@@ -90,7 +107,14 @@ namespace Components.Grid.Generator
 			}
 
 			// Update the object's position
-			_currentTileController.transform.position = worldMousePosition;
+			if(_currentTileController != null)
+			{
+				_currentTileController.transform.position = worldMousePosition;
+			}
+			else if (_currentObstacleController != null)
+			{
+				_currentObstacleController.transform.position = worldMousePosition;
+			}
 		}
 
 		// ------------------------------------------------------------------------- INPUT HANDLERS -------------------------------------------------------------------------
@@ -108,18 +132,37 @@ namespace Components.Grid.Generator
 				return;
 			}
 
-			foreach(TileController tile in _tileInstantiateList)
+			if(_currentTileController != null)
 			{
-				if(tile.TileCoordinateX == chosenCell.X && tile.TileCoordinateZ == chosenCell.Y)
+				foreach (TileController tile in _tileInstantiateList)
 				{
-					TileController tileInstantiate = _allTilesController.GenerateTileByPrefab(chosenCell.X, chosenCell.Y, _grid, _groundHolder, _cellSize, _currentTileController);
-					_tileInstantiateList.Add(tileInstantiate);
+					if (tile.Cell == chosenCell)
+					{
+						TileController tileInstantiate = _allTilesController.GenerateTileFromPrefab(chosenCell, _grid, _groundHolder, _cellSize, _currentTileController);
+						_tileInstantiateList.Add(tileInstantiate);
 
-					_tileInstantiateList.Remove(tile);
-					Destroy(tile.gameObject);
-					return;
+						_tileInstantiateList.Remove(tile);
+						Destroy(tile.gameObject);
+						return;
+					}
 				}
 			}
+
+			else if( _currentObstacleController != null)
+			{
+				foreach (ObstacleController obstacle in _obstacleInstantiateList)
+				{
+					if (obstacle.Cell == chosenCell)
+					{
+						ObstacleController obstacleController = _allObstacleController.GenerateObstacleFromPrefab(_grid, chosenCell,  _obstacleHolder, _cellSize, _currentObstacleController);
+						_obstacleInstantiateList.Add(obstacleController);
+						_obstacleInstantiateList.Remove(obstacle);
+						Destroy(obstacle.gameObject);
+						return;
+					}
+				}
+			}
+
 
 
 		}
@@ -141,15 +184,14 @@ namespace Components.Grid.Generator
 			{
 				for (int z = 0; z < _grid.GetHeight(); z++)
 				{
-					TileController tile = _allTilesController.GenerateTile(x, z, _grid, _groundHolder, _cellSize);
+					_grid.TryGetCellByCoordinates(x, z, out var chosenCell);
+					TileController tile = _allTilesController.GenerateTile(chosenCell, _grid, _groundHolder, _cellSize);
 					_tileInstantiateList.Add(tile);
 					if (tile.TileType != TileType.WATER)
 					{
 						if (x != 1 && x != _grid.GetWidth() - 2 && z != 1 && z != _grid.GetHeight() - 2)
 						{
-							//Instantiate Obstacle
-							_grid.TryGetCellByCoordinates(x, z, out var chosenCell);
-							_obstacleController.GenerateObstacle(_grid, chosenCell, _obstacleHolder, _cellSize);
+							_allObstacleController.GenerateObstacle(_grid, chosenCell, _obstacleHolder, _cellSize);
 						}
 					}
 				}
@@ -163,11 +205,12 @@ namespace Components.Grid.Generator
 				ClearGrid();
 			}
 			_grid = new Grid(_gridXValue, _gridYValue, _cellSize, _startPosition, _groundHolder, false);
-			_tileInstantiateList = tileControllerList;
-			foreach(TileController tile in tileControllerList)
-			{
-				_allTilesController.GenerateTileByPrefab(tile.TileCoordinateX, tile.TileCoordinateZ, _grid, _groundHolder, _cellSize, tile);
-			}
+			//_grid.TryGetCellByCoordinates(x, z, out var chosenCell);
+			//_tileInstantiateList = tileControllerList;
+			//foreach(TileController tile in tileControllerList)
+			//{
+			//	_allTilesController.GenerateTileFromPrefab(chosenCell, _grid, _groundHolder, _cellSize, tile);
+			//}
 		}
 
 		private void ClearGrid()

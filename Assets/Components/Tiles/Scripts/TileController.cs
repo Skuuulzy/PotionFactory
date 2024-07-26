@@ -9,33 +9,31 @@ namespace Components.Grid.Tile
     public class TileController : MonoBehaviour
     {
         [SerializeField] private Transform _3dViewHolder;
-        [SerializeField] public TileType TileType;
-        [SerializeField] public int TileCoordinateX;
-        [SerializeField] public int TileCoordinateZ;
+        [SerializeField] private TileType _tileType;
+        [SerializeField] private Cell _cell;
 
         private GameObject _view;
 
+		public TileType TileType => _tileType;
+		public Cell Cell => _cell;
 
 
-
-
-        // ------------------------------------------------------------------------- INIT -------------------------------------------------------------------------
-        public void InstantiatePreview(TileTemplate tileTemplate, float scale)
+		// ------------------------------------------------------------------------- INIT -------------------------------------------------------------------------
+		public void InstantiatePreview(TileTemplate tileTemplate, float scale)
         {
             _view = Instantiate(tileTemplate.GridView, _3dViewHolder);
            
             _view.transform.localScale = new Vector3(scale, scale, scale);
         }
 
-		public void SetCoordinate(int x, int z)
+		public void SetCell(Cell cell)
 		{
-            TileCoordinateX = x;
-            TileCoordinateZ = z;
+			_cell = cell;
 		}
 
         public void SetTileType(TileType tileType)
 		{
-            TileType = tileType;
+            _tileType = tileType;
 		}
 	}
 
