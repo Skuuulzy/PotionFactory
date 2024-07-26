@@ -1,12 +1,11 @@
 using Components.Machines;
+using Database;
 using UnityEditor;
 
 namespace VComponent.Tools.CSVReader
 {
-    public class MachineCreator
+    public class MachinesDatabaseManager
     {
-        private const string SO_PATH = "Assets/Components/Machines/ScriptableObjects/";
-        
         public static MachineTemplate GetMachine(string name)
         {
             return AssetDatabase.LoadAssetAtPath<MachineTemplate>(MachinePath(name));
@@ -14,7 +13,7 @@ namespace VComponent.Tools.CSVReader
         
         private static string MachinePath(string machineName)
         {
-            return SO_PATH + machineName + ".asset";
+            return ScriptableObjectDatabase.MACHINE_SO_PATH + machineName + ".asset";
         }
     }
 }

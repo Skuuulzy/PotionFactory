@@ -9,9 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4bf94c88d3c8170499f96abf561bf98b, type: 3}
-  m_Name: RecipeManager
+  m_Script: {fileID: 11500000, guid: 3686ee114200bb74992aade14f2b832b, type: 3}
+  m_Name: DEFAULT
   m_EditorClassIdentifier: 
-  _recipeTemplatesList:
-  - {fileID: 11400000, guid: 364f90983f6a2f24cab4d8aa6febb88b, type: 2}
-  _unknownItemRecipe: {fileID: 0}
+  _name: Angel feather
+  _price: 42
+  _isLiquid: 0
+  _executionTimeModifier: 0.8
+  _resources: 
+  _types: 
+  _3dView: {fileID: 0}
+  _debug3DView: {fileID: 0}

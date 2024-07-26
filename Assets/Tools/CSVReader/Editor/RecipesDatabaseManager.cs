@@ -1,15 +1,15 @@
 using System.Collections.Generic;
 using Components.Items;
 using Components.Recipes;
+using Database;
 using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEngine;
 
 namespace VComponent.Tools.CSVReader
 {
-    public class RecipesCreator
+    public class RecipesDatabaseManager
     {
-        private const string RECIPES_SO_PATH = "Assets/Components/Recipes/ScriptableObjects/";
         private readonly List<int> _ingredientsCSVIndexes = new List<int>() { 5, 8, 11 };
 
         private RecipeTemplate CreateNewRecipeTemplate(RecipeTemplate template, string name)
@@ -32,8 +32,8 @@ namespace VComponent.Tools.CSVReader
             {
                 // Parse the data
                 var name = csvDataLine[i][0];
-                var outIngredient = IngredientCreator.GetIngredient(name);
-                var machine = MachineCreator.GetMachine(csvDataLine[i][3]);
+                var outIngredient = IngredientsDatabaseManager.GetIngredient(name);
+                var machine = MachinesDatabaseManager.GetMachine(csvDataLine[i][3]);
 
                 // Find recipes ingredients
                 Dictionary<IngredientTemplate, int> recipesIngredients = new();
@@ -47,7 +47,7 @@ namespace VComponent.Tools.CSVReader
                         break;
                     }
 
-                    IngredientTemplate ingredient = IngredientCreator.GetIngredient(ingredientName);
+                    IngredientTemplate ingredient = IngredientsDatabaseManager.GetIngredient(ingredientName);
                     
                     // No ingredients have been found
                     if (!ingredient)
@@ -86,7 +86,7 @@ namespace VComponent.Tools.CSVReader
 
         private static string RecipePath(string ingredientName)
         {
-            return RECIPES_SO_PATH + ingredientName + ".asset";
+            return ScriptableObjectDatabase.RECIPES_SO_PATH + ingredientName + ".asset";
         }
     }
 }

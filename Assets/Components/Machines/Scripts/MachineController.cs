@@ -121,7 +121,7 @@ namespace Components.Machines
             
             if (show)
             {
-                _itemController.CreateRepresentationWith(_machine.Items[0].Resources, _machine.Items[0].Types);
+                _itemController.CreateRepresentationWith(_machine.Ingredients[0].Resources, _machine.Ingredients[0].Types);
             }
             else
             {

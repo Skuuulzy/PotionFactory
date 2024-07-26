@@ -1,5 +1,7 @@
 using Components.Items;
+using Components.Machines;
 using Components.Recipes;
+using Database;
 using Sirenix.OdinInspector.Editor;
 using Sirenix.Utilities.Editor;
 using UnityEditor;
@@ -7,9 +9,9 @@ using UnityEngine;
 
 namespace VComponent.Tools.CSVReader
 {
-    public partial class CSVReaderOdinWindows : OdinMenuEditorWindow
+    public class CSVReaderOdinWindows : OdinMenuEditorWindow
     {
-        private IngredientCreator _createIngredientCreator;
+        private IngredientsDatabaseManager _createIngredientsDatabaseManager;
 
         [MenuItem("Tools/Items & Recipes database")]
         private static void OpenWindow()
@@ -28,12 +30,15 @@ namespace VComponent.Tools.CSVReader
                 }
             };
 
-            _createIngredientCreator = new IngredientCreator();
-            tree.Add("Ingredients", _createIngredientCreator);
-            tree.AddAllAssetsAtPath("Ingredients", "Assets/Components/Ingredients/ScriptableObjects", typeof(IngredientTemplate));
+            _createIngredientsDatabaseManager = new IngredientsDatabaseManager();
+            tree.Add("Ingredients", _createIngredientsDatabaseManager);
+            tree.AddAllAssetsAtPath("Ingredients", ScriptableObjectDatabase.INGREDIENTS_SO_PATH, typeof(IngredientTemplate));
 
-            tree.Add("Recipes", new RecipesCreator());
-            tree.AddAllAssetsAtPath("Recipes", "Assets/Components/Recipes/ScriptableObjects", typeof(RecipeTemplate));
+            tree.Add("Recipes", new RecipesDatabaseManager());
+            tree.AddAllAssetsAtPath("Recipes", ScriptableObjectDatabase.RECIPES_SO_PATH, typeof(RecipeTemplate));
+            
+            tree.Add("Machines", new MachinesDatabaseManager());
+            tree.AddAllAssetsAtPath("Machines", ScriptableObjectDatabase.MACHINE_SO_PATH, typeof(MachineTemplate));
             
             return tree;
         }
@@ -62,10 +67,10 @@ namespace VComponent.Tools.CSVReader
         {
             base.OnDestroy();
 
-            if (_createIngredientCreator != null)
+            if (_createIngredientsDatabaseManager != null)
             {
                 // Clean the instance of the item template.
-                DestroyImmediate(_createIngredientCreator.Ingredient);
+                DestroyImmediate(_createIngredientsDatabaseManager.Ingredient);
             }
         }
     }
