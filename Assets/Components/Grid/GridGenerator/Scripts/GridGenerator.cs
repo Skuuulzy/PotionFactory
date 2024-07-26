@@ -57,11 +57,11 @@ namespace Components.Grid.Generator
 		{
 			MoveSelection();
 
-			//if (Input.GetMouseButton(1))
-			//{
-			//	RemoveMachineFromGrid();
+			if (Input.GetMouseButton(1))
+			{
+				RemoveObstacleFromGrid();
+			}
 
-			//}
 			if (Input.GetMouseButton(0))
 			{
 				AddSelectedTileToGrid();
@@ -75,6 +75,8 @@ namespace Components.Grid.Generator
 		private void InstantiateNewPreview()
 		{
 			_currentTileController = Instantiate(_tilePrefab);
+			_currentObstacleController = Instantiate(_obstaclePrefab);
+
 			TileManager.OnChangeSelectedTile += UpdateTileSelection;
 			ObstacleManager.OnChangeSelectedObstacle += UpdateObstacleSelection;
 
@@ -82,8 +84,15 @@ namespace Components.Grid.Generator
 
 		private void UpdateTileSelection(TileTemplate tileTemplate)
 		{
-			Destroy(_currentTileController.gameObject);
-			Destroy(_currentObstacleController.gameObject);
+			if(_currentTileController != null)
+			{
+				Destroy(_currentTileController.gameObject);
+			}
+			
+			if( _currentObstacleController != null )
+			{
+				Destroy(_currentObstacleController.gameObject);
+			}
 
 			_currentTileController = Instantiate(_tilePrefab);
 			_currentTileController.InstantiatePreview(tileTemplate, _cellSize);
@@ -92,8 +101,15 @@ namespace Components.Grid.Generator
 
 		private void UpdateObstacleSelection(ObstacleTemplate obstacleTemplate)
 		{
-			Destroy(_currentTileController.gameObject);
-			Destroy(_currentObstacleController.gameObject);
+			if (_currentTileController != null)
+			{
+				Destroy(_currentTileController.gameObject);
+			}
+
+			if (_currentObstacleController != null)
+			{
+				Destroy(_currentObstacleController.gameObject);
+			}
 
 			_currentObstacleController = Instantiate(_obstaclePrefab);
 			_currentObstacleController.InstantiatePreview(obstacleTemplate, _cellSize);
@@ -134,37 +150,67 @@ namespace Components.Grid.Generator
 
 			if(_currentTileController != null)
 			{
-				foreach (TileController tile in _tileInstantiateList)
+				if (chosenCell.ContainsTile)
 				{
-					if (tile.Cell == chosenCell)
-					{
-						TileController tileInstantiate = _allTilesController.GenerateTileFromPrefab(chosenCell, _grid, _groundHolder, _cellSize, _currentTileController);
-						_tileInstantiateList.Add(tileInstantiate);
-
-						_tileInstantiateList.Remove(tile);
-						Destroy(tile.gameObject);
-						return;
-					}
+					_tileInstantiateList.Remove(chosenCell.TileController);
+					Destroy(chosenCell.TileController.gameObject);
 				}
+
+				TileController tileInstantiate = _allTilesController.GenerateTileFromPrefab(chosenCell, _grid, _groundHolder, _cellSize, _currentTileController);
+				_tileInstantiateList.Add(tileInstantiate);
+				chosenCell.AddTileToCell(tileInstantiate);
+				return;
 			}
 
 			else if( _currentObstacleController != null)
 			{
-				foreach (ObstacleController obstacle in _obstacleInstantiateList)
+				if (chosenCell.ContainsObstacle == true)
 				{
-					if (obstacle.Cell == chosenCell)
-					{
-						ObstacleController obstacleController = _allObstacleController.GenerateObstacleFromPrefab(_grid, chosenCell,  _obstacleHolder, _cellSize, _currentObstacleController);
-						_obstacleInstantiateList.Add(obstacleController);
-						_obstacleInstantiateList.Remove(obstacle);
-						Destroy(obstacle.gameObject);
-						return;
-					}
+
+					_obstacleInstantiateList.Remove(chosenCell.ObstacleController);
+					Destroy(chosenCell.ObstacleController.gameObject);
 				}
+
+				ObstacleController obstacleController = _allObstacleController.GenerateObstacleFromPrefab(_grid, chosenCell, _obstacleHolder, _cellSize, _currentObstacleController);
+				_obstacleInstantiateList.Add(obstacleController);
+				chosenCell.AddObstacleToCell(obstacleController);
+				return;
 			}
 
+		}
 
+		private void RemoveObstacleFromGrid()
+		{
+			if(_currentTileController != null)
+			{
+				Destroy(_currentTileController.gameObject);
+				_currentTileController = null;	
+			}
+			else if (_currentObstacleController != null)
+			{
+				Destroy(_currentObstacleController.gameObject);
+				_currentObstacleController = null;
+			}
 
+			// Try to get the position on the grid.
+			if (!UtilsClass.ScreenToWorldPositionIgnoringUI(Input.mousePosition, _camera, out Vector3 worldMousePosition))
+			{
+				return;
+			}
+
+			// Try getting the cell
+			if (!_grid.TryGetCellByPosition(worldMousePosition, out Cell chosenCell))
+			{
+				return;
+			}
+
+			if (chosenCell.ContainsObstacle == true)
+			{
+
+				_obstacleInstantiateList.Remove(chosenCell.ObstacleController);
+				Destroy(chosenCell.ObstacleController.gameObject);
+				chosenCell.RemoveObstacleFromCell();
+			}
 		}
 
 		// ------------------------------------------------------------------------- GENERATE GRID -------------------------------------------------------------------------
@@ -177,6 +223,7 @@ namespace Components.Grid.Generator
 
 			_grid = new Grid(_gridXValue, _gridYValue, _cellSize, _startPosition, _groundHolder, false);
 			_tileInstantiateList = new List<TileController>();
+			_obstacleInstantiateList = new List<ObstacleController>();
 			_allTilesController.SelectATileType();
 
 			// Instantiate ground blocks
@@ -191,7 +238,12 @@ namespace Components.Grid.Generator
 					{
 						if (x != 1 && x != _grid.GetWidth() - 2 && z != 1 && z != _grid.GetHeight() - 2)
 						{
-							_allObstacleController.GenerateObstacle(_grid, chosenCell, _obstacleHolder, _cellSize);
+							ObstacleController obstacle = _allObstacleController.GenerateObstacle(_grid, chosenCell, _obstacleHolder, _cellSize);
+							if(obstacle != null)
+							{
+								_obstacleInstantiateList.Add(obstacle);
+							}
+
 						}
 					}
 				}

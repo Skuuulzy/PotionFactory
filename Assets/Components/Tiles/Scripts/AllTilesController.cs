@@ -20,7 +20,7 @@ namespace Components.Grid.Tile
                 tile.transform.localScale = new Vector3(cellSize, cellSize, cellSize);
                 tile.name = $"Cell ({cell})";
                 tile.SetTileType(_groundTile.TileType);
-                tile.SetCell(cell);
+                cell.AddTileToCell(tile);
                 return tile;
             }
             else
@@ -28,9 +28,8 @@ namespace Components.Grid.Tile
                 TileController tile = Instantiate(_waterTile, grid.GetWorldPosition(cell.X, cell.Y), Quaternion.identity, groundHolder);
                 tile.transform.localScale = new Vector3(cellSize, cellSize, cellSize);
                 tile.name = $"Cell ({cell})";
-                tile.SetCell(cell);
                 tile.SetTileType(TileType.WATER);
-                cell.DefineCellAsWaterCell();
+				cell.AddTileToCell(tile);
                 return tile;
             }
 
@@ -42,8 +41,8 @@ namespace Components.Grid.Tile
             //tile.transform.localScale = new Vector3(cellSize, cellSize, cellSize);
             tile.name = $"Cell ({cell})";
             tile.SetTileType(tileController.TileType);
-            tile.SetCell(cell);
-            return tile;
+			cell.AddTileToCell(tile);
+			return tile;
         }
 
         public void SelectATileType()

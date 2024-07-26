@@ -9,13 +9,11 @@ namespace Components.Grid.Obstacle
 	{
 		[SerializeField] private Transform _3dViewHolder;
 		[SerializeField] private ObstacleType _obstacleType;
-		[SerializeField] private Cell _cell;
 
 		private GameObject _view;
 
 		public Transform View => _3dViewHolder;
 		public ObstacleType ObstacleType => _obstacleType;
-		public Cell Cell => _cell;
 
 		// ------------------------------------------------------------------------- INIT -------------------------------------------------------------------------
 		public void InstantiatePreview(ObstacleTemplate obstacleTemplate, float scale)
@@ -25,10 +23,6 @@ namespace Components.Grid.Obstacle
 			_view.transform.localScale = new Vector3(scale, scale, scale);
 		}
 
-		public void SetCell(Cell cell)
-		{
-			_cell = cell;
-		}
 
 		public void SetObstacleType(ObstacleType obstacleType)
 		{

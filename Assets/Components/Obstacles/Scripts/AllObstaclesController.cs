@@ -12,7 +12,7 @@ namespace Components.Grid.Obstacle
 		[SerializeField] private float _obstacleGenerationProbability;
 		[SerializeField] private float _randomBonusProbability;
 
-		public void GenerateObstacle(Grid grid, Cell chosenCell, Transform obstacleHolder, float cellSize)
+		public ObstacleController GenerateObstacle(Grid grid, Cell chosenCell, Transform obstacleHolder, float cellSize)
 		{
 			_randomBonusProbability = 0.0f;
 
@@ -27,7 +27,7 @@ namespace Components.Grid.Obstacle
 
 			if (!(Random.value <= _obstacleGenerationProbability + _randomBonusProbability))
 			{
-				return;
+				return null;
 			}
 
 
@@ -36,17 +36,16 @@ namespace Components.Grid.Obstacle
 			obstacle.transform.localScale = new Vector3(cellSize, cellSize, cellSize);
 
 			chosenCell.AddObstacleToCell(obstacle);
+			return obstacle;
 		}
 
 		public ObstacleController GenerateObstacleFromPrefab(Grid grid, Cell chosenCell, Transform obstacleHolder, float cellSize, ObstacleController obstacleController)
 		{
-			var obstacle = Instantiate(_obstacleList[Random.Range(0, _obstacleList.Count)], obstacleHolder);
+			var obstacle = Instantiate(obstacleController, obstacleHolder);
 			obstacle.transform.position = grid.GetWorldPosition(chosenCell.X, chosenCell.Y) + new Vector3(cellSize / 2, 0, cellSize / 2);
-			obstacle.transform.localScale = new Vector3(cellSize, cellSize, cellSize);
 			chosenCell.AddObstacleToCell(obstacle);
 
 			obstacle.SetObstacleType(obstacleController.ObstacleType);
-			obstacle.SetCell(chosenCell);
 			return obstacle;
 		}
 	}
