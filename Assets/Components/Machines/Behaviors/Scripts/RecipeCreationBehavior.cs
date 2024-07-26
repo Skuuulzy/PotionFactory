@@ -13,7 +13,7 @@ namespace Components.Machines.Behaviors
         public override void Process(Machine machine)
         {
             // Try to find a recipe based on the machine and the items inside the machine.
-            if (!_currentRecipe)
+            if (!ProcessingRecipe)
             {
                 if (ScriptableObjectDatabase.TryFindRecipe(machine.Template, machine.Ingredients, out RecipeTemplate recipe))
                 {
@@ -24,6 +24,8 @@ namespace Components.Machines.Behaviors
                     return;
                 }
             }
+
+            ProcessingRecipe = true;
             
             // Increment the process time until we reach it.
             if (_currentProcessTime < _processTime)
@@ -38,7 +40,8 @@ namespace Components.Machines.Behaviors
                 if (outMachine.TryGiveItemItem(_currentRecipe.OutIngredient))
                 {
                     Debug.Log($"Machine: {machine.Controller.name} outputting: {_currentRecipe.OutIngredient.name} to: {outMachine.Controller.name}.");
-                    
+
+                    ProcessingRecipe = false;
                     _currentRecipe = null;
                     _currentProcessTime = 0;
                     machine.ClearItems();

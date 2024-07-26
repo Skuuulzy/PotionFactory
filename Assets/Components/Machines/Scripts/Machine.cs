@@ -113,6 +113,11 @@ namespace Components.Machines
             // There is already too many items in the machine
             if (Template.MaxItemCount != -1 && Ingredients.Count >= Template.MaxItemCount)
                 return false;
+
+            if (Behavior.ProcessingRecipe)
+            {
+                return false;
+            }
             
             Ingredients.Add(ingredient);
             OnItemAdded?.Invoke(true);
