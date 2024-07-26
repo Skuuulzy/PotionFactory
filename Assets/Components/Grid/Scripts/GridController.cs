@@ -33,7 +33,7 @@ namespace Components.Grid
         [Header("Extractor")]
         [SerializeField] private bool _addRandomExtractor;
         [SerializeField] private MachineTemplate _extractorMachine;
-        [SerializeField] private List<ItemTemplate> _itemTemplateList;
+        [SerializeField] private List<IngredientTemplate> _itemTemplateList;
 		[SerializeField] private float _extractorGenerationProbability;
 
 		// Grid

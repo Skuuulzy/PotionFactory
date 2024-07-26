@@ -10,16 +10,16 @@ namespace Components.Recipes
 		[SerializeField] private List<RecipeTemplate> _recipeTemplatesList;
 		[SerializeField] private RecipeTemplate _unknownItemRecipe;
 		
-		public bool TryFindRecipe(MachineTemplate machineTemplate, List<ItemTemplate> inputsItems, out RecipeTemplate recipe)
+		public bool TryFindRecipe(MachineTemplate machineTemplate, List<IngredientTemplate> inputsItems, out RecipeTemplate recipe)
 		{
 			foreach (RecipeTemplate recipeTemplate in _recipeTemplatesList)
 			{
 				if (recipeTemplate.Machine != machineTemplate) 
 					continue;
 				
-				foreach (ItemTemplate itemTemplate in inputsItems)
+				foreach (IngredientTemplate itemTemplate in inputsItems)
 				{
-					if (!IsItemMatch(itemTemplate, recipeTemplate.ItemsUsedInRecipe.ToDictionary()))
+					if (!IsItemMatch(itemTemplate, recipeTemplate.Ingredients))
 					{
 						continue;
 					}
@@ -34,9 +34,9 @@ namespace Components.Recipes
 			return false;
 		}
 
-		private bool IsItemMatch(ItemTemplate item, Dictionary<ItemTemplate, int> item2)
+		private bool IsItemMatch(IngredientTemplate ingredient, Dictionary<IngredientTemplate, int> item2)
 		{
-			return item2.ContainsKey(item);
+			return item2.ContainsKey(ingredient);
 		}
 	}
 }
