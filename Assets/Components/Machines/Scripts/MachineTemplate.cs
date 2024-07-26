@@ -9,7 +9,6 @@ namespace Components.Machines
     {
         [Header("Definition")]
         [SerializeField] private string _name;
-        [SerializeField] private MachineType _machineType;
 
         [SerializeField] private GameObject _gridView;
         [SerializeField] private Sprite _uiView;
@@ -20,19 +19,8 @@ namespace Components.Machines
 
         [Header("Parameters")] 
         [SerializeField] private int _maxItemCount;
-
-        public enum MachineType
-        {
-            CAULDRON,
-            DISPENSER,
-            MIXER,
-            PRESS,
-            CONVEYOR,
-            DISTILLER
-        }
         
         public string Name => _name;
-        public MachineType Type => _machineType;
 
         public GameObject GridView => _gridView;
         public Sprite UIView => _uiView;

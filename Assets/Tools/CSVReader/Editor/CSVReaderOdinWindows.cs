@@ -1,4 +1,5 @@
 using Components.Items;
+using Components.Machines;
 using Components.Recipes;
 using Database;
 using Sirenix.OdinInspector.Editor;
@@ -35,6 +36,9 @@ namespace VComponent.Tools.CSVReader
 
             tree.Add("Recipes", new RecipesDatabaseManager());
             tree.AddAllAssetsAtPath("Recipes", ScriptableObjectDatabase.RECIPES_SO_PATH, typeof(RecipeTemplate));
+            
+            tree.Add("Machines", new MachinesDatabaseManager());
+            tree.AddAllAssetsAtPath("Machines", ScriptableObjectDatabase.MACHINE_SO_PATH, typeof(MachineTemplate));
             
             return tree;
         }

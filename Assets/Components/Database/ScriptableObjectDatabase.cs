@@ -33,7 +33,7 @@ namespace Database
                 DATABASE[type] = new Dictionary<string, ScriptableObject>();
             }
 
-            T[] templates = Resources.LoadAll<T>(path);
+            T[] templates = Resources.LoadAll<T>("");
             foreach (var template in templates)
             {
                 DATABASE[type][template.name] = template;
@@ -70,9 +70,16 @@ namespace Database
 				
                 foreach (IngredientTemplate ingredient in inputsIngredients)
                 {
-                    if (!recipeTemplate.Ingredients.ContainsKey(ingredient))
+                    // Is there an ingredient inside the recipe that match the input ingredient.
+                    if (!recipeTemplate.Ingredients.TryGetValue(ingredient, out var ingredientCount))
                     {
                         continue;
+                    }
+
+                    // Is there enough ingredient to complete the recipe
+                    if (ingredientCount != inputsIngredients.Count)
+                    {
+                        break;
                     }
 					
                     recipe = recipeTemplate;
