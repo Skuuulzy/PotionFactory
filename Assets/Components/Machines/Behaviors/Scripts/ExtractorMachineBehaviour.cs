@@ -6,11 +6,11 @@ namespace Components.Machines.Behaviors
     [CreateAssetMenu(fileName = "New Machine Behaviour", menuName = "Machines/Behavior/Extractor")]
     public class ExtractorMachineBehaviour : MachineBehavior
     {
-        [SerializeField] private ItemTemplate _itemTemplate;
+        [SerializeField] private IngredientTemplate _ingredientTemplate;
         
-		public void Init(ItemTemplate itemTemplate)
+		public void Init(IngredientTemplate ingredientTemplate)
 		{
-            _itemTemplate = itemTemplate;
+            _ingredientTemplate = ingredientTemplate;
 		}
         
 		public override void Process(Machine machine)
@@ -24,7 +24,7 @@ namespace Components.Machines.Behaviors
             
             if (machine.TryGetOutMachine(out Machine outMachine))
             {
-                outMachine.TryGiveItemItem(_itemTemplate);
+                outMachine.TryGiveItemItem(_ingredientTemplate);
             }
         }
     }

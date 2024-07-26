@@ -11,7 +11,7 @@ namespace Components.Machines
     public class Machine : ITickable
     {
         // ----------------------------------------------------------------------- PRIVATE FIELDS -------------------------------------------------------------------------
-        [SerializeField] private List<ItemTemplate> _items;
+        [SerializeField] private List<IngredientTemplate> _items;
         [SerializeField] private List<Node> _nodes;
         [SerializeField] private MachineController _controller;
         [SerializeField] private MachineBehavior _behavior;
@@ -22,7 +22,7 @@ namespace Components.Machines
         public MachineTemplate Template => _template;
         public MachineController Controller => _controller;
         public MachineBehavior Behavior => _behavior;
-        public List<ItemTemplate> Items => _items;
+        public List<IngredientTemplate> Items => _items;
         public virtual List<Node> Nodes => _nodes;
         
         // ------------------------------------------------------------------------- ACTIONS -------------------------------------------------------------------------
@@ -38,7 +38,7 @@ namespace Components.Machines
 
             UpdateNodesRotation(0);
             
-            _items = new List<ItemTemplate>();
+            _items = new List<IngredientTemplate>();
         }
 
         public void UpdateNodesRotation(int rotation)
@@ -108,13 +108,13 @@ namespace Components.Machines
             OnItemAdded?.Invoke(true);
         }
         
-        public bool TryGiveItemItem(ItemTemplate item)
+        public bool TryGiveItemItem(IngredientTemplate ingredient)
         {
             // There is already too many items in the machine
             if (Template.MaxItemCount != -1 && Items.Count >= Template.MaxItemCount)
                 return false;
             
-            Items.Add(item);
+            Items.Add(ingredient);
             OnItemAdded?.Invoke(true);
             return true;
         }
