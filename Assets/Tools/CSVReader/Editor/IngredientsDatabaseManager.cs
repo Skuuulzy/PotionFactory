@@ -1,19 +1,19 @@
 using Components.Items;
+using Database;
 using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEngine;
 
 namespace VComponent.Tools.CSVReader
 {
-    public class IngredientCreator
+    public class IngredientsDatabaseManager
     {
-        private const string INGREDIENTS_SO_PATH = "Assets/Components/Ingredients/ScriptableObjects/";
 
         // ------------------------------------ MANUAL CREATOR -------------------------------
         [BoxGroup("Manual"), InlineEditor(Expanded = true)]
         public IngredientTemplate Ingredient;
 
-        public IngredientCreator()
+        public IngredientsDatabaseManager()
         {
             Ingredient = ScriptableObject.CreateInstance<IngredientTemplate>();
         }
@@ -69,7 +69,7 @@ namespace VComponent.Tools.CSVReader
         
         private static string IngredientPath(string ingredientName)
         {
-            return INGREDIENTS_SO_PATH + ingredientName + ".asset";
+            return ScriptableObjectDatabase.INGREDIENTS_SO_PATH + ingredientName + ".asset";
         }
     }
 }

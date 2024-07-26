@@ -6,7 +6,6 @@ namespace Components.Machines.Behaviors
     public abstract class MachineBehavior : ScriptableObject
     {
         [SerializeField] protected int _processTime;
-        [SerializeField] protected RecipeManager _recipeManager;
         
         protected int CurrentTick;
 

@@ -1,4 +1,5 @@
 using Components.Recipes;
+using Database;
 using UnityEngine;
 
 namespace Components.Machines.Behaviors
@@ -14,7 +15,7 @@ namespace Components.Machines.Behaviors
             // Try to find a recipe based on the machine and the items inside the machine.
             if (!_currentRecipe)
             {
-                if (_recipeManager.TryFindRecipe(machine.Template, machine.Items, out RecipeTemplate recipe))
+                if (ScriptableObjectDatabase.TryFindRecipe(machine.Template, machine.Items, out RecipeTemplate recipe))
                 {
                     _currentRecipe = recipe;
                 }
