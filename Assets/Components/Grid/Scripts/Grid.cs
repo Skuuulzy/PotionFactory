@@ -1,8 +1,6 @@
 ﻿using UnityEngine;
 using CodeMonkey.Utils;
 using System.Collections.Generic;
-using Components.Machines;
-using System;
 
 namespace Components.Grid
 {
