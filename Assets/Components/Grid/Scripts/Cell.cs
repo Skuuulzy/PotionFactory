@@ -1,4 +1,6 @@
 using System;
+using Components.Grid.Obstacle;
+using Components.Grid.Tile;
 using Components.Machines;
 using UnityEngine;
 
@@ -10,14 +12,16 @@ namespace Components.Grid
         public int X { get; }
         public int Y { get; }
         public float Size { get; }
-        public bool IsWater { get; private set; }
         public bool ContainsObject { get; private set; }
         public bool ContainsObstacle { get; private set; }
+        public bool ContainsTile { get; private set; }
 
-		[SerializeField] private GameObject _obstacle; 
+		[SerializeField] private ObstacleController _obstacleController; 
+		[SerializeField] private TileController _tileController; 
 		[SerializeField] private Node _node; 
        
-        public GameObject Obstacle => _obstacle;  
+        public ObstacleController ObstacleController => _obstacleController;  
+        public TileController TileController => _tileController;  
         public Node Node => _node;
 
         public Cell(int x, int y, float size, bool containsObject)
@@ -28,21 +32,34 @@ namespace Components.Grid
             ContainsObject = containsObject;
         }
 
-        public void AddObstacleToCell(GameObject obstacle)
+        public void AddObstacleToCell(ObstacleController obstacle)
         {
-            _obstacle = obstacle;
+            _obstacleController = obstacle;
             ContainsObject = true;
             ContainsObstacle = true;
         }
 
         public void RemoveObstacleFromCell()
         {
-            _obstacle = null;
+            _obstacleController = null;
             ContainsObject = false;
             ContainsObstacle = false;
         }
 
-        public void AddNodeToCell(Node node)
+		public void AddTileToCell(TileController tile)
+		{
+			_tileController = tile;
+			ContainsTile = true;
+		}
+
+		public void RemoveTileFromCell()
+		{
+			_tileController = null;
+			ContainsTile = false;
+		}
+
+
+		public void AddNodeToCell(Node node)
         {
             ContainsObject = true;
             _node = node;
@@ -54,9 +71,6 @@ namespace Components.Grid
             _node = null;
         }
 
-        public void DefineCellAsWaterCell()
-		{
-            IsWater = true;
-		}
+
     }
 }

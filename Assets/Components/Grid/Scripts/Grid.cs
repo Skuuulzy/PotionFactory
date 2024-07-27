@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using CodeMonkey.Utils;
 using System.Collections.Generic;
+using Components.Machines;
+using System;
 
 namespace Components.Grid
 {
@@ -110,7 +112,9 @@ namespace Components.Grid
             return false;
         }
 
-        public void ClearCellsData()
+
+
+		public void ClearCellsData()
         {
             foreach (var cell in _cells)
             {

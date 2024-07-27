@@ -625,6 +625,74 @@ Light:
   m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
   m_ShadowAngle: 0
+--- !u!1001 &399657796
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 822939198778213949, guid: ea0747fb00ef0764aa50dcd2d47441f5,
+        type: 3}
+      propertyPath: m_Name
+      value: ItemManager
+      objectReference: {fileID: 0}
+    - target: {fileID: 5729808733383590843, guid: ea0747fb00ef0764aa50dcd2d47441f5,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 116.78767
+      objectReference: {fileID: 0}
+    - target: {fileID: 5729808733383590843, guid: ea0747fb00ef0764aa50dcd2d47441f5,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 87.383995
+      objectReference: {fileID: 0}
+    - target: {fileID: 5729808733383590843, guid: ea0747fb00ef0764aa50dcd2d47441f5,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.41394758
+      objectReference: {fileID: 0}
+    - target: {fileID: 5729808733383590843, guid: ea0747fb00ef0764aa50dcd2d47441f5,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5729808733383590843, guid: ea0747fb00ef0764aa50dcd2d47441f5,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5729808733383590843, guid: ea0747fb00ef0764aa50dcd2d47441f5,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5729808733383590843, guid: ea0747fb00ef0764aa50dcd2d47441f5,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5729808733383590843, guid: ea0747fb00ef0764aa50dcd2d47441f5,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5729808733383590843, guid: ea0747fb00ef0764aa50dcd2d47441f5,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5729808733383590843, guid: ea0747fb00ef0764aa50dcd2d47441f5,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: ea0747fb00ef0764aa50dcd2d47441f5, type: 3}
 --- !u!1 &418744443
 GameObject:
   m_ObjectHideFlags: 0
@@ -3880,8 +3948,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f73a3eab49f30d344a207d7d3d931d98, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _responsiveness: 3
   _cameraSpeed: 150
+  _responsiveness: 3
+  _rotationSpeed: 100
 --- !u!114 &2077672730 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2922091601394712576, guid: 0ef98c6108f43c54c81c54882a4836ec,
@@ -4402,6 +4471,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2922091601394712576, guid: 0ef98c6108f43c54c81c54882a4836ec,
         type: 3}
+      propertyPath: _groundTile
+      value: 
+      objectReference: {fileID: 5488635875282986484, guid: 763f6990e5d7f74418e2a1161ea2cfeb,
+        type: 3}
+    - target: {fileID: 2922091601394712576, guid: 0ef98c6108f43c54c81c54882a4836ec,
+        type: 3}
       propertyPath: _objectToInstantiate
       value: 
       objectReference: {fileID: 0}
@@ -4410,6 +4485,12 @@ PrefabInstance:
       propertyPath: _randomBonusProbability
       value: 0.1
       objectReference: {fileID: 0}
+    - target: {fileID: 2922091601394712576, guid: 0ef98c6108f43c54c81c54882a4836ec,
+        type: 3}
+      propertyPath: _machineControllerPrefab
+      value: 
+      objectReference: {fileID: 2567407675386972328, guid: 859503caaa5f96242b5ba83dccd721c9,
+        type: 3}
     - target: {fileID: 2922091601394712576, guid: 0ef98c6108f43c54c81c54882a4836ec,
         type: 3}
       propertyPath: _obstacleList.Array.size
@@ -4657,6 +4738,7 @@ SceneRoots:
   - {fileID: 4266030440050234855}
   - {fileID: 3841295291633844933}
   - {fileID: 119422664301323618}
+  - {fileID: 399657796}
   - {fileID: 697047491}
   - {fileID: 798778437}
   - {fileID: 466627925}

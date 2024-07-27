@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c96c6dd1b832fb4cb5f5f1808b67811, type: 3}
+  m_Name: AllTilesController
+  m_EditorClassIdentifier: 
+  _groundTilesList:
+  - {fileID: 8980534838031880519, guid: 29ac3fa80022eca449ff53807b9a44f1, type: 3}
+  - {fileID: 8980534838031880519, guid: 596747ea9b32cf144b94515aabed9598, type: 3}
+  - {fileID: 8980534838031880519, guid: 199816236cb553b498a7449667f1393e, type: 3}
+  - {fileID: 8980534838031880519, guid: a6ff5ec942550cc4e952ce2984eb9491, type: 3}
+  _waterTile: {fileID: 8980534838031880519, guid: 4d2e4d65570cb7049bc177e742241595,
+    type: 3}
+  _waterTileGenerationProbability: 0.02
