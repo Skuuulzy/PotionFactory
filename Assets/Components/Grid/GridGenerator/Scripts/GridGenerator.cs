@@ -247,7 +247,7 @@ namespace Components.Grid.Generator
 			{
 				ClearGrid();
 			}
-			_grid = new Grid(_gridXValue, _gridYValue, _cellSize, _startPosition, _groundHolder, false);
+			_grid = new Grid(_gridXValue, _gridYValue, _cellSize, _startPosition, _groundHolder, false, cellList);
 			_cellList = cellList;
 
 			for(int i = 0; i < _cellList.Count; i++)

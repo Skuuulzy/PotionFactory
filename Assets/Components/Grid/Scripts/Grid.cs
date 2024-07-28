@@ -40,6 +40,22 @@ namespace Components.Grid
             }
         }
 
+        public Grid(int width, int height, float cellSize, Vector3 originPosition, Transform parentTransform, bool showDebug, List<Cell> cellList)
+		{
+            _width = width;
+            _height = height;
+            _cellSize = cellSize;
+            _originPosition = originPosition;
+
+            _gridArray = new int[width, height];
+            _cells = cellList;
+
+            if (showDebug)
+            {
+                DrawGridDebug(width, height, cellSize, parentTransform);
+            }
+        }
+
         // ------------------------------------------------------------------------- GRID INFOS -------------------------------------------------------------------------
         public int GetWidth()
         {
