@@ -41,12 +41,35 @@ namespace Components.Grid.Obstacle
 
 		public ObstacleController GenerateObstacleFromPrefab(Grid grid, Cell chosenCell, Transform obstacleHolder, float cellSize, ObstacleController obstacleController)
 		{
-			var obstacle = Instantiate(obstacleController, obstacleHolder);
+			ObstacleController obstacle = Instantiate(obstacleController, obstacleHolder);
 			obstacle.transform.position = grid.GetWorldPosition(chosenCell.X, chosenCell.Y) + new Vector3(cellSize / 2, 0, cellSize / 2);
+			obstacle.transform.localScale = new Vector3(cellSize, cellSize, cellSize);
+
 			chosenCell.AddObstacleToCell(obstacle);
 
 			obstacle.SetObstacleType(obstacleController.ObstacleType);
 			return obstacle;
+		}
+
+		public ObstacleController GenerateObstacleFromType( Cell chosenCell, Grid grid, Transform obstacleHolder, float cellSize, ObstacleType obstacleType)
+		{
+			foreach (ObstacleController obstacleController in _obstacleList)
+			{
+				if (obstacleController.ObstacleType == obstacleType)
+				{
+					ObstacleController obstacle = Instantiate(obstacleController, obstacleHolder);
+					obstacle.transform.position = grid.GetWorldPosition(chosenCell.X, chosenCell.Y) + new Vector3(cellSize / 2, 0, cellSize / 2);
+					obstacle.transform.localScale = new Vector3(cellSize, cellSize, cellSize);
+
+					chosenCell.AddObstacleToCell(obstacle);
+
+					obstacle.SetObstacleType(obstacleType);
+					return obstacleController;
+				}
+			}
+
+			Debug.LogError("Can't find obstacle associated ObstacleType : " + obstacleType);
+			return null;
 		}
 	}
 

@@ -40,6 +40,30 @@ namespace Components.Grid
             }
         }
 
+        public Grid(int width, int height, float cellSize, Vector3 originPosition, Transform parentTransform, bool showDebug, List<SerializedCell> serializedCellList)
+		{
+            _width = width;
+            _height = height;
+            _cellSize = cellSize;
+            _originPosition = originPosition;
+
+            _gridArray = new int[width, height];
+            _cells = new List<Cell>();
+
+            for (int i = 0; i < serializedCellList.Count; i++)
+			{
+                SerializedCell serializedCell = serializedCellList[i];
+                //Create a new cell and add it to cell list
+                Cell cell = new Cell(serializedCell.X, serializedCell.Y, cellSize, serializedCell.ContainsObject);
+                _cells.Add(cell);
+            }
+
+            if (showDebug)
+            {
+                DrawGridDebug(width, height, cellSize, parentTransform);
+            }
+        }
+
         // ------------------------------------------------------------------------- GRID INFOS -------------------------------------------------------------------------
         public int GetWidth()
         {
