@@ -17,7 +17,7 @@ namespace Components.Grid.Tile
                 TileController tile = Instantiate(_groundTile, groundHolder);
                 tile.transform.position = grid.GetWorldPosition(cell.X, cell.Y) + new Vector3(cellSize / 2, 0, cellSize / 2);
                 tile.transform.localScale = new Vector3(cellSize, cellSize, cellSize);
-                tile.name = $"Cell ({cell})";
+                tile.name = $"Tile ({tile})";
                 tile.SetTileType(_groundTile.TileType);
                 cell.AddTileToCell(tile);
                 return tile;
@@ -27,7 +27,7 @@ namespace Components.Grid.Tile
                 TileController tile = Instantiate(_waterTile, groundHolder);
                 tile.transform.position = grid.GetWorldPosition(cell.X, cell.Y) + new Vector3(cellSize / 2, 0, cellSize / 2);
                 tile.transform.localScale = new Vector3(cellSize, cellSize, cellSize);
-                tile.name = $"Cell ({cell})";
+                tile.name = $"Tile ({tile})";
                 tile.SetTileType(TileType.WATER);
 				cell.AddTileToCell(tile);
                 return tile;
@@ -40,26 +40,36 @@ namespace Components.Grid.Tile
             TileController tile = Instantiate(tileController, groundHolder);
             tile.transform.position = grid.GetWorldPosition(cell.X, cell.Y) + new Vector3(cellSize / 2, 0, cellSize / 2);
             tile.transform.localScale = new Vector3(cellSize, cellSize, cellSize);
-            tile.name = $"Cell ({cell})";
+            tile.name = $"Tile ({tile})";
             tile.SetTileType(tileController.TileType);
 			return tile;
         }
 
-        public TileController GetTileFromTileType(TileType tileType)
+        public TileController GenerateTileFromType(Cell cell, Grid grid, Transform groundHolder, float cellSize, TileType tileType)
 		{
             if(tileType == TileType.WATER)
 			{
-                return _waterTile;
+                TileController tile = Instantiate(_waterTile, groundHolder);
+                tile.transform.position = grid.GetWorldPosition(cell.X, cell.Y) + new Vector3(cellSize / 2, 0, cellSize / 2);
+                tile.transform.localScale = new Vector3(cellSize, cellSize, cellSize);
+                tile.name = $"Tile ({tile})";
+                tile.SetTileType(TileType.WATER);
+                cell.AddTileToCell(tile);
+                return tile;
 			}
 
             foreach(TileController tileController in _groundTilesList)
 			{
-                
                 if(tileController.TileType == tileType)
 				{
-                    return tileController;
+                    TileController tile = Instantiate(tileController, groundHolder);
+                    tile.transform.position = grid.GetWorldPosition(cell.X, cell.Y) + new Vector3(cellSize / 2, 0, cellSize / 2);
+                    tile.transform.localScale = new Vector3(cellSize, cellSize, cellSize);
+                    tile.name = $"Tile ({tile})";
+                    tile.SetTileType(tileType);
+                    cell.AddTileToCell(tile);
+                    return tile;
 				}
-
 			}
 
             Debug.LogError("Can't find tile associated TileType : " + tileType);

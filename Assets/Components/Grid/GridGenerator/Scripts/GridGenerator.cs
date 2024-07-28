@@ -33,6 +33,7 @@ namespace Components.Grid.Generator
 
 		[Header("TilesGenerated")]
 		private List<Cell> _cellList;
+		private List<TileController> _tileInstantiateList;
 
 		// Grid
 		private Grid _grid;
@@ -153,12 +154,18 @@ namespace Components.Grid.Generator
 
 			if(_currentTileController != null)
 			{
-				if (chosenCell.ContainsTile)
+				foreach(TileController tileController in _tileInstantiateList)
 				{
-					Destroy(chosenCell.TileController.gameObject);
+					if(tileController == chosenCell.TileController)
+					{
+						Destroy(tileController.gameObject);
+						_tileInstantiateList.Remove(tileController);
+						break;
+					}
 				}
 
 				TileController tileInstantiate = _allTilesController.GenerateTileFromPrefab(chosenCell, _grid, _groundHolder, _cellSize, _currentTileController);
+				_tileInstantiateList.Add(tileInstantiate);
 				chosenCell.AddTileToCell(tileInstantiate);
 
 				return;
@@ -166,10 +173,7 @@ namespace Components.Grid.Generator
 
 			else if( _currentObstacleController != null)
 			{
-				if (chosenCell.ContainsObstacle == true)
-				{
-					Destroy(chosenCell.ObstacleController.gameObject);
-				}
+
 
 				ObstacleController obstacleController = _allObstacleController.GenerateObstacleFromPrefab(_grid, chosenCell, _obstacleHolder, _cellSize, _currentObstacleController);
 				chosenCell.AddObstacleToCell(obstacleController);
@@ -220,6 +224,7 @@ namespace Components.Grid.Generator
 
 			_grid = new Grid(_gridXValue, _gridYValue, _cellSize, _startPosition, _groundHolder, false);
 			_cellList = new List<Cell>();
+			_tileInstantiateList = new List<TileController>();
 			_allTilesController.SelectATileType();
 
 			// Instantiate ground blocks
@@ -229,6 +234,7 @@ namespace Components.Grid.Generator
 				{
 					_grid.TryGetCellByCoordinates(x, z, out var chosenCell);
 					TileController tile = _allTilesController.GenerateTile(chosenCell, _grid, _groundHolder, _cellSize);
+					_tileInstantiateList.Add(tile);
 					if (tile.TileType != TileType.WATER)
 					{
 						if (x != 1 && x != _grid.GetWidth() - 2 && z != 1 && z != _grid.GetHeight() - 2)
@@ -241,29 +247,36 @@ namespace Components.Grid.Generator
 			}
 		}
 
-		private void GenerateGridFromTemplate(List<Cell> cellList)
+		private void GenerateGridFromTemplate(List<SerializedCell> serializedCellList)
 		{
 			if (_grid != null)
 			{
 				ClearGrid();
 			}
-			_grid = new Grid(_gridXValue, _gridYValue, _cellSize, _startPosition, _groundHolder, false, cellList);
-			_cellList = cellList;
-
-			for(int i = 0; i < _cellList.Count; i++)
+			_grid = new Grid(_gridXValue, _gridYValue, _cellSize, _startPosition, _groundHolder, false, serializedCellList);
+			_tileInstantiateList = new List<TileController>();
+			_cellList = new List<Cell>();
+			// Instantiate ground blocks
+			for (int x = 0; x < _grid.GetWidth(); x++)
 			{
-				Cell cell = _cellList[i];
-
-				if(cell.TileController != null)
+				for (int z = 0; z < _grid.GetHeight(); z++)
 				{
-					_allTilesController.GenerateTileFromPrefab(cell, _grid, _groundHolder, _cellSize, cell.TileController);
-				}
+					_grid.TryGetCellByCoordinates(x, z, out var chosenCell);
+					SerializedCell serializeCell = serializedCellList.Find(cell => cell.X == x && cell.Y == z);
 
-				if(cell.ObstacleController != null)
-				{
-					_allObstacleController.GenerateObstacleFromPrefab(_grid, cell, _obstacleHolder, _cellSize, cell.ObstacleController);
-				}
+					if(serializeCell.TileType != TileType.NONE)
+					{
+						TileController tile = _allTilesController.GenerateTileFromType(chosenCell, _grid, _groundHolder, _cellSize, serializeCell.TileType);
+						_tileInstantiateList.Add(tile);
+					}
 
+					if(serializeCell.ObstacleType != ObstacleType.NONE)
+					{
+						ObstacleController obstacle = _allObstacleController.GenerateObstacleFromType(chosenCell, _grid, _obstacleHolder, _cellSize, serializeCell.ObstacleType);
+					}
+
+					_cellList.Add(chosenCell);
+				}
 			}
 		}
 
@@ -304,37 +317,7 @@ namespace Components.Grid.Generator
 		public void LoadMap()
 		{
 			SerializedCell[] serializedCellArray = JsonHelper.FromJson<SerializedCell>(System.IO.File.ReadAllText(Application.persistentDataPath + $"/{_fileName}.json"));
-			Debug.Log(serializedCellArray[0]);
-			GenerateGridFromTemplate(GetCellListFromSerializedCellArray(serializedCellArray));
-		}
-
-		//------------------------------------------------------------------------ CELL GENERATION ------------------------------------------------------------
-
-		public List<Cell> GetCellListFromSerializedCellArray(SerializedCell[] cellArray)
-		{
-			List<Cell> cellList = new List<Cell>();
-
-			for(int i = 0; i < cellArray.Length; i++)
-			{
-				SerializedCell serializeCell = cellArray[i];
-				Cell cell = new Cell(serializeCell.X, serializeCell.Y, serializeCell.Size, serializeCell.ContainsObject);
-
-				if(serializeCell.TileType != TileType.NONE)
-				{
-					TileController tileController = _allTilesController.GetTileFromTileType(serializeCell.TileType);
-					cell.AddTileToCell(tileController);
-				}
-
-				if(serializeCell.ObstacleType != ObstacleType.NONE)
-				{
-					ObstacleController obstacleController = _allObstacleController.GetObstacleFromObstacleType(serializeCell.ObstacleType);
-					cell.AddObstacleToCell(obstacleController);
-				}
-					
-				cellList.Add(cell);
-			}
-
-			return cellList;
+			GenerateGridFromTemplate(serializedCellArray.ToList());
 		}
 	}
 

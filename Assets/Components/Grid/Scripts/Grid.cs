@@ -40,7 +40,7 @@ namespace Components.Grid
             }
         }
 
-        public Grid(int width, int height, float cellSize, Vector3 originPosition, Transform parentTransform, bool showDebug, List<Cell> cellList)
+        public Grid(int width, int height, float cellSize, Vector3 originPosition, Transform parentTransform, bool showDebug, List<SerializedCell> serializedCellList)
 		{
             _width = width;
             _height = height;
@@ -48,7 +48,15 @@ namespace Components.Grid
             _originPosition = originPosition;
 
             _gridArray = new int[width, height];
-            _cells = cellList;
+            _cells = new List<Cell>();
+
+            for (int i = 0; i < serializedCellList.Count; i++)
+			{
+                SerializedCell serializedCell = serializedCellList[i];
+                //Create a new cell and add it to cell list
+                Cell cell = new Cell(serializedCell.X, serializedCell.Y, cellSize, serializedCell.ContainsObject);
+                _cells.Add(cell);
+            }
 
             if (showDebug)
             {
