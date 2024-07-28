@@ -20,7 +20,7 @@ namespace Components.Grid.Obstacle
 		{
 			_view = Instantiate(obstacleTemplate.GridView, _3dViewHolder);
 
-			_view.transform.localScale = new Vector3(scale, scale, scale);
+			transform.localScale = new Vector3(scale, scale, scale);
 		}
 
 
@@ -32,6 +32,7 @@ namespace Components.Grid.Obstacle
 
 	public enum ObstacleType
 	{
+		NONE,
 		TREE1,
 		TREE2,
 		BUSH1,

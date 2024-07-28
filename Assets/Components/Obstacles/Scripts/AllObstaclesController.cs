@@ -43,10 +43,26 @@ namespace Components.Grid.Obstacle
 		{
 			var obstacle = Instantiate(obstacleController, obstacleHolder);
 			obstacle.transform.position = grid.GetWorldPosition(chosenCell.X, chosenCell.Y) + new Vector3(cellSize / 2, 0, cellSize / 2);
+			obstacle.transform.localScale = new Vector3(cellSize, cellSize, cellSize);
+
 			chosenCell.AddObstacleToCell(obstacle);
 
 			obstacle.SetObstacleType(obstacleController.ObstacleType);
 			return obstacle;
+		}
+
+		public ObstacleController GetObstacleFromObstacleType(ObstacleType obstacleType)
+		{
+			foreach (ObstacleController obstacleController in _obstacleList)
+			{
+				if (obstacleController.ObstacleType == obstacleType)
+				{
+					return obstacleController;
+				}
+			}
+
+			Debug.LogError("Can't find obstacle associated ObstacleType : " + obstacleType);
+			return null;
 		}
 	}
 

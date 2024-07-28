@@ -39,11 +39,33 @@ namespace Components.Grid.Tile
 		{
             TileController tile = Instantiate(tileController, groundHolder);
             tile.transform.position = grid.GetWorldPosition(cell.X, cell.Y) + new Vector3(cellSize / 2, 0, cellSize / 2);
-            //tile.transform.localScale = new Vector3(cellSize, cellSize, cellSize);
+            tile.transform.localScale = new Vector3(cellSize, cellSize, cellSize);
             tile.name = $"Cell ({cell})";
             tile.SetTileType(tileController.TileType);
 			return tile;
         }
+
+        public TileController GetTileFromTileType(TileType tileType)
+		{
+            if(tileType == TileType.WATER)
+			{
+                return _waterTile;
+			}
+
+            foreach(TileController tileController in _groundTilesList)
+			{
+                
+                if(tileController.TileType == tileType)
+				{
+                    return tileController;
+				}
+
+			}
+
+            Debug.LogError("Can't find tile associated TileType : " + tileType);
+            return null;
+		}
+
 
         public void SelectATileType()
         {

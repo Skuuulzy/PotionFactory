@@ -6,7 +6,6 @@ using UnityEngine;
 
 namespace Components.Grid
 {
-    [Serializable]
     public class Cell
     {
         public int X { get; }
@@ -72,5 +71,34 @@ namespace Components.Grid
         }
 
 
+    }
+
+
+    [Serializable]
+    public class SerializedCell
+	{
+        [SerializeField] public int X;
+        [SerializeField] public int Y;
+        [SerializeField] public float Size;
+        [SerializeField] public bool ContainsObject;
+        [SerializeField] public bool ContainsObstacle;
+        [SerializeField] public bool ContainsTile;
+        [SerializeField] public TileType TileType;
+        [SerializeField] public ObstacleType ObstacleType;
+
+
+        public SerializedCell(Cell cell)
+		{
+            X = cell.X;
+            Y = cell.Y;
+            Size = cell.Size;
+            ContainsObject = cell.ContainsObject;
+            ContainsObstacle = cell.ContainsObstacle;
+            ContainsTile = cell.ContainsTile;
+
+            
+            TileType = cell.TileController == null ? TileType.NONE : cell.TileController.TileType ;
+            ObstacleType = cell.ObstacleController == null ? ObstacleType.NONE : cell.ObstacleController.ObstacleType ;
+		}
     }
 }
