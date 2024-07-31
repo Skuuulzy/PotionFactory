@@ -5,7 +5,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class LoadingMapPreview : MonoBehaviour
+public class SavingAndLoadingMapPreview : MonoBehaviour
 {
 	[SerializeField] private TextMeshProUGUI _fileNameText;
 	[SerializeField] private Button _button;

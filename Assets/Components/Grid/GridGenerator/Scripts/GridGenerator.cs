@@ -311,7 +311,7 @@ namespace Components.Grid.Generator
 
 			_jsonString = JsonHelper.ToJson(serializeCellArray, true);
 			Debug.Log(Application.persistentDataPath);
-			System.IO.File.WriteAllText(Application.persistentDataPath + $"/{_fileName}.json", _jsonString);
+			System.IO.File.WriteAllText(Application.persistentDataPath + $"/{_fileName}", _jsonString);
 		}
 
 		public void LoadMap()
