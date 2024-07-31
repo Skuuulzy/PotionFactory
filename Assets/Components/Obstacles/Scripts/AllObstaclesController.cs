@@ -45,9 +45,9 @@ namespace Components.Grid.Obstacle
 			obstacle.transform.position = grid.GetWorldPosition(chosenCell.X, chosenCell.Y) + new Vector3(cellSize / 2, 0, cellSize / 2);
 			obstacle.transform.localScale = new Vector3(cellSize, cellSize, cellSize);
 
-			chosenCell.AddObstacleToCell(obstacle);
 
 			obstacle.SetObstacleType(obstacleController.ObstacleType);
+			chosenCell.AddObstacleToCell(obstacle);
 			return obstacle;
 		}
 
@@ -61,9 +61,9 @@ namespace Components.Grid.Obstacle
 					obstacle.transform.position = grid.GetWorldPosition(chosenCell.X, chosenCell.Y) + new Vector3(cellSize / 2, 0, cellSize / 2);
 					obstacle.transform.localScale = new Vector3(cellSize, cellSize, cellSize);
 
-					chosenCell.AddObstacleToCell(obstacle);
 
 					obstacle.SetObstacleType(obstacleType);
+					chosenCell.AddObstacleToCell(obstacle);
 					return obstacleController;
 				}
 			}

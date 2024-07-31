@@ -33,7 +33,6 @@ namespace Components.Grid.Generator
 
 		[Header("TilesGenerated")]
 		private List<Cell> _cellList;
-		private List<TileController> _tileInstantiateList;
 
 		// Grid
 		private Grid _grid;
@@ -154,18 +153,11 @@ namespace Components.Grid.Generator
 
 			if(_currentTileController != null)
 			{
-				foreach(TileController tileController in _tileInstantiateList)
+				if(chosenCell.TileController != null)
 				{
-					if(tileController == chosenCell.TileController)
-					{
-						Destroy(tileController.gameObject);
-						_tileInstantiateList.Remove(tileController);
-						break;
-					}
+					Destroy(chosenCell.TileController.gameObject);
 				}
-
 				TileController tileInstantiate = _allTilesController.GenerateTileFromPrefab(chosenCell, _grid, _groundHolder, _cellSize, _currentTileController);
-				_tileInstantiateList.Add(tileInstantiate);
 				chosenCell.AddTileToCell(tileInstantiate);
 
 				return;
@@ -173,8 +165,10 @@ namespace Components.Grid.Generator
 
 			else if( _currentObstacleController != null)
 			{
-
-
+				if(chosenCell.ObstacleController != null)
+				{
+					Destroy(chosenCell.ObstacleController.gameObject);
+				}
 				ObstacleController obstacleController = _allObstacleController.GenerateObstacleFromPrefab(_grid, chosenCell, _obstacleHolder, _cellSize, _currentObstacleController);
 				chosenCell.AddObstacleToCell(obstacleController);
 				return;
@@ -211,6 +205,7 @@ namespace Components.Grid.Generator
 			{
 				Destroy(chosenCell.ObstacleController.gameObject);
 				chosenCell.RemoveObstacleFromCell();
+
 			}
 		}
 
@@ -224,7 +219,6 @@ namespace Components.Grid.Generator
 
 			_grid = new Grid(_gridXValue, _gridYValue, _cellSize, _startPosition, _groundHolder, false);
 			_cellList = new List<Cell>();
-			_tileInstantiateList = new List<TileController>();
 			_allTilesController.SelectATileType();
 
 			// Instantiate ground blocks
@@ -234,12 +228,11 @@ namespace Components.Grid.Generator
 				{
 					_grid.TryGetCellByCoordinates(x, z, out var chosenCell);
 					TileController tile = _allTilesController.GenerateTile(chosenCell, _grid, _groundHolder, _cellSize);
-					_tileInstantiateList.Add(tile);
 					if (tile.TileType != TileType.WATER)
 					{
 						if (x != 1 && x != _grid.GetWidth() - 2 && z != 1 && z != _grid.GetHeight() - 2)
 						{
-							_allObstacleController.GenerateObstacle(_grid, chosenCell, _obstacleHolder, _cellSize);
+							ObstacleController obstacleController = _allObstacleController.GenerateObstacle(_grid, chosenCell, _obstacleHolder, _cellSize);
 						}
 					}
 					_cellList.Add(chosenCell);
@@ -254,7 +247,6 @@ namespace Components.Grid.Generator
 				ClearGrid();
 			}
 			_grid = new Grid(_gridXValue, _gridYValue, _cellSize, _startPosition, _groundHolder, false, serializedCellList);
-			_tileInstantiateList = new List<TileController>();
 			_cellList = new List<Cell>();
 			// Instantiate ground blocks
 			for (int x = 0; x < _grid.GetWidth(); x++)
@@ -267,7 +259,6 @@ namespace Components.Grid.Generator
 					if(serializeCell.TileType != TileType.NONE)
 					{
 						TileController tile = _allTilesController.GenerateTileFromType(chosenCell, _grid, _groundHolder, _cellSize, serializeCell.TileType);
-						_tileInstantiateList.Add(tile);
 					}
 
 					if(serializeCell.ObstacleType != ObstacleType.NONE)
@@ -311,12 +302,12 @@ namespace Components.Grid.Generator
 
 			_jsonString = JsonHelper.ToJson(serializeCellArray, true);
 			Debug.Log(Application.persistentDataPath);
-			System.IO.File.WriteAllText(Application.persistentDataPath + $"/{_fileName}.json", _jsonString);
+			System.IO.File.WriteAllText(Application.persistentDataPath + $"/{_fileName}", _jsonString);
 		}
 
 		public void LoadMap()
 		{
-			SerializedCell[] serializedCellArray = JsonHelper.FromJson<SerializedCell>(System.IO.File.ReadAllText(Application.persistentDataPath + $"/{_fileName}.json"));
+			SerializedCell[] serializedCellArray = JsonHelper.FromJson<SerializedCell>(System.IO.File.ReadAllText(Application.persistentDataPath + $"/{_fileName}"));
 			GenerateGridFromTemplate(serializedCellArray.ToList());
 		}
 	}
