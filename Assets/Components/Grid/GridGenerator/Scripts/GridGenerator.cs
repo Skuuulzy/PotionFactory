@@ -316,7 +316,7 @@ namespace Components.Grid.Generator
 
 		public void LoadMap()
 		{
-			SerializedCell[] serializedCellArray = JsonHelper.FromJson<SerializedCell>(System.IO.File.ReadAllText(Application.persistentDataPath + $"/{_fileName}.json"));
+			SerializedCell[] serializedCellArray = JsonHelper.FromJson<SerializedCell>(System.IO.File.ReadAllText(Application.persistentDataPath + $"/{_fileName}"));
 			GenerateGridFromTemplate(serializedCellArray.ToList());
 		}
 	}
