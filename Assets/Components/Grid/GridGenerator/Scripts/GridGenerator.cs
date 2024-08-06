@@ -32,8 +32,7 @@ namespace Components.Grid.Generator
 		[SerializeField] private AllObstaclesController _allObstacleController;
 
 		[Header("TilesGenerated")]
-		private List<TileController> _tileInstantiateList;
-		private List<ObstacleController> _obstacleInstantiateList;
+		private List<Cell> _cellList;
 
 		// Grid
 		private Grid _grid;
@@ -44,6 +43,7 @@ namespace Components.Grid.Generator
 		private UnityEngine.Camera _camera;
 
 		private string _jsonString;
+		private string _fileName;
 
 		// ------------------------------------------------------------------------- MONO -------------------------------------------------------------------------
 		private void Start()
@@ -64,7 +64,7 @@ namespace Components.Grid.Generator
 
 			if (Input.GetMouseButton(0))
 			{
-				AddSelectedTileToGrid();
+				AddSelectedTileOrObstacleToGrid();
 			}
 
 		}
@@ -95,6 +95,7 @@ namespace Components.Grid.Generator
 			}
 
 			_currentTileController = Instantiate(_tilePrefab);
+			_currentTileController.SetTileType(tileTemplate.TileType);
 			_currentTileController.InstantiatePreview(tileTemplate, _cellSize);
 
 		}
@@ -112,6 +113,8 @@ namespace Components.Grid.Generator
 			}
 
 			_currentObstacleController = Instantiate(_obstaclePrefab);
+
+			_currentObstacleController.SetObstacleType(obstacleTemplate.ObstacleType);
 			_currentObstacleController.InstantiatePreview(obstacleTemplate, _cellSize);
 		}
 
@@ -134,7 +137,7 @@ namespace Components.Grid.Generator
 		}
 
 		// ------------------------------------------------------------------------- INPUT HANDLERS -------------------------------------------------------------------------
-		private void AddSelectedTileToGrid()
+		private void AddSelectedTileOrObstacleToGrid()
 		{
 			// Try to get the position on the grid.
 			if (!UtilsClass.ScreenToWorldPositionIgnoringUI(Input.mousePosition, _camera, out Vector3 worldMousePosition))
@@ -150,29 +153,23 @@ namespace Components.Grid.Generator
 
 			if(_currentTileController != null)
 			{
-				if (chosenCell.ContainsTile)
+				if(chosenCell.TileController != null)
 				{
-					_tileInstantiateList.Remove(chosenCell.TileController);
 					Destroy(chosenCell.TileController.gameObject);
 				}
-
 				TileController tileInstantiate = _allTilesController.GenerateTileFromPrefab(chosenCell, _grid, _groundHolder, _cellSize, _currentTileController);
-				_tileInstantiateList.Add(tileInstantiate);
 				chosenCell.AddTileToCell(tileInstantiate);
+
 				return;
 			}
 
 			else if( _currentObstacleController != null)
 			{
-				if (chosenCell.ContainsObstacle == true)
+				if(chosenCell.ObstacleController != null)
 				{
-
-					_obstacleInstantiateList.Remove(chosenCell.ObstacleController);
 					Destroy(chosenCell.ObstacleController.gameObject);
 				}
-
 				ObstacleController obstacleController = _allObstacleController.GenerateObstacleFromPrefab(_grid, chosenCell, _obstacleHolder, _cellSize, _currentObstacleController);
-				_obstacleInstantiateList.Add(obstacleController);
 				chosenCell.AddObstacleToCell(obstacleController);
 				return;
 			}
@@ -206,10 +203,9 @@ namespace Components.Grid.Generator
 
 			if (chosenCell.ContainsObstacle == true)
 			{
-
-				_obstacleInstantiateList.Remove(chosenCell.ObstacleController);
 				Destroy(chosenCell.ObstacleController.gameObject);
 				chosenCell.RemoveObstacleFromCell();
+
 			}
 		}
 
@@ -222,8 +218,7 @@ namespace Components.Grid.Generator
 			}
 
 			_grid = new Grid(_gridXValue, _gridYValue, _cellSize, _startPosition, _groundHolder, false);
-			_tileInstantiateList = new List<TileController>();
-			_obstacleInstantiateList = new List<ObstacleController>();
+			_cellList = new List<Cell>();
 			_allTilesController.SelectATileType();
 
 			// Instantiate ground blocks
@@ -233,36 +228,47 @@ namespace Components.Grid.Generator
 				{
 					_grid.TryGetCellByCoordinates(x, z, out var chosenCell);
 					TileController tile = _allTilesController.GenerateTile(chosenCell, _grid, _groundHolder, _cellSize);
-					_tileInstantiateList.Add(tile);
 					if (tile.TileType != TileType.WATER)
 					{
 						if (x != 1 && x != _grid.GetWidth() - 2 && z != 1 && z != _grid.GetHeight() - 2)
 						{
-							ObstacleController obstacle = _allObstacleController.GenerateObstacle(_grid, chosenCell, _obstacleHolder, _cellSize);
-							if(obstacle != null)
-							{
-								_obstacleInstantiateList.Add(obstacle);
-							}
-
+							ObstacleController obstacleController = _allObstacleController.GenerateObstacle(_grid, chosenCell, _obstacleHolder, _cellSize);
 						}
 					}
+					_cellList.Add(chosenCell);
 				}
 			}
 		}
 
-		private void GenerateGridFromTemplate(List<TileController> tileControllerList)
+		private void GenerateGridFromTemplate(List<SerializedCell> serializedCellList)
 		{
 			if (_grid != null)
 			{
 				ClearGrid();
 			}
-			_grid = new Grid(_gridXValue, _gridYValue, _cellSize, _startPosition, _groundHolder, false);
-			//_grid.TryGetCellByCoordinates(x, z, out var chosenCell);
-			//_tileInstantiateList = tileControllerList;
-			//foreach(TileController tile in tileControllerList)
-			//{
-			//	_allTilesController.GenerateTileFromPrefab(chosenCell, _grid, _groundHolder, _cellSize, tile);
-			//}
+			_grid = new Grid(_gridXValue, _gridYValue, _cellSize, _startPosition, _groundHolder, false, serializedCellList);
+			_cellList = new List<Cell>();
+			// Instantiate ground blocks
+			for (int x = 0; x < _grid.GetWidth(); x++)
+			{
+				for (int z = 0; z < _grid.GetHeight(); z++)
+				{
+					_grid.TryGetCellByCoordinates(x, z, out var chosenCell);
+					SerializedCell serializeCell = serializedCellList.Find(cell => cell.X == x && cell.Y == z);
+
+					if(serializeCell.TileType != TileType.NONE)
+					{
+						TileController tile = _allTilesController.GenerateTileFromType(chosenCell, _grid, _groundHolder, _cellSize, serializeCell.TileType);
+					}
+
+					if(serializeCell.ObstacleType != ObstacleType.NONE)
+					{
+						ObstacleController obstacle = _allObstacleController.GenerateObstacleFromType(chosenCell, _grid, _obstacleHolder, _cellSize, serializeCell.ObstacleType);
+					}
+
+					_cellList.Add(chosenCell);
+				}
+			}
 		}
 
 		private void ClearGrid()
@@ -280,19 +286,29 @@ namespace Components.Grid.Generator
 		}
 
 		// ------------------------------------------------------------------------ SAVE AND LOAD MAP -------------------------------------------------------------
+
+		public void SetFileName(string fileName)
+		{
+			_fileName = fileName;
+		}
 		public void SaveMap()
 		{
+			SerializedCell[] serializeCellArray = new SerializedCell[_cellList.Count];
+			for (int i = 0; i < serializeCellArray.Length; i++)
+			{
+				SerializedCell cell = new SerializedCell(_cellList[i]);
+				serializeCellArray[i] = cell;
+			}
 
-			_jsonString = JsonHelper.ToJson(_tileInstantiateList.ToArray(), true);
+			_jsonString = JsonHelper.ToJson(serializeCellArray, true);
 			Debug.Log(Application.persistentDataPath);
-			System.IO.File.WriteAllText(Application.persistentDataPath + "/Map.json", _jsonString);
+			System.IO.File.WriteAllText(Application.persistentDataPath + $"/{_fileName}", _jsonString);
 		}
 
 		public void LoadMap()
 		{
-			TileController[] tileControllerArray = JsonHelper.FromJson<TileController>(System.IO.File.ReadAllText(Application.persistentDataPath + "/Map.json"));
-			Debug.Log(tileControllerArray[0]);
-			GenerateGridFromTemplate(tileControllerArray.ToList());
+			SerializedCell[] serializedCellArray = JsonHelper.FromJson<SerializedCell>(System.IO.File.ReadAllText(Application.persistentDataPath + $"/{_fileName}"));
+			GenerateGridFromTemplate(serializedCellArray.ToList());
 		}
 	}
 

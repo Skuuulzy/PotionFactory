@@ -5,7 +5,6 @@ using UnityEngine;
 
 namespace Components.Grid.Tile
 {
-    [System.Serializable]
     public class TileController : MonoBehaviour
     {
         [SerializeField] private Transform _3dViewHolder;
@@ -15,12 +14,13 @@ namespace Components.Grid.Tile
 
 		public TileType TileType => _tileType;
 
+
 		// ------------------------------------------------------------------------- INIT -------------------------------------------------------------------------
 		public void InstantiatePreview(TileTemplate tileTemplate, float scale)
         {
             _view = Instantiate(tileTemplate.GridView, _3dViewHolder);
            
-            _view.transform.localScale = new Vector3(scale, scale, scale);
+            transform.localScale = new Vector3(scale, scale, scale);
         }
 
 
@@ -33,6 +33,7 @@ namespace Components.Grid.Tile
 
     public enum TileType
 	{
+        NONE,
         GRASS,
         SAND,
         STONE,
