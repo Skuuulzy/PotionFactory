@@ -132,8 +132,6 @@ namespace Components.Grid
 				return;
 			}
 			
-			Debug.Log($"Clicking cell: {chosenCell.X}, {chosenCell.Y}, on position {worldMousePosition}");
-			
 			// Check if the machine can be placed on the grid.
 			foreach (var node in _currentMachineController.Machine.Nodes)
 			{

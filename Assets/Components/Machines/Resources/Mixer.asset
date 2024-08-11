@@ -12,11 +12,41 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 581ab5ce2c92484d9bd63e4e972996c1, type: 3}
   m_Name: Mixer
   m_EditorClassIdentifier: 
-  _name: 
-  _gridView: {fileID: 0}
-  _uiView: {fileID: 0}
-  _behavior: {fileID: 11400000, guid: 0c1f3da570c2306459d2af1c953fed52, type: 2}
-  _dimension: {x: 1, y: 1}
-  _baseInPorts: []
-  _baseOutPorts: []
-  _maxItemCount: 1
+  _name: Mixer
+  _gridView: {fileID: 2546896531206445068, guid: f9e0820ad4d2b484694edfc56c6c4101,
+    type: 3}
+  _uiView: {fileID: 21300000, guid: 5a83be747fe3d4e1e8187dd1adabc8f5, type: 3}
+  _behavior: {fileID: 11400000, guid: 150ba0f5943b5cf478cf810bb3648a20, type: 2}
+  _nodes:
+  - _localPosition: {x: 0, y: 0}
+    _gridPosition: {x: 0, y: 0}
+    _ports: []
+  - _localPosition: {x: 0, y: -1}
+    _gridPosition: {x: 0, y: 0}
+    _ports:
+    - _side: 3
+      _way: 0
+  - _localPosition: {x: 0, y: -2}
+    _gridPosition: {x: 0, y: 0}
+    _ports: []
+  - _localPosition: {x: 1, y: 0}
+    _gridPosition: {x: 0, y: 0}
+    _ports: []
+  - _localPosition: {x: 1, y: -1}
+    _gridPosition: {x: 0, y: 0}
+    _ports: []
+  - _localPosition: {x: 1, y: -2}
+    _gridPosition: {x: 0, y: 0}
+    _ports: []
+  - _localPosition: {x: 2, y: 0}
+    _gridPosition: {x: 0, y: 0}
+    _ports: []
+  - _localPosition: {x: 2, y: -1}
+    _gridPosition: {x: 0, y: 0}
+    _ports:
+    - _side: 2
+      _way: 1
+  - _localPosition: {x: 2, y: -2}
+    _gridPosition: {x: 0, y: 0}
+    _ports: []
+  _maxItemCount: -1

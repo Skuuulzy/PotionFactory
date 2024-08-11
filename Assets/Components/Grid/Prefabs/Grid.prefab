@@ -83,9 +83,9 @@ MonoBehaviour:
   _cellSize: 20
   _startPosition: {x: 0, y: 0, z: 0}
   _showDebug: 0
-  _machineControllerPrefab: {fileID: 2567407675386972328, guid: 859503caaa5f96242b5ba83dccd721c9,
+  _groundTile: {fileID: 5488635875282986484, guid: 763f6990e5d7f74418e2a1161ea2cfeb,
     type: 3}
-  _machinePreviewControllerPrefab: {fileID: 6386158893697936347, guid: 093bb9d24028b664380f7e20bb1bd87f,
+  _machineControllerPrefab: {fileID: 2567407675386972328, guid: 859503caaa5f96242b5ba83dccd721c9,
     type: 3}
   _groundHolder: {fileID: 3378976111399413885}
   _objectsHolder: {fileID: 5446604651869953757}
@@ -93,14 +93,6 @@ MonoBehaviour:
   _tileController: {fileID: 11400000, guid: 98fb794df76978f4b994523c8c857b41, type: 2}
   _obstacleController: {fileID: 11400000, guid: 4e515b2a00523b04699a5b6777c492a2,
     type: 2}
-  _extractorMachine: {fileID: 11400000, guid: d676a07d3bcf31d4fbb44eeab5b325c5, type: 2}
-  _itemTemplateList:
-  - {fileID: 11400000, guid: 98ebfc979facba846b1110a0c2c42492, type: 2}
-  - {fileID: 11400000, guid: 5998c1f9426bc474aa5530a8b348e0fb, type: 2}
-  - {fileID: 11400000, guid: 11be2af5791454c4f9d5a3fbbebc81f7, type: 2}
-  - {fileID: 11400000, guid: 4fcba209563364945bde39e37a3071e2, type: 2}
-  - {fileID: 11400000, guid: 3004566fae36dae429d5bc489e101726, type: 2}
-  _extractorGenerationProbability: 0.1
 --- !u!1 &3142047636322267640
 GameObject:
   m_ObjectHideFlags: 0

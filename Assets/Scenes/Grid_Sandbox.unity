@@ -4337,6 +4337,23 @@ PrefabInstance:
       propertyPath: _machineSelectorViewHolder
       value: 
       objectReference: {fileID: 811147901}
+    - target: {fileID: 5005348551661390984, guid: 00a714b3d8b50be45995daf2ebd07a8f,
+        type: 3}
+      propertyPath: _machineTemplates.Array.size
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 5005348551661390984, guid: 00a714b3d8b50be45995daf2ebd07a8f,
+        type: 3}
+      propertyPath: _machineTemplates.Array.data[5]
+      value: 
+      objectReference: {fileID: 11400000, guid: a8537385e1b8cb8458deab9ee8a55a7a,
+        type: 2}
+    - target: {fileID: 5005348551661390984, guid: 00a714b3d8b50be45995daf2ebd07a8f,
+        type: 3}
+      propertyPath: _machineTemplates.Array.data[6]
+      value: 
+      objectReference: {fileID: 11400000, guid: 2e90757fd7d3d10459a62e29b5335f12,
+        type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4455,11 +4472,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2922091601394712576, guid: 0ef98c6108f43c54c81c54882a4836ec,
         type: 3}
-      propertyPath: _showDebug
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2922091601394712576, guid: 0ef98c6108f43c54c81c54882a4836ec,
-        type: 3}
       propertyPath: _waterTile
       value: 
       objectReference: {fileID: 5098640816377893079, guid: 8ebe8fcb5637c8e4687b5e5aca85e655,
@@ -4476,22 +4488,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2922091601394712576, guid: 0ef98c6108f43c54c81c54882a4836ec,
         type: 3}
-      propertyPath: _groundTile
-      value: 
-      objectReference: {fileID: 5488635875282986484, guid: 763f6990e5d7f74418e2a1161ea2cfeb,
-        type: 3}
-    - target: {fileID: 2922091601394712576, guid: 0ef98c6108f43c54c81c54882a4836ec,
-        type: 3}
-      propertyPath: _startPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2922091601394712576, guid: 0ef98c6108f43c54c81c54882a4836ec,
-        type: 3}
-      propertyPath: _startPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2922091601394712576, guid: 0ef98c6108f43c54c81c54882a4836ec,
-        type: 3}
       propertyPath: _objectToInstantiate
       value: 
       objectReference: {fileID: 0}
@@ -4500,12 +4496,6 @@ PrefabInstance:
       propertyPath: _randomBonusProbability
       value: 0.1
       objectReference: {fileID: 0}
-    - target: {fileID: 2922091601394712576, guid: 0ef98c6108f43c54c81c54882a4836ec,
-        type: 3}
-      propertyPath: _machineControllerPrefab
-      value: 
-      objectReference: {fileID: 2567407675386972328, guid: 859503caaa5f96242b5ba83dccd721c9,
-        type: 3}
     - target: {fileID: 2922091601394712576, guid: 0ef98c6108f43c54c81c54882a4836ec,
         type: 3}
       propertyPath: _obstacleList.Array.size
@@ -4612,11 +4602,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8271884485009922326, guid: 0ef98c6108f43c54c81c54882a4836ec,
-        type: 3}
-      propertyPath: _objectToInstantiate
-      value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
