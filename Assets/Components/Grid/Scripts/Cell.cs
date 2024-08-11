@@ -12,6 +12,7 @@ namespace Components.Grid
         public int Y { get; }
         public float Size { get; }
         public bool ContainsObject { get; private set; }
+        public bool ContainsNode { get; private set; }
         public bool ContainsObstacle { get; private set; }
         public bool ContainsTile { get; private set; }
 
@@ -60,13 +61,13 @@ namespace Components.Grid
 
 		public void AddNodeToCell(Node node)
         {
-            ContainsObject = true;
+            ContainsNode = true;
             _node = node;
         }
 
         public void RemoveNodeFromCell()
         {
-            ContainsObject = false;
+	        ContainsNode = false;
             _node = null;
         }
 

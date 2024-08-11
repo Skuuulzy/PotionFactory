@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Components.Items;
 using Components.Machines;
 using Components.Recipes;
@@ -60,34 +61,38 @@ namespace Database
         {
             foreach (var scriptableObject in DATABASE[typeof(RecipeTemplate)].Values)
             {
-                if (scriptableObject is not RecipeTemplate recipeTemplate)
+                if (scriptableObject is not RecipeTemplate currentRecipeTemplate)
                 {
                     continue;
                 }
-                
-                if (recipeTemplate.Machine != machineTemplate) 
-                    continue;
-				
-                foreach (IngredientTemplate ingredient in inputsIngredients)
-                {
-                    // Is there an ingredient inside the recipe that match the input ingredient.
-                    if (!recipeTemplate.Ingredients.TryGetValue(ingredient, out var ingredientCount))
-                    {
-                        continue;
-                    }
 
-                    // Is there enough ingredient to complete the recipe
-                    if (ingredientCount != inputsIngredients.Count)
+                if (currentRecipeTemplate.Machine != machineTemplate)
+                    continue;
+
+                bool isRecipeValid = true;
+                
+                // We go through every ingredient of the recipe.
+                foreach (var recipeIngredient in currentRecipeTemplate.Ingredients)
+                {
+                    // We get the number of ingredients of that type in the inputs ingredients.
+                    int inputIngredientTypeCount = inputsIngredients.Count(ingredient => ingredient.Name == recipeIngredient.Key.Name);
+
+                    // If there is not enough ingredients, the recipe cannot be made.
+                    if (inputIngredientTypeCount < recipeIngredient.Value)
                     {
+                        isRecipeValid = false;
                         break;
                     }
-					
-                    recipe = recipeTemplate;
+                }
+
+                if (isRecipeValid)
+                {
+                    recipe = currentRecipeTemplate;
                     return true;
                 }
             }
 
-            //We don't find any recipes SO we return an unknown item recipe.
+            // If no recipe was found, return the default.
             recipe = GetScriptableObject<RecipeTemplate>("DEFAULT");
             return false;
         }

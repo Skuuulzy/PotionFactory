@@ -18,6 +18,7 @@ namespace Components.Machines.Behaviors
                 if (ScriptableObjectDatabase.TryFindRecipe(machine.Template, machine.Ingredients, out RecipeTemplate recipe))
                 {
                     _currentRecipe = recipe;
+                    Debug.Log($"Machine: {machine.Controller.name} found recipe: {_currentRecipe.name}. Start processing for {_processTime}.");
                 }
                 else
                 {
@@ -30,6 +31,7 @@ namespace Components.Machines.Behaviors
             // Increment the process time until we reach it.
             if (_currentProcessTime < _processTime)
             {
+                Debug.Log($"Machine: {machine.Controller.name} process: {_currentRecipe.name}, {_currentProcessTime}/{_processTime}.");
                 _currentProcessTime++;
                 return;
             }
@@ -46,6 +48,14 @@ namespace Components.Machines.Behaviors
                     _currentProcessTime = 0;
                     machine.ClearItems();
                 }
+                else
+                {
+                    Debug.Log($"Machine: {machine.Controller.name} cannot output: {_currentRecipe.OutIngredient.name} to: {outMachine.Controller.name}. Because {outMachine.Controller.name} is either full or processing a recipe");
+                }
+            }
+            else
+            {
+                Debug.Log($"Machine: {machine.Controller.name} cannot output: {_currentRecipe.OutIngredient.name} because no out machine is connected.");
             }
         }
     }
