@@ -205,7 +205,7 @@ namespace Components.Grid
         {
 	        if (_grid.TryGetCellByCoordinates(neighbourPosition.x , neighbourPosition.y, out Cell neighbourCell))
 	        {
-		        if (neighbourCell.ContainsObject)
+		        if (neighbourCell.ContainsNode)
 		        {
 			        foreach (var potentialPort in neighbourCell.Node.Ports)
 			        {
