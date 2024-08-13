@@ -234,7 +234,7 @@ namespace Components.Grid
             }
 
             // Check if the cell has an object
-            if (!chosenCell.ContainsObject)
+            if (!chosenCell.ContainsNode)
             {
                 return;
             }
