@@ -62,12 +62,14 @@ namespace Components.Grid
 		public void AddNodeToCell(Node node)
         {
             ContainsNode = true;
+            ContainsObject = true;
             _node = node;
         }
 
         public void RemoveNodeFromCell()
         {
 	        ContainsNode = false;
+            ContainsObject = false;
             _node = null;
         }
 

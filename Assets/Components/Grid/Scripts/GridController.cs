@@ -195,7 +195,7 @@ namespace Components.Grid
 		            }
 	            }
             }
-            
+            //originCell.
             _currentMachineController.ConfirmPlacement();
             
             InstantiateNewPreview();
