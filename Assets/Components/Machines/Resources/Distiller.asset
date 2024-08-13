@@ -12,10 +12,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 581ab5ce2c92484d9bd63e4e972996c1, type: 3}
   m_Name: Distiller
   m_EditorClassIdentifier: 
-  _name: 
-  _machineType: 0
-  _gridView: {fileID: 0}
-  _uiView: {fileID: 0}
-  _behavior: {fileID: 0}
-  _nodes: []
-  _maxItemCount: 0
+  _name: Distiller
+  _gridView: {fileID: 3656516272554326776, guid: eb0c162a58841dc4c9e9d58d9576cf99,
+    type: 3}
+  _uiView: {fileID: 21300000, guid: 2e734506c0c0940b492a78952289d3fb, type: 3}
+  _behavior: {fileID: 11400000, guid: 150ba0f5943b5cf478cf810bb3648a20, type: 2}
+  _nodes:
+  - _localPosition: {x: 0, y: 0}
+    _gridPosition: {x: 0, y: 0}
+    _ports:
+    - _side: 3
+      _way: 0
+  - _localPosition: {x: 1, y: 0}
+    _gridPosition: {x: 0, y: 0}
+    _ports: []
+  - _localPosition: {x: 2, y: 0}
+    _gridPosition: {x: 0, y: 0}
+    _ports:
+    - _side: 2
+      _way: 1
+  _maxItemCount: -1
