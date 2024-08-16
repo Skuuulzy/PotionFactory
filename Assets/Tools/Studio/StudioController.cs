@@ -1,23 +1,27 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
+using System.Collections;
+using UnityEditor;
+using System;
 
 public class StudioController : MonoBehaviour
 {
     //Private variables
-    private List<CameraPreset> _cameraPresets = new List<CameraPreset>();
+    [SerializeField] private List<CameraPreset> _cameraPresets = new List<CameraPreset>();
 
-    private CameraPreset _selecteCameraPreset;
+    [SerializeField] private CameraPreset _selecteCameraPreset;
 
-    private Transform _presetsParentTransform;
+    [SerializeField] private Transform _presetsParentTransform;
+
+    [SerializeField] private Transform _objectToCaptureParentTransform;
 
     //Public variables
     public List<CameraPreset> CameraPresets => _cameraPresets;
     public CameraPreset SelectedCameraPreset => _selecteCameraPreset;
     public Transform PresetsParentTransform { get => _presetsParentTransform; set => _presetsParentTransform = value; }
+    public Transform ObjectToCaptureParentTransform { get => _objectToCaptureParentTransform; set => _objectToCaptureParentTransform = value; }
 
-    //Screenshot
-    public enum ImageFormat { PNG, JPG }
 
     public void AddPreset()
     {
@@ -62,7 +66,12 @@ public class StudioController : MonoBehaviour
 
         GameObject camera = new GameObject($"{cameraPreset.PresetName} camera");
         camera.transform.parent = presetParent.transform;
-        cameraPreset.Camera = camera.AddComponent<Camera>();
+
+        Camera cameraComponent = camera.AddComponent<Camera>();
+        cameraComponent.clearFlags = CameraClearFlags.SolidColor;
+        //cameraComponent.backgroundColor = Color.clear;
+
+        cameraPreset.Camera = cameraComponent;
 
         cameraPreset.IsSetup = true;
         Debug.Log($"Camera preset [{cameraPreset.PresetName}] is setup");
@@ -80,43 +89,79 @@ public class StudioController : MonoBehaviour
         Debug.Log($"Camera preset [{cameraPreset.PresetName}] is selected");
     }
 
-    //Screenshot
-    public void TakeScreenshot(string filePath, ImageFormat format, int width, int height)
+    //Capture
+    public void TakeCapture(string filePath, ImageFormat format, int width, int height, string objectCapture = null)
     {
-        // Créer une texture temporaire avec la taille souhaitée
-        Texture2D screenshot = new Texture2D(width, height, TextureFormat.RGBA32, false);
+        Camera cam = SelectedCameraPreset.Camera;
+        int Fwidth = SelectedCameraPreset.ImageSize == ImageSize.Screen ? Screen.currentResolution.width : width;
+        int Fheight = SelectedCameraPreset.ImageSize == ImageSize.Screen ? Screen.currentResolution.height : height;
 
-        // Capturer le screenshot
-        Rect rect = new Rect(0, 0, width, height);
-        screenshot.ReadPixels(rect, 0, 0);
-        screenshot.Apply();
+        RenderTexture rt;
+        rt = new RenderTexture(Fwidth, Fheight, 24);
+        cam.targetTexture = rt;
 
-        // Convertir la texture en bytes selon le format choisi
-        byte[] bytes = null;
-        if (format == ImageFormat.PNG)
+        Texture2D capture = new Texture2D(Fwidth, Fheight, format == ImageFormat.PNG ? TextureFormat.RGBA32 : TextureFormat.RGB24, false);
+        cam.Render();
+
+        RenderTexture.active = rt;
+        capture.ReadPixels(new Rect(0, 0, Fwidth, Fheight), 0, 0);
+        capture.Apply();
+
+        cam.targetTexture = null;
+        RenderTexture.active = null;
+
+        DestroyImmediate(rt);
+
+        // Save capture
+        byte[] bytes = format == ImageFormat.PNG ? capture.EncodeToPNG() : capture.EncodeToJPG();
+        string extension = format == ImageFormat.PNG ? "png" : "jpg";
+
+        if (objectCapture == null)
         {
-            bytes = screenshot.EncodeToPNG();
-        }
-        else if (format == ImageFormat.JPG)
-        {
-            bytes = screenshot.EncodeToJPG();
-        }
-
-        filePath = Path.Combine(Application.dataPath, "XXX" + "." + format.ToString().ToLower());
-
-        // Enregistrer le fichier
-        if (bytes != null)
-        {
-            File.WriteAllBytes(filePath, bytes);
-            Debug.Log($"Screenshot saved to {filePath}");
+            filePath = Path.Combine(filePath, $"Screenshot_{System.DateTime.Now:yyyyMMdd_HHmmss}.{extension}");
         }
         else
         {
-            Debug.LogError("Failed to encode screenshot");
+            filePath = Path.Combine(filePath, $"{objectCapture}.{extension}");
         }
 
-        // Libérer la texture
-        DestroyImmediate(screenshot);
+        File.WriteAllBytes(filePath, bytes);
+
+        DestroyImmediate(capture);
+
+        Debug.Log($"Capture saved to {filePath}");
+    }
+
+    public void TakeAllCapture(string filePath, ImageFormat format, int width, int height)
+    {
+        StartEditorCoroutine(TakeAllCaptureCoroutine(filePath, format, width, height, ObjectToCaptureParentTransform, this));
+    }
+
+    public static void StartEditorCoroutine(IEnumerator routine)
+    {
+        EditorApplication.update += () =>
+        {
+            if (!routine.MoveNext())
+            {
+                EditorApplication.update -= () => StartEditorCoroutine(routine);
+            }
+        };
+    }
+
+    static IEnumerator TakeAllCaptureCoroutine(string filePath, ImageFormat format, int width, int height, Transform objectToCapture, StudioController studioController)
+    {
+        foreach (Transform child in objectToCapture)
+        {
+            child.gameObject.SetActive(false);
+        }
+
+        foreach (Transform child in objectToCapture)
+        {
+            child.gameObject.SetActive(true);
+            studioController.TakeCapture(filePath, format, width, height, child.name);
+            yield return new WaitForSeconds(0.5f);
+            child.gameObject.SetActive(false);
+        }
     }
 }
 
@@ -124,12 +169,16 @@ public class StudioController : MonoBehaviour
 public class CameraPreset
 {
     //Private variables
-    private string _presetName;
-    private GameObject _presetParent;
-    private Camera _camera;
-    private bool _isSetUp;
-    private bool _wantRemove = false;
-    private bool _wantDeleteFromHierarchie = false;
+    [SerializeField] private string _presetName;
+    [SerializeField] private GameObject _presetParent;
+    [SerializeField] private Camera _camera;
+    [SerializeField] private bool _isSetUp;
+    [SerializeField] private bool _wantRemove = false;
+    [SerializeField] private bool _wantDeleteFromHierarchie = false;
+    [SerializeField] private string _filePath = Application.dataPath;
+    [SerializeField] private ImageFormat _imageFormat = ImageFormat.PNG;
+    [SerializeField] private ImageSize _imageSize = ImageSize.Screen;
+    [SerializeField] private Vector2Int _imageSizeValue = Vector2Int.zero;
 
 
     //Public variables
@@ -139,4 +188,11 @@ public class CameraPreset
     public bool IsSetup { get => _isSetUp; set => _isSetUp = value; }
     public bool WantRemoved { get => _wantRemove; set => _wantRemove = value; }
     public bool WantDeleteFromHierarchie { get => _wantDeleteFromHierarchie; set => _wantDeleteFromHierarchie = value; }
+    public string FilePath { get => _filePath; set => _filePath = value; }
+    public ImageFormat ImageFormat { get => _imageFormat; set => _imageFormat = value; }
+    public ImageSize ImageSize { get => _imageSize; set => _imageSize = value; }
+    public Vector2Int ImageSizeValue { get => _imageSizeValue; set => _imageSizeValue = value; }
 }
+
+public enum ImageFormat { PNG, JPG }
+public enum ImageSize { Screen, Custom }
