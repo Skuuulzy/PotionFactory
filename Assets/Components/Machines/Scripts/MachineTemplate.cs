@@ -9,6 +9,7 @@ namespace Components.Machines
     {
         [Header("Definition")]
         [SerializeField] private string _name;
+        [SerializeField] private MachineType _type;
 
         [SerializeField] private GameObject _gridView;
         [SerializeField] private Sprite _uiView;
@@ -21,12 +22,15 @@ namespace Components.Machines
         [SerializeField] private int _maxItemCount;
         
         public string Name => _name;
+        public MachineType Type => _type;
 
         public GameObject GridView => _gridView;
         public Sprite UIView => _uiView;
 
         public List<Node> Nodes => GetNodeInstance();
         public int MaxItemCount => _maxItemCount;
+        
+
         
         private List<Node> GetNodeInstance()
         {

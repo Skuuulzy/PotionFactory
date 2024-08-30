@@ -1,20 +1,23 @@
+using System;
+using Components.Interactions.Clickable;
 using Components.Items;
 using Components.Tick;
 using UnityEngine;
 
 namespace Components.Machines
 {
-    public class MachineController : MonoBehaviour
+    public class MachineController : MonoBehaviour, IClickable
     {
         [SerializeField] private Transform _3dViewHolder;
         [SerializeField] private Machine _machine;
         [SerializeField] private ItemController _itemController;
         [SerializeField] private GameObject _debugItem;
+
+        public static Action<Machine> OnMachineClicked;
         
         public Machine Machine => _machine;
 
         private bool _initialized;
-
         private GameObject _view;
         
         // ------------------------------------------------------------------------- INIT -------------------------------------------------------------------------
@@ -24,7 +27,7 @@ namespace Components.Machines
             _machine = new Machine(machineTemplate, this);
             _view.transform.localScale = new Vector3(scale, scale, scale);
         }
-
+        
         public void RotatePreview(int angle)
         {
             _view.transform.rotation = Quaternion.Euler(new Vector3(0, angle, 0));
@@ -127,6 +130,18 @@ namespace Components.Machines
             {
                 _itemController.DestroyRepresentation();
             }
+        }
+        
+        // ------------------------------------------------------------------------- CLICKABLE BEHAVIOUR -------------------------------------------------------------------------
+        public void Clicked()
+        {
+            if (!_initialized)
+            {
+                return;
+            }
+            
+            Debug.Log($"Machine: {gameObject.name} clicked");
+            OnMachineClicked?.Invoke(_machine);
         }
     }
 }

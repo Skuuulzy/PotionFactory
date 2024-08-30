@@ -14,4 +14,16 @@
         IN,
         OUT
     }
+    
+    public enum MachineType
+    {
+        CAULDRON,
+        CONVEYOR,
+        DESTRUCTOR,
+        DISPANCER,
+        DISTILLER,
+        EXTRACTOR,
+        MIXER,
+        PRESS
+    }
 }

@@ -13,13 +13,14 @@ MonoBehaviour:
   m_Name: Extractor
   m_EditorClassIdentifier: 
   _name: Extractor
+  _type: 5
   _gridView: {fileID: 5776661972514393347, guid: 825538e3f1d109d4994e920117e9ea2a,
     type: 3}
   _uiView: {fileID: 21300000, guid: 1a4f25f54f85e0e40a0d9d85454d33df, type: 3}
   _behavior: {fileID: 11400000, guid: bc35d351eb022d044a11687a9cd4c735, type: 2}
   _nodes:
   - _localPosition: {x: 0, y: 0}
-    _debugWorldPosition: {x: 0, y: 0}
+    _gridPosition: {x: 0, y: 0}
     _ports:
     - _side: 2
       _way: 1
