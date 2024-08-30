@@ -13,13 +13,14 @@ MonoBehaviour:
   m_Name: Destructor
   m_EditorClassIdentifier: 
   _name: Destructor
+  _type: 2
   _gridView: {fileID: 5776661972514393347, guid: 90a602ef077d8dd40bda7d47a2884a66,
     type: 3}
   _uiView: {fileID: 21300000, guid: dafed84662c74164ea80c926098dc96e, type: 3}
   _behavior: {fileID: 11400000, guid: fbd2336df64b98448b6cbb27bd42805c, type: 2}
   _nodes:
   - _localPosition: {x: 0, y: 0}
-    _debugWorldPosition: {x: 0, y: 0}
+    _gridPosition: {x: 0, y: 0}
     _ports:
     - _side: 3
       _way: 0

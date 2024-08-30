@@ -14,6 +14,7 @@ namespace Components.Items
 		[SerializeField] private List<Resource> _resources;
 		[SerializeField] private List<ItemState> _types;
 		[SerializeField] private GameObject _3dView;
+		[SerializeField] private Sprite _icon;
 
 		[Header("Debug")]
 		[SerializeField] private GameObject _debug3DView;
