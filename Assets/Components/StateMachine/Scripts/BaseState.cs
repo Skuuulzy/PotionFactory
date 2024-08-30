@@ -7,8 +7,11 @@ public abstract partial class BaseState : IState
 	protected bool _isFinished;
 	public bool IsFinished => _isFinished;
 
-	public static Action<string> OnStateStarted;
+	public static Action<BaseState> OnStateStarted;
+	public static Action OnStateEnded;
 	protected string _stateName;
+
+	public string StateName => _stateName;
 
 	public virtual void SetName()
 	{
@@ -18,7 +21,7 @@ public abstract partial class BaseState : IState
 	public virtual void OnEnter()
 	{
 		SetName();
-		OnStateStarted?.Invoke(_stateName);
+		OnStateStarted?.Invoke(this);
 	}
 
 	public virtual void Update()
@@ -35,7 +38,11 @@ public abstract partial class BaseState : IState
 
 	public virtual void OnExit()
 	{
+		OnStateEnded?.Invoke();
+	}
 
-		//noop
+	public virtual void SetStateFinished()
+	{
+		_isFinished = true;
 	}
 }

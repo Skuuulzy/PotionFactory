@@ -5,10 +5,9 @@ using VComponent.Tools.Timer;
 
 public class FactoryState : BaseState
 {
-	public static Action FactoryStateBegin;
-	public static Action FactoryStateEnd;
+	public static Action<FactoryState> OnFactoryStateStarted;
+	public static Action<FactoryState> OnFactoryStateEnded;
 
-	private CountdownTimer _countdownTimer;
 	public override void SetName()
 	{
 		_stateName = "Factory state";
@@ -16,29 +15,15 @@ public class FactoryState : BaseState
 	public override void OnEnter()
 	{
 		base.OnEnter();
-
+		OnFactoryStateStarted?.Invoke(this);
 		_isFinished = false;
-		FactoryStateBegin?.Invoke();
-		_countdownTimer = new CountdownTimer(10);
-		_countdownTimer.OnTimerStop += SetStateFinished;
-		_countdownTimer.Start();
-		Debug.Log("Factory State begin");
 	}
 
-	public override void Update()
-	{
-		_countdownTimer.Tick(Time.deltaTime);
-	}
 
 	public override void OnExit()
 	{
-		FactoryStateEnd?.Invoke();
-		Debug.Log("Factory State end");
-	}
-
-	private void SetStateFinished()
-	{
-		_isFinished = true;
+		base.OnExit();
+		OnFactoryStateEnded?.Invoke(this);
 	}
 
 }

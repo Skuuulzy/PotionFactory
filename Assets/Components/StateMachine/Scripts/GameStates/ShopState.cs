@@ -5,8 +5,8 @@ using VComponent.Tools.Timer;
 
 public class ShopState : BaseState
 {
-	public static Action ShopStateBegin;
-	public static Action ShopStateEnd;
+	public static Action<ShopState> OnShopStateStarted;
+	public static Action<ShopState> OnShopStateEnded;
 
 	public override void SetName()
 	{
@@ -17,8 +17,7 @@ public class ShopState : BaseState
 	{
 		base.OnEnter();
 		_isFinished = false;
-		ShopStateBegin?.Invoke();
-		Debug.Log("Shop State begin");
+		OnShopStateStarted?.Invoke(this);
 	}
 
 	public override void Update()
@@ -28,9 +27,9 @@ public class ShopState : BaseState
 
 	public override void OnExit()
 	{
+		base.OnExit();
 		_isFinished = true;
-		ShopStateEnd?.Invoke();
-		Debug.Log("Shop State end");
+		OnShopStateEnded?.Invoke(this);
 	}
 
 }
