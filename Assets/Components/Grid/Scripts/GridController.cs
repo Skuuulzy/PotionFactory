@@ -45,7 +45,9 @@ namespace Components.Grid
         // Actions
         public Action<Machine> OnMachineAdded;
         public Action<Machine> OnMachineRemoved;
-        
+
+		// StateMachine
+		private StateMachine _stateMachine;
 
         // ------------------------------------------------------------------------- MONO -------------------------------------------------------------------------
         private void Start()
@@ -53,7 +55,24 @@ namespace Components.Grid
             _camera = UnityEngine.Camera.main;
             InstantiateNewPreview();
             GenerateGrid();
+
+            //State Machine
+            _stateMachine = new StateMachine();
+
+            //Declare state
+            FactoryState factoryState = new FactoryState();
+            ShopState shopState = new ShopState();
+
+            //Define transitions 
+            At(factoryState, shopState, new FuncPredicate(() => factoryState.IsFinished));
+            At(shopState, factoryState, new FuncPredicate(() => shopState.IsFinished));
+            //Set initial state
+            _stateMachine.SetState(factoryState);
+
         }
+
+        void At(IState from, IState to, IPredicate condition) => _stateMachine.AddTransition(from, to, condition);
+        void Any(IState to, IPredicate condition) => _stateMachine.AddAnyTransition(to, condition);
 
         private void Update()
         {
@@ -75,6 +94,7 @@ namespace Components.Grid
             {
                 RotateSelection();
             }
+            _stateMachine.Update();
         }
         
         // ------------------------------------------------------------------------- SELECTION -------------------------------------------------------------------------

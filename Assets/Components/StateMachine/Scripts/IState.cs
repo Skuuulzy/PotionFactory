@@ -4,6 +4,8 @@ using UnityEngine;
 
 public interface IState 
 {
+
+    void SetName();
     void OnEnter();
     void Update();
     void FixedUpdate();

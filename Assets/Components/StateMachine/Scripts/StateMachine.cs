@@ -9,6 +9,8 @@ public class StateMachine
 	Dictionary<Type, StateNode> nodes = new();
 	HashSet<ITransition> anyTransitions = new();
 
+
+
 	public void Update()
 	{
 		var transition = GetTransition();
@@ -30,6 +32,7 @@ public class StateMachine
 		current = nodes[state.GetType()];
 		current.State?.OnEnter();
 	}
+
 	private void ChangeState(IState state)
 	{
 		if(state == current.State)
@@ -93,6 +96,7 @@ public class StateMachine
 	{
 		public IState State { get; }
 		public HashSet<ITransition> Transitions { get; }
+
 		public StateNode(IState state)
 		{
 			State = state;
