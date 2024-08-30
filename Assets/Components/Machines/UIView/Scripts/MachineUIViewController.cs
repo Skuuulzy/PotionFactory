@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 namespace Components.Machines.UIView
@@ -6,6 +5,7 @@ namespace Components.Machines.UIView
     public class MachineUIViewController : MonoBehaviour
     {
         [SerializeField] private SerializableDictionary<MachineType, MachineUIViewBase> _machineViewPrefabs;
+        [SerializeField] private MachineUIViewBase _machineViewBasePrefab;
         [SerializeField] private Transform _holder;
         
         private MachineUIViewBase _currentView;
@@ -23,21 +23,11 @@ namespace Components.Machines.UIView
         private void HandleMachineClicked(Machine machine)
         {
             var machineType = machine.Template.Type;
-            
-            if (!_currentView || _currentView.AssociatedType != machineType)
-            {
-                _currentView = Instantiate(_machineViewPrefabs[machineType], _holder);
-            }
 
             switch (machineType)
             {
                 case MachineType.EXTRACTOR:
-                    if (_currentView is ExtractorUIView extractorUIView)
-                    {
-                        extractorUIView.Initialize(machine);
-                        break;
-                    }
-                    Debug.LogError($"The clicked machine is type: {machineType}, yet the instanced view is not of type: {nameof(ExtractorUIView)}");
+                    InstantiateAndInitializeView<ExtractorUIView>(machine);
                     break;
                 case MachineType.CAULDRON:
                 case MachineType.CONVEYOR:
@@ -46,11 +36,32 @@ namespace Components.Machines.UIView
                 case MachineType.DISTILLER:
                 case MachineType.MIXER:
                 case MachineType.PRESS:
-                    _currentView.Initialize(machine);
+                    InstantiateAndInitializeView(machine);
                     break;
-                default:
-                    throw new ArgumentOutOfRangeException();
             }
+        }
+        
+        private void InstantiateAndInitializeView(Machine machine)
+        {
+            if (_currentView)
+            {
+                Destroy(_currentView.gameObject);
+            }
+            
+            _currentView = Instantiate(_machineViewBasePrefab, _holder);
+            _currentView.Initialize(machine);
+        }
+
+        private void InstantiateAndInitializeView<T>(Machine machine) where T : MachineUIViewBase
+        {
+            if (_currentView && _currentView is T desiredTypeView)
+            {
+                desiredTypeView.Initialize(machine);
+                return;
+            }
+            
+            _currentView = Instantiate(_machineViewPrefabs[machine.Template.Type], _holder);
+            ((T)_currentView).Initialize(machine);
         }
     }
 }

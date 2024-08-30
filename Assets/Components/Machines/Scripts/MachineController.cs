@@ -140,7 +140,6 @@ namespace Components.Machines
                 return;
             }
             
-            Debug.Log($"Machine: {gameObject.name} clicked");
             OnMachineClicked?.Invoke(_machine);
         }
     }
