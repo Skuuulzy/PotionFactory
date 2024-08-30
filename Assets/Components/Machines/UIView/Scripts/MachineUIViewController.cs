@@ -1,13 +1,11 @@
 using System;
-using System.Collections.Generic;
-using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Components.Machines.UIView
 {
     public class MachineUIViewController : MonoBehaviour
     {
-        [ShowInInspector] private Dictionary<MachineType, MachineUIViewBase> _viewBasePrefab;
+        [SerializeField] private SerializableDictionary<MachineType, MachineUIViewBase> _machineViewPrefabs;
         [SerializeField] private Transform _holder;
         
         private MachineUIViewBase _currentView;
@@ -28,7 +26,7 @@ namespace Components.Machines.UIView
             
             if (!_currentView || _currentView.AssociatedType != machineType)
             {
-                _currentView = Instantiate(_viewBasePrefab[machineType], _holder);
+                _currentView = Instantiate(_machineViewPrefabs[machineType], _holder);
             }
 
             switch (machineType)

@@ -4,6 +4,7 @@ using System.Linq;
 using Components.Items;
 using Components.Machines;
 using Components.Recipes;
+using Sirenix.Utilities;
 using UnityEngine;
 
 namespace Database
@@ -21,12 +22,12 @@ namespace Database
         static ScriptableObjectDatabase()
         {
             // This static constructor will be called at the first time GetScriptableObject is called. Some nice lazy initialization here.
-            LoadAllScriptableObjects<IngredientTemplate>(INGREDIENTS_SO_PATH);
-            LoadAllScriptableObjects<RecipeTemplate>(RECIPES_SO_PATH);
-            LoadAllScriptableObjects<MachineTemplate>(MACHINE_SO_PATH);
+            LoadAllScriptableObjects<IngredientTemplate>();
+            LoadAllScriptableObjects<RecipeTemplate>();
+            LoadAllScriptableObjects<MachineTemplate>();
         }
 
-        private static void LoadAllScriptableObjects<T>(string path) where T : ScriptableObject
+        private static void LoadAllScriptableObjects<T>() where T : ScriptableObject
         {
             var type = typeof(T);
             if (!DATABASE.ContainsKey(type))
@@ -54,6 +55,22 @@ namespace Database
         
             Debug.LogError($"Unable to find a {type.Name} with name: {name}");
             return null;
+        }
+
+        public static List<T> GetAllScriptableObjectOfType<T>() where T : ScriptableObject
+        {
+            var result = new List<T>();
+
+            var type = typeof(T);
+            if (DATABASE.TryGetValue(type, out var typeDictionary))
+            {
+                foreach (var scriptableObject in typeDictionary)
+                {
+                    result.Add(scriptableObject.Value as T);
+                }
+            }
+
+            return result;
         }
         
         // ----------------------------------------- RECIPE DATA BASE ------------------------------------------

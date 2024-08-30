@@ -6,14 +6,14 @@ namespace Components.Machines.UIView
     public class MachineUIViewBase : MonoBehaviour
     {
         [SerializeField] private TMP_Text _machineName;
+        
+        protected Machine AssociatedMachine;
 
-        private MachineType _associatedType;
-
-        public MachineType AssociatedType => _associatedType;
+        public MachineType AssociatedType => AssociatedMachine.Template.Type;
 
         public virtual void Initialize(Machine machine)
         {
-            _associatedType = machine.Template.Type;
+            AssociatedMachine = machine;
             _machineName.text = machine.Controller.name;
         }
     }

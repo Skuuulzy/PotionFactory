@@ -1,4 +1,5 @@
 using Components.Items;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Components.Machines.Behaviors
@@ -6,7 +7,7 @@ namespace Components.Machines.Behaviors
     [CreateAssetMenu(fileName = "New Machine Behaviour", menuName = "Machines/Behavior/Extractor")]
     public class ExtractorMachineBehaviour : MachineBehavior
     {
-        [SerializeField] private IngredientTemplate _ingredientTemplate;
+        [ShowInInspector, ReadOnly] private IngredientTemplate _ingredientTemplate;
         
 		public void Init(IngredientTemplate ingredientTemplate)
 		{
@@ -15,6 +16,11 @@ namespace Components.Machines.Behaviors
         
 		public override void Process(Machine machine)
         {
+            if (!_ingredientTemplate)
+            {
+                return;
+            }
+            
             CurrentTick++;
 
             if (!CanProcess(CurrentTick))
