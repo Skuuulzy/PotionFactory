@@ -57,7 +57,10 @@ namespace Components.Grid
 
         private void Update()
         {
-            MoveSelection();
+            if(_currentMachineController != null)
+            {
+				MoveSelection();
+			}
             
             if (Input.GetMouseButton(1))
             {
@@ -86,9 +89,12 @@ namespace Components.Grid
         
         private void UpdateSelection(MachineTemplate newTemplate)
         {
-	        Destroy(_currentMachineController.gameObject);
+            if(_currentMachineController != null)
+            {
+				Destroy(_currentMachineController.gameObject);
+			}
 
-	        _currentMachineController = Instantiate(_machineControllerPrefab);
+			_currentMachineController = Instantiate(_machineControllerPrefab);
             _currentMachineController.InstantiatePreview(newTemplate, _cellSize);
 
             _currentRotation = 0;
@@ -96,7 +102,7 @@ namespace Components.Grid
 
         private void DeleteSelection()
         {
-           //_currentMachineController.DeletePreview();
+           Destroy(_currentMachineController.gameObject);
 		}
         
         private void MoveSelection()
@@ -220,7 +226,12 @@ namespace Components.Grid
         
         private void RemoveMachineFromGrid()
         {
-			DeleteSelection();
+            if(_currentMachineController != null)
+            {
+				DeleteSelection();
+                return;
+			}
+
 			// Try to get the world position.
 			if (!UtilsClass.ScreenToWorldPositionIgnoringUI(Input.mousePosition, _camera, out Vector3 worldMousePosition))
             {
