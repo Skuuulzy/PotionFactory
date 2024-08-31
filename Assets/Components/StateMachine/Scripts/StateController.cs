@@ -36,6 +36,12 @@ public class StateController : MonoBehaviour
 		_stateMachine.SetState(factoryState);
 	}
 
+	private void OnDestroy()
+	{
+		FactoryState.OnFactoryStateStarted -= FactoryStateStarted;
+		ShopState.OnShopStateStarted -= ShopStateStarted;
+	}
+
 	void Update()
     {
 		_stateMachine.Update();

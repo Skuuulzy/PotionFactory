@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -7,12 +8,15 @@ namespace Components.Tick
 {
     public class TickSystem : Singleton<TickSystem>
     {
-        [SerializeField] private float _tickDuration = 0.2f;
+        [SerializeField] private float _initialTickDuration = 0.2f;
         [ShowInInspector] private static readonly List<ITickable> TICKABLES = new();
         
         private float _tickTimer;
+        private float _currentTickDuration;
+		private bool _isPause;
 
-        protected override void Awake()
+		// ------------------------------------------------------------------------- MONO -------------------------------------------------------------------------
+		protected override void Awake()
         {
             base.Awake();
             
@@ -24,17 +28,38 @@ namespace Components.Tick
             TICKABLES.Clear();
         }
 
-        private void Update()
+		private void Start()
+		{
+            _currentTickDuration = _initialTickDuration;
+            FactoryState.OnFactoryStateStarted += HandleFactoryState;
+            ShopState.OnShopStateStarted += HandleShopState;
+        }
+
+		private void OnDestroy()
         {
+            FactoryState.OnFactoryStateStarted -= HandleFactoryState;
+            ShopState.OnShopStateStarted -= HandleShopState;
+        
+        }
+
+		private void Update()
+        {
+            if(_isPause == true)
+			{
+                return;
+			}
+
             _tickTimer += Time.deltaTime;
             
-            while (_tickTimer >= _tickDuration)
+            while (_tickTimer >= _currentTickDuration)
             {
-                _tickTimer -= _tickDuration;
+                _tickTimer -= _currentTickDuration;
                 
                 TickAll();
             }
         }
+
+        // ------------------------------------------------------------------------- TICK METHODS -------------------------------------------------------------------------
 
         private void TickAll()
         {
@@ -74,7 +99,27 @@ namespace Components.Tick
 
         public void ChangeTimeSpeed(int value)
         {
-            Time.timeScale = value;
+            if(value == 0)
+			{
+                _isPause = true;
+                return;
+			}
+
+            _currentTickDuration =  _initialTickDuration / value;
+            _isPause = false;
+        }
+
+
+        // ------------------------------------------------------------------------- STATE METHODS -------------------------------------------------------------------------
+
+        private void HandleShopState(ShopState obj)
+        {
+            ChangeTimeSpeed(0);
+        }
+
+        private void HandleFactoryState(FactoryState obj)
+        {
+            ChangeTimeSpeed(1);
         }
     }
 }

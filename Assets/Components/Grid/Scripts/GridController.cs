@@ -46,18 +46,34 @@ namespace Components.Grid
         public Action<Machine> OnMachineAdded;
         public Action<Machine> OnMachineRemoved;
 
-
+        private bool _isFactoryState = true;
         // ------------------------------------------------------------------------- MONO -------------------------------------------------------------------------
         private void Start()
         {
             _camera = UnityEngine.Camera.main;
             InstantiateNewPreview();
             GenerateGrid();
+
+            FactoryState.OnFactoryStateStarted += HandleFactoryState;
+            ShopState.OnShopStateStarted += HandleShopState;
+        }
+
+		private void OnDestroy()
+		{
+            FactoryState.OnFactoryStateStarted -= HandleFactoryState;
+            ShopState.OnShopStateStarted -= HandleShopState;
         }
 
 
-        private void Update()
+
+		private void Update()
         {
+            //Can't interact with anything if we are not in factory state
+            if(_isFactoryState == false)
+			{
+                return;
+			}
+
             if(_currentMachineController != null)
             {
 				MoveSelection();
@@ -325,6 +341,17 @@ namespace Components.Grid
 
 			_grid.ClearCellsData();
             _instancedObjects.Clear();
+        }
+
+        // ------------------------------------------------------------------------- STATES METHODS -------------------------------------------------------------------------
+        private void HandleShopState(ShopState obj)
+        {
+            _isFactoryState = false;
+        }
+
+        private void HandleFactoryState(FactoryState obj)
+        {
+            _isFactoryState = true;
         }
     }
 }
