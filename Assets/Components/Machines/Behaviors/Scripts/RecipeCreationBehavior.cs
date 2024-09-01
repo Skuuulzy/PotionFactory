@@ -18,7 +18,7 @@ namespace Components.Machines.Behaviors
                 if (ScriptableObjectDatabase.TryFindRecipe(machine.Template, machine.Ingredients, out RecipeTemplate recipe))
                 {
                     _currentRecipe = recipe;
-                    Debug.Log($"Machine: {machine.Controller.name} found recipe: {_currentRecipe.name}. Start processing for {_processTime}.");
+                    Debug.Log($"Machine: {machine.Controller.name} found recipe: {_currentRecipe.name}. Start processing for {_processTime} ticks.");
                 }
                 else
                 {
@@ -31,7 +31,6 @@ namespace Components.Machines.Behaviors
             // Increment the process time until we reach it.
             if (_currentProcessTime < _processTime)
             {
-                Debug.Log($"Machine: {machine.Controller.name} process: {_currentRecipe.name}, {_currentProcessTime}/{_processTime}.");
                 _currentProcessTime++;
                 return;
             }

@@ -1,20 +1,22 @@
-using Components.Items;
+using System;
+using Components.Interactions.Clickable;
+using Components.Ingredients;
 using Components.Tick;
 using UnityEngine;
 
 namespace Components.Machines
 {
-    public class MachineController : MonoBehaviour
+    public class MachineController : MonoBehaviour, IClickable
     {
         [SerializeField] private Transform _3dViewHolder;
         [SerializeField] private Machine _machine;
-        [SerializeField] private ItemController _itemController;
-        [SerializeField] private GameObject _debugItem;
+        [SerializeField] private IngredientController _ingredientController;
+
+        public static Action<Machine> OnMachineClicked;
         
         public Machine Machine => _machine;
 
         private bool _initialized;
-
         private GameObject _view;
         
         // ------------------------------------------------------------------------- INIT -------------------------------------------------------------------------
@@ -24,7 +26,7 @@ namespace Components.Machines
             _machine = new Machine(machineTemplate, this);
             _view.transform.localScale = new Vector3(scale, scale, scale);
         }
-
+        
         public void RotatePreview(int angle)
         {
             _view.transform.rotation = Quaternion.Euler(new Vector3(0, angle, 0));
@@ -114,19 +116,29 @@ namespace Components.Machines
         }
 
         // ------------------------------------------------------------------------- ITEM -------------------------------------------------------------------------
+        
+        // TODO: The ingredient should not be controlled by the machine but need to be independent and linked to a machine.
         private void ShowItem(bool show)
         {
-            _debugItem.SetActive(show);
-            return;
-            
             if (show)
             {
-                _itemController.CreateRepresentationWith(_machine.Ingredients[0].Resources, _machine.Ingredients[0].Types);
+                _ingredientController.CreateRepresentationFromTemplate(_machine.Ingredients);
             }
             else
             {
-                _itemController.DestroyRepresentation();
+                _ingredientController.DestroyRepresentation();
             }
+        }
+        
+        // ------------------------------------------------------------------------- CLICKABLE BEHAVIOUR -------------------------------------------------------------------------
+        public void Clicked()
+        {
+            if (!_initialized)
+            {
+                return;
+            }
+            
+            OnMachineClicked?.Invoke(_machine);
         }
     }
 }

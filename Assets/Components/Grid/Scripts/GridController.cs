@@ -82,7 +82,6 @@ namespace Components.Grid
             if (Input.GetMouseButton(1))
             {
                 RemoveMachineFromGrid();
-
             }
             if (Input.GetMouseButton(0))
             {
@@ -121,11 +120,17 @@ namespace Components.Grid
         private void DeleteSelection()
         {
            Destroy(_currentMachineController.gameObject);
-		}
+           _currentMachineController = null;
+        }
         
         private void MoveSelection()
         {
-            if (!UtilsClass.ScreenToWorldPositionIgnoringUI(Input.mousePosition, _camera, out Vector3 worldMousePosition))
+	        if (!_currentMachineController)
+	        {
+				return;
+	        }
+
+	        if (!UtilsClass.ScreenToWorldPositionIgnoringUI(Input.mousePosition, _camera, out Vector3 worldMousePosition))
             {
                 return;
             }
@@ -136,6 +141,11 @@ namespace Components.Grid
         
         private void RotateSelection()
         {
+	        if (!_currentMachineController)
+	        {
+		        return;
+	        }
+	        
             _currentRotation += 90;
             _currentRotation %= 360;
             _currentMachineController.RotatePreview(_currentRotation);
@@ -144,6 +154,11 @@ namespace Components.Grid
         // ------------------------------------------------------------------------- INPUT HANDLERS -------------------------------------------------------------------------
         private void AddSelectedMachineToGrid()
         {
+	        if (!_currentMachineController)
+	        {
+		        return;
+	        }
+	        
 			// Try to get the position on the grid.
 			if (!UtilsClass.ScreenToWorldPositionIgnoringUI(Input.mousePosition, _camera, out Vector3 worldMousePosition))
 			{
@@ -244,7 +259,7 @@ namespace Components.Grid
         
         private void RemoveMachineFromGrid()
         {
-            if(_currentMachineController != null)
+            if(_currentMachineController)
             {
 				DeleteSelection();
                 return;

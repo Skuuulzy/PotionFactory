@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Components.Items;
+using Components.Ingredients;
 using Components.Recipes;
 using Database;
 using Sirenix.OdinInspector;

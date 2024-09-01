@@ -13,13 +13,14 @@ MonoBehaviour:
   m_Name: Curved0Conveyor
   m_EditorClassIdentifier: 
   _name: Conveyor
+  _type: 1
   _gridView: {fileID: 1691528847705169943, guid: 113670807ae43d94d9e624eb601fbbe4,
     type: 3}
   _uiView: {fileID: 21300000, guid: a609b6f25385e9f439a61b99345f64d3, type: 3}
   _behavior: {fileID: 11400000, guid: f3d403794d898ac40b5d56bac13fe50c, type: 2}
   _nodes:
   - _localPosition: {x: 0, y: 0}
-    _debugWorldPosition: {x: 0, y: 0}
+    _gridPosition: {x: 0, y: 0}
     _ports:
     - _side: 3
       _way: 0
