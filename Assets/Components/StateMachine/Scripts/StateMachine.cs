@@ -13,6 +13,11 @@ public class StateMachine
 
 	public void Update()
 	{
+		if(current == null)
+		{
+			return;
+		}
+
 		var transition = GetTransition();
 		if(transition != null)
 		{
