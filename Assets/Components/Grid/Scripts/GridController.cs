@@ -45,20 +45,40 @@ namespace Components.Grid
         // Actions
         public Action<Machine> OnMachineAdded;
         public Action<Machine> OnMachineRemoved;
-        
 
+        private bool _isFactoryState = true;
         // ------------------------------------------------------------------------- MONO -------------------------------------------------------------------------
         private void Start()
         {
             _camera = UnityEngine.Camera.main;
             InstantiateNewPreview();
             GenerateGrid();
+
+            PlanningFactoryState.OnPlanningFactoryStateStarted += HandlePlanningFactoryState;
+            ShopState.OnShopStateStarted += HandleShopState;
         }
 
-        private void Update()
+		private void OnDestroy()
+		{
+            PlanningFactoryState.OnPlanningFactoryStateStarted -= HandlePlanningFactoryState;
+            ShopState.OnShopStateStarted -= HandleShopState;
+        }
+
+
+
+		private void Update()
         {
-	        MoveSelection();
-	        
+            //Can't interact with anything if we are not in factory state
+            if(_isFactoryState == false)
+			{
+                return;
+			}
+
+            if(_currentMachineController != null)
+            {
+				MoveSelection();
+			}
+            
             if (Input.GetMouseButton(1))
             {
                 RemoveMachineFromGrid();
@@ -71,6 +91,7 @@ namespace Components.Grid
             {
                 RotateSelection();
             }
+
         }
         
         // ------------------------------------------------------------------------- SELECTION -------------------------------------------------------------------------
@@ -335,6 +356,17 @@ namespace Components.Grid
 
 			_grid.ClearCellsData();
             _instancedObjects.Clear();
+        }
+
+        // ------------------------------------------------------------------------- STATES METHODS -------------------------------------------------------------------------
+        private void HandleShopState(ShopState obj)
+        {
+            _isFactoryState = false;
+        }
+
+        private void HandlePlanningFactoryState(PlanningFactoryState obj)
+        {
+            _isFactoryState = true;
         }
     }
 }
