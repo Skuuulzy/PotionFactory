@@ -711,6 +711,18 @@ Light:
   m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
   m_ShadowAngle: 0
+--- !u!114 &409413894 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7430885785059387855, guid: 610a453a4b89c6848b363cb792b4894a,
+    type: 3}
+  m_PrefabInstance: {fileID: 3061453988998842678}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &418744443
 GameObject:
   m_ObjectHideFlags: 0
@@ -2110,6 +2122,7 @@ RectTransform:
   - {fileID: 2120930068}
   - {fileID: 811147901}
   - {fileID: 37268672}
+  - {fileID: 562924444}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -2132,7 +2145,7 @@ MonoBehaviour:
   _stateUITitleAnimator: {fileID: 279993064}
   _stateNameText: {fileID: 278877104}
   _stateCountdownImage: {fileID: 172289206}
-  _finishShopButton: {fileID: 365067783}
+  _finishShopButton: {fileID: 409413894}
 --- !u!1 &811147900
 GameObject:
   m_ObjectHideFlags: 0
@@ -5295,6 +5308,7 @@ SceneRoots:
   - {fileID: 4266030440050234855}
   - {fileID: 3841295291633844933}
   - {fileID: 119422664301323618}
+  - {fileID: 6199721328342390973}
   - {fileID: 697047491}
   - {fileID: 798778437}
   - {fileID: 466627925}
