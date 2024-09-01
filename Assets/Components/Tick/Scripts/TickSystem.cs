@@ -31,13 +31,15 @@ namespace Components.Tick
 		private void Start()
 		{
             _currentTickDuration = _initialTickDuration;
-            FactoryState.OnFactoryStateStarted += HandleFactoryState;
+            PlanningFactoryState.OnPlanningFactoryStateStarted += HandlePlanningFactoryState;
+            ResolutionFactoryState.OnResolutionFactoryStateStarted += HandleResolutionFactoryState;
             ShopState.OnShopStateStarted += HandleShopState;
         }
 
 		private void OnDestroy()
         {
-            FactoryState.OnFactoryStateStarted -= HandleFactoryState;
+            PlanningFactoryState.OnPlanningFactoryStateStarted -= HandlePlanningFactoryState;
+            ResolutionFactoryState.OnResolutionFactoryStateStarted -= HandleResolutionFactoryState;
             ShopState.OnShopStateStarted -= HandleShopState;
         
         }
@@ -117,7 +119,12 @@ namespace Components.Tick
             ChangeTimeSpeed(0);
         }
 
-        private void HandleFactoryState(FactoryState obj)
+        private void HandlePlanningFactoryState(PlanningFactoryState obj)
+        {
+            ChangeTimeSpeed(0);
+        }
+
+        private void HandleResolutionFactoryState(ResolutionFactoryState obj)
         {
             ChangeTimeSpeed(1);
         }

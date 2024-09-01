@@ -54,13 +54,13 @@ namespace Components.Grid
             InstantiateNewPreview();
             GenerateGrid();
 
-            FactoryState.OnFactoryStateStarted += HandleFactoryState;
+            PlanningFactoryState.OnPlanningFactoryStateStarted += HandlePlanningFactoryState;
             ShopState.OnShopStateStarted += HandleShopState;
         }
 
 		private void OnDestroy()
 		{
-            FactoryState.OnFactoryStateStarted -= HandleFactoryState;
+            PlanningFactoryState.OnPlanningFactoryStateStarted -= HandlePlanningFactoryState;
             ShopState.OnShopStateStarted -= HandleShopState;
         }
 
@@ -349,7 +349,7 @@ namespace Components.Grid
             _isFactoryState = false;
         }
 
-        private void HandleFactoryState(FactoryState obj)
+        private void HandlePlanningFactoryState(PlanningFactoryState obj)
         {
             _isFactoryState = true;
         }
