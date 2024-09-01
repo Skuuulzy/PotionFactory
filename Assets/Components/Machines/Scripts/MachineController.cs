@@ -1,6 +1,6 @@
 using System;
 using Components.Interactions.Clickable;
-using Components.Items;
+using Components.Ingredients;
 using Components.Tick;
 using UnityEngine;
 
@@ -10,8 +10,7 @@ namespace Components.Machines
     {
         [SerializeField] private Transform _3dViewHolder;
         [SerializeField] private Machine _machine;
-        [SerializeField] private ItemController _itemController;
-        [SerializeField] private GameObject _debugItem;
+        [SerializeField] private IngredientController _ingredientController;
 
         public static Action<Machine> OnMachineClicked;
         
@@ -117,18 +116,17 @@ namespace Components.Machines
         }
 
         // ------------------------------------------------------------------------- ITEM -------------------------------------------------------------------------
+        
+        // TODO: The ingredient should not be controlled by the machine but need to be independent and linked to a machine.
         private void ShowItem(bool show)
         {
-            _debugItem.SetActive(show);
-            return;
-            
             if (show)
             {
-                _itemController.CreateRepresentationWith(_machine.Ingredients[0].Resources, _machine.Ingredients[0].Types);
+                _ingredientController.CreateRepresentationFromTemplate(_machine.Ingredients);
             }
             else
             {
-                _itemController.DestroyRepresentation();
+                _ingredientController.DestroyRepresentation();
             }
         }
         

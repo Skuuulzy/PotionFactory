@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using Components.Items;
+using Components.Ingredients;
 using Components.Machines.Behaviors;
 using Database;
 using TMPro;

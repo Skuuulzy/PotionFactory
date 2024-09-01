@@ -1,4 +1,4 @@
-using Components.Items;
+using Components.Ingredients;
 using Database;
 using Sirenix.OdinInspector;
 using UnityEditor;

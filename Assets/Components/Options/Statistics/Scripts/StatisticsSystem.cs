@@ -27,14 +27,12 @@ public class StatisticsSystem : MonoBehaviour
 
     private void AddMachineToDictionary(Machine machine)
     {
-        return;
-        
-        if (!_machineStatsDictionary.TryAdd(machine.Template.Name, 1))
-        {
-            _machineStatsDictionary[machine.Template.Name]++;
-        }
-
-        OnMachineAddedToStat?.Invoke(machine.Template.Name, _machineStatsDictionary[machine.Template.Name], machine.Behavior.ProcessTime);
+        // if (!_machineStatsDictionary.TryAdd(machine.Template.Name, 1))
+        // {
+        //     _machineStatsDictionary[machine.Template.Name]++;
+        // }
+        //
+        // OnMachineAddedToStat?.Invoke(machine.Template.Name, _machineStatsDictionary[machine.Template.Name], machine.Behavior.ProcessTime);
     }
 
     private void RemoveMachineToDictionary(Machine machine)
