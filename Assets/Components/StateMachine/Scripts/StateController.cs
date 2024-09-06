@@ -52,7 +52,6 @@ public class StateController : MonoBehaviour
 	{
 		PlanningFactoryState.OnPlanningFactoryStateStarted -= HandlePlanningFactoryState;
 		ResolutionFactoryState.OnResolutionFactoryStateStarted -= HandleResolutionFactoryState;
-
 		ShopState.OnShopStateStarted -= HandleShopState;
 	}
 
@@ -70,23 +69,31 @@ public class StateController : MonoBehaviour
 
 	private void HandleShopState(ShopState state)
 	{
-		_uiStateController.DisplayFinishShopButton(state);
+		_uiStateController.DisplayFinishStateButton(state);
+		_countdownTimer = null;
 	}
 
 	private void HandlePlanningFactoryState(PlanningFactoryState state)
 	{
+		
 		_countdownTimer = new CountdownTimer(_planningFactoryStateTime);
+		BaseState.OnStateEnded += _countdownTimer.Stop;
 		_countdownTimer.OnTimerStop += state.SetStateFinished;
 		_countdownTimer.OnTimerStop += _uiStateController.HideCountdown;
 		_countdownTimer.Start();
+		_uiStateController.DisplayFinishStateButton(state);
+
+		
 	}
 
 	private void HandleResolutionFactoryState(ResolutionFactoryState state)
 	{
 		_countdownTimer = new CountdownTimer(_resolutionFactoryStateTime);
+		BaseState.OnStateEnded += _countdownTimer.Stop;
 		_countdownTimer.OnTimerStop += state.SetStateFinished;
 		_countdownTimer.OnTimerStop += _uiStateController.HideCountdown;
 		_countdownTimer.Start();
+		_uiStateController.DisplayFinishStateButton(state);
 	}
 
 	void At(IState from, IState to, IPredicate condition) => _stateMachine.AddTransition(from, to, condition);
