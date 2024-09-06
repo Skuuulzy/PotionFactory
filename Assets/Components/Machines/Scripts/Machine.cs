@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Components.Ingredients;
 using Components.Machines.Behaviors;
 using Components.Tick;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Components.Machines
@@ -13,7 +14,7 @@ namespace Components.Machines
         // ----------------------------------------------------------------------- PRIVATE FIELDS -------------------------------------------------------------------------
         [SerializeField] private List<IngredientTemplate> _ingredients;
         [SerializeField] private List<Node> _nodes;
-        [SerializeField] private MachineController _controller;
+        [SerializeField, ReadOnly] private MachineController _controller;
         [SerializeField] private MachineBehavior _behavior;
         
         private readonly MachineTemplate _template;

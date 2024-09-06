@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Components.Interactions.Clickable;
 using Components.Ingredients;
 using Components.Tick;
@@ -12,10 +13,15 @@ namespace Components.Machines
         [SerializeField] private Machine _machine;
         [SerializeField] private IngredientController _ingredientController;
 
+        [SerializeField] private GameObject _inPreview;
+        [SerializeField] private GameObject _outPreview;
+        
         public static Action<Machine> OnMachineClicked;
         
         public Machine Machine => _machine;
 
+        private List<GameObject> _previewObjects;
+        
         private bool _initialized;
         private GameObject _view;
         
@@ -25,6 +31,17 @@ namespace Components.Machines
             _view = Instantiate(machineTemplate.GridView, _3dViewHolder);
             _machine = new Machine(machineTemplate, this);
             _view.transform.localScale = new Vector3(scale, scale, scale);
+
+            _previewObjects = new List<GameObject>();
+            
+            foreach (var node in machineTemplate.Nodes)
+            {
+                foreach (var port in node.Ports)
+                {
+                    var previewArrow = Instantiate(port.Way == Way.IN ? _inPreview : _outPreview);
+                    _previewObjects.Add(previewArrow);
+                }
+            }
         }
         
         public void RotatePreview(int angle)
@@ -35,6 +52,12 @@ namespace Components.Machines
         
         public void ConfirmPlacement()
         {
+            foreach (var previewObject in _previewObjects)
+            {
+                Destroy(previewObject);
+            }
+            _previewObjects.Clear();
+            
             _initialized = true;
             
             _machine.OnTick += Tick;

@@ -4172,7 +4172,7 @@ Transform:
   m_GameObject: {fileID: 2067332681}
   serializedVersion: 2
   m_LocalRotation: {x: 0.46174863, y: 0, z: 0, w: 0.8870109}
-  m_LocalPosition: {x: 544, y: 200, z: -130}
+  m_LocalPosition: {x: 10, y: 14, z: -8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4190,9 +4190,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f73a3eab49f30d344a207d7d3d931d98, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _cameraSpeed: 150
+  _cameraSpeed: 15
   _responsiveness: 3
-  _rotationSpeed: 100
+  _rotationSpeed: 30
 --- !u!114 &2077672730 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2922091601394712576, guid: 0ef98c6108f43c54c81c54882a4836ec,
@@ -5034,7 +5034,7 @@ PrefabInstance:
     - target: {fileID: 2922091601394712576, guid: 0ef98c6108f43c54c81c54882a4836ec,
         type: 3}
       propertyPath: _cellSize
-      value: 20
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2922091601394712576, guid: 0ef98c6108f43c54c81c54882a4836ec,
         type: 3}

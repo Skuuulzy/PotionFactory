@@ -30,8 +30,6 @@ namespace Components.Machines
         public List<Node> Nodes => GetNodeInstance();
         public int MaxItemCount => _maxItemCount;
         
-
-        
         private List<Node> GetNodeInstance()
         {
             List<Node> result = new List<Node>();
