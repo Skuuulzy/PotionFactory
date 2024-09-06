@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Cauldron
   m_EditorClassIdentifier: 
   _name: Cauldron
+  _type: 0
   _gridView: {fileID: 6216866908102591433, guid: 63d035a7941274d499413bc2d95c04e5,
     type: 3}
   _uiView: {fileID: 21300000, guid: 77fd9620dc283f34cb20b707063def7d, type: 3}
@@ -50,3 +51,5 @@ MonoBehaviour:
     _gridPosition: {x: 0, y: 0}
     _ports: []
   _maxItemCount: -1
+  _shopSpawnProbability: 0.05
+  _shopPrice: 2500

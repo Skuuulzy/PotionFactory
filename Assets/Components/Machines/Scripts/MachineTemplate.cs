@@ -20,6 +20,10 @@ namespace Components.Machines
 
         [Header("Parameters")] 
         [SerializeField] private int _maxItemCount;
+
+        [Header("Shop")]
+        [SerializeField] private float _shopSpawnProbability;
+        [SerializeField] private int _shopPrice = 200;
         
         public string Name => _name;
         public MachineType Type => _type;
@@ -29,7 +33,8 @@ namespace Components.Machines
 
         public List<Node> Nodes => GetNodeInstance();
         public int MaxItemCount => _maxItemCount;
-        
+        public float ShopSpawnProbability => _shopSpawnProbability;
+        public int ShopPrice => _shopPrice;
 
         
         private List<Node> GetNodeInstance()

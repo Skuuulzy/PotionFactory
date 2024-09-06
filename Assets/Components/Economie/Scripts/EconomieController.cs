@@ -1,5 +1,6 @@
 using Components.Ingredients;
 using Components.Machines.Behaviors;
+using Components.Shop.ShopItems;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,17 +11,20 @@ namespace Components.Economie
 	public class EconomieController : MonoBehaviour
 	{
 
-		private int _playerMoney = 0;
+		public static  int PlayerMoney = 0;
 
 		public static Action<int> OnPlayerMoneyUpdate;
 		void Start()
 		{
 			DestructorMachineBehaviour.OnItemSold += OnItemsSold;
+			ShopItemUIViewController.OnItemBuyed += OnItemBuyed;
 		}
 
 		private void OnDestroy()
 		{
 			DestructorMachineBehaviour.OnItemSold -= OnItemsSold;
+			ShopItemUIViewController.OnItemBuyed -= OnItemBuyed;
+
 		}
 
 
@@ -28,10 +32,16 @@ namespace Components.Economie
 		{
 			foreach(IngredientTemplate ingredientTemplate in ingredientTemplates)
 			{
-				_playerMoney += ingredientTemplate.Price;
+				PlayerMoney += ingredientTemplate.Price;
 			}
 
-			OnPlayerMoneyUpdate?.Invoke(_playerMoney);
+			OnPlayerMoneyUpdate?.Invoke(PlayerMoney);
+		}
+
+		private void OnItemBuyed(int itemPrice)
+		{
+			PlayerMoney -= itemPrice;
+			OnPlayerMoneyUpdate?.Invoke(PlayerMoney);
 		}
 	}
 }

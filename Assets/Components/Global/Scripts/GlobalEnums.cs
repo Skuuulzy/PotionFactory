@@ -9,3 +9,10 @@ public enum Season
 	SUMMER,
 	AUTUMN
 }
+
+public enum ShopItemType
+{
+	MACHINE,
+	CONSUMABLE,
+	RELIC
+}
