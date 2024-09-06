@@ -102,5 +102,21 @@ namespace Components.Machines
                     throw new ArgumentOutOfRangeException();
             }
         }
+
+        public static int Angle(this Side side)
+        {
+            switch (side)
+            {
+                case Side.DOWN:
+                    return 90;
+                case Side.UP:
+                    return 270;
+                case Side.RIGHT:
+                case Side.LEFT:
+                    return 0;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(side), side, null);
+            }
+        }
     }
 }

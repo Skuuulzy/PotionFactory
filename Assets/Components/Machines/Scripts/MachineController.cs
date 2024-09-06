@@ -38,7 +38,9 @@ namespace Components.Machines
             {
                 foreach (var port in node.Ports)
                 {
-                    var previewArrow = Instantiate(port.Way == Way.IN ? _inPreview : _outPreview);
+                    var previewArrow = Instantiate(port.Way == Way.IN ? _inPreview : _outPreview, _view.transform);
+                    previewArrow.transform.localPosition = new Vector3(node.LocalPosition.x, previewArrow.transform.position.y, node.LocalPosition.y);
+                    previewArrow.transform.Rotate(Vector3.up, port.Side.Angle());
                     _previewObjects.Add(previewArrow);
                 }
             }

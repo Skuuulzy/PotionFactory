@@ -19,6 +19,7 @@ namespace Components.Machines
         [SerializeField] private List<Node> _nodes;
 
         [Header("Parameters")] 
+        [SerializeField] private bool _showArrowPreview;
         [SerializeField] private int _maxItemCount;
         
         public string Name => _name;
