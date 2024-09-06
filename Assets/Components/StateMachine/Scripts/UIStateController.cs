@@ -11,7 +11,7 @@ public class UIStateController : MonoBehaviour
 	[SerializeField] private Animator _stateUITitleAnimator;
 	[SerializeField] private TextMeshProUGUI _stateNameText;
 	[SerializeField] private Image _stateCountdownImage;
-	[SerializeField] private Button _finishShopButton;
+	[SerializeField] private Button _finishStateButton;
 
 	private void Awake()
 	{
@@ -40,9 +40,9 @@ public class UIStateController : MonoBehaviour
 		_stateCountdownImage.gameObject.SetActive(false);
 	}
 
-	public void DisplayFinishShopButton(ShopState state)
+	public void DisplayFinishStateButton(BaseState state)
 	{
-		_finishShopButton.gameObject.SetActive(true);
-		_finishShopButton.onClick.AddListener(state.SetStateFinished);
+		_finishStateButton.gameObject.SetActive(true);
+		_finishStateButton.onClick.AddListener(state.SetStateFinished);
 	}
 }
