@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 581ab5ce2c92484d9bd63e4e972996c1, type: 3}
+  m_Name: Merger
+  m_EditorClassIdentifier: 
+  _name: Merger
+  _type: 8
+  _gridView: {fileID: 4377708450514837446, guid: 81af9bfd3795ec247ab8824cb76ecf73,
+    type: 3}
+  _uiView: {fileID: 21300000, guid: 9b2db208432e74069a526b81826489b9, type: 3}
+  _behavior: {fileID: 11400000, guid: f3d403794d898ac40b5d56bac13fe50c, type: 2}
+  _nodes:
+  - _localPosition: {x: 0, y: 0}
+    _gridPosition: {x: 0, y: 0}
+    _ports:
+    - _side: 3
+      _way: 0
+  - _localPosition: {x: 0, y: -1}
+    _gridPosition: {x: 0, y: 0}
+    _ports: []
+  - _localPosition: {x: 0, y: -2}
+    _gridPosition: {x: 0, y: 0}
+    _ports:
+    - _side: 3
+      _way: 0
+  - _localPosition: {x: 1, y: 0}
+    _gridPosition: {x: 0, y: 0}
+    _ports: []
+  - _localPosition: {x: 1, y: -1}
+    _gridPosition: {x: 0, y: 0}
+    _ports:
+    - _side: 2
+      _way: 1
+  - _localPosition: {x: 1, y: -2}
+    _gridPosition: {x: 0, y: 0}
+    _ports: []
+  _showArrowPreview: 0
+  _maxItemCount: 0

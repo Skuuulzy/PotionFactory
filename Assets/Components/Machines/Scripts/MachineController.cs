@@ -24,6 +24,8 @@ namespace Components.Machines
         
         private bool _initialized;
         private GameObject _view;
+
+        private int _outMachineTickCount;
         
         // ------------------------------------------------------------------------- INIT -------------------------------------------------------------------------
         public void InstantiatePreview(MachineTemplate machineTemplate, float scale)
@@ -63,6 +65,7 @@ namespace Components.Machines
             _initialized = true;
             
             _machine.OnTick += Tick;
+            _machine.OnPropagateTick += PropagateTick;
             _machine.OnItemAdded += ShowItem;
             _machine.LinkNodeData();
             
@@ -79,25 +82,62 @@ namespace Components.Machines
             RemoveMachineFromChain();
             
             _machine.OnTick -= Tick;
+            _machine.OnPropagateTick -= PropagateTick;
             _machine.OnItemAdded -= ShowItem;
         }
 
+        // Base tick called by the tick system.
         private void Tick()
         {
             _machine.Behavior.Process(_machine);
             
             // Propagate tick
-            if (_machine.TryGetInMachine(out Machine previousMachine))
+            if (_machine.TryGetInMachine(out List<Machine> previousMachines))
             {
-                previousMachine.Tick();
+                foreach (var previousMachine in previousMachines)
+                {
+                    previousMachine.PropagateTick();
+                }
             }
+        }
+
+        // Tick propagation called by the next machine.
+        private void PropagateTick()
+        {
+            _outMachineTickCount++;
+
+            if (!_machine.TryGetOutMachines(out var connectedMachines))
+            {
+                return;            
+            }
+
+            // The machine has not received the propagation of all his next machine.
+            if (_outMachineTickCount < connectedMachines.Count)
+            {
+                return;
+            }
+            
+            _machine.Behavior.Process(_machine);
+
+            // Propagate tick
+            if (!_machine.TryGetInMachine(out List<Machine> previousMachines))
+            {
+                return;
+            }
+            
+            foreach (var previousMachine in previousMachines)
+            {
+                previousMachine.PropagateTick();
+            }
+
+            _outMachineTickCount = 0;
         }
 
         // ------------------------------------------------------------------------- CHAIN -------------------------------------------------------------------------
         private void AddMachineToChain()
         {
-            bool hasInMachine = _machine.TryGetInMachine(out Machine inMachine);
-            bool hasOutMachine = _machine.TryGetOutMachine(out _);
+            bool hasInMachine = _machine.TryGetInMachine(out List<Machine> inMachines);
+            bool hasOutMachine = _machine.TryGetOutMachines(out _);
 
             // The machine is not connected to any chain, create a new one.
             if (!hasInMachine && !hasOutMachine)
@@ -107,20 +147,26 @@ namespace Components.Machines
             // The machine only has an IN, it is now the end of the chain.
             if (hasInMachine && !hasOutMachine)
             {
-                TickSystem.ReplaceTickable(inMachine, _machine);
+                foreach (var inMachine in inMachines)
+                {
+                    TickSystem.ReplaceTickable(inMachine, _machine);
+                }
             }
             // The machine has an IN and an OUT, it makes a link between two existing chains,
             // remove the IN tickable since the out chain already has a tickable.
             if (hasInMachine && hasOutMachine)
             {
-                TickSystem.RemoveTickable(inMachine);
+                foreach (var inMachine in inMachines)
+                {
+                    TickSystem.RemoveTickable(inMachine);
+                }
             }
         }
 
         private void RemoveMachineFromChain()
         {
-            bool hasInMachine = _machine.TryGetInMachine(out Machine inMachine);
-            bool hasOutMachine = _machine.TryGetOutMachine(out _);
+            bool hasInMachine = _machine.TryGetInMachine(out List<Machine> inMachines);
+            bool hasOutMachine = _machine.TryGetOutMachines(out _);
             
             // The machine is not connected to any chain, create a new one.
             if (!hasInMachine && !hasOutMachine)
@@ -130,13 +176,19 @@ namespace Components.Machines
             // The machine only has an IN, it is now the end of the chain.
             if (hasInMachine && !hasOutMachine)
             {
-                TickSystem.ReplaceTickable(_machine, inMachine);
+                foreach (var inMachine in inMachines)
+                {
+                    TickSystem.ReplaceTickable(_machine, inMachine);
+                }
             }
             // The machine has an IN and an OUT, it makes a link between two existing chains,
             // remove the IN tickable since the out chain already has a tickable.
             if (hasInMachine && hasOutMachine)
             {
-                TickSystem.AddTickable(inMachine);
+                foreach (var inMachine in inMachines)
+                {
+                    TickSystem.AddTickable(inMachine);
+                }
             }
         }
 

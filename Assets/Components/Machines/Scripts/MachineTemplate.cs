@@ -20,7 +20,6 @@ namespace Components.Machines
 
         [Header("Parameters")] 
         [SerializeField] private bool _showArrowPreview;
-        [SerializeField] private int _maxItemCount;
         
         public string Name => _name;
         public MachineType Type => _type;
@@ -29,7 +28,6 @@ namespace Components.Machines
         public Sprite UIView => _uiView;
 
         public List<Node> Nodes => GetNodeInstance();
-        public int MaxItemCount => _maxItemCount;
         
         private List<Node> GetNodeInstance()
         {
