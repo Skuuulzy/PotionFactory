@@ -8,7 +8,7 @@ namespace Components.Machines.Behaviors
     {
         public override void Process(Machine machine)
         {
-            if (machine.Ingredients.Count != 1)
+            if (machine.Ingredients.Count == 0)
             {
                 return;
             }
