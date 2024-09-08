@@ -33,7 +33,7 @@ namespace Components.Machines
             _view = Instantiate(machineTemplate.GridView, _3dViewHolder);
             _machine = new Machine(machineTemplate, this);
             _view.transform.localScale = new Vector3(scale, scale, scale);
-
+            
             _previewObjects = new List<GameObject>();
             
             foreach (var node in machineTemplate.Nodes)

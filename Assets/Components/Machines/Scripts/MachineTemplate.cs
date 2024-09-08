@@ -18,9 +18,6 @@ namespace Components.Machines
         [Header("Structure")] 
         [SerializeField] private List<Node> _nodes;
 
-        [Header("Parameters")] 
-        [SerializeField] private bool _showArrowPreview;
-
         [Header("Shop")]
         [SerializeField] private float _shopSpawnProbability;
         [SerializeField] private int _shopPrice = 200;
@@ -32,6 +29,7 @@ namespace Components.Machines
         public Sprite UIView => _uiView;
 
         public List<Node> Nodes => GetNodeInstance();
+        
         public float ShopSpawnProbability => _shopSpawnProbability;
         public int ShopPrice => _shopPrice;
         
