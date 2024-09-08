@@ -1,4 +1,5 @@
-
+using Components.Economy;
+using Components.Inventory;
 
 namespace Components.Shop.ShopItems
 {
@@ -13,5 +14,17 @@ namespace Components.Shop.ShopItems
             Price = shopItem.MachineTemplate.ShopPrice;
 
 		}
-    }
+
+		public override void BuyItem()
+		{
+			if (EconomyController.Instance.PlayerMoney < Price)
+				return;
+
+			EconomyController.Instance.RemoveMoney(Price);
+
+			_soldItemGO.SetActive(true);
+			InventoryController.Instance.AddMachineToPlayerInventory(_shopItem.MachineTemplate, 1);
+
+		}
+	}
 }

@@ -14,14 +14,14 @@ namespace Components.Shop.ShopItems
 		[SerializeField] protected GameObject _soldItemGO;
 
 		protected int Price;
-		private ShopItem _shopItem;
+		protected ShopItem _shopItem;
 		
 		public virtual void Init(ShopItem shopItem)
 		{
 			_shopItem = shopItem;
 		}
 
-		public void BuyItem()
+		public virtual void BuyItem()
 		{
 			if (EconomyController.Instance.PlayerMoney < Price) 
 				return;
