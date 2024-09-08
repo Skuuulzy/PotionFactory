@@ -1,6 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -8,12 +5,11 @@ namespace Components.Economie
 {
     public class UIEconomieController : MonoBehaviour
     {
-
         [SerializeField] private TextMeshProUGUI _playerMoneyText;
 
-        // Start is called before the first frame update
-        void Start()
+        private void Start()
         {
+	        _playerMoneyText.text = "0";
             EconomieController.OnPlayerMoneyUpdate += UpdateUIPlayerMoney;
 		}
 
@@ -24,8 +20,7 @@ namespace Components.Economie
 
 		private void UpdateUIPlayerMoney(int playerMoney)
 		{
-            _playerMoneyText.text = $"Player Money : {playerMoney}";
+            _playerMoneyText.text = $"{playerMoney}";
 		}
-
     }
 }
