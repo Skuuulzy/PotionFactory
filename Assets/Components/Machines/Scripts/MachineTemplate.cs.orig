@@ -19,11 +19,15 @@ namespace Components.Machines
         [SerializeField] private List<Node> _nodes;
 
         [Header("Parameters")] 
+<<<<<<< HEAD
         [SerializeField] private bool _showArrowPreview;
+=======
+        [SerializeField] private int _maxItemCount;
 
         [Header("Shop")]
         [SerializeField] private float _shopSpawnProbability;
         [SerializeField] private int _shopPrice = 200;
+>>>>>>> Features/ShopItems
         
         public string Name => _name;
         public MachineType Type => _type;
@@ -32,8 +36,13 @@ namespace Components.Machines
         public Sprite UIView => _uiView;
 
         public List<Node> Nodes => GetNodeInstance();
+<<<<<<< HEAD
+=======
+        public int MaxItemCount => _maxItemCount;
         public float ShopSpawnProbability => _shopSpawnProbability;
         public int ShopPrice => _shopPrice;
+
+>>>>>>> Features/ShopItems
         
         private List<Node> GetNodeInstance()
         {

@@ -1821,7 +1821,7 @@ GameObject:
   m_Component:
   - component: {fileID: 697047491}
   m_Layer: 0
-  m_Name: '----- UI -----'
+  m_Name: ----- UI -----
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2225,6 +2225,9 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+<<<<<<< HEAD
+--- !u!114 &811147903
+=======
 --- !u!1 &843287399
 GameObject:
   m_ObjectHideFlags: 0
@@ -2263,11 +2266,23 @@ RectTransform:
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &843287401
+>>>>>>> Features/ShopItems
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
+<<<<<<< HEAD
+  m_GameObject: {fileID: 811147900}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0ff25f388244cf3a41eec890a1aa418, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _machineSelectorView: {fileID: 4789450057896576343, guid: d01f5d2668de1a246ab8b9b7504e53f6,
+    type: 3}
+  _machineSelectorViewHolder: {fileID: 811147901}
+=======
   m_GameObject: {fileID: 843287399}
   m_Enabled: 1
   m_EditorHideFlags: 0
@@ -2278,21 +2293,7 @@ MonoBehaviour:
   _machineShopUIViewController: {fileID: 3604681718957568401, guid: 0d7b89c1cadbe284299a9614a4cd51c2,
     type: 3}
   _machineShopUIParent: {fileID: 986785475}
---- !u!114 &811147903
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 811147900}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c0ff25f388244cf3a41eec890a1aa418, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _machineSelectorView: {fileID: 4789450057896576343, guid: d01f5d2668de1a246ab8b9b7504e53f6,
-    type: 3}
-  _machineSelectorViewHolder: {fileID: 811147901}
+>>>>>>> Features/ShopItems
 --- !u!1001 &916444964
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3162,7 +3163,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1352410576}
   m_Layer: 0
-  m_Name: '----- MANAGERS -----'
+  m_Name: ----- MANAGERS -----
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

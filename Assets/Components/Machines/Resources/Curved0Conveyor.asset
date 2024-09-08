@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 581ab5ce2c92484d9bd63e4e972996c1, type: 3}
   m_Name: Curved0Conveyor
   m_EditorClassIdentifier: 
-  _name: Conveyor
+  _name: CurvedConveyorLeft
   _type: 1
   _gridView: {fileID: 1691528847705169943, guid: 113670807ae43d94d9e624eb601fbbe4,
     type: 3}
@@ -27,3 +27,5 @@ MonoBehaviour:
     - _side: 1
       _way: 1
   _maxItemCount: 1
+  _shopSpawnProbability: 0.7
+  _shopPrice: 500
