@@ -53,7 +53,7 @@ namespace Components.Grid
         private void Start()
         {
             _camera = UnityEngine.Camera.main;
-            InstantiateNewPreview();
+            MachineManager.OnChangeSelectedMachine += UpdateSelection;
             GenerateGrid();
 
             PlanningFactoryState.OnPlanningFactoryStateStarted += HandlePlanningFactoryState;
@@ -99,11 +99,11 @@ namespace Components.Grid
         // ------------------------------------------------------------------------- SELECTION -------------------------------------------------------------------------
         private void InstantiateNewPreview()
         {
-            _currentMachinePreview = Instantiate(_machineControllerPrefab);
-            _currentMachinePreview.InstantiatePreview(MachineManager.Instance.SelectedMachine, _cellSize);
-            _currentMachinePreview.RotatePreview(_currentRotation);
+			_currentMachinePreview = Instantiate(_machineControllerPrefab);
+			_currentMachinePreview.InstantiatePreview(MachineManager.Instance.SelectedMachine, _cellSize);
+			_currentMachinePreview.RotatePreview(_currentRotation);
 
-            MachineManager.OnChangeSelectedMachine += UpdateSelection;
+			
         }
         
         private void UpdateSelection(MachineTemplate newTemplate)
