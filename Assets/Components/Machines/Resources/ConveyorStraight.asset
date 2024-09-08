@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 581ab5ce2c92484d9bd63e4e972996c1, type: 3}
-  m_Name: Curved1Conveyor
+  m_Name: ConveyorStraight
   m_EditorClassIdentifier: 
-  _name: CurvedConveyorRight
+  _name: Conveyor
   _type: 1
-  _gridView: {fileID: 1691528847705169943, guid: 79d173fa022e051469a7b682bf3c6809,
+  _gridView: {fileID: 1691528847705169943, guid: 9a763f7d37651394abe80f2562d15d45,
     type: 3}
-  _uiView: {fileID: 21300000, guid: 921ad9377734ac1468e6fa1ef491c653, type: 3}
+  _uiView: {fileID: 21300000, guid: 069582b6846ced1499ed92d2ff2ccf46, type: 3}
   _behavior: {fileID: 11400000, guid: f3d403794d898ac40b5d56bac13fe50c, type: 2}
   _nodes:
   - _localPosition: {x: 0, y: 0}
@@ -24,8 +24,9 @@ MonoBehaviour:
     _ports:
     - _side: 3
       _way: 0
-    - _side: 0
+    - _side: 2
       _way: 1
   _maxItemCount: 1
-  _shopSpawnProbability: 0.7
-  _shopPrice: 500
+  _shopSpawnProbability: 0
+  _shopPrice: 50
+  _sellPrice: 100

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Database;
 using UnityEngine;
 using VComponent.Tools.Singletons;
 
@@ -7,20 +8,21 @@ namespace Components.Machines
 {
     public class MachineManager : Singleton<MachineManager>
     {
-        [Header("Templates")]
-        [SerializeField] private List<MachineTemplate> _machineTemplates;
         [Header("Selector View")]
         [SerializeField] private MachineSelectorView _machineSelectorView;
         [SerializeField] private Transform _machineSelectorViewHolder;
         
         public MachineTemplate SelectedMachine { get; private set; }
-
         public static Action<MachineTemplate> OnChangeSelectedMachine;
 
+        private List<MachineTemplate> _machineTemplates;
+        
         protected override void Awake()
         {
             base.Awake();
 
+            _machineTemplates = ScriptableObjectDatabase.GetAllScriptableObjectOfType<MachineTemplate>();
+            
             if (_machineTemplates.Count <= 0)
             {
                 Debug.LogWarning("[MACHINES] No templates found.");

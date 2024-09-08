@@ -3,12 +3,12 @@ using UnityEngine;
 
 namespace Components.Machines.Behaviors
 {
-    [CreateAssetMenu(fileName = "New Machine Behaviour", menuName = "Machines/Behavior/Conveyor")]
-    public class ConveyorMachineBehavior : MachineBehavior
+    [CreateAssetMenu(fileName = "New Machine Behaviour", menuName = "Machines/Behavior/Merger")]
+    public class MergerMachineBehavior : MachineBehavior
     {
         public override void Process(Machine machine)
         {
-            if (machine.Ingredients.Count != 1)
+            if (machine.Ingredients.Count == 0)
             {
                 return;
             }
@@ -16,7 +16,7 @@ namespace Components.Machines.Behaviors
             if (machine.TryGetOutMachines(out List<Machine> outMachines))
             {
                 var outMachine = outMachines[0];
-                
+
                 if (outMachine.TryGiveItemItem(machine.Ingredients[0]))
                 {
                     machine.RemoveItem(0);

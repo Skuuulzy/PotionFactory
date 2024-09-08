@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Components.Recipes;
 using Database;
 using UnityEngine;
@@ -36,8 +37,10 @@ namespace Components.Machines.Behaviors
             }
             
             // Try to give the item to the next machine.
-            if (machine.TryGetOutMachine(out Machine outMachine))
+            if (machine.TryGetOutMachines(out List<Machine> outMachines))
             {
+                var outMachine = outMachines[0];
+                
                 if (outMachine.TryGiveItemItem(_currentRecipe.OutIngredient))
                 {
                     Debug.Log($"Machine: {machine.Controller.name} outputting: {_currentRecipe.OutIngredient.name} to: {outMachine.Controller.name}.");

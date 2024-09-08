@@ -10,7 +10,7 @@ namespace Components.Shop.ShopItems
             _itemName.text = shopItem.MachineTemplate.Name;
             _itemPrice.text = $"{shopItem.MachineTemplate.ShopPrice}";
             _itemView.sprite = shopItem.MachineTemplate.UIView;
-            _price = shopItem.MachineTemplate.ShopPrice;
+            Price = shopItem.MachineTemplate.ShopPrice;
 
 		}
     }

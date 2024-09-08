@@ -24,6 +24,7 @@
         DISTILLER,
         EXTRACTOR,
         MIXER,
-        PRESS
+        PRESS,
+        MERGER
     }
 }

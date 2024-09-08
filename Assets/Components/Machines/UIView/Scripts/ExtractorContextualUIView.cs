@@ -8,15 +8,16 @@ using UnityEngine;
 
 namespace Components.Machines.UIView
 {
-    public class ExtractorUIView : MachineUIViewBase
+    public class ExtractorContextualUIView : MonoBehaviour
     {
         [SerializeField] private TMP_Dropdown _extractorResourceTypeDropdown;
 
+        private Machine _associatedMachine;
         private List<IngredientTemplate> _allIngredients;
-        
-        public override void Initialize(Machine machine)
+
+        public void Initialize(Machine machine)
         {
-            base.Initialize(machine);
+            _associatedMachine = machine;
             
             _allIngredients = ScriptableObjectDatabase.GetAllScriptableObjectOfType<IngredientTemplate>();
             var ingredientsName = _allIngredients.Select(ingredientTemplate => ingredientTemplate.Name).ToList();
@@ -24,6 +25,17 @@ namespace Components.Machines.UIView
 
             _extractorResourceTypeDropdown.ClearOptions();
             _extractorResourceTypeDropdown.AddOptions(ingredientsName);
+
+            // Set up the dropdown to the selected extractor ingredient if there is one.
+            var machineBehavior = _associatedMachine.Behavior;
+            if (machineBehavior is ExtractorMachineBehaviour extractorMachineBehaviour)
+            {
+                if (extractorMachineBehaviour.IngredientTemplate != null)
+                { 
+                    // +1 because there is the NONE at index 0.
+                    _extractorResourceTypeDropdown.SetValueWithoutNotify(_allIngredients.IndexOf(extractorMachineBehaviour.IngredientTemplate) + 1);
+                }
+            }
         }
 
         public void SelectIngredient(int ingredientIndex)
@@ -35,14 +47,14 @@ namespace Components.Machines.UIView
                 return;
             }
             
-            // +1 because there is the NONE at index 0.
+            // -1 because there is the NONE at index 0.
             var selectedIngredient = _allIngredients[ingredientIndex - 1];
             SetSelectedIngredient(selectedIngredient);
         }
 
         private void SetSelectedIngredient(IngredientTemplate template)
         {
-            var machineBehavior = AssociatedMachine.Behavior;
+            var machineBehavior = _associatedMachine.Behavior;
             if (machineBehavior is ExtractorMachineBehaviour extractorMachineBehaviour)
             {
                 extractorMachineBehaviour.Init(template);

@@ -10,47 +10,40 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 581ab5ce2c92484d9bd63e4e972996c1, type: 3}
-  m_Name: Cauldron
+  m_Name: Merger
   m_EditorClassIdentifier: 
-  _name: Cauldron
-  _type: 0
-  _gridView: {fileID: 6216866908102591433, guid: 63d035a7941274d499413bc2d95c04e5,
+  _name: Merger
+  _type: 8
+  _gridView: {fileID: 4377708450514837446, guid: 81af9bfd3795ec247ab8824cb76ecf73,
     type: 3}
-  _uiView: {fileID: 21300000, guid: 77fd9620dc283f34cb20b707063def7d, type: 3}
-  _behavior: {fileID: 11400000, guid: 150ba0f5943b5cf478cf810bb3648a20, type: 2}
+  _uiView: {fileID: 21300000, guid: 9b2db208432e74069a526b81826489b9, type: 3}
+  _behavior: {fileID: 11400000, guid: 4bd481d361fd4ef48bd01de8db970275, type: 2}
   _nodes:
   - _localPosition: {x: 0, y: 0}
-    _gridPosition: {x: 0, y: 0}
-    _ports: []
-  - _localPosition: {x: 0, y: -1}
     _gridPosition: {x: 0, y: 0}
     _ports:
     - _side: 3
       _way: 0
-  - _localPosition: {x: 0, y: -2}
+  - _localPosition: {x: 0, y: -1}
     _gridPosition: {x: 0, y: 0}
     _ports: []
+  - _localPosition: {x: 0, y: -2}
+    _gridPosition: {x: 0, y: 0}
+    _ports:
+    - _side: 3
+      _way: 0
   - _localPosition: {x: 1, y: 0}
     _gridPosition: {x: 0, y: 0}
     _ports: []
   - _localPosition: {x: 1, y: -1}
     _gridPosition: {x: 0, y: 0}
-    _ports: []
-  - _localPosition: {x: 1, y: -2}
-    _gridPosition: {x: 0, y: 0}
-    _ports: []
-  - _localPosition: {x: 2, y: 0}
-    _gridPosition: {x: 0, y: 0}
-    _ports: []
-  - _localPosition: {x: 2, y: -1}
-    _gridPosition: {x: 0, y: 0}
     _ports:
     - _side: 2
       _way: 1
-  - _localPosition: {x: 2, y: -2}
+  - _localPosition: {x: 1, y: -2}
     _gridPosition: {x: 0, y: 0}
     _ports: []
   _maxItemCount: -1
-  _shopSpawnProbability: 0.05
-  _shopPrice: 2500
+  _shopSpawnProbability: 0
+  _shopPrice: 200
   _sellPrice: 100

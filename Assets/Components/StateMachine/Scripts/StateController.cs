@@ -1,13 +1,10 @@
 using Cysharp.Threading.Tasks;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditorInternal;
 using UnityEngine;
 using VComponent.Tools.Timer;
 
 public class StateController : MonoBehaviour
 {
+	[SerializeField] private bool _disable;
 	[SerializeField] private UIStateController _uiStateController;
 	[SerializeField] private int _planningFactoryStateTime = 180;
 	[SerializeField] private int _resolutionFactoryStateTime = 120;
@@ -18,8 +15,13 @@ public class StateController : MonoBehaviour
 	private StateMachine _stateMachine;
 
 	//------------------------------------------------------------------------ MONO --------------------------------------------------------------------------------------------
-	void Start()
+	private void Start()
     {
+	    if (_disable)
+	    {
+		    return;
+	    }
+	    
         PlanningFactoryState.OnPlanningFactoryStateStarted += HandlePlanningFactoryState;
         ResolutionFactoryState.OnResolutionFactoryStateStarted += HandleResolutionFactoryState;
         ShopState.OnShopStateStarted += HandleShopState;
@@ -55,8 +57,13 @@ public class StateController : MonoBehaviour
 		ShopState.OnShopStateStarted -= HandleShopState;
 	}
 
-	void Update()
+	private void Update()
     {
+	    if (_disable)
+	    {
+		    return;
+	    }
+	    
 		_stateMachine.Update();
 		if (_countdownTimer != null )
 		{
