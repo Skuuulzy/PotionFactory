@@ -17,7 +17,7 @@ MonoBehaviour:
   _gridView: {fileID: 4377708450514837446, guid: 81af9bfd3795ec247ab8824cb76ecf73,
     type: 3}
   _uiView: {fileID: 21300000, guid: 9b2db208432e74069a526b81826489b9, type: 3}
-  _behavior: {fileID: 11400000, guid: f3d403794d898ac40b5d56bac13fe50c, type: 2}
+  _behavior: {fileID: 11400000, guid: 4bd481d361fd4ef48bd01de8db970275, type: 2}
   _nodes:
   - _localPosition: {x: 0, y: 0}
     _gridPosition: {x: 0, y: 0}
@@ -43,5 +43,7 @@ MonoBehaviour:
   - _localPosition: {x: 1, y: -2}
     _gridPosition: {x: 0, y: 0}
     _ports: []
-  _showArrowPreview: 0
-  _maxItemCount: 0
+  _maxItemCount: -1
+  _shopSpawnProbability: 0
+  _shopPrice: 200
+  _sellPrice: 100

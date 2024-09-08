@@ -10,8 +10,10 @@ namespace Components.Machines.Behaviors
     {
         [ShowInInspector, ReadOnly] private IngredientTemplate _ingredientTemplate;
         [ShowInInspector, ReadOnly] private string _outMachineName;
-        
-		public void Init(IngredientTemplate ingredientTemplate)
+
+        public IngredientTemplate IngredientTemplate => _ingredientTemplate;
+
+        public void Init(IngredientTemplate ingredientTemplate)
 		{
             _ingredientTemplate = ingredientTemplate;
 		}

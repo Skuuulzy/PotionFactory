@@ -13,25 +13,20 @@ namespace Components.Shop
 		[SerializeField] private int _numberOfConsumableItemInShop = 3;
 		[SerializeField] private int _numberOfRelicItemInShop = 1;
 
-
 		private List<ShopItem> _shopItemsList;
 
 		public static Action<List<ShopItem>> OnShopGenerated;
-		void Start()
+
+		private void Start()
 		{
 			ShopState.OnShopStateStarted += GenerateShop;
 		}
-
-
-
+		
 		private void OnDestroy()
 		{
 			ShopState.OnShopStateStarted -= GenerateShop;
-
 		}
-
-
-
+		
 		private void GenerateShop(ShopState state)
 		{
 			_shopItemsList = new List<ShopItem>();
@@ -45,10 +40,8 @@ namespace Components.Shop
 				ShopItem shopItem = new ShopItem(allMachinesTemplate, _shopItemsList);
 				_shopItemsList.Add(shopItem);
 			}
-
-
+			
 			OnShopGenerated?.Invoke(_shopItemsList);
 		}
 	}
-
 }

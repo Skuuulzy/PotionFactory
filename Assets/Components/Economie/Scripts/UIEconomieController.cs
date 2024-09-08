@@ -1,7 +1,7 @@
 using TMPro;
 using UnityEngine;
 
-namespace Components.Economie
+namespace Components.Economy
 {
     public class UIEconomieController : MonoBehaviour
     {
@@ -10,12 +10,12 @@ namespace Components.Economie
         private void Start()
         {
 	        _playerMoneyText.text = "0";
-            EconomieController.OnPlayerMoneyUpdate += UpdateUIPlayerMoney;
+            EconomyController.OnPlayerMoneyUpdated += UpdateUIPlayerMoney;
 		}
 
 		private void OnDestroy()
 		{
-            EconomieController.OnPlayerMoneyUpdate -= UpdateUIPlayerMoney;
+            EconomyController.OnPlayerMoneyUpdated -= UpdateUIPlayerMoney;
 		}
 
 		private void UpdateUIPlayerMoney(int playerMoney)

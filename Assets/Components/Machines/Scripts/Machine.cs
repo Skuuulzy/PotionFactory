@@ -74,6 +74,11 @@ namespace Components.Machines
                     {
                         continue;
                     }
+
+                    if (port.ConnectedPort.Node.Machine.Controller == null)
+                    {
+                        continue;
+                    }
                     
                     // Get the other machine by the connected port.
                     connectedMachines.Add(port.ConnectedPort.Node.Machine);
@@ -102,6 +107,11 @@ namespace Components.Machines
                         continue;
                     }
                     
+                    if (port.ConnectedPort.Node.Machine.Controller == null)
+                    {
+                        continue;
+                    }
+                    
                     // Get the other machine by the connected port.
                     connectedMachines.Add(port.ConnectedPort.Node.Machine);
                 }
@@ -124,6 +134,11 @@ namespace Components.Machines
         
         public bool TryGiveItemItem(IngredientTemplate ingredient)
         {
+            if (Template.MaxItemCount != -1 && Ingredients.Count >= Template.MaxItemCount)
+            {
+                return false;
+            }
+            
             if (Behavior.ProcessingRecipe)
             {
                 return false;

@@ -1,4 +1,4 @@
-using Components.Economie;
+using Components.Economy;
 using System;
 using TMPro;
 using UnityEngine;
@@ -8,14 +8,14 @@ namespace Components.Shop.ShopItems
 {
 	public class ShopItemUIViewController : MonoBehaviour
 	{
-		private ShopItem _shopItem;
-		protected int _price;
 		[SerializeField] protected Image _itemView;
 		[SerializeField] protected TextMeshProUGUI _itemName;
 		[SerializeField] protected TextMeshProUGUI _itemPrice;
 		[SerializeField] protected GameObject _soldItemGO;
 
-		public static Action<int> OnItemBuyed;
+		protected int Price;
+		private ShopItem _shopItem;
+		
 		public virtual void Init(ShopItem shopItem)
 		{
 			_shopItem = shopItem;
@@ -23,11 +23,12 @@ namespace Components.Shop.ShopItems
 
 		public void BuyItem()
 		{
-			if(EconomieController.PlayerMoney >=  _price)
-			{
-				OnItemBuyed?.Invoke(_price);
-				_soldItemGO.SetActive(true);
-			}
+			if (EconomyController.Instance.PlayerMoney < Price) 
+				return;
+			
+			EconomyController.Instance.RemoveMoney(Price);
+			
+			_soldItemGO.SetActive(true);
 		}
 	}
 }
