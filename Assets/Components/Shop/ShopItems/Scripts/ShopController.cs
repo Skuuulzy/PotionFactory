@@ -38,7 +38,7 @@ namespace Components.Shop
 
 			//Get the classic convoyer machine to add it to the shopItemList 
 			MachineTemplate convoyer = allMachinesTemplate.Find(x => x.Name == "Conveyor");
-			ShopItem conveyorShopItem = new ShopItem(convoyer);
+			ShopItem conveyorShopItem = new ShopItem(convoyer, -1);
 			shopItemListToGenerate.Add(conveyorShopItem);
 			
 			//Remove it to not selection it for the shop

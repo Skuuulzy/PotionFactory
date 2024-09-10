@@ -7,7 +7,7 @@ namespace Components.Shop.UI
 	public class UIShopController : MonoBehaviour
 	{
 		[SerializeField] private GameObject _shopUIView;
-		[SerializeField] private MachineShopItemUIViewController _machineShopUIViewController;
+		[SerializeField] private UIMachineShopItemViewController _machineShopUIViewController;
 		[SerializeField] private Transform _machineShopUIParent;
 
 		void Start()
@@ -39,7 +39,7 @@ namespace Components.Shop.UI
 				//Check if the shopItem contains a machine
 				if (shopItem.MachineTemplate != null)
 				{
-					MachineShopItemUIViewController machineShopUIViewController = Instantiate(_machineShopUIViewController, _machineShopUIParent);
+					UIMachineShopItemViewController machineShopUIViewController = Instantiate(_machineShopUIViewController, _machineShopUIParent);
 					machineShopUIViewController.Init(shopItem);
 				}
 			}

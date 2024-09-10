@@ -9,27 +9,21 @@ namespace Components.Shop.ShopItems
     {
         // ----------------------------------------------------------------------- PRIVATE FIELDS -------------------------------------------------------------------------
         private MachineTemplate _machineTemplate;
+        private int _numberOfItemToSell;
 
         // ----------------------------------------------------------------------- PUBLIC FIELDS -------------------------------------------------------------------------
         public MachineTemplate MachineTemplate => _machineTemplate;
+        public int NumberOfItemToSell => _numberOfItemToSell;
 
-        public ShopItem(MachineTemplate machineTemplate)
+        public ShopItem(MachineTemplate machineTemplate, int numberOfItemToSell = 1)
         {
             _machineTemplate = machineTemplate;
+            _numberOfItemToSell = numberOfItemToSell;
         }
 
-        public ShopItem(List<MachineTemplate> machineTemplates, List<ShopItem> _shopItemAlreadyInShop)
+        public void DecreaseNumberOfItemToSell()
         {
-            float random = UnityEngine.Random.value;
-			machineTemplates = machineTemplates.OrderBy(x => Guid.NewGuid()).ToList();
-			foreach (var machineTemplate in machineTemplates)
-            {
-                if(random <= machineTemplate.ShopSpawnProbability && _shopItemAlreadyInShop.Find(x => x.MachineTemplate == machineTemplate) == null)
-                {
-                    _machineTemplate = machineTemplate;
-                    break;
-                }
-            }
+            _numberOfItemToSell--;
         }
     }
 }
