@@ -18,7 +18,7 @@ namespace Components.Economy
 			OnPlayerMoneyUpdated?.Invoke(_playerMoney);
 		}
 		
-		public void RemoveMoney(int amount)
+		public void DecreaseMoney(int amount)
 		{
 			_playerMoney -= amount;
 			

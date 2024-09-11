@@ -8,6 +8,7 @@ using Components.Economy;
 using Components.Grid.Tile;
 using Components.Grid.Obstacle;
 using Components.Machines.UIView;
+using Components.Inventory;
 
 namespace Components.Grid
 {
@@ -53,7 +54,7 @@ namespace Components.Grid
         private void Start()
         {
             _camera = UnityEngine.Camera.main;
-            InstantiateNewPreview();
+            MachineManager.OnChangeSelectedMachine += UpdateSelection;
             GenerateGrid();
 
             PlanningFactoryState.OnPlanningFactoryStateStarted += HandlePlanningFactoryState;
@@ -99,11 +100,11 @@ namespace Components.Grid
         // ------------------------------------------------------------------------- SELECTION -------------------------------------------------------------------------
         private void InstantiateNewPreview()
         {
-            _currentMachinePreview = Instantiate(_machineControllerPrefab);
-            _currentMachinePreview.InstantiatePreview(MachineManager.Instance.SelectedMachine, _cellSize);
-            _currentMachinePreview.RotatePreview(_currentRotation);
+			_currentMachinePreview = Instantiate(_machineControllerPrefab);
+			_currentMachinePreview.InstantiatePreview(MachineManager.Instance.SelectedMachine, _cellSize);
+			_currentMachinePreview.RotatePreview(_currentRotation);
 
-            MachineManager.OnChangeSelectedMachine += UpdateSelection;
+			
         }
         
         private void UpdateSelection(MachineTemplate newTemplate)
@@ -196,50 +197,58 @@ namespace Components.Grid
 
         private void AddMachineToGrid(MachineTemplate machine, Cell originCell)
         {
-	        _instancedObjects.Add(_currentMachinePreview);
+            _instancedObjects.Add(_currentMachinePreview);
 
-	        _currentMachinePreview.transform.position = _grid.GetWorldPosition(originCell.X, originCell.Y) + new Vector3(_cellSize / 2, 0, _cellSize / 2);
+            _currentMachinePreview.transform.position = _grid.GetWorldPosition(originCell.X, originCell.Y) + new Vector3(_cellSize / 2, 0, _cellSize / 2);
             _currentMachinePreview.transform.name = $"{machine.Name}_{_instancedObjects.Count}";
             _currentMachinePreview.transform.parent = _objectsHolder;
-            
+
             // Adding nodes to the cells
             foreach (var node in _currentMachinePreview.Machine.Nodes)
             {
-	            var nodeGridPosition = node.SetGridPosition(new Vector2Int(originCell.X, originCell.Y));
-	            
-	            if (_grid.TryGetCellByCoordinates(nodeGridPosition.x, nodeGridPosition.y, out Cell overlapCell))
-	            {
-		            overlapCell.AddNodeToCell(node);
-		            
-		            // Add potential connected ports
-		            foreach (var port in node.Ports)
-		            {
-			            switch (port.Side)
-			            {
-				            case Side.DOWN:
-					            TryBindConnectedPort(port, new Vector2Int(nodeGridPosition.x, nodeGridPosition.y - 1));
-					            break;
-				            case Side.UP:
-					            TryBindConnectedPort(port, new Vector2Int(nodeGridPosition.x, nodeGridPosition.y + 1));
-					            break;
-				            case Side.RIGHT:
-					            TryBindConnectedPort(port, new Vector2Int(nodeGridPosition.x + 1, nodeGridPosition.y));
-					            break;
-				            case Side.LEFT:
-					            TryBindConnectedPort(port, new Vector2Int(nodeGridPosition.x - 1, nodeGridPosition.y));
-					            break;
-				            case Side.NONE:
-					            break;
-				            default:
-					            throw new ArgumentOutOfRangeException();
-			            }
-		            }
-	            }
+                var nodeGridPosition = node.SetGridPosition(new Vector2Int(originCell.X, originCell.Y));
+
+                if (_grid.TryGetCellByCoordinates(nodeGridPosition.x, nodeGridPosition.y, out Cell overlapCell))
+                {
+                    overlapCell.AddNodeToCell(node);
+
+                    // Add potential connected ports
+                    foreach (var port in node.Ports)
+                    {
+                        switch (port.Side)
+                        {
+                            case Side.DOWN:
+                                TryBindConnectedPort(port, new Vector2Int(nodeGridPosition.x, nodeGridPosition.y - 1));
+                                break;
+                            case Side.UP:
+                                TryBindConnectedPort(port, new Vector2Int(nodeGridPosition.x, nodeGridPosition.y + 1));
+                                break;
+                            case Side.RIGHT:
+                                TryBindConnectedPort(port, new Vector2Int(nodeGridPosition.x + 1, nodeGridPosition.y));
+                                break;
+                            case Side.LEFT:
+                                TryBindConnectedPort(port, new Vector2Int(nodeGridPosition.x - 1, nodeGridPosition.y));
+                                break;
+                            case Side.NONE:
+                                break;
+                            default:
+                                throw new ArgumentOutOfRangeException();
+                        }
+                    }
+                }
             }
             //originCell.
             _currentMachinePreview.ConfirmPlacement();
-            
+
             InstantiateNewPreview();
+
+            //Remove one machine from the inventory
+            InventoryController.Instance.RemoveMachineToPlayerInventory(machine, 1);
+            //Check if we don"t have any left of this machine in player inventory 
+            if (InventoryController.Instance.PlayerMachinesDictionary[machine] == 0)
+            {
+                DeletePreview();
+            }
         }
 
         private void TryBindConnectedPort(Port port, Vector2Int neighbourPosition)
