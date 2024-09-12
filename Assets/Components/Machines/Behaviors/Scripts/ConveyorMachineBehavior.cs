@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Components.Machines.Behaviors
@@ -12,8 +13,10 @@ namespace Components.Machines.Behaviors
                 return;
             }
 
-            if (machine.TryGetOutMachine(out Machine outMachine))
+            if (machine.TryGetOutMachines(out List<Machine> outMachines))
             {
+                var outMachine = outMachines[0];
+                
                 if (outMachine.TryGiveItemItem(machine.Ingredients[0]))
                 {
                     machine.RemoveItem(0);

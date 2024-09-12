@@ -9,7 +9,8 @@ namespace Components.Camera
 		[SerializeField] private float _rotationSpeed = 100f;
 
 		private Vector3 _cameraPosition;
-		private float _speedMultiplicateur = 1f;
+		private float _speedMultiplier = 1f;
+		
 		private void Start()
 		{
 			_cameraPosition = transform.position;
@@ -32,31 +33,31 @@ namespace Components.Camera
 
 			if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
 			{
-				_cameraPosition -= right * (_cameraSpeed * _speedMultiplicateur * Time.deltaTime);
+				_cameraPosition -= right * (_cameraSpeed * _speedMultiplier * Time.deltaTime);
 			}
 
 			if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
 			{
-				_cameraPosition += right * (_cameraSpeed * _speedMultiplicateur * Time.deltaTime);
+				_cameraPosition += right * (_cameraSpeed * _speedMultiplier * Time.deltaTime);
 			}
 
 			if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
 			{
-				_cameraPosition += forward * (_cameraSpeed * _speedMultiplicateur * Time.deltaTime);
+				_cameraPosition += forward * (_cameraSpeed * _speedMultiplier * Time.deltaTime);
 			}
 
 			if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
 			{
-				_cameraPosition -= forward * (_cameraSpeed * _speedMultiplicateur * Time.deltaTime);
+				_cameraPosition -= forward * (_cameraSpeed * _speedMultiplier * Time.deltaTime);
 			}
 
 			if (Input.GetKeyDown(KeyCode.LeftShift))
 			{
-				_speedMultiplicateur = 2;
+				_speedMultiplier = 2;
 			}
 			if (Input.GetKeyUp(KeyCode.LeftShift))
 			{
-				_speedMultiplicateur = 1;
+				_speedMultiplier = 1;
 			}
 		}
 

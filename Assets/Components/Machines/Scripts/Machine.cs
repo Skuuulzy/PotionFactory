@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Components.Ingredients;
 using Components.Machines.Behaviors;
 using Components.Tick;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Components.Machines
@@ -13,7 +14,7 @@ namespace Components.Machines
         // ----------------------------------------------------------------------- PRIVATE FIELDS -------------------------------------------------------------------------
         [SerializeField] private List<IngredientTemplate> _ingredients;
         [SerializeField] private List<Node> _nodes;
-        [SerializeField] private MachineController _controller;
+        [SerializeField, ReadOnly] private MachineController _controller;
         [SerializeField] private MachineBehavior _behavior;
         
         private readonly MachineTemplate _template;
@@ -27,6 +28,7 @@ namespace Components.Machines
         
         // ------------------------------------------------------------------------- ACTIONS -------------------------------------------------------------------------
         public Action OnTick;
+        public Action OnPropagateTick;
         public Action<bool> OnItemAdded;
         
         // --------------------------------------------------------------------- INITIALISATION -------------------------------------------------------------------------
@@ -60,8 +62,10 @@ namespace Components.Machines
             }
         }
         
-        public bool TryGetOutMachine(out Machine connectedMachine)
+        public bool TryGetOutMachines(out List<Machine> connectedMachines)
         {
+            connectedMachines = new List<Machine>();
+            
             foreach (var node in Nodes)
             {
                 foreach (var port in node.Ports)
@@ -70,19 +74,30 @@ namespace Components.Machines
                     {
                         continue;
                     }
+
+                    if (port.ConnectedPort.Node.Machine.Controller == null)
+                    {
+                        continue;
+                    }
                     
                     // Get the other machine by the connected port.
-                    connectedMachine = port.ConnectedPort.Node.Machine;
-                    return true;
+                    connectedMachines.Add(port.ConnectedPort.Node.Machine);
                 }
             }
 
-            connectedMachine = null;
+            if (connectedMachines.Count > 0)
+            {
+                return true;
+            }
+
+            connectedMachines = null;
             return false;
         }
         
-        public bool TryGetInMachine(out Machine connectedMachine)
+        public bool TryGetInMachine(out List<Machine> connectedMachines)
         {
+            connectedMachines = new List<Machine>();
+            
             foreach (var node in Nodes)
             {
                 foreach (var port in node.Ports)
@@ -92,13 +107,22 @@ namespace Components.Machines
                         continue;
                     }
                     
+                    if (port.ConnectedPort.Node.Machine.Controller == null)
+                    {
+                        continue;
+                    }
+                    
                     // Get the other machine by the connected port.
-                    connectedMachine = port.ConnectedPort.Node.Machine;
-                    return true;
+                    connectedMachines.Add(port.ConnectedPort.Node.Machine);
                 }
             }
+            
+            if (connectedMachines.Count > 0)
+            {
+                return true;
+            }
 
-            connectedMachine = null;
+            connectedMachines = null;
             return false;
         }
 
@@ -110,10 +134,11 @@ namespace Components.Machines
         
         public bool TryGiveItemItem(IngredientTemplate ingredient)
         {
-            // There is already too many items in the machine
             if (Template.MaxItemCount != -1 && Ingredients.Count >= Template.MaxItemCount)
+            {
                 return false;
-
+            }
+            
             if (Behavior.ProcessingRecipe)
             {
                 return false;
@@ -146,6 +171,11 @@ namespace Components.Machines
         public void Tick()
         {
             OnTick?.Invoke();
+        }
+        
+        public void PropagateTick()
+        {
+            OnPropagateTick?.Invoke();
         }
         
         // ------------------------------------------------------------------- PORTS & ROTATIONS -------------------------------------------------------------------------

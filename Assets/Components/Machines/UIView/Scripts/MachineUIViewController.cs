@@ -4,11 +4,11 @@ namespace Components.Machines.UIView
 {
     public class MachineUIViewController : MonoBehaviour
     {
-        [SerializeField] private SerializableDictionary<MachineType, MachineUIViewBase> _machineViewPrefabs;
-        [SerializeField] private MachineUIViewBase _machineViewBasePrefab;
+        [SerializeField] private SerializableDictionary<MachineType, MachineContextualUIView> _specialMachineViewPrefabs;
+        [SerializeField] private MachineContextualUIView _machineContextualViewPrefab;
         [SerializeField] private Transform _holder;
         
-        private MachineUIViewBase _currentView;
+        private MachineContextualUIView _currentView;
         
         private void Awake()
         {
@@ -22,23 +22,7 @@ namespace Components.Machines.UIView
 
         private void HandleMachineClicked(Machine machine)
         {
-            var machineType = machine.Template.Type;
-
-            switch (machineType)
-            {
-                case MachineType.EXTRACTOR:
-                    InstantiateAndInitializeView<ExtractorUIView>(machine);
-                    break;
-                case MachineType.CAULDRON:
-                case MachineType.CONVEYOR:
-                case MachineType.DESTRUCTOR:
-                case MachineType.DISPANCER:
-                case MachineType.DISTILLER:
-                case MachineType.MIXER:
-                case MachineType.PRESS:
-                    InstantiateAndInitializeView(machine);
-                    break;
-            }
+            InstantiateAndInitializeView(machine);
         }
         
         private void InstantiateAndInitializeView(Machine machine)
@@ -48,20 +32,32 @@ namespace Components.Machines.UIView
                 Destroy(_currentView.gameObject);
             }
             
-            _currentView = Instantiate(_machineViewBasePrefab, _holder);
-            _currentView.Initialize(machine);
-        }
-
-        private void InstantiateAndInitializeView<T>(Machine machine) where T : MachineUIViewBase
-        {
-            if (_currentView && _currentView is T desiredTypeView)
+            // Potential special views
+            switch (machine.Template.Type)
             {
-                desiredTypeView.Initialize(machine);
-                return;
+                case MachineType.EXTRACTOR:
+                    _currentView = Instantiate(_specialMachineViewPrefabs[MachineType.EXTRACTOR], _holder);
+                    break;
+                default:
+                    _currentView = Instantiate(_machineContextualViewPrefab, _holder);
+                    break;
             }
             
-            _currentView = Instantiate(_machineViewPrefabs[machine.Template.Type], _holder);
-            ((T)_currentView).Initialize(machine);
+            // Contextual base data
+            _currentView.Initialize(machine);
+
+            // Potential special views
+            switch (machine.Template.Type)
+            {
+                case MachineType.EXTRACTOR:
+                    if (_currentView.TryGetComponent(out ExtractorContextualUIView extractorView))
+                    {
+                        extractorView.Initialize(machine);
+                    }
+                    break;
+            }
+
+            _currentView.gameObject.SetActive(true);
         }
     }
 }

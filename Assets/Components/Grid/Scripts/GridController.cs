@@ -4,8 +4,11 @@ using System.Collections.Generic;
 using Components.Machines;
 using Sirenix.OdinInspector;
 using System;
+using Components.Economy;
 using Components.Grid.Tile;
 using Components.Grid.Obstacle;
+using Components.Machines.UIView;
+using Components.Inventory;
 
 namespace Components.Grid
 {
@@ -38,7 +41,7 @@ namespace Components.Grid
 		private readonly List<MachineController> _instancedObjects = new ();
 		
         // Preview
-        private MachineController _currentMachineController;
+        private MachineController _currentMachinePreview;
         private int _currentRotation;
         private UnityEngine.Camera _camera;
         
@@ -51,20 +54,20 @@ namespace Components.Grid
         private void Start()
         {
             _camera = UnityEngine.Camera.main;
-            InstantiateNewPreview();
+            MachineManager.OnChangeSelectedMachine += UpdateSelection;
             GenerateGrid();
 
             PlanningFactoryState.OnPlanningFactoryStateStarted += HandlePlanningFactoryState;
             ShopState.OnShopStateStarted += HandleShopState;
+            MachineContextualUIView.OnSellMachine += HandleMachineSold;
         }
 
 		private void OnDestroy()
 		{
             PlanningFactoryState.OnPlanningFactoryStateStarted -= HandlePlanningFactoryState;
             ShopState.OnShopStateStarted -= HandleShopState;
+            MachineContextualUIView.OnSellMachine -= HandleMachineSold;
         }
-
-
 
 		private void Update()
         {
@@ -74,7 +77,7 @@ namespace Components.Grid
                 return;
 			}
 
-            if(_currentMachineController != null)
+            if(_currentMachinePreview != null)
             {
 				MoveSelection();
 			}
@@ -97,35 +100,35 @@ namespace Components.Grid
         // ------------------------------------------------------------------------- SELECTION -------------------------------------------------------------------------
         private void InstantiateNewPreview()
         {
-            _currentMachineController = Instantiate(_machineControllerPrefab);
-            _currentMachineController.InstantiatePreview(MachineManager.Instance.SelectedMachine, _cellSize);
-            _currentMachineController.RotatePreview(_currentRotation);
+			_currentMachinePreview = Instantiate(_machineControllerPrefab);
+			_currentMachinePreview.InstantiatePreview(MachineManager.Instance.SelectedMachine, _cellSize);
+			_currentMachinePreview.RotatePreview(_currentRotation);
 
-            MachineManager.OnChangeSelectedMachine += UpdateSelection;
+			
         }
         
         private void UpdateSelection(MachineTemplate newTemplate)
         {
-            if(_currentMachineController != null)
+            if(_currentMachinePreview != null)
             {
-				Destroy(_currentMachineController.gameObject);
+				Destroy(_currentMachinePreview.gameObject);
 			}
 
-			_currentMachineController = Instantiate(_machineControllerPrefab);
-            _currentMachineController.InstantiatePreview(newTemplate, _cellSize);
+			_currentMachinePreview = Instantiate(_machineControllerPrefab);
+            _currentMachinePreview.InstantiatePreview(newTemplate, _cellSize);
 
             _currentRotation = 0;
         }
 
-        private void DeleteSelection()
+        private void DeletePreview()
         {
-           Destroy(_currentMachineController.gameObject);
-           _currentMachineController = null;
+           Destroy(_currentMachinePreview.gameObject);
+           _currentMachinePreview = null;
         }
         
         private void MoveSelection()
         {
-	        if (!_currentMachineController)
+	        if (!_currentMachinePreview)
 	        {
 				return;
 	        }
@@ -136,25 +139,25 @@ namespace Components.Grid
             }
 
             // Update the object's position
-            _currentMachineController.transform.position = worldMousePosition;
+            _currentMachinePreview.transform.position = worldMousePosition;
         }
         
         private void RotateSelection()
         {
-	        if (!_currentMachineController)
+	        if (!_currentMachinePreview)
 	        {
 		        return;
 	        }
 	        
             _currentRotation += 90;
             _currentRotation %= 360;
-            _currentMachineController.RotatePreview(_currentRotation);
+            _currentMachinePreview.RotatePreview(_currentRotation);
         }
 
         // ------------------------------------------------------------------------- INPUT HANDLERS -------------------------------------------------------------------------
         private void AddSelectedMachineToGrid()
         {
-	        if (!_currentMachineController)
+	        if (!_currentMachinePreview)
 	        {
 		        return;
 	        }
@@ -172,7 +175,7 @@ namespace Components.Grid
 			}
 			
 			// Check if the machine can be placed on the grid.
-			foreach (var node in _currentMachineController.Machine.Nodes)
+			foreach (var node in _currentMachinePreview.Machine.Nodes)
 			{
 				var nodeGridPosition = node.SetGridPosition(new Vector2Int(chosenCell.X, chosenCell.Y));
 
@@ -194,50 +197,58 @@ namespace Components.Grid
 
         private void AddMachineToGrid(MachineTemplate machine, Cell originCell)
         {
-	        _instancedObjects.Add(_currentMachineController);
+            _instancedObjects.Add(_currentMachinePreview);
 
-	        _currentMachineController.transform.position = _grid.GetWorldPosition(originCell.X, originCell.Y) + new Vector3(_cellSize / 2, 0, _cellSize / 2);
-            _currentMachineController.transform.name = $"{machine.Name}_{_instancedObjects.Count}";
-            _currentMachineController.transform.parent = _objectsHolder;
-            
+            _currentMachinePreview.transform.position = _grid.GetWorldPosition(originCell.X, originCell.Y) + new Vector3(_cellSize / 2, 0, _cellSize / 2);
+            _currentMachinePreview.transform.name = $"{machine.Name}_{_instancedObjects.Count}";
+            _currentMachinePreview.transform.parent = _objectsHolder;
+
             // Adding nodes to the cells
-            foreach (var node in _currentMachineController.Machine.Nodes)
+            foreach (var node in _currentMachinePreview.Machine.Nodes)
             {
-	            var nodeGridPosition = node.SetGridPosition(new Vector2Int(originCell.X, originCell.Y));
-	            
-	            if (_grid.TryGetCellByCoordinates(nodeGridPosition.x, nodeGridPosition.y, out Cell overlapCell))
-	            {
-		            overlapCell.AddNodeToCell(node);
-		            
-		            // Add potential connected ports
-		            foreach (var port in node.Ports)
-		            {
-			            switch (port.Side)
-			            {
-				            case Side.DOWN:
-					            TryBindConnectedPort(port, new Vector2Int(nodeGridPosition.x, nodeGridPosition.y - 1));
-					            break;
-				            case Side.UP:
-					            TryBindConnectedPort(port, new Vector2Int(nodeGridPosition.x, nodeGridPosition.y + 1));
-					            break;
-				            case Side.RIGHT:
-					            TryBindConnectedPort(port, new Vector2Int(nodeGridPosition.x + 1, nodeGridPosition.y));
-					            break;
-				            case Side.LEFT:
-					            TryBindConnectedPort(port, new Vector2Int(nodeGridPosition.x - 1, nodeGridPosition.y));
-					            break;
-				            case Side.NONE:
-					            break;
-				            default:
-					            throw new ArgumentOutOfRangeException();
-			            }
-		            }
-	            }
+                var nodeGridPosition = node.SetGridPosition(new Vector2Int(originCell.X, originCell.Y));
+
+                if (_grid.TryGetCellByCoordinates(nodeGridPosition.x, nodeGridPosition.y, out Cell overlapCell))
+                {
+                    overlapCell.AddNodeToCell(node);
+
+                    // Add potential connected ports
+                    foreach (var port in node.Ports)
+                    {
+                        switch (port.Side)
+                        {
+                            case Side.DOWN:
+                                TryBindConnectedPort(port, new Vector2Int(nodeGridPosition.x, nodeGridPosition.y - 1));
+                                break;
+                            case Side.UP:
+                                TryBindConnectedPort(port, new Vector2Int(nodeGridPosition.x, nodeGridPosition.y + 1));
+                                break;
+                            case Side.RIGHT:
+                                TryBindConnectedPort(port, new Vector2Int(nodeGridPosition.x + 1, nodeGridPosition.y));
+                                break;
+                            case Side.LEFT:
+                                TryBindConnectedPort(port, new Vector2Int(nodeGridPosition.x - 1, nodeGridPosition.y));
+                                break;
+                            case Side.NONE:
+                                break;
+                            default:
+                                throw new ArgumentOutOfRangeException();
+                        }
+                    }
+                }
             }
             //originCell.
-            _currentMachineController.ConfirmPlacement();
-            
+            _currentMachinePreview.ConfirmPlacement();
+
             InstantiateNewPreview();
+
+            //Remove one machine from the inventory
+            InventoryController.Instance.RemoveMachineToPlayerInventory(machine, 1);
+            //Check if we don"t have any left of this machine in player inventory 
+            if (InventoryController.Instance.PlayerMachinesDictionary[machine] == 0)
+            {
+                DeletePreview();
+            }
         }
 
         private void TryBindConnectedPort(Port port, Vector2Int neighbourPosition)
@@ -259,46 +270,11 @@ namespace Components.Grid
         
         private void RemoveMachineFromGrid()
         {
-            if(_currentMachineController)
+            if(_currentMachinePreview)
             {
-				DeleteSelection();
+				DeletePreview();
                 return;
 			}
-
-			// Try to get the world position.
-			if (!UtilsClass.ScreenToWorldPositionIgnoringUI(Input.mousePosition, _camera, out Vector3 worldMousePosition))
-            {
-                return;
-            }
-
-            // Try getting the cell
-            if (!_grid.TryGetCellByPosition(worldMousePosition, out Cell chosenCell))
-            {
-                return;
-            }
-
-            // Check if the cell has an object
-            if (!chosenCell.ContainsNode)
-            {
-                return;
-            }
-            
-            //Destroy the machine associated to the node
-            var machineToDestroy = chosenCell.Node.Machine;
-
-            //Reset all cell linked to the machine.
-            foreach (var node in chosenCell.Node.Machine.Nodes)
-            {
-	            if (!_grid.TryGetCellByCoordinates(node.GridPosition.x, node.GridPosition.y, out Cell linkedCell))
-	            {
-		            continue;
-	            }
-	            
-	            linkedCell.RemoveNodeFromCell();
-            }
-            
-            _instancedObjects.Remove(machineToDestroy.Controller);
-            Destroy(machineToDestroy.Controller.gameObject);
         }
         
         // ------------------------------------------------------------------------- GRID METHODS -------------------------------------------------------------------------
@@ -367,6 +343,27 @@ namespace Components.Grid
         private void HandlePlanningFactoryState(PlanningFactoryState obj)
         {
             _isFactoryState = true;
+        }
+        
+        // --------------------------------------------------------------------- MACHINE METHODS -----------------------------------------------------------
+        private void HandleMachineSold(Machine machineToSell, int sellPrice)
+        {
+	        //Reset all cell linked to the machine.
+	        foreach (var node in machineToSell.Nodes)
+	        {
+		        if (!_grid.TryGetCellByCoordinates(node.GridPosition.x, node.GridPosition.y, out Cell linkedCell))
+		        {
+			        continue;
+		        }
+	            
+		        linkedCell.RemoveNodeFromCell();
+	        }
+            
+	        _instancedObjects.Remove(machineToSell.Controller);
+	        Destroy(machineToSell.Controller.gameObject);
+
+	        EconomyController.Instance.AddMoney(sellPrice);
+	        machineToSell = null;
         }
     }
 }

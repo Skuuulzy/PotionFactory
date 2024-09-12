@@ -13,12 +13,10 @@ namespace Components.Tribes
         [Header("Definition")]
         [SerializeField] private string _name;
         [SerializeField] private Sprite _uiView;
-        [SerializeField] private List<ShopItemTemplate> _shopItemsTemplate;
 
         // ----------------------------------------------------------------------- PUBLIC FIELDS -------------------------------------------------------------------------
         public string Name => _name;
         public Sprite UIView => _uiView;
-        public List<ShopItemTemplate> ShopItemsTemplate => _shopItemsTemplate;
 
     }
 }
