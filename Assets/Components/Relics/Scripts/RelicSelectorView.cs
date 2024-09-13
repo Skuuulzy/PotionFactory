@@ -1,8 +1,4 @@
-using Components.Inventory;
-using Components.Machines;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,7 +6,7 @@ using UnityEngine.UI;
 public class RelicSelectorView : MonoBehaviour
 {
 	[SerializeField] private TMP_Text _name;
-	[SerializeField] private Image _background;
+	[SerializeField] private Image _uiView;
 
 	public static Action<RelicTemplate> OnSelected;
 
@@ -22,7 +18,7 @@ public class RelicSelectorView : MonoBehaviour
 	{
 		_relic = relic;
 		_name.text = relic.RelicName;
-		_background.sprite = relic.UIView;
+		_uiView.sprite = relic.UIView;
 	}
 
 	public void Select()

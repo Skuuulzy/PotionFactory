@@ -2444,10 +2444,20 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 162607309}
     m_Modifications:
+    - target: {fileID: 1925909772337961406, guid: f8b5386e29aba424688e0e82a7f90ff1,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3388396359383161611, guid: f8b5386e29aba424688e0e82a7f90ff1,
         type: 3}
       propertyPath: m_Name
       value: UIInventoryController
+      objectReference: {fileID: 0}
+    - target: {fileID: 6451627086883829643, guid: f8b5386e29aba424688e0e82a7f90ff1,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7442296562829507545, guid: f8b5386e29aba424688e0e82a7f90ff1,
         type: 3}
@@ -2467,7 +2477,7 @@ PrefabInstance:
     - target: {fileID: 7442296562829507545, guid: f8b5386e29aba424688e0e82a7f90ff1,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7442296562829507545, guid: f8b5386e29aba424688e0e82a7f90ff1,
         type: 3}
@@ -2482,12 +2492,12 @@ PrefabInstance:
     - target: {fileID: 7442296562829507545, guid: f8b5386e29aba424688e0e82a7f90ff1,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: -100
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7442296562829507545, guid: f8b5386e29aba424688e0e82a7f90ff1,
         type: 3}
       propertyPath: m_SizeDelta.y
-      value: 200
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7442296562829507545, guid: f8b5386e29aba424688e0e82a7f90ff1,
         type: 3}
@@ -2532,7 +2542,7 @@ PrefabInstance:
     - target: {fileID: 7442296562829507545, guid: f8b5386e29aba424688e0e82a7f90ff1,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 10
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7442296562829507545, guid: f8b5386e29aba424688e0e82a7f90ff1,
         type: 3}
