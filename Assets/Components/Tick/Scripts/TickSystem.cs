@@ -111,6 +111,11 @@ namespace Components.Tick
             _isPause = false;
         }
 
+        public void ChangeTimeSpeed(float tickDurationValue)
+        {
+            _currentTickDuration = tickDurationValue;
+		}
+
 
         // ------------------------------------------------------------------------- STATE METHODS -------------------------------------------------------------------------
 

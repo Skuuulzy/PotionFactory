@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2364afc6ebac51b43b3ace629d3262df, type: 3}
+  m_Name: Gunfinger_ChaseStatus_Irah
+  m_EditorClassIdentifier: 
+  _musicName: Gunfinger (Salute) - IRAH, Chase & Status
+  _audioClip: {fileID: 8300000, guid: 83b720e944ebf1c4ba45f8a926171023, type: 3}
+  _bpm: 174
+  _musicBPMModifiers:
+  - Time: 0
+    BPM: 80
+    VoiceVolume: 5
+  - Time: 10
+    BPM: 120
+    VoiceVolume: 20
+  - Time: 49
+    BPM: 174
+    VoiceVolume: 80
