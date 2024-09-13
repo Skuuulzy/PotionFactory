@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Components.Machines.Behaviors;
+using Components.Machines.UIView;
 using UnityEngine;
 
 namespace Components.Machines
@@ -23,6 +24,9 @@ namespace Components.Machines
         [SerializeField] private float _shopSpawnProbability;
         [SerializeField] private int _shopPrice = 200;
         [SerializeField] private int _sellPrice = 100;
+
+        [Header("Contextual View")] 
+        [SerializeField] private List<UIContextualComponent> _contextualComponents;
         
         public string Name => _name;
         public MachineType Type => _type;
@@ -36,7 +40,9 @@ namespace Components.Machines
         public float ShopSpawnProbability => _shopSpawnProbability;
         public int ShopPrice => _shopPrice;
         public int SellPrice => _sellPrice;
-        
+
+        public List<UIContextualComponent> ContextualComponents => _contextualComponents;
+
         private List<Node> GetNodeInstance()
         {
             List<Node> result = new List<Node>();

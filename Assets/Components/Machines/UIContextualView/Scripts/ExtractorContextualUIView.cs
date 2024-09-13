@@ -8,14 +8,14 @@ using UnityEngine;
 
 namespace Components.Machines.UIView
 {
-    public class ExtractorContextualUIView : MonoBehaviour
+    public class ExtractorContextualUIView : UIContextualComponent
     {
         [SerializeField] private TMP_Dropdown _extractorResourceTypeDropdown;
 
         private Machine _associatedMachine;
         private List<IngredientTemplate> _allIngredients;
 
-        public void Initialize(Machine machine)
+        public override void Initialize(Machine machine)
         {
             _associatedMachine = machine;
             

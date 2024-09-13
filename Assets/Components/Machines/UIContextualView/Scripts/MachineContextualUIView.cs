@@ -8,14 +8,18 @@ namespace Components.Machines.UIView
 {
     public class MachineContextualUIView : MonoBehaviour
     {
+        [Header("Components")]
         [SerializeField] private TMP_Text _machineName;
         [SerializeField] private TMP_Text _heldIngredients;
         [SerializeField] private TMP_Text _sellPriceTxt;
-
+        [SerializeField] private Transform _componentsHolder;
+        
         public static Action<Machine, int> OnSellMachine;
         
         private Machine _associatedMachine;
+        private List<UIContextualComponent> _contextualComponents;
         
+        // --------------------------------------------------------- UI INITIALIZATION ---------------------------------------------------------
         public void Initialize(Machine machine)
         {
             _associatedMachine = machine;
@@ -34,6 +38,37 @@ namespace Components.Machines.UIView
             _associatedMachine.OnItemAdded -= HandleItemAdded;
         }
 
+        public void AddComponents(List<UIContextualComponent> contextualComponents)
+        {
+            ClearComponents();
+            
+            _contextualComponents = new List<UIContextualComponent>();
+            
+            foreach (var contextualComponent in contextualComponents)
+            {
+                var component = Instantiate(contextualComponent, _componentsHolder);
+                component.Initialize(_associatedMachine);
+                
+                _contextualComponents.Add(component);
+            }
+        }
+
+        private void ClearComponents()
+        {
+            if (_contextualComponents == null)
+            {
+                return;
+            }
+
+            foreach (var contextualComponent in _contextualComponents)
+            {
+                Destroy(contextualComponent.gameObject);
+            }
+            
+            _contextualComponents.Clear();
+        }
+        
+        // ------------------------------------------------------- BASE MACHINE CONTEXTUAL ------------------------------------------------------
         private void HandleItemAdded(bool _)
         {
             _heldIngredients.text = "Empty";
