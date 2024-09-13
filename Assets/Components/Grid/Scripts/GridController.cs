@@ -243,7 +243,7 @@ namespace Components.Grid
             InstantiateNewPreview();
 
             //Remove one machine from the inventory
-            InventoryController.Instance.RemoveMachineToPlayerInventory(machine, 1);
+            InventoryController.Instance.DecreaseMachineToPlayerInventory(machine, 1);
             //Check if we don"t have any left of this machine in player inventory 
             if (InventoryController.Instance.PlayerMachinesDictionary[machine] == 0)
             {

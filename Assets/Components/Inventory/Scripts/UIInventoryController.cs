@@ -10,23 +10,28 @@ namespace Components.Inventory
     public class UIInventoryController : MonoBehaviour
     {
 		[SerializeField] private MachineSelectorView _machineSelectorViewPrefab;
+		[SerializeField] private ConsumableSelectorView _consumableSelectorViewPrefab;
+		[SerializeField] private RelicSelectorView _relicSelectorViewPrefab;
 
 		[SerializeField] private Transform _machineSelectorViewParent;
+		[SerializeField] private Transform _consumableSelectorViewParent;
+		[SerializeField] private Transform _relicSelectorViewParent;
+
 		private List<MachineSelectorView> _inventoryMachinesList;
 
 		private void Awake()
 		{
 			_inventoryMachinesList = new List<MachineSelectorView>();
-			InventoryController.OnMachineAddedOrRemoved += UpdateUIView;
+			InventoryController.OnMachineAddedOrRemoved += UpdateMachineUIView;
 		}
 
 		private void OnDestroy()
 		{
-			InventoryController.OnMachineAddedOrRemoved -= UpdateUIView;
+			InventoryController.OnMachineAddedOrRemoved -= UpdateMachineUIView;
 
 		}
 
-		private void UpdateUIView(MachineTemplate machineTemplate, int value)
+		private void UpdateMachineUIView(MachineTemplate machineTemplate, int value)
 		{
 
 			//Search for an existing machine selector view to update the value
