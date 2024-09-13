@@ -110,7 +110,7 @@ namespace Database
             }
 
             // If no recipe was found, return the default.
-            recipe = GetScriptableObject<RecipeTemplate>("DEFAULT");
+            recipe = null;
             return false;
         }
     }
