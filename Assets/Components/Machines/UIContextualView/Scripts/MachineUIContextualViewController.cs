@@ -11,7 +11,6 @@ namespace Components.Machines.UIView
         
         private void Awake()
         {
-            InstantiateAndInitializeBaseView();
             MachineController.OnMachineClicked += HandleMachineClicked;
         }
 
@@ -19,8 +18,8 @@ namespace Components.Machines.UIView
         {
             MachineController.OnMachineClicked -= HandleMachineClicked;
         }
-
-        private void InstantiateAndInitializeBaseView()
+        
+        private void HandleMachineClicked(Machine machine)
         {
             if (_currentView)
             {
@@ -28,13 +27,10 @@ namespace Components.Machines.UIView
             }
 
             _currentView = Instantiate(_machineContextualViewPrefab, _holder);
-            _currentView.gameObject.SetActive(false);
-        }
-        
-        private void HandleMachineClicked(Machine machine)
-        {
+            
             _currentView.Initialize(machine);
             _currentView.AddComponents(machine.Template.ContextualComponents);
+            
             _currentView.gameObject.SetActive(true);
         }
     }
