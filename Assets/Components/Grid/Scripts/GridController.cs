@@ -9,6 +9,7 @@ using Components.Grid.Tile;
 using Components.Grid.Obstacle;
 using Components.Machines.UIView;
 using Components.Inventory;
+using Components.Relics;
 
 namespace Components.Grid
 {
@@ -24,6 +25,7 @@ namespace Components.Grid
         [Header("Prefabs")] 
         [SerializeField] private GameObject _groundTile;
         [SerializeField] private MachineController _machineControllerPrefab;
+        [SerializeField] private RelicController _relicControllerPrefab;
         
         [Header("Holders")]
         [SerializeField] private Transform _groundHolder;
@@ -42,6 +44,7 @@ namespace Components.Grid
 		
         // Preview
         private MachineController _currentMachinePreview;
+        private RelicController _currentRelicPreview;
         private int _currentRotation;
         private UnityEngine.Camera _camera;
         
@@ -109,16 +112,34 @@ namespace Components.Grid
         
         private void UpdateSelection(MachineTemplate newTemplate)
         {
-            if(_currentMachinePreview != null)
-            {
-				Destroy(_currentMachinePreview.gameObject);
-			}
+            DestroySelection();
 
 			_currentMachinePreview = Instantiate(_machineControllerPrefab);
             _currentMachinePreview.InstantiatePreview(newTemplate, _cellSize);
 
             _currentRotation = 0;
         }
+
+        private void UpdateSelection(RelicTemplate relicTemplate)
+        {
+            DestroySelection();
+            _currentRelicPreview = Instantiate(_relicControllerPrefab);
+            _currentRelicPreview.InstantiatePreview(relicTemplate, _cellSize);
+            _currentRotation = 0;
+		}
+       
+        private void DestroySelection()
+        {
+			if (_currentMachinePreview != null)
+			{
+				Destroy(_currentMachinePreview.gameObject);
+			}
+			if (_currentRelicPreview != null)
+			{
+				Destroy(_currentRelicPreview.gameObject);
+			}
+
+		}
 
         private void DeletePreview()
         {
