@@ -41,6 +41,7 @@ namespace Components.Grid
 		// Grid
 		private Grid _grid;
 		private readonly List<MachineController> _instancedObjects = new ();
+		private readonly List<RelicController> _instancedRelics = new ();
 		
         // Preview
         private MachineController _currentMachinePreview;
@@ -58,6 +59,7 @@ namespace Components.Grid
         {
             _camera = UnityEngine.Camera.main;
             MachineManager.OnChangeSelectedMachine += UpdateSelection;
+            RelicManager.OnChangeSelectedRelic += UpdateSelection;
             GenerateGrid();
 
             PlanningFactoryState.OnPlanningFactoryStateStarted += HandlePlanningFactoryState;
@@ -70,6 +72,8 @@ namespace Components.Grid
             PlanningFactoryState.OnPlanningFactoryStateStarted -= HandlePlanningFactoryState;
             ShopState.OnShopStateStarted -= HandleShopState;
             MachineContextualUIView.OnSellMachine -= HandleMachineSold;
+
+            RelicManager.OnChangeSelectedRelic -= UpdateSelection;
         }
 
 		private void Update()
@@ -80,7 +84,7 @@ namespace Components.Grid
                 return;
 			}
 
-            if(_currentMachinePreview != null)
+            if(_currentMachinePreview != null || _currentRelicPreview != null)
             {
 				MoveSelection();
 			}
@@ -92,6 +96,7 @@ namespace Components.Grid
             if (Input.GetMouseButton(0))
             {
                 AddSelectedMachineToGrid();
+                AddSelectedRelicToGrid();
             }
             if (Input.GetMouseButtonDown(2))
             {
@@ -106,23 +111,26 @@ namespace Components.Grid
 			_currentMachinePreview = Instantiate(_machineControllerPrefab);
 			_currentMachinePreview.InstantiatePreview(MachineManager.Instance.SelectedMachine, _cellSize);
 			_currentMachinePreview.RotatePreview(_currentRotation);
+		}
 
-			
-        }
-        
-        private void UpdateSelection(MachineTemplate newTemplate)
+		private void InstantiateNewRelicPreview()
+		{
+			_currentRelicPreview = Instantiate(_relicControllerPrefab);
+			_currentRelicPreview.InstantiatePreview(RelicManager.Instance.SelectedRelic, _cellSize);
+			_currentRelicPreview.RotatePreview(_currentRotation);
+		}
+
+		private void UpdateSelection(MachineTemplate newTemplate)
         {
-            DestroySelection();
-
-			_currentMachinePreview = Instantiate(_machineControllerPrefab);
+            DeletePreview();
+            _currentMachinePreview = Instantiate(_machineControllerPrefab);
             _currentMachinePreview.InstantiatePreview(newTemplate, _cellSize);
-
             _currentRotation = 0;
         }
 
         private void UpdateSelection(RelicTemplate relicTemplate)
         {
-            DestroySelection();
+            DeletePreview();
             _currentRelicPreview = Instantiate(_relicControllerPrefab);
             _currentRelicPreview.InstantiatePreview(relicTemplate, _cellSize);
             _currentRotation = 0;
@@ -143,13 +151,14 @@ namespace Components.Grid
 
         private void DeletePreview()
         {
-           Destroy(_currentMachinePreview.gameObject);
+            DestroySelection();
            _currentMachinePreview = null;
+           _currentRelicPreview = null;
         }
         
         private void MoveSelection()
         {
-	        if (!_currentMachinePreview)
+	        if (!_currentMachinePreview && !_currentRelicPreview)
 	        {
 				return;
 	        }
@@ -160,19 +169,34 @@ namespace Components.Grid
             }
 
             // Update the object's position
-            _currentMachinePreview.transform.position = worldMousePosition;
+            if(_currentMachinePreview != null)
+			{
+                _currentMachinePreview.transform.position = worldMousePosition;
+			}
+            else if (_currentRelicPreview != null)
+			{
+                _currentRelicPreview.transform.position = worldMousePosition;
+			}
         }
         
         private void RotateSelection()
         {
-	        if (!_currentMachinePreview)
+	        if (!_currentMachinePreview && !_currentRelicPreview)
 	        {
 		        return;
 	        }
 	        
             _currentRotation += 90;
             _currentRotation %= 360;
-            _currentMachinePreview.RotatePreview(_currentRotation);
+
+            if(_currentMachinePreview != null)
+			{
+                _currentMachinePreview.RotatePreview(_currentRotation); 
+			}
+            else if (_currentRelicPreview != null)
+			{
+                _currentMachinePreview.RotatePreview(_currentRotation);
+            }
         }
 
         // ------------------------------------------------------------------------- INPUT HANDLERS -------------------------------------------------------------------------
@@ -216,6 +240,50 @@ namespace Components.Grid
 			AddMachineToGrid(MachineManager.Instance.SelectedMachine, chosenCell);
         }
 
+        private void AddSelectedRelicToGrid()
+		{
+            if (!_currentRelicPreview)
+            {
+                return;
+            }
+
+            // Try to get the position on the grid.
+            if (!UtilsClass.ScreenToWorldPositionIgnoringUI(Input.mousePosition, _camera, out Vector3 worldMousePosition))
+            {
+                return;
+            }
+
+            // Try getting the cell
+            if (!_grid.TryGetCellByPosition(worldMousePosition, out Cell chosenCell))
+            {
+                return;
+            }
+
+            // One node of the machine overlap a cell that already contain an object.
+            if (chosenCell.ContainsObject)
+            {
+                return;
+            }
+
+            AddRelicToGrid(_currentRelicPreview.Template, chosenCell);
+        }
+
+        private void AddRelicToGrid(RelicTemplate template, Cell chosenCell)
+		{
+            _instancedRelics.Add(_currentRelicPreview);
+            _currentRelicPreview.transform.position = _grid.GetWorldPosition(chosenCell.X, chosenCell.Y) + new Vector3(_cellSize / 2, 0, _cellSize / 2);
+            _currentRelicPreview.transform.name = $"{template.RelicName}_{_instancedRelics.Count}";
+            _currentRelicPreview.transform.parent = _objectsHolder;
+
+            _currentRelicPreview.ConfirmPlacement();
+            InstantiateNewRelicPreview();
+
+
+            //Remove one machine from the inventory
+            InventoryController.Instance.RemoveRelicFromPlayerInventory(template);
+            DeletePreview();
+
+        }
         private void AddMachineToGrid(MachineTemplate machine, Cell originCell)
         {
             _instancedObjects.Add(_currentMachinePreview);

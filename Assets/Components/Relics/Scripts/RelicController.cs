@@ -14,14 +14,14 @@ namespace Components.Relics
 		[SerializeField] private Transform _3dViewHolder;
 		[SerializeField] private Relic _relic;
 
-		[SerializeField] private GameObject _inPreview;
-		[SerializeField] private GameObject _outPreview;
-
-		public static Action<Relic> OnRelicClicked;
+		public static Action<RelicTemplate> OnRelicClicked;
 		public Relic Relic => _relic;
 
 		private bool _initialized;
 		private GameObject _view;
+		private RelicTemplate _template;
+
+		public RelicTemplate Template => _template;
 
 
 		// ------------------------------------------------------------------------- INIT -------------------------------------------------------------------------
@@ -30,6 +30,7 @@ namespace Components.Relics
 			_view = Instantiate(relicTemplate.GridView, _3dViewHolder);
 			_relic = new Relic(relicTemplate, this);
 			_view.transform.localScale = new Vector3(scale, scale, scale);
+			_template = relicTemplate;
 		}
 
 		public void RotatePreview(int angle)
@@ -65,7 +66,7 @@ namespace Components.Relics
 				return;
 			}
 
-			OnRelicClicked?.Invoke(_relic);
+			OnRelicClicked?.Invoke(_template);
 		}
 
 		private void Tick()

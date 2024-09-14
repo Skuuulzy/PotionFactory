@@ -82,6 +82,7 @@ namespace Components.Inventory
 				{
 					Destroy(_inventoryConsumableList[i].gameObject);
 					_inventoryConsumableList.Remove(_inventoryConsumableList[i]);
+					return;
 				}
 			}
 
@@ -103,10 +104,11 @@ namespace Components.Inventory
 				{
 					Destroy(_inventoryRelicList[i].gameObject);
 					_inventoryRelicList.Remove(_inventoryRelicList[i]);
+					return;
 				}
 			}
 
-			Debug.LogError("Can't find the consumable template : " + relic);
+			Debug.LogError("Can't find the relic template : " + relic);
 		}
 	}
 }
