@@ -11,10 +11,12 @@ public class RelicTemplate : ScriptableObject
 	[SerializeField] private GameObject _gridView;
 	[SerializeField] private Sprite _uiView;
 	[SerializeField] private float _spawnProbability = 0.25f;
+	[SerializeField] private int _effectZoneRadius = 5;
 
 	public string RelicName => _relicName;
 	public int ShopPrice => _shopPrice;	
 	public GameObject GridView => _gridView;
 	public Sprite UIView => _uiView;
 	public float SpawnProbability => _spawnProbability;
+	public int EffectZoneRadius => _effectZoneRadius;
 }

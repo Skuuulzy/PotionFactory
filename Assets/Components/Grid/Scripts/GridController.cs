@@ -276,6 +276,7 @@ namespace Components.Grid
             _currentRelicPreview.transform.parent = _objectsHolder;
 
             _currentRelicPreview.ConfirmPlacement();
+            _currentRelicPreview.DrawZoneGizmos(chosenCell, 5, _gridXValue, _gridYValue, _grid);
             InstantiateNewRelicPreview();
 
 
