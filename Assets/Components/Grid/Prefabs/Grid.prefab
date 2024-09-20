@@ -80,7 +80,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _gridXValue: 24
   _gridYValue: 24
-  _cellSize: 20
+  _cellSize: 1
   _startPosition: {x: 0, y: 0, z: 0}
   _showDebug: 0
   _groundTile: {fileID: 5488635875282986484, guid: 763f6990e5d7f74418e2a1161ea2cfeb,
@@ -95,6 +95,7 @@ MonoBehaviour:
   _tileController: {fileID: 11400000, guid: 98fb794df76978f4b994523c8c857b41, type: 2}
   _obstacleController: {fileID: 11400000, guid: 4e515b2a00523b04699a5b6777c492a2,
     type: 2}
+  _extractorsOnGridCount: 4
 --- !u!1 &3142047636322267640
 GameObject:
   m_ObjectHideFlags: 0

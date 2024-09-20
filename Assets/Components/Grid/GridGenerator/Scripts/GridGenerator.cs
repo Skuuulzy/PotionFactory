@@ -97,7 +97,6 @@ namespace Components.Grid.Generator
 			_currentTileController = Instantiate(_tilePrefab);
 			_currentTileController.SetTileType(tileTemplate.TileType);
 			_currentTileController.InstantiatePreview(tileTemplate, _cellSize);
-
 		}
 
 		private void UpdateObstacleSelection(ObstacleTemplate obstacleTemplate)

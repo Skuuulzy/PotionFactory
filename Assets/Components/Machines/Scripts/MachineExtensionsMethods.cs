@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Components.Machines
 {
-    public static class ExtensionsMethods
+    public static class MachineExtensionsMethods
     {
         // ------------------------------------------------------------------------- NODE ROTATION -------------------------------------------------------------------------
         public static List<Node> RotateNodes(this List<Node> nodes, int angle)

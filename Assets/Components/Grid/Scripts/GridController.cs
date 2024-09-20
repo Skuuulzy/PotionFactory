@@ -4,12 +4,18 @@ using System.Collections.Generic;
 using Components.Machines;
 using Sirenix.OdinInspector;
 using System;
+using System.Linq;
 using Components.Economy;
 using Components.Grid.Tile;
 using Components.Grid.Obstacle;
+using Components.Ingredients;
 using Components.Machines.UIView;
 using Components.Inventory;
+using Components.Machines.Behaviors;
+using Components.Recipes;
 using Components.Relics;
+using Components.Tools.ExtensionMethods;
+using Database;
 
 namespace Components.Grid
 {
@@ -38,6 +44,9 @@ namespace Components.Grid
 		[Header("Obstacles")]
 		[SerializeField] private AllObstaclesController _obstacleController;
 
+		[Header("Ingredients")]
+		[SerializeField] private int _extractorsOnGridCount = 4;
+		
 		// Grid
 		private Grid _grid;
 		private readonly List<MachineController> _instancedObjects = new ();
@@ -108,6 +117,12 @@ namespace Components.Grid
         // ------------------------------------------------------------------------- SELECTION -------------------------------------------------------------------------
         private void InstantiateNewPreview()
         {
+	        if (MachineManager.Instance.SelectedMachine == null)
+	        {
+		        _currentMachinePreview = null;
+		        return;
+	        }
+	        
 			_currentMachinePreview = Instantiate(_machineControllerPrefab);
 			_currentMachinePreview.InstantiatePreview(MachineManager.Instance.SelectedMachine, _cellSize);
 			_currentMachinePreview.RotatePreview(_currentRotation);
@@ -379,13 +394,40 @@ namespace Components.Grid
             _grid = new Grid(_gridXValue, _gridYValue, _cellSize, _startPosition, _groundHolder, _showDebug);
             _tileController.SelectATileType();
 
+            var ingredientsFromRecipes = ScriptableObjectDatabase.GetAllScriptableObjectOfType<RecipeTemplate>().Select(template => template.OutIngredient);
+            var allIngredients = ScriptableObjectDatabase.GetAllScriptableObjectOfType<IngredientTemplate>();
+
+            var baseIngredient = allIngredients.Except(ingredientsFromRecipes).ToList();
+            var randomIngredientsIndexes = ListExtensionsMethods.GetRandomIndexes(baseIngredient.Count, _extractorsOnGridCount);
+
+            Queue<IngredientTemplate> selectedIngredients = new Queue<IngredientTemplate>();
+            
+            for (int i = 0; i < baseIngredient.Count; i++)
+            {
+	            if (randomIngredientsIndexes.Contains(i))
+	            {
+		            selectedIngredients.Enqueue(baseIngredient[i]);
+	            }
+            }
+            
+            List<(int, int)> extractorPotentialCoordinates = new List<(int, int)>();
+            
 			// Instantiate ground blocks
 			for (int x = 0; x < _grid.GetWidth(); x++)
             {
                 for (int z = 0; z < _grid.GetHeight(); z++)
                 {
 					_grid.TryGetCellByCoordinates(x, z, out var chosenCell);
+					
 					TileController tile = _tileController.GenerateTile(chosenCell, _grid, _groundHolder, _cellSize);
+					
+					// Get the zone where the extractors can be placed
+					if ((x == 0 && z <= _grid.GetWidth() / 2) || (x == _grid.GetWidth() - 1 && z <= _grid.GetWidth() / 2) || z == 0)
+					{
+						extractorPotentialCoordinates.Add(new(x, z));
+						continue;
+					}
+					
 					if (tile.TileType == TileType.WATER)
 					{
 						//No need to place anything else on this cell because it is water
@@ -397,6 +439,41 @@ namespace Components.Grid
 						_obstacleController.GenerateObstacle(_grid, chosenCell, _obstacleHolder, _cellSize);
 					}
                 }
+            }
+
+            var randomExtractorCoordinates = ListExtensionsMethods.GetRandomIndexes(extractorPotentialCoordinates.Count, _extractorsOnGridCount);
+            for (int i = 0; i < extractorPotentialCoordinates.Count; i++)
+            {
+	            // We want to place an extractor here.
+	            if (randomExtractorCoordinates.Contains(i))
+	            {
+		            _grid.TryGetCellByCoordinates(extractorPotentialCoordinates[i].Item1, extractorPotentialCoordinates[i].Item2, out var chosenCell);
+		            var ingredient = selectedIngredients.Dequeue();
+		            
+		            Debug.Log($"Going to place on ({chosenCell.X}, {chosenCell.Y}) an extractor with ingredient: {ingredient}");
+
+		            var extractorTemplate = ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("Extractor");
+		            
+		            _currentMachinePreview = Instantiate(_machineControllerPrefab);
+		            _currentMachinePreview.InstantiatePreview(extractorTemplate, _cellSize);
+
+		            // Make sure that the machine are correctly oriented.
+		            if (chosenCell.Y == 0)
+		            {
+			            _currentMachinePreview.RotatePreview(270);
+		            }
+		            if (chosenCell.X == _grid.GetWidth() - 1)
+		            {
+			            _currentMachinePreview.RotatePreview(180);
+		            }
+		            
+		            AddMachineToGrid(extractorTemplate, chosenCell);
+
+		            if (chosenCell.Node.Machine.Behavior is ExtractorMachineBehaviour extractorMachineBehaviour)
+		            {
+			            extractorMachineBehaviour.Init(ingredient);
+		            }
+	            }
             }
         }
         
