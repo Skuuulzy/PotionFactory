@@ -10,7 +10,10 @@ namespace Components.Machines.Behaviors
     {
         private RecipeTemplate _currentRecipe;
         private int _currentProcessTime;
-        
+
+        public RecipeTemplate CurrentRecipe => _currentRecipe;
+        public int CurrentProcessTime => _currentProcessTime;
+
         public override void Process(Machine machine)
         {
             // Try to find a recipe based on the machine and the items inside the machine.
