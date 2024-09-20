@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Components.Machines.Behaviors
@@ -7,14 +8,16 @@ namespace Components.Machines.Behaviors
     {
         public override void Process(Machine machine)
         {
-            if (machine.Items.Count != 1)
+            if (machine.Ingredients.Count != 1)
             {
                 return;
             }
 
-            if (machine.TryGetOutMachine(out Machine outMachine))
+            if (machine.TryGetOutMachines(out List<Machine> outMachines))
             {
-                if (outMachine.TryGiveItemItem(machine.Items[0]))
+                var outMachine = outMachines[0];
+                
+                if (outMachine.TryGiveItemItem(machine.Ingredients[0]))
                 {
                     machine.RemoveItem(0);
                 }
