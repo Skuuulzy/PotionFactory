@@ -10,6 +10,7 @@ using Components.Grid.Obstacle;
 using Components.Machines.UIView;
 using Components.Inventory;
 using Components.Relics;
+using Components.Consumable;
 
 namespace Components.Grid
 {
@@ -26,6 +27,7 @@ namespace Components.Grid
         [SerializeField] private GameObject _groundTile;
         [SerializeField] private MachineController _machineControllerPrefab;
         [SerializeField] private RelicController _relicControllerPrefab;
+        [SerializeField] private ConsumableController _consumableControllerPrefab;
         
         [Header("Holders")]
         [SerializeField] private Transform _groundHolder;
@@ -46,6 +48,8 @@ namespace Components.Grid
         // Preview
         private MachineController _currentMachinePreview;
         private RelicController _currentRelicPreview;
+        private ConsumableController _currentConsumablePreview;
+
         private int _currentRotation;
         private UnityEngine.Camera _camera;
         
@@ -60,6 +64,7 @@ namespace Components.Grid
             _camera = UnityEngine.Camera.main;
             MachineManager.OnChangeSelectedMachine += UpdateSelection;
             RelicManager.OnChangeSelectedRelic += UpdateSelection;
+            ConsumableManager.OnChangeSelectedConsumable += UpdateSelection;
             GenerateGrid();
 
             PlanningFactoryState.OnPlanningFactoryStateStarted += HandlePlanningFactoryState;
@@ -72,8 +77,10 @@ namespace Components.Grid
             PlanningFactoryState.OnPlanningFactoryStateStarted -= HandlePlanningFactoryState;
             ShopState.OnShopStateStarted -= HandleShopState;
             MachineContextualUIView.OnSellMachine -= HandleMachineSold;
+			ConsumableManager.OnChangeSelectedConsumable -= UpdateSelection;
 
-            RelicManager.OnChangeSelectedRelic -= UpdateSelection;
+
+			RelicManager.OnChangeSelectedRelic -= UpdateSelection;
         }
 
 		private void Update()
@@ -84,7 +91,7 @@ namespace Components.Grid
                 return;
 			}
 
-            if(_currentMachinePreview != null || _currentRelicPreview != null)
+            if(_currentMachinePreview != null || _currentRelicPreview != null || _currentConsumablePreview != null)
             {
 				MoveSelection();
 			}
@@ -97,6 +104,7 @@ namespace Components.Grid
             {
                 AddSelectedMachineToGrid();
                 AddSelectedRelicToGrid();
+                AddSelectedConsumableToGrid();
             }
             if (Input.GetMouseButtonDown(2))
             {
@@ -135,6 +143,13 @@ namespace Components.Grid
             _currentRelicPreview.InstantiatePreview(relicTemplate, _cellSize);
             _currentRotation = 0;
 		}
+
+        private void UpdateSelection(ConsumableTemplate consumableTemplate)
+        {
+            DeletePreview();
+			_currentConsumablePreview = Instantiate(_consumableControllerPrefab);
+			_currentConsumablePreview.InstantiatePreview(consumableTemplate, _cellSize);
+		}
        
         private void DestroySelection()
         {
@@ -146,6 +161,10 @@ namespace Components.Grid
 			{
 				Destroy(_currentRelicPreview.gameObject);
 			}
+			if(_currentConsumablePreview != null)
+			{
+				Destroy(_currentConsumablePreview.gameObject);
+			}
 
 		}
 
@@ -154,11 +173,12 @@ namespace Components.Grid
             DestroySelection();
            _currentMachinePreview = null;
            _currentRelicPreview = null;
+			_currentConsumablePreview = null;
         }
         
         private void MoveSelection()
         {
-	        if (!_currentMachinePreview && !_currentRelicPreview)
+	        if (!_currentMachinePreview && !_currentRelicPreview && !_currentConsumablePreview)
 	        {
 				return;
 	        }
@@ -177,7 +197,11 @@ namespace Components.Grid
 			{
                 _currentRelicPreview.transform.position = worldMousePosition;
 			}
-        }
+			else if (_currentConsumablePreview != null)
+			{
+				_currentConsumablePreview.transform.position = worldMousePosition;
+			}
+		}
         
         private void RotateSelection()
         {
@@ -240,7 +264,89 @@ namespace Components.Grid
 			AddMachineToGrid(MachineManager.Instance.SelectedMachine, chosenCell);
         }
 
-        private void AddSelectedRelicToGrid()
+		private void AddMachineToGrid(MachineTemplate machine, Cell originCell)
+		{
+			_instancedObjects.Add(_currentMachinePreview);
+
+			_currentMachinePreview.transform.position = _grid.GetWorldPosition(originCell.X, originCell.Y) + new Vector3(_cellSize / 2, 0, _cellSize / 2);
+			_currentMachinePreview.transform.name = $"{machine.Name}_{_instancedObjects.Count}";
+			_currentMachinePreview.transform.parent = _objectsHolder;
+
+			// Adding nodes to the cells
+			foreach (var node in _currentMachinePreview.Machine.Nodes)
+			{
+				var nodeGridPosition = node.SetGridPosition(new Vector2Int(originCell.X, originCell.Y));
+
+				if (_grid.TryGetCellByCoordinates(nodeGridPosition.x, nodeGridPosition.y, out Cell overlapCell))
+				{
+					overlapCell.AddNodeToCell(node);
+
+					// Add potential connected ports
+					foreach (var port in node.Ports)
+					{
+						switch (port.Side)
+						{
+							case Side.DOWN:
+								TryBindConnectedPort(port, new Vector2Int(nodeGridPosition.x, nodeGridPosition.y - 1));
+								break;
+							case Side.UP:
+								TryBindConnectedPort(port, new Vector2Int(nodeGridPosition.x, nodeGridPosition.y + 1));
+								break;
+							case Side.RIGHT:
+								TryBindConnectedPort(port, new Vector2Int(nodeGridPosition.x + 1, nodeGridPosition.y));
+								break;
+							case Side.LEFT:
+								TryBindConnectedPort(port, new Vector2Int(nodeGridPosition.x - 1, nodeGridPosition.y));
+								break;
+							case Side.NONE:
+								break;
+							default:
+								throw new ArgumentOutOfRangeException();
+						}
+					}
+				}
+			}
+			//originCell.
+			_currentMachinePreview.ConfirmPlacement();
+
+			InstantiateNewPreview();
+
+			//Remove one machine from the inventory
+			InventoryController.Instance.DecreaseMachineToPlayerInventory(machine, 1);
+			//Check if we don"t have any left of this machine in player inventory 
+			if (InventoryController.Instance.PlayerMachinesDictionary[machine] == 0)
+			{
+				DeletePreview();
+			}
+		}
+
+		private void TryBindConnectedPort(Port port, Vector2Int neighbourPosition)
+		{
+			if (_grid.TryGetCellByCoordinates(neighbourPosition.x, neighbourPosition.y, out Cell neighbourCell))
+			{
+				if (neighbourCell.ContainsNode)
+				{
+					foreach (var potentialPort in neighbourCell.Node.Ports)
+					{
+						if (potentialPort.Side == port.Side.Opposite())
+						{
+							port.SetConnectedPort(potentialPort);
+						}
+					}
+				}
+			}
+		}
+
+		private void RemoveMachineFromGrid()
+		{
+			if (_currentMachinePreview)
+			{
+				DeletePreview();
+				return;
+			}
+		}
+
+		private void AddSelectedRelicToGrid()
 		{
             if (!_currentRelicPreview)
             {
@@ -268,104 +374,54 @@ namespace Components.Grid
             AddRelicToGrid(_currentRelicPreview.Template, chosenCell);
         }
 
-        private void AddRelicToGrid(RelicTemplate template, Cell chosenCell)
+		private void AddRelicToGrid(RelicTemplate template, Cell chosenCell)
 		{
-            _instancedRelics.Add(_currentRelicPreview);
-            _currentRelicPreview.transform.position = _grid.GetWorldPosition(chosenCell.X, chosenCell.Y) + new Vector3(_cellSize / 2, 0, _cellSize / 2);
-            _currentRelicPreview.transform.name = $"{template.RelicName}_{_instancedRelics.Count}";
-            _currentRelicPreview.transform.parent = _objectsHolder;
+			_instancedRelics.Add(_currentRelicPreview);
+			_currentRelicPreview.transform.position = _grid.GetWorldPosition(chosenCell.X, chosenCell.Y) + new Vector3(_cellSize / 2, 0, _cellSize / 2);
+			_currentRelicPreview.transform.name = $"{template.RelicName}_{_instancedRelics.Count}";
+			_currentRelicPreview.transform.parent = _objectsHolder;
 
-            _currentRelicPreview.ConfirmPlacement();
-            _currentRelicPreview.DrawZoneGizmos(chosenCell, 5, _gridXValue, _gridYValue, _grid);
-            InstantiateNewRelicPreview();
+			_currentRelicPreview.ConfirmPlacement();
+			_currentRelicPreview.DrawZoneGizmos(chosenCell, template.EffectZoneRadius, _gridXValue, _gridYValue, _grid);
+			InstantiateNewRelicPreview();
 
 
-            //Remove one machine from the inventory
-            InventoryController.Instance.RemoveRelicFromPlayerInventory(template);
-            DeletePreview();
+			//Remove one machine from the inventory
+			InventoryController.Instance.RemoveRelicFromPlayerInventory(template);
+			DeletePreview();
 
-        }
-        private void AddMachineToGrid(MachineTemplate machine, Cell originCell)
+		}
+
+		private void AddSelectedConsumableToGrid()
         {
-            _instancedObjects.Add(_currentMachinePreview);
-
-            _currentMachinePreview.transform.position = _grid.GetWorldPosition(originCell.X, originCell.Y) + new Vector3(_cellSize / 2, 0, _cellSize / 2);
-            _currentMachinePreview.transform.name = $"{machine.Name}_{_instancedObjects.Count}";
-            _currentMachinePreview.transform.parent = _objectsHolder;
-
-            // Adding nodes to the cells
-            foreach (var node in _currentMachinePreview.Machine.Nodes)
+            if (!_currentConsumablePreview)
             {
-                var nodeGridPosition = node.SetGridPosition(new Vector2Int(originCell.X, originCell.Y));
-
-                if (_grid.TryGetCellByCoordinates(nodeGridPosition.x, nodeGridPosition.y, out Cell overlapCell))
-                {
-                    overlapCell.AddNodeToCell(node);
-
-                    // Add potential connected ports
-                    foreach (var port in node.Ports)
-                    {
-                        switch (port.Side)
-                        {
-                            case Side.DOWN:
-                                TryBindConnectedPort(port, new Vector2Int(nodeGridPosition.x, nodeGridPosition.y - 1));
-                                break;
-                            case Side.UP:
-                                TryBindConnectedPort(port, new Vector2Int(nodeGridPosition.x, nodeGridPosition.y + 1));
-                                break;
-                            case Side.RIGHT:
-                                TryBindConnectedPort(port, new Vector2Int(nodeGridPosition.x + 1, nodeGridPosition.y));
-                                break;
-                            case Side.LEFT:
-                                TryBindConnectedPort(port, new Vector2Int(nodeGridPosition.x - 1, nodeGridPosition.y));
-                                break;
-                            case Side.NONE:
-                                break;
-                            default:
-                                throw new ArgumentOutOfRangeException();
-                        }
-                    }
-                }
-            }
-            //originCell.
-            _currentMachinePreview.ConfirmPlacement();
-
-            InstantiateNewPreview();
-
-            //Remove one machine from the inventory
-            InventoryController.Instance.DecreaseMachineToPlayerInventory(machine, 1);
-            //Check if we don"t have any left of this machine in player inventory 
-            if (InventoryController.Instance.PlayerMachinesDictionary[machine] == 0)
-            {
-                DeletePreview();
-            }
-        }
-
-        private void TryBindConnectedPort(Port port, Vector2Int neighbourPosition)
-        {
-	        if (_grid.TryGetCellByCoordinates(neighbourPosition.x , neighbourPosition.y, out Cell neighbourCell))
-	        {
-		        if (neighbourCell.ContainsNode)
-		        {
-			        foreach (var potentialPort in neighbourCell.Node.Ports)
-			        {
-				        if (potentialPort.Side == port.Side.Opposite())
-				        {
-					        port.SetConnectedPort(potentialPort);
-				        }
-			        }
-		        }
-	        }
-        }
-        
-        private void RemoveMachineFromGrid()
-        {
-            if(_currentMachinePreview)
-            {
-				DeletePreview();
                 return;
+            }
+
+			// Try to get the position on the grid.
+			if (!UtilsClass.ScreenToWorldPositionIgnoringUI(Input.mousePosition, _camera, out Vector3 worldMousePosition))
+			{
+				return;
 			}
-        }
+
+			// Try getting the cell
+			if (!_grid.TryGetCellByPosition(worldMousePosition, out Cell chosenCell))
+			{
+				return;
+			}
+
+            AddConsumableToGrid(_currentConsumablePreview.Template, chosenCell);
+		}
+
+		private void AddConsumableToGrid(ConsumableTemplate template, Cell chosenCell)
+		{
+			_currentConsumablePreview.ConfirmPlacement(chosenCell);
+
+			//Remove one machine from the inventory
+			InventoryController.Instance.RemoveConsumableFromPlayerInventory(template);
+			DeletePreview();
+		}        
         
         // ------------------------------------------------------------------------- GRID METHODS -------------------------------------------------------------------------
         [PropertySpace ,Button(ButtonSizes.Medium)]

@@ -32,7 +32,7 @@ namespace Components.Relics
 		{
 			_view = Instantiate(relicTemplate.GridView, _3dViewHolder);
 			_relic = new Relic(relicTemplate, this);
-			_view.transform.localScale = new Vector3(scale, scale, scale);
+			_view.transform.localScale = new Vector3(scale, _view.transform.localScale.y, scale);
 			_template = relicTemplate;
 		}
 
