@@ -1,5 +1,6 @@
 using Components.Grid;
 using Components.Interactions.Clickable;
+using Components.Relics.Behavior;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -25,7 +26,7 @@ namespace Components.Relics
 		private int _mapWidth;
 		private int _mapHeight;
 		private Grid.Grid _grid;
-
+		List<Cell> _zone;
 
 		// ------------------------------------------------------------------------- INIT -------------------------------------------------------------------------
 		public void InstantiatePreview(RelicTemplate relicTemplate, float scale)
@@ -48,6 +49,13 @@ namespace Components.Relics
 			_initialized = true;
 
 			_relic.OnTick += Tick;
+
+			foreach(RelicBehavior relic in _relic.Template.RelicBehaviors)
+			{
+				relic.ApplyEffect();
+				relic.ApplyEffect(_zone);
+
+			}
 
 		}
 
@@ -104,10 +112,10 @@ namespace Components.Relics
 				return;
 			}
 
-			List<Cell> zone = GetZone(_chosenCell, _radius, _mapWidth, _mapHeight, _grid);
+			_zone = GetZone(_chosenCell, _radius, _mapWidth, _mapHeight, _grid);
 			Gizmos.color = Color.red;
 
-			foreach (Cell cell in zone)
+			foreach (Cell cell in _zone)
 			{
 				Vector3 cellPosition = new Vector3(cell.X + cell.Size / 2, 0 , cell.Y + cell.Size / 2);
 				Gizmos.DrawCube(cellPosition, new Vector3(1,0.1f,1));; // Draw a cube for each cell in the zone

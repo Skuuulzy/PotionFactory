@@ -1,3 +1,4 @@
+using Components.Relics.Behavior;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,6 +13,7 @@ public class RelicTemplate : ScriptableObject
 	[SerializeField] private Sprite _uiView;
 	[SerializeField] private float _spawnProbability = 0.25f;
 	[SerializeField] private int _effectZoneRadius = 5;
+	[SerializeField] private List<RelicBehavior> _relicBehaviors;
 
 	public string RelicName => _relicName;
 	public int ShopPrice => _shopPrice;	
@@ -19,4 +21,5 @@ public class RelicTemplate : ScriptableObject
 	public Sprite UIView => _uiView;
 	public float SpawnProbability => _spawnProbability;
 	public int EffectZoneRadius => _effectZoneRadius;
+	public List<RelicBehavior> RelicBehaviors => _relicBehaviors;
 }

@@ -22,5 +22,10 @@ namespace Components.Machines.Behaviors
         {
             return Instantiate(this);
         }
+
+        public void ChangeProcessTime(float percentage)
+        {
+            _processTime += Mathf.RoundToInt( _processTime * percentage);
+        }
     }
 }
