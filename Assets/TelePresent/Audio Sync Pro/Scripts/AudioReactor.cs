@@ -1,0 +1,339 @@
+/*******************************************************
+Product - Audio Sync Pro
+  Publisher - TelePresent Games
+              http://TelePresentGames.dk
+  Author    - Martin Hansen
+  Created   - 2024
+  (c) 2024 Martin Hansen. All rights reserved.
+/*******************************************************/
+
+using UnityEngine;
+using System.Collections.Generic;
+using UnityEditor;
+
+namespace TelePresent.AudioSyncPro
+{
+    [ExecuteInEditMode]
+    public class AudioReactor : MonoBehaviour
+    {
+        public AudioSourcePlus audioSourcePlus;
+        public Transform targetTransform;
+        [SerializeField]
+        public List<MonoBehaviour> reactionComponents;
+        [SerializeField]
+        private List<ASP_IAudioReaction> reactions;
+        private Vector3 initialPosition;
+        private Vector3 initialScale;
+        private Quaternion initialRotation;
+        private bool firstInitializationCompleted = false;
+        private Transform tempTransform;
+        private bool canUpdate = false;
+#if UNITY_EDITOR
+        private bool isEditorUpdateSubscribed = false;
+#endif
+        private bool isReactionsInitialized = false;
+
+        private HashSet<MonoBehaviour> destroyedReactions = new HashSet<MonoBehaviour>();
+        private float[] audioSamples;
+        private float[] spectrumData;
+        private float rmsValue;
+        private float averageSpectrumValue;
+
+        private void Awake()
+        {
+            if (targetTransform == null)
+            {
+                targetTransform = this.transform;
+                if (audioSourcePlus == null)
+                {
+                    AudioSourcePlus[] audioSourcePluses = FindObjectsByType<AudioSourcePlus>(FindObjectsSortMode.None);
+                    if (audioSourcePluses.Length == 1)
+                    {
+                        audioSourcePlus = audioSourcePluses[0];
+                    }
+                }
+            }
+            InitializeAudioDataArray();
+            SubscribeToAudioEvents();
+        }
+
+        private void OnValidate()
+        {
+            if (Time.frameCount == 0) return;
+
+            SubscribeToAudioEvents();
+            ReinitializeReactionsIfTransformChanged();
+            CheckForExternalReactionComponents();
+        }
+
+        private void OnEnable()
+        {
+            if (Time.frameCount == 0) return;
+            SubscribeToAudioEvents();
+            ReinitializeReactionsIfTransformChanged();
+            CheckForExternalReactionComponents();
+            if (audioSourcePlus != null)
+            {
+                if (audioSourcePlus?.isPlaying == true && audioSourcePlus.reactorsShouldListen)
+                {
+                    OnAudioStarted();
+                }
+            }
+        }
+
+        private void CheckForExternalReactionComponents()
+        {
+            if (reactionComponents != null && reactionComponents.Count > 0)
+            {
+                List<MonoBehaviour> externalComponents = new List<MonoBehaviour>();
+
+                foreach (var component in reactionComponents)
+                {
+                    if (component != null && component.gameObject != this.gameObject)
+                    {
+                        externalComponents.Add(component);
+                    }
+                }
+
+                if (externalComponents.Count > 0)
+                {
+                    foreach (var externalComponent in externalComponents)
+                    {
+                        var newComponent = (MonoBehaviour)this.gameObject.AddComponent(externalComponent.GetType());
+                        reactionComponents.Add(newComponent);
+                        reactionComponents.Remove(externalComponent);
+                    }
+                }
+            }
+        }
+
+        private void OnDisable()
+        {
+            UnsubscribeFromAudioEvents();
+            UnsubscribeFromEditorUpdate();
+        }
+
+        private void OnDestroy()
+        {
+            if (Time.frameCount == 0) return;
+            UnsubscribeFromAudioEvents();
+            ClearReactions();
+        }
+
+        public void InitializeNewReaction(ASP_IAudioReaction reaction)
+        {
+            if (reactions == null)
+            {
+                reactions = new List<ASP_IAudioReaction>();
+            }
+            reactions.Add(reaction);
+            reaction.Initialize(initialPosition, initialScale, initialRotation);
+        }
+
+        private void InitializeReactions()
+        {
+            if (this == null || targetTransform == null || reactionComponents == null) return;
+
+            reactions = reactionComponents.ConvertAll(x => x as ASP_IAudioReaction);
+            if (reactions == null) return;
+
+            initialPosition = targetTransform.localPosition;
+            initialScale = targetTransform.localScale;
+            initialRotation = targetTransform.localRotation;
+
+            foreach (var reaction in reactions)
+            {
+                reaction?.Initialize(initialPosition, initialScale, initialRotation);
+            }
+        }
+
+        private void OnAudioStarted()
+        {
+            if (this == null || audioSourcePlus == null) return;
+
+            InitializeReactions();
+            InitializeReactionsOnPlay();
+            canUpdate = true;
+            SubscribeToEditorUpdate();
+        }
+
+        private void OnAudioStopped()
+        {
+            canUpdate = false;
+            ResetReactionsToOriginalState();
+            UnsubscribeFromEditorUpdate();
+        }
+
+        private void LateUpdate()
+        {
+            if (canUpdate && Application.isPlaying && audioSourcePlus.reactorsShouldListen)
+            {
+                ReactToAudio();
+            }
+        }
+
+#if UNITY_EDITOR
+        private void EditorUpdate()
+        {
+            if (canUpdate && !Application.isPlaying && audioSourcePlus?.isPlaying == true && audioSourcePlus.reactorsShouldListen)
+            {
+                ReactToAudio();
+            }
+        }
+
+        private void OnPlayModeStateChanged(PlayModeStateChange state)
+        {
+            if (state == PlayModeStateChange.EnteredPlayMode)
+            {
+                ResetReactionsToOriginalState();
+            }
+        }
+#endif
+
+        public void ResetValueFromReactor(ASP_IAudioReaction reactor)
+        {
+            reactions?.Remove(reactor);
+            reactor.ResetToOriginalState(targetTransform);
+        }
+
+        private void InitializeAudioDataArray()
+        {
+            if (audioSourcePlus?.audioSource?.clip != null)
+            {
+                int sampleCount = Mathf.Min(256, audioSourcePlus.audioSource.clip.samples);
+                audioSamples = new float[sampleCount];
+                spectrumData = new float[1024];
+            }
+            else
+            {
+                audioSamples = new float[256];
+                spectrumData = new float[1024];
+            }
+        }
+
+        private void SubscribeToAudioEvents()
+        {
+            if (audioSourcePlus == null) return;
+
+            audioSourcePlus.OnAudioStarted += OnAudioStarted;
+            audioSourcePlus.OnAudioStopped += OnAudioStopped;
+        }
+
+        private void UnsubscribeFromAudioEvents()
+        {
+            if (audioSourcePlus == null) return;
+
+            audioSourcePlus.OnAudioStarted -= OnAudioStarted;
+            audioSourcePlus.OnAudioStopped -= OnAudioStopped;
+        }
+
+        private void SubscribeToEditorUpdate()
+        {
+#if UNITY_EDITOR
+            if (!isEditorUpdateSubscribed)
+            {
+                EditorApplication.update += EditorUpdate;
+                isEditorUpdateSubscribed = true;
+            }
+#endif
+        }
+
+        private void UnsubscribeFromEditorUpdate()
+        {
+#if UNITY_EDITOR
+            if (isEditorUpdateSubscribed)
+            {
+                EditorApplication.update -= EditorUpdate;
+                isEditorUpdateSubscribed = false;
+            }
+#endif
+        }
+
+        private void InitializeReactionsOnPlay()
+        {
+            if (!firstInitializationCompleted && targetTransform != null && audioSourcePlus?.isPlaying == true)
+            {
+                if (!isReactionsInitialized)
+                {
+                    isReactionsInitialized = true;
+                    OnAudioStarted();
+                    InitializeReactions();
+                    firstInitializationCompleted = true;
+                }
+            }
+        }
+
+        private void ReinitializeReactionsIfTransformChanged()
+        {
+            if (targetTransform != tempTransform)
+            {
+                InitializeReactions();
+            }
+            tempTransform = targetTransform;
+        }
+
+        private void ClearReactions()
+        {
+            if (!Application.isPlaying && reactions != null)
+            {
+                foreach (var reaction in reactions)
+                {
+                    var monoBehaviour = reaction as MonoBehaviour;
+                    if (monoBehaviour != null && monoBehaviour.gameObject != null && monoBehaviour.gameObject.activeInHierarchy && !destroyedReactions.Contains(monoBehaviour))
+                    {
+                        destroyedReactions.Add(monoBehaviour);
+
+#if UNITY_EDITOR
+                        DestroyImmediate(monoBehaviour, true);
+#else
+                        Destroy(monoBehaviour);
+#endif
+                    }
+                }
+                reactions.Clear();
+                reactions = null;
+                destroyedReactions.Clear();
+            }
+        }
+
+        private void ResetReactionsToOriginalState()
+        {
+            if (reactions == null || targetTransform == null) return;
+
+            foreach (var reaction in reactions)
+            {
+                reaction?.ResetToOriginalState(targetTransform);
+            }
+        }
+
+        private void ReactToAudio()
+        {
+            if (reactions == null) return;
+
+            foreach (var reaction in reactions)
+            {
+                if (reaction != null)
+                {
+                    if (!reaction.IsActive) continue;
+                    reaction?.React(audioSourcePlus, targetTransform, audioSourcePlus.rmsValue, audioSourcePlus.spectrumData);
+                }
+            }
+        }
+
+        public void ToggleAllAudioReactions(bool isActive)
+        {
+            if (reactions == null) return;
+
+            foreach (var reaction in reactions)
+            {
+                var monoBehaviour = reaction as MonoBehaviour;
+
+                var audioReaction = reaction as ASP_IAudioReaction;
+                if (audioReaction != null)
+                {
+                    audioReaction.IsActive = isActive;
+                }
+            }
+        }
+    }
+}
