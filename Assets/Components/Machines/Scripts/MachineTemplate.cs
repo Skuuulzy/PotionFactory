@@ -18,9 +18,12 @@ namespace Components.Machines
 
         [Header("Structure")] 
         [SerializeField] private List<Node> _nodes;
-
-        [Header("Parameters")] 
+        
+        [Header("Process")]
         [SerializeField] private int _maxItemCount = -1;
+        [SerializeField] private int _processTime;
+        
+        [Header("Shop")]
         [SerializeField] private float _shopSpawnProbability;
         [SerializeField] private int _shopPrice = 200;
         [SerializeField] private bool _cannotBeSell;
@@ -38,6 +41,8 @@ namespace Components.Machines
         public List<Node> Nodes => GetNodeInstance();
 
         public int MaxItemCount => _maxItemCount;
+        public int ProcessTime => _processTime;
+
         public float ShopSpawnProbability => _shopSpawnProbability;
         public int ShopPrice => _shopPrice;
         public int SellPrice => _sellPrice;

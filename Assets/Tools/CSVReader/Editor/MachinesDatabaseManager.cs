@@ -8,7 +8,7 @@ namespace VComponent.Tools.CSVReader
     {
         public static MachineTemplate GetMachine(string name)
         {
-            return AssetDatabase.LoadAssetAtPath<MachineTemplate>(MachinePath(name));
+            return ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>(name);
         }
         
         private static string MachinePath(string machineName)

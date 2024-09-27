@@ -64,7 +64,7 @@ namespace VComponent.Tools.CSVReader
 
         public static IngredientTemplate GetIngredient(string name)
         {
-            return AssetDatabase.LoadAssetAtPath<IngredientTemplate>(IngredientPath(name));
+            return ScriptableObjectDatabase.GetScriptableObject<IngredientTemplate>(name);
         }
         
         private static string IngredientPath(string ingredientName)
