@@ -252,7 +252,7 @@ namespace Components.Grid
 				}
 			}
 			
-			AddMachineToGrid(MachineManager.Instance.SelectedMachine, chosenCell);
+			AddMachineToGrid(MachineManager.Instance.SelectedMachine, chosenCell, true);
         }
 
         private void AddSelectedRelicToGrid()
@@ -301,7 +301,7 @@ namespace Components.Grid
 
         }
         
-        private void AddMachineToGrid(MachineTemplate machine, Cell originCell)
+        private void AddMachineToGrid(MachineTemplate machine, Cell originCell, bool fetchFromInventory)
         {
             _instancedObjects.Add(_currentMachinePreview);
 
@@ -348,10 +348,16 @@ namespace Components.Grid
 
             InstantiateNewPreview();
 
+            if (!fetchFromInventory)
+            {
+	            return;
+            }
+            
             //Remove one machine from the inventory
             InventoryController.Instance.DecreaseMachineToPlayerInventory(machine, 1);
+            
             //Check if we don"t have any left of this machine in player inventory 
-            if (InventoryController.Instance.PlayerMachinesDictionary[machine] == 0)
+            if (InventoryController.Instance.CountMachineOfType(machine) == 0)
             {
                 DeletePreview();
             }
@@ -530,7 +536,7 @@ namespace Components.Grid
 			            _currentMachinePreview.RotatePreview(180);
 		            }
 		            
-		            AddMachineToGrid(extractorTemplate, chosenCell);
+		            AddMachineToGrid(extractorTemplate, chosenCell, false);
 
 		            if (chosenCell.Node.Machine.Behavior is ExtractorMachineBehaviour extractorMachineBehaviour)
 		            {
