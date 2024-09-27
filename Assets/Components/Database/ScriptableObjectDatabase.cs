@@ -25,6 +25,8 @@ namespace Database
             LoadAllScriptableObjects<IngredientTemplate>();
             LoadAllScriptableObjects<RecipeTemplate>();
             LoadAllScriptableObjects<MachineTemplate>();
+            LoadAllScriptableObjects<ConsumableTemplate>();
+            LoadAllScriptableObjects<RelicTemplate>();
         }
 
         private static void LoadAllScriptableObjects<T>() where T : ScriptableObject
@@ -110,7 +112,7 @@ namespace Database
             }
 
             // If no recipe was found, return the default.
-            recipe = GetScriptableObject<RecipeTemplate>("DEFAULT");
+            recipe = null;
             return false;
         }
     }

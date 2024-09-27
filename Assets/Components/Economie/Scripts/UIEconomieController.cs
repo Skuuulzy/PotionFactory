@@ -22,5 +22,10 @@ namespace Components.Economy
 		{
             _playerMoneyText.text = $"{playerMoney}";
 		}
+
+		public void DebugAddMoney()
+		{
+			EconomyController.Instance.AddMoney(1000);
+		}
     }
 }

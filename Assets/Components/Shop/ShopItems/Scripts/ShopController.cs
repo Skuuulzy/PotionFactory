@@ -3,6 +3,7 @@ using Components.Shop.ShopItems;
 using Database;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace Components.Shop
@@ -11,9 +12,8 @@ namespace Components.Shop
 	{
 		[SerializeField] private int _numberOfMachineItemInShop = 5;
 		[SerializeField] private int _numberOfConsumableItemInShop = 3;
-		[SerializeField] private int _numberOfRelicItemInShop = 1;
+		[SerializeField] private int _numberOfRelicItemInShop = 2;
 
-		private List<ShopItem> _allShopItemList;
 
 		public static Action<List<ShopItem>> OnShopGenerated;
 
@@ -29,41 +29,84 @@ namespace Components.Shop
 		
 		private void GenerateShop(ShopState state)
 		{
+			List<ShopItem> shopItemListToGenerate = new List<ShopItem>();
+			shopItemListToGenerate.AddRange(GenerateMachinesInShop());
+			shopItemListToGenerate.AddRange(GenerateConsumablesInShop());
+			shopItemListToGenerate.AddRange(GenerateRelicsInShop());
+			//ShopIsGenerated
+			OnShopGenerated?.Invoke(shopItemListToGenerate);
+		}
+		
+		private List<ShopItem> GenerateMachinesInShop()
+		{
 			//Generate allItemList to select random items from it and the shopItemList to generate in shop
-			_allShopItemList = new List<ShopItem>();
+			List<ShopItem> allMachineShopItemList = new List<ShopItem>();
 			List<ShopItem> shopItemListToGenerate = new List<ShopItem>();
 
 			//Get all existing machines
-			List <MachineTemplate> allMachinesTemplate = ScriptableObjectDatabase.GetAllScriptableObjectOfType<MachineTemplate>();
+			List<MachineTemplate> allMachinesTemplate = ScriptableObjectDatabase.GetAllScriptableObjectOfType<MachineTemplate>();
 
 			//Get the classic convoyer machine to add it to the shopItemList 
 			MachineTemplate convoyer = allMachinesTemplate.Find(x => x.Name == "Conveyor");
 			ShopItem conveyorShopItem = new ShopItem(convoyer, -1);
 			shopItemListToGenerate.Add(conveyorShopItem);
-			
+
 			//Remove it to not selection it for the shop
 			allMachinesTemplate.Remove(convoyer);
 
 			for (int i = 0; i < allMachinesTemplate.Count; i++)
 			{
 				ShopItem shopItem = new ShopItem(allMachinesTemplate[i]);
-				_allShopItemList.Add(shopItem);
+				allMachineShopItemList.Add(shopItem);
 			}
 
 			//Generate random list of shop items
-			shopItemListToGenerate.AddRange(GetRandomItemList(_numberOfMachineItemInShop));
+			shopItemListToGenerate.AddRange(GetRandomItemList(_numberOfMachineItemInShop, allMachineShopItemList));
 
-			//ShopIsGenerated
-			OnShopGenerated?.Invoke(shopItemListToGenerate);
+			return shopItemListToGenerate;
+		}
+
+		private List<ShopItem> GenerateConsumablesInShop()
+		{
+			List<ShopItem> allConsumableShopItemList = new List<ShopItem>();
+			List<ShopItem> shopItemListToGenerate = new List<ShopItem>();
+			List<ConsumableTemplate> allConsumableTemplate = ScriptableObjectDatabase.GetAllScriptableObjectOfType<ConsumableTemplate>();
+
+			for (int i = 0; i < allConsumableTemplate.Count; i++)
+			{
+				ShopItem shopItem = new ShopItem(allConsumableTemplate[i]);
+				allConsumableShopItemList.Add(shopItem);
+			}
+			//Generate random list of shop items
+			shopItemListToGenerate.AddRange(GetRandomItemList(_numberOfConsumableItemInShop, allConsumableShopItemList));
+			return shopItemListToGenerate;
+		}
+
+		private List<ShopItem> GenerateRelicsInShop()
+		{
+			List<ShopItem> allRelicShopItemList = new List<ShopItem>();
+			List<ShopItem> shopItemListToGenerate = new List<ShopItem>();
+			List<RelicTemplate> allRelicTemplate = ScriptableObjectDatabase.GetAllScriptableObjectOfType<RelicTemplate>();
+
+			for (int i = 0; i < allRelicTemplate.Count; i++)
+			{
+				ShopItem shopItem = new ShopItem(allRelicTemplate[i]);
+				allRelicShopItemList.Add(shopItem);
+			}
+
+			//Generate random list of shop items
+			shopItemListToGenerate.AddRange(GetRandomItemList(_numberOfRelicItemInShop, allRelicShopItemList));
+
+			return shopItemListToGenerate;
 		}
 
 		/// <summary>
 		/// Selects a random item from the list based on spawn probability.
 		/// </summary>
-		public List<ShopItem> GetRandomItemList(int count)
+		public List<ShopItem> GetRandomItemList(int count, List<ShopItem> itemList)
 		{
 			// Make a copy of the items list to avoid modifying the original
-			List<ShopItem> availableItems = new List<ShopItem>(_allShopItemList);
+			List<ShopItem> availableItems = itemList;
 			List<ShopItem> selectedItems = new List<ShopItem>();
 
 
@@ -105,7 +148,7 @@ namespace Components.Shop
 			float total = 0;
 			foreach (ShopItem item in availableItems)
 			{
-				total += item.MachineTemplate.ShopSpawnProbability;
+				total += item.SpawnProbability;
 			}
 			return total;
 		}
@@ -122,7 +165,7 @@ namespace Components.Shop
 
 			foreach (ShopItem item in availableItems)
 			{
-				cumulativeWeight += item.MachineTemplate.ShopSpawnProbability;
+				cumulativeWeight += item.SpawnProbability;
 				if (randomValue <= cumulativeWeight)
 				{
 					return item;
