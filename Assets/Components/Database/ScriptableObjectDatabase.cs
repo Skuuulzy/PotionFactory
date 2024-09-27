@@ -25,6 +25,8 @@ namespace Database
             LoadAllScriptableObjects<IngredientTemplate>();
             LoadAllScriptableObjects<RecipeTemplate>();
             LoadAllScriptableObjects<MachineTemplate>();
+            LoadAllScriptableObjects<ConsumableTemplate>();
+            LoadAllScriptableObjects<RelicTemplate>();
         }
 
         private static void LoadAllScriptableObjects<T>() where T : ScriptableObject

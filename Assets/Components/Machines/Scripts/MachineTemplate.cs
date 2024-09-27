@@ -23,6 +23,7 @@ namespace Components.Machines
         [SerializeField] private int _maxItemCount = -1;
         [SerializeField] private float _shopSpawnProbability;
         [SerializeField] private int _shopPrice = 200;
+        [SerializeField] private bool _cannotBeSell;
         [SerializeField] private int _sellPrice = 100;
 
         [Header("Contextual View")] 
@@ -40,6 +41,7 @@ namespace Components.Machines
         public float ShopSpawnProbability => _shopSpawnProbability;
         public int ShopPrice => _shopPrice;
         public int SellPrice => _sellPrice;
+        public bool CannotBeSell => _cannotBeSell;
 
         public List<UIContextualComponent> ContextualComponents => _contextualComponents;
 

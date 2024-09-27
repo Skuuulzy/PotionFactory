@@ -6,10 +6,11 @@ namespace Components.Grid.Tile
     public class AllTilesController : ScriptableObject
     {
         [SerializeField] private List<TileController> _groundTilesList;
-        private TileController _groundTile;
         [SerializeField] private TileController _waterTile;
         [SerializeField] private float _waterTileGenerationProbability;
 
+        private TileController _groundTile;
+        
         public TileController GenerateTile(Cell cell, Grid grid, Transform groundHolder, float cellSize)
         {
             if (!(Random.value <= _waterTileGenerationProbability))
@@ -17,9 +18,9 @@ namespace Components.Grid.Tile
                 TileController tile = Instantiate(_groundTile, groundHolder);
                 tile.transform.position = grid.GetWorldPosition(cell.X, cell.Y) + new Vector3(cellSize / 2, 0, cellSize / 2);
                 tile.transform.localScale = new Vector3(cellSize, cellSize, cellSize);
-                tile.name = $"Tile ({tile})";
                 tile.SetTileType(_groundTile.TileType);
                 cell.AddTileToCell(tile);
+                tile.name = $"Tile ({tile.TileType})";
                 return tile;
             }
             else
@@ -27,9 +28,9 @@ namespace Components.Grid.Tile
                 TileController tile = Instantiate(_waterTile, groundHolder);
                 tile.transform.position = grid.GetWorldPosition(cell.X, cell.Y) + new Vector3(cellSize / 2, 0, cellSize / 2);
                 tile.transform.localScale = new Vector3(cellSize, cellSize, cellSize);
-                tile.name = $"Tile ({tile})";
                 tile.SetTileType(TileType.WATER);
 				cell.AddTileToCell(tile);
+                tile.name = $"Tile ({tile.TileType})";
                 return tile;
             }
 

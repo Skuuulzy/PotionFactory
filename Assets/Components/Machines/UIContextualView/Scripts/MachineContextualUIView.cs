@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Components.Machines.UIView
 {
@@ -12,6 +13,7 @@ namespace Components.Machines.UIView
         [SerializeField] private TMP_Text _machineName;
         [SerializeField] private TMP_Text _heldIngredients;
         [SerializeField] private TMP_Text _sellPriceTxt;
+        [SerializeField] private Button _sellButton;
         [SerializeField] private Transform _componentsHolder;
         
         public static Action<Machine, int> OnSellMachine;
@@ -27,7 +29,16 @@ namespace Components.Machines.UIView
             string cleanMachineName = machine.Controller.name.Replace("_", " ");
             _machineName.text = cleanMachineName;
 
-            _sellPriceTxt.text = $"Sell ({machine.Template.SellPrice})";
+            if (machine.Template.CannotBeSell)
+            {
+                _sellButton.interactable = false;
+                _sellPriceTxt.text = $"Cannot be sell";
+            }
+            else
+            {
+                _sellButton.interactable = true;
+                _sellPriceTxt.text = $"Sell ({machine.Template.SellPrice})";
+            }
 
             HandleItemAdded(false);
             _associatedMachine.OnItemAdded += HandleItemAdded;

@@ -8,7 +8,11 @@ namespace Components.Shop.UI
 	{
 		[SerializeField] private GameObject _shopUIView;
 		[SerializeField] private UIMachineShopItemViewController _machineShopUIViewController;
+		[SerializeField] private UIConsumableShopItemViewController _consumableShopUIViewController;
+		[SerializeField] private UIRelicShopItemViewController _relicShopUIViewController;
 		[SerializeField] private Transform _machineShopUIParent;
+		[SerializeField] private Transform _consumableShopUIParent;
+		[SerializeField] private Transform _relicShopUIParent;
 
 		void Start()
 		{
@@ -31,6 +35,16 @@ namespace Components.Shop.UI
 				Destroy(child.gameObject);
 			}
 
+			foreach (Transform child in _consumableShopUIParent)
+			{
+				Destroy(child.gameObject);
+			}
+
+			foreach (Transform child in _relicShopUIParent)
+			{
+				Destroy(child.gameObject);
+			}
+
 			_shopUIView.SetActive(true);
 
 			//Instantiate all shop items
@@ -39,8 +53,18 @@ namespace Components.Shop.UI
 				//Check if the shopItem contains a machine
 				if (shopItem.MachineTemplate != null)
 				{
-					UIMachineShopItemViewController machineShopUIViewController = Instantiate(_machineShopUIViewController, _machineShopUIParent);
-					machineShopUIViewController.Init(shopItem);
+					UIMachineShopItemViewController UIMachineShopItemViewController = Instantiate(_machineShopUIViewController, _machineShopUIParent);
+					UIMachineShopItemViewController.Init(shopItem);
+				}
+				else if(shopItem.ConsumableTemplate != null)
+				{
+					UIShopItemViewController UIShopItemViewController = Instantiate(_consumableShopUIViewController, _consumableShopUIParent);
+					UIShopItemViewController.Init(shopItem);
+				}
+				else if(shopItem.RelicTemplate != null)
+				{
+					UIRelicShopItemViewController UIRelicShopItemViewController = Instantiate(_relicShopUIViewController, _relicShopUIParent);
+					UIRelicShopItemViewController.Init(shopItem);
 				}
 			}
 		}
