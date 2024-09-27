@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using Components.Items;
+using Components.Ingredients;
 using Components.Machines.Behaviors;
 using Components.Tick;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Components.Machines
@@ -11,9 +12,9 @@ namespace Components.Machines
     public class Machine : ITickable
     {
         // ----------------------------------------------------------------------- PRIVATE FIELDS -------------------------------------------------------------------------
-        [SerializeField] private List<ItemTemplate> _items;
+        [SerializeField] private List<IngredientTemplate> _ingredients;
         [SerializeField] private List<Node> _nodes;
-        [SerializeField] private MachineController _controller;
+        [SerializeField, ReadOnly] private MachineController _controller;
         [SerializeField] private MachineBehavior _behavior;
         
         private readonly MachineTemplate _template;
@@ -22,11 +23,12 @@ namespace Components.Machines
         public MachineTemplate Template => _template;
         public MachineController Controller => _controller;
         public MachineBehavior Behavior => _behavior;
-        public List<ItemTemplate> Items => _items;
+        public List<IngredientTemplate> Ingredients => _ingredients;
         public virtual List<Node> Nodes => _nodes;
         
         // ------------------------------------------------------------------------- ACTIONS -------------------------------------------------------------------------
         public Action OnTick;
+        public Action OnPropagateTick;
         public Action<bool> OnItemAdded;
         
         // --------------------------------------------------------------------- INITIALISATION -------------------------------------------------------------------------
@@ -38,7 +40,7 @@ namespace Components.Machines
 
             UpdateNodesRotation(0);
             
-            _items = new List<ItemTemplate>();
+            _ingredients = new List<IngredientTemplate>();
         }
 
         public void UpdateNodesRotation(int rotation)
@@ -60,8 +62,10 @@ namespace Components.Machines
             }
         }
         
-        public bool TryGetOutMachine(out Machine connectedMachine)
+        public bool TryGetOutMachines(out List<Machine> connectedMachines)
         {
+            connectedMachines = new List<Machine>();
+            
             foreach (var node in Nodes)
             {
                 foreach (var port in node.Ports)
@@ -70,19 +74,30 @@ namespace Components.Machines
                     {
                         continue;
                     }
+
+                    if (port.ConnectedPort.Node.Machine.Controller == null)
+                    {
+                        continue;
+                    }
                     
                     // Get the other machine by the connected port.
-                    connectedMachine = port.ConnectedPort.Node.Machine;
-                    return true;
+                    connectedMachines.Add(port.ConnectedPort.Node.Machine);
                 }
             }
 
-            connectedMachine = null;
+            if (connectedMachines.Count > 0)
+            {
+                return true;
+            }
+
+            connectedMachines = null;
             return false;
         }
         
-        public bool TryGetInMachine(out Machine connectedMachine)
+        public bool TryGetInMachine(out List<Machine> connectedMachines)
         {
+            connectedMachines = new List<Machine>();
+            
             foreach (var node in Nodes)
             {
                 foreach (var port in node.Ports)
@@ -92,13 +107,22 @@ namespace Components.Machines
                         continue;
                     }
                     
+                    if (port.ConnectedPort.Node.Machine.Controller == null)
+                    {
+                        continue;
+                    }
+                    
                     // Get the other machine by the connected port.
-                    connectedMachine = port.ConnectedPort.Node.Machine;
-                    return true;
+                    connectedMachines.Add(port.ConnectedPort.Node.Machine);
                 }
             }
+            
+            if (connectedMachines.Count > 0)
+            {
+                return true;
+            }
 
-            connectedMachine = null;
+            connectedMachines = null;
             return false;
         }
 
@@ -108,32 +132,38 @@ namespace Components.Machines
             OnItemAdded?.Invoke(true);
         }
         
-        public bool TryGiveItemItem(ItemTemplate item)
+        public bool TryGiveItemItem(IngredientTemplate ingredient)
         {
-            // There is already too many items in the machine
-            if (Template.MaxItemCount != -1 && Items.Count >= Template.MaxItemCount)
+            if (Template.MaxItemCount != -1 && Ingredients.Count >= Template.MaxItemCount)
+            {
                 return false;
+            }
             
-            Items.Add(item);
+            if (Behavior.ProcessingRecipe)
+            {
+                return false;
+            }
+            
+            Ingredients.Add(ingredient);
             OnItemAdded?.Invoke(true);
             return true;
         }
 
         public void RemoveAllItems()
         {
-            Items.Clear();
+            Ingredients.Clear();
             OnItemAdded?.Invoke(false);
         }
 
         public void RemoveItem(int index)
         {
-            Items.RemoveAt(index);
+            Ingredients.RemoveAt(index);
             OnItemAdded?.Invoke(false);
         }
         
         public void ClearItems()
         {
-            Items.Clear();
+            Ingredients.Clear();
             OnItemAdded?.Invoke(false);
         }
 
@@ -141,6 +171,11 @@ namespace Components.Machines
         public void Tick()
         {
             OnTick?.Invoke();
+        }
+        
+        public void PropagateTick()
+        {
+            OnPropagateTick?.Invoke();
         }
         
         // ------------------------------------------------------------------- PORTS & ROTATIONS -------------------------------------------------------------------------

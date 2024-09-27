@@ -1,4 +1,6 @@
-using Components.Items;
+using System.Collections.Generic;
+using Components.Ingredients;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Components.Machines.Behaviors
@@ -6,15 +8,23 @@ namespace Components.Machines.Behaviors
     [CreateAssetMenu(fileName = "New Machine Behaviour", menuName = "Machines/Behavior/Extractor")]
     public class ExtractorMachineBehaviour : MachineBehavior
     {
-        [SerializeField] private ItemTemplate _itemTemplate;
-        
-		public void Init(ItemTemplate itemTemplate)
+        [ShowInInspector, ReadOnly] private IngredientTemplate _ingredientTemplate;
+        [ShowInInspector, ReadOnly] private string _outMachineName;
+
+        public IngredientTemplate IngredientTemplate => _ingredientTemplate;
+
+        public void Init(IngredientTemplate ingredientTemplate)
 		{
-            _itemTemplate = itemTemplate;
+            _ingredientTemplate = ingredientTemplate;
 		}
         
 		public override void Process(Machine machine)
         {
+            if (!_ingredientTemplate)
+            {
+                return;
+            }
+            
             CurrentTick++;
 
             if (!CanProcess(CurrentTick))
@@ -22,9 +32,16 @@ namespace Components.Machines.Behaviors
                 return;
             }
             
-            if (machine.TryGetOutMachine(out Machine outMachine))
+            if (machine.TryGetOutMachines(out List<Machine> outMachines))
             {
-                outMachine.TryGiveItemItem(_itemTemplate);
+                var outMachine = outMachines[0];
+                
+                _outMachineName = outMachine.Controller.name;
+                outMachine.TryGiveItemItem(_ingredientTemplate);
+            }
+            else
+            {
+                _outMachineName = "None";
             }
         }
     }

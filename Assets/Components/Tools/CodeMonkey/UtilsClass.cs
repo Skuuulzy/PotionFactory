@@ -112,6 +112,7 @@ namespace CodeMonkey.Utils
             textMesh.alignment = textAlignment;
             textMesh.text = text;
             textMesh.fontSize = fontSize;
+            textMesh.characterSize = 0.2f;
             textMesh.color = color;
             textMesh.GetComponent<MeshRenderer>().sortingOrder = sortingOrder;
             return textMesh;

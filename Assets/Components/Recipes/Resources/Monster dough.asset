@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9cd67c4c33928f34894964bb28cabb66, type: 3}
+  m_Name: Monster dough
+  m_EditorClassIdentifier: 
+  _machine: {fileID: 11400000, guid: 2e90757fd7d3d10459a62e29b5335f12, type: 2}
+  _ingredients:
+    m_Dictionnary:
+    - m_key: {fileID: 11400000, guid: 6b25e702a8cd7704a891a0d6de7c66c8, type: 2}
+      m_value: 2
+    - m_key: {fileID: 11400000, guid: e66f728e9e2c0bc43a68023c78555949, type: 2}
+      m_value: 4
+    - m_key: {fileID: 11400000, guid: 6c656645dfc0a824a9ebb5d75266980d, type: 2}
+      m_value: 5
+  _outIngredient: {fileID: 11400000, guid: d8fd0a1f12e17ae498fd027faf6d3bf8, type: 2}

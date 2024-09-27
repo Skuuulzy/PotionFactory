@@ -39,7 +39,7 @@ namespace VComponent.Tools.Timer
             OnTimerStop.Invoke();
         }
 
-        public void Resume() => IsRunning = true;
+		public void Resume() => IsRunning = true;
         public void Pause() => IsRunning = false;
         public abstract void Tick(float deltaTime);
     }
