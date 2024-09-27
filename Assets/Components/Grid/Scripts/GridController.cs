@@ -63,7 +63,7 @@ namespace Components.Grid
         public Action<Machine> OnMachineRemoved;
 
         private bool _isFactoryState = true;
-        // ------------------------------------------------------------------------- MONO -------------------------------------------------------------------------
+        // ------------------------------------------------------------------------- MONO --------------------------------------------------------------------------------
         private void Start()
         {
             _camera = UnityEngine.Camera.main;
@@ -114,7 +114,7 @@ namespace Components.Grid
 
         }
         
-        // ------------------------------------------------------------------------- SELECTION -------------------------------------------------------------------------
+        // ------------------------------------------------------------------------- SELECTION ---------------------------------------------------------------------------
         private void InstantiateNewPreview()
         {
 	        if (MachineManager.Instance.SelectedMachine == null)
@@ -300,6 +300,7 @@ namespace Components.Grid
             DeletePreview();
 
         }
+        
         private void AddMachineToGrid(MachineTemplate machine, Cell originCell)
         {
             _instancedObjects.Add(_currentMachinePreview);
@@ -382,7 +383,7 @@ namespace Components.Grid
 			}
         }
         
-        // ------------------------------------------------------------------------- GRID METHODS -------------------------------------------------------------------------
+        // ------------------------------------------------------------------------- GRID METHODS ------------------------------------------------------------------------
         [PropertySpace ,Button(ButtonSizes.Medium)]
         private void GenerateGrid()
         {
@@ -394,7 +395,69 @@ namespace Components.Grid
             _grid = new Grid(_gridXValue, _gridYValue, _cellSize, _startPosition, _groundHolder, _showDebug);
             _tileController.SelectATileType();
 
-            var ingredientsFromRecipes = ScriptableObjectDatabase.GetAllScriptableObjectOfType<RecipeTemplate>().Select(template => template.OutIngredient);
+            PlaceExtractors();
+        }
+        
+        private void ClearGrid()
+        {
+            foreach (var machineController in _instancedObjects)
+            {
+                Destroy(machineController.gameObject);
+            }
+
+			foreach (Transform groundTile in _groundHolder)
+			{
+				Destroy(groundTile.gameObject);
+			}
+			foreach (Transform obstacleTile in _obstacleHolder)
+			{
+				Destroy(obstacleTile.gameObject);
+			}
+			foreach (Transform objectTile in _objectsHolder)
+			{
+				Destroy(objectTile.gameObject);
+			}
+
+			_grid.ClearCellsData();
+            _instancedObjects.Clear();
+        }
+
+        // ------------------------------------------------------------------------- STATES METHODS ----------------------------------------------------------------------
+        private void HandleShopState(ShopState obj)
+        {
+            _isFactoryState = false;
+        }
+
+        private void HandlePlanningFactoryState(PlanningFactoryState obj)
+        {
+            _isFactoryState = true;
+        }
+        
+        // ------------------------------------------------------------------------ MACHINE METHODS ----------------------------------------------------------------------
+        private void HandleMachineSold(Machine machineToSell, int sellPrice)
+        {
+	        //Reset all cell linked to the machine.
+	        foreach (var node in machineToSell.Nodes)
+	        {
+		        if (!_grid.TryGetCellByCoordinates(node.GridPosition.x, node.GridPosition.y, out Cell linkedCell))
+		        {
+			        continue;
+		        }
+	            
+		        linkedCell.RemoveNodeFromCell();
+	        }
+            
+	        _instancedObjects.Remove(machineToSell.Controller);
+	        Destroy(machineToSell.Controller.gameObject);
+
+	        EconomyController.Instance.AddMoney(sellPrice);
+	        machineToSell = null;
+        }
+        
+        // -------------------------------------------------------------------------- EXTRACTOR --------------------------------------------------------------------------
+	    private void PlaceExtractors()
+        {
+	        var ingredientsFromRecipes = ScriptableObjectDatabase.GetAllScriptableObjectOfType<RecipeTemplate>().Select(template => template.OutIngredient);
             var allIngredients = ScriptableObjectDatabase.GetAllScriptableObjectOfType<IngredientTemplate>();
 
             var baseIngredient = allIngredients.Except(ingredientsFromRecipes).ToList();
@@ -450,7 +513,7 @@ namespace Components.Grid
 		            _grid.TryGetCellByCoordinates(extractorPotentialCoordinates[i].Item1, extractorPotentialCoordinates[i].Item2, out var chosenCell);
 		            var ingredient = selectedIngredients.Dequeue();
 		            
-		            Debug.Log($"Going to place on ({chosenCell.X}, {chosenCell.Y}) an extractor with ingredient: {ingredient}");
+		            //Debug.Log($"Going to place on ({chosenCell.X}, {chosenCell.Y}) an extractor with ingredient: {ingredient}");
 
 		            var extractorTemplate = ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("Extractor");
 		            
@@ -475,62 +538,6 @@ namespace Components.Grid
 		            }
 	            }
             }
-        }
-        
-        private void ClearGrid()
-        {
-            foreach (var machineController in _instancedObjects)
-            {
-                Destroy(machineController.gameObject);
-            }
-
-			foreach (Transform groundTile in _groundHolder)
-			{
-				Destroy(groundTile.gameObject);
-			}
-			foreach (Transform obstacleTile in _obstacleHolder)
-			{
-				Destroy(obstacleTile.gameObject);
-			}
-			foreach (Transform objectTile in _objectsHolder)
-			{
-				Destroy(objectTile.gameObject);
-			}
-
-			_grid.ClearCellsData();
-            _instancedObjects.Clear();
-        }
-
-        // ------------------------------------------------------------------------- STATES METHODS -------------------------------------------------------------------------
-        private void HandleShopState(ShopState obj)
-        {
-            _isFactoryState = false;
-        }
-
-        private void HandlePlanningFactoryState(PlanningFactoryState obj)
-        {
-            _isFactoryState = true;
-        }
-        
-        // --------------------------------------------------------------------- MACHINE METHODS -----------------------------------------------------------
-        private void HandleMachineSold(Machine machineToSell, int sellPrice)
-        {
-	        //Reset all cell linked to the machine.
-	        foreach (var node in machineToSell.Nodes)
-	        {
-		        if (!_grid.TryGetCellByCoordinates(node.GridPosition.x, node.GridPosition.y, out Cell linkedCell))
-		        {
-			        continue;
-		        }
-	            
-		        linkedCell.RemoveNodeFromCell();
-	        }
-            
-	        _instancedObjects.Remove(machineToSell.Controller);
-	        Destroy(machineToSell.Controller.gameObject);
-
-	        EconomyController.Instance.AddMoney(sellPrice);
-	        machineToSell = null;
         }
     }
 }
