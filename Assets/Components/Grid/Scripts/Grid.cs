@@ -40,6 +40,30 @@ namespace Components.Grid
             }
         }
 
+        public Grid(int width, int height, float cellSize, Vector3 originPosition, Transform parentTransform, bool showDebug, List<SerializedCell> serializedCellList)
+		{
+            _width = width;
+            _height = height;
+            _cellSize = cellSize;
+            _originPosition = originPosition;
+
+            _gridArray = new int[width, height];
+            _cells = new List<Cell>();
+
+            for (int i = 0; i < serializedCellList.Count; i++)
+			{
+                SerializedCell serializedCell = serializedCellList[i];
+                //Create a new cell and add it to cell list
+                Cell cell = new Cell(serializedCell.X, serializedCell.Y, cellSize, serializedCell.ContainsObject);
+                _cells.Add(cell);
+            }
+
+            if (showDebug)
+            {
+                DrawGridDebug(width, height, cellSize, parentTransform);
+            }
+        }
+
         // ------------------------------------------------------------------------- GRID INFOS -------------------------------------------------------------------------
         public int GetWidth()
         {
@@ -110,7 +134,9 @@ namespace Components.Grid
             return false;
         }
 
-        public void ClearCellsData()
+
+
+		public void ClearCellsData()
         {
             foreach (var cell in _cells)
             {
@@ -138,7 +164,7 @@ namespace Components.Grid
 
                     var worldPosition = GetWorldPosition(x, y) + new Vector3(_cellSize / 2, 0, _cellSize / 2);
 
-                    debugTextArray[x][y] = UtilsClass.CreateWorldText($"({x},{y})", parentTransform, worldPosition, 60, Color.white, TextAnchor.MiddleCenter);
+                    debugTextArray[x][y] = UtilsClass.CreateWorldText($"({x},{y})", parentTransform, worldPosition, 18, Color.red, TextAnchor.MiddleCenter);
                     debugTextArray[x][y].transform.rotation = Quaternion.Euler(90, 0, 0);
                     Debug.DrawLine(GetWorldPosition(x, y), GetWorldPosition(x, y + 1), Color.white, float.PositiveInfinity);
                     Debug.DrawLine(GetWorldPosition(x, y), GetWorldPosition(x + 1, y), Color.white, float.PositiveInfinity);

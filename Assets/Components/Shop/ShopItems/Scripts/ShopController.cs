@@ -1,0 +1,178 @@
+using Components.Machines;
+using Components.Shop.ShopItems;
+using Database;
+using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using UnityEngine;
+
+namespace Components.Shop
+{
+	public class ShopController : MonoBehaviour
+	{
+		[SerializeField] private int _numberOfMachineItemInShop = 5;
+		[SerializeField] private int _numberOfConsumableItemInShop = 3;
+		[SerializeField] private int _numberOfRelicItemInShop = 2;
+
+
+		public static Action<List<ShopItem>> OnShopGenerated;
+
+		private void Start()
+		{
+			ShopState.OnShopStateStarted += GenerateShop;
+		}
+		
+		private void OnDestroy()
+		{
+			ShopState.OnShopStateStarted -= GenerateShop;
+		}
+		
+		private void GenerateShop(ShopState state)
+		{
+			List<ShopItem> shopItemListToGenerate = new List<ShopItem>();
+			shopItemListToGenerate.AddRange(GenerateMachinesInShop());
+			shopItemListToGenerate.AddRange(GenerateConsumablesInShop());
+			shopItemListToGenerate.AddRange(GenerateRelicsInShop());
+			//ShopIsGenerated
+			OnShopGenerated?.Invoke(shopItemListToGenerate);
+		}
+		
+		private List<ShopItem> GenerateMachinesInShop()
+		{
+			//Generate allItemList to select random items from it and the shopItemList to generate in shop
+			List<ShopItem> allMachineShopItemList = new List<ShopItem>();
+			List<ShopItem> shopItemListToGenerate = new List<ShopItem>();
+
+			//Get all existing machines
+			List<MachineTemplate> allMachinesTemplate = ScriptableObjectDatabase.GetAllScriptableObjectOfType<MachineTemplate>();
+
+			//Get the classic convoyer machine to add it to the shopItemList 
+			MachineTemplate convoyer = allMachinesTemplate.Find(x => x.Name == "Conveyor");
+			ShopItem conveyorShopItem = new ShopItem(convoyer, -1);
+			shopItemListToGenerate.Add(conveyorShopItem);
+
+			//Remove it to not selection it for the shop
+			allMachinesTemplate.Remove(convoyer);
+
+			for (int i = 0; i < allMachinesTemplate.Count; i++)
+			{
+				ShopItem shopItem = new ShopItem(allMachinesTemplate[i]);
+				allMachineShopItemList.Add(shopItem);
+			}
+
+			//Generate random list of shop items
+			shopItemListToGenerate.AddRange(GetRandomItemList(_numberOfMachineItemInShop, allMachineShopItemList));
+
+			return shopItemListToGenerate;
+		}
+
+		private List<ShopItem> GenerateConsumablesInShop()
+		{
+			List<ShopItem> allConsumableShopItemList = new List<ShopItem>();
+			List<ShopItem> shopItemListToGenerate = new List<ShopItem>();
+			List<ConsumableTemplate> allConsumableTemplate = ScriptableObjectDatabase.GetAllScriptableObjectOfType<ConsumableTemplate>();
+
+			for (int i = 0; i < allConsumableTemplate.Count; i++)
+			{
+				ShopItem shopItem = new ShopItem(allConsumableTemplate[i]);
+				allConsumableShopItemList.Add(shopItem);
+			}
+			//Generate random list of shop items
+			shopItemListToGenerate.AddRange(GetRandomItemList(_numberOfConsumableItemInShop, allConsumableShopItemList));
+			return shopItemListToGenerate;
+		}
+
+		private List<ShopItem> GenerateRelicsInShop()
+		{
+			List<ShopItem> allRelicShopItemList = new List<ShopItem>();
+			List<ShopItem> shopItemListToGenerate = new List<ShopItem>();
+			List<RelicTemplate> allRelicTemplate = ScriptableObjectDatabase.GetAllScriptableObjectOfType<RelicTemplate>();
+
+			for (int i = 0; i < allRelicTemplate.Count; i++)
+			{
+				ShopItem shopItem = new ShopItem(allRelicTemplate[i]);
+				allRelicShopItemList.Add(shopItem);
+			}
+
+			//Generate random list of shop items
+			shopItemListToGenerate.AddRange(GetRandomItemList(_numberOfRelicItemInShop, allRelicShopItemList));
+
+			return shopItemListToGenerate;
+		}
+
+		/// <summary>
+		/// Selects a random item from the list based on spawn probability.
+		/// </summary>
+		public List<ShopItem> GetRandomItemList(int count, List<ShopItem> itemList)
+		{
+			// Make a copy of the items list to avoid modifying the original
+			List<ShopItem> availableItems = itemList;
+			List<ShopItem> selectedItems = new List<ShopItem>();
+
+
+			for (int i = 0; i < count; i++)
+			{
+				if (availableItems.Count == 0) break;
+
+				// Select a random item based on probability
+				ShopItem selectedItem = GetRandomItem(availableItems);
+
+				// Add to the selected list and remove from the available list
+				selectedItems.Add(selectedItem);
+				availableItems.Remove(selectedItem);
+			}
+
+			return selectedItems;
+		}
+
+		/// <summary>
+		/// Selects a random item from a given list based on spawn probability.
+		/// </summary>
+		/// <param name="availableItems">The list of items to select from.</param>
+		/// <returns>Selected Item based on probability.</returns>
+		private ShopItem GetRandomItem(List<ShopItem> availableItems)
+		{
+			float totalWeight = GetTotalWeight(availableItems);
+			float randomValue = UnityEngine.Random.value * totalWeight;
+
+			return GetItemBasedOnProbability(randomValue, availableItems);
+		}
+
+		/// <summary>
+		/// Sums the spawn probabilities of all items in the given list.
+		/// </summary>
+		/// <param name="availableItems">The list of items to sum probabilities for.</param>
+		/// <returns>Total weight of all spawn probabilities.</returns>
+		private float GetTotalWeight(List<ShopItem> availableItems)
+		{
+			float total = 0;
+			foreach (ShopItem item in availableItems)
+			{
+				total += item.SpawnProbability;
+			}
+			return total;
+		}
+
+		/// <summary>
+		/// Chooses an item from the list based on the accumulated weight and random value.
+		/// </summary>
+		/// <param name="randomValue">A random value multiplied by the total weight.</param>
+		/// <param name="availableItems">The list of items to select from.</param>
+		/// <returns>Selected Item based on probability.</returns>
+		private ShopItem GetItemBasedOnProbability(float randomValue, List<ShopItem> availableItems)
+		{
+			float cumulativeWeight = 0;
+
+			foreach (ShopItem item in availableItems)
+			{
+				cumulativeWeight += item.SpawnProbability;
+				if (randomValue <= cumulativeWeight)
+				{
+					return item;
+				}
+			}
+
+			return null; // In case of no match (shouldn't happen if probabilities are well-formed)
+		}
+	}
+}

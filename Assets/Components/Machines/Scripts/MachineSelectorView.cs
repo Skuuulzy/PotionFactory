@@ -1,3 +1,4 @@
+using Components.Inventory;
 using System;
 using TMPro;
 using UnityEngine;
@@ -11,21 +12,29 @@ namespace Components.Machines
         [SerializeField] private Image _background;
         [SerializeField] private TextMeshProUGUI _numberOfAvailableMAchineText;
 
-        public Action<MachineTemplate> OnSelected;
+        public static Action<MachineTemplate> OnSelected;
         
         private MachineTemplate _machine;
 
-        public void Init(MachineTemplate machine)
+        public MachineTemplate Machine => _machine;
+
+        public void Init(MachineTemplate machine, int value = 1)
         {
             _machine = machine;
 
             _name.text = machine.Name;
             _background.sprite = machine.UIView;
+            UpdateNumberOfAvailableMachine(value);
         }
+
+        
 
         public void Select()
         {
-            OnSelected?.Invoke(_machine);
+            if(InventoryController.Instance.PlayerMachinesDictionary[_machine] > 0)
+			{
+                OnSelected?.Invoke(_machine);
+            }
         }
 
 		public void UpdateNumberOfAvailableMachine(int number)
