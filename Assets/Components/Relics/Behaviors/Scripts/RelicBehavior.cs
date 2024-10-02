@@ -12,10 +12,6 @@ namespace Components.Relics.Behavior
 
 		public string Description => _description;
 
-		public abstract void ApplyEffect();
-		public abstract void ApplyEffect(List<Cell> cells);
-		public abstract void ApplyEffect(List<Machine> machines);
-
 		public RelicBehavior Clone()
 		{
 			return Instantiate(this);

@@ -50,12 +50,6 @@ namespace Components.Relics
 
 			_relic.OnTick += Tick;
 
-			foreach(RelicBehavior relic in _relic.Template.RelicBehaviors)
-			{
-				relic.ApplyEffect();
-				relic.ApplyEffect(_zone);
-
-			}
 
 		}
 
