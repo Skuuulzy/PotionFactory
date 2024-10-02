@@ -413,52 +413,6 @@ namespace Components.Grid
 			}
 		}
 
-		private void AddSelectedRelicToGrid()
-		{
-            if (!_currentRelicPreview)
-            {
-                return;
-            }
-
-            // Try to get the position on the grid.
-            if (!UtilsClass.ScreenToWorldPositionIgnoringUI(Input.mousePosition, _camera, out Vector3 worldMousePosition))
-            {
-                return;
-            }
-
-            // Try getting the cell
-            if (!_grid.TryGetCellByPosition(worldMousePosition, out Cell chosenCell))
-            {
-                return;
-            }
-
-            // One node of the machine overlap a cell that already contain an object.
-            if (chosenCell.ContainsObject)
-            {
-                return;
-            }
-
-            AddRelicToGrid(_currentRelicPreview.Template, chosenCell);
-        }
-
-		private void AddRelicToGrid(RelicTemplate template, Cell chosenCell)
-		{
-			_instancedRelics.Add(_currentRelicPreview);
-			_currentRelicPreview.transform.position = _grid.GetWorldPosition(chosenCell.X, chosenCell.Y) + new Vector3(_cellSize / 2, 0, _cellSize / 2);
-			_currentRelicPreview.transform.name = $"{template.RelicName}_{_instancedRelics.Count}";
-			_currentRelicPreview.transform.parent = _objectsHolder;
-
-			_currentRelicPreview.ConfirmPlacement();
-			_currentRelicPreview.DrawZoneGizmos(chosenCell, template.EffectZoneRadius, _gridXValue, _gridYValue, _grid);
-			InstantiateNewRelicPreview();
-
-
-			//Remove one machine from the inventory
-			InventoryController.Instance.RemoveRelicFromPlayerInventory(template);
-			DeletePreview();
-
-		}
-
 		private void AddSelectedConsumableToGrid()
         {
             if (!_currentConsumablePreview)

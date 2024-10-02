@@ -9,6 +9,7 @@ namespace Components.Machines.Behaviors
         protected int CurrentTick;
 
         public int ProcessTime => _processTime;
+        public int BonusProcessTime;
         public bool ProcessingRecipe { get; protected set; }
 
         public abstract void Process(Machine machine);
