@@ -8,9 +8,7 @@ namespace Components.Relics.Behavior
 	[CreateAssetMenu(fileName = "New Relic Behaviour", menuName = "Relics/Behavior/TeslaRelicBehavior")]
 	public class TeslaRelicBehavior : RelicBehavior
 	{
-		[SerializeField] private float _percentageEffect;
 
-		public float PercentageEffect => _percentageEffect;
 	}
 }
 

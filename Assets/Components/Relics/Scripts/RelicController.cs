@@ -45,12 +45,10 @@ namespace Components.Relics
 
 		public void ConfirmPlacement()
 		{
-
 			_initialized = true;
-
 			_relic.OnTick += Tick;
 
-
+			
 		}
 
 		/// <summary>
