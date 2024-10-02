@@ -479,6 +479,7 @@ MonoBehaviour:
   _machineName: {fileID: 7635522549003023900}
   _heldIngredients: {fileID: 4661085468696441076}
   _sellPriceTxt: {fileID: 1299974013043190806}
+  _sellButton: {fileID: 8310622798912012133}
   _componentsHolder: {fileID: 2999832862114198844}
 --- !u!222 &1771407093466864667
 CanvasRenderer:
@@ -1112,6 +1113,18 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 3546861870756702652}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &8310622798912012133 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4786692480659429081, guid: 18d70a7069f6de743b09b40c795c545c,
+    type: 3}
+  m_PrefabInstance: {fileID: 3546861870756702652}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &6620810091532736345
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -22,9 +22,7 @@ namespace Components.Grid.Tile
            
             transform.localScale = new Vector3(scale, scale, scale);
         }
-
-
-
+		
         public void SetTileType(TileType tileType)
 		{
             _tileType = tileType;
