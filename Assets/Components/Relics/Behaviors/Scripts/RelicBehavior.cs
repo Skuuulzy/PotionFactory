@@ -19,5 +19,7 @@ namespace Components.Relics.Behavior
 			return Instantiate(this);
 		}
 	}
+
+
 }
 

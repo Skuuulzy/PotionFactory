@@ -47,8 +47,28 @@ namespace Components.Relics
 		{
 			_initialized = true;
 			_relic.OnTick += Tick;
+			CheckRelicType();
+		}
 
-			
+		private void CheckRelicType()
+		{
+			foreach(RelicEffect effect in _template.RelicBehavior.Effects)
+			{
+				switch (effect.Type)
+				{
+					case RelicEffectType.MACHINE_RELIC_TYPE:
+						if(_zone == null)
+						{
+							_zone = GetZone(_chosenCell, _radius, _mapWidth, _mapHeight, _grid);
+							foreach(Cell cell in _zone)
+							{
+								cell.AddRelicEffectToCell(effect);
+							}
+						}
+						break;
+				}
+			}
+
 		}
 
 		/// <summary>

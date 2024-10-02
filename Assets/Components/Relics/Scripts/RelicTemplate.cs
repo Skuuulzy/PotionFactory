@@ -21,5 +21,5 @@ public class RelicTemplate : ScriptableObject
 	public Sprite UIView => _uiView;
 	public float SpawnProbability => _spawnProbability;
 	public int EffectZoneRadius => _effectZoneRadius;
-	public RelicBehavior RelicBehaviors => _relicBehaviors;
+	public RelicBehavior RelicBehavior => _relicBehaviors;
 }
