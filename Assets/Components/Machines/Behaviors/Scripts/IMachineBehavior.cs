@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Components.Machines.Behaviors
@@ -6,6 +7,10 @@ namespace Components.Machines.Behaviors
     {
         private int _initialProcessTime;
         protected int CurrentTick;
+
+        public float RelicEffectBonusProcessTime = 0;
+        public List<RelicEffect> RelicEffects;
+
 
         protected int InitialProcessTime => _initialProcessTime;
 

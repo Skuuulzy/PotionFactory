@@ -14,7 +14,7 @@ namespace Components.Machines.Behaviors
         private int _currentProcessTime;
         private int _additionalRecipeProcessTime;
 
-        public int FullProcessTime => InitialProcessTime + _additionalRecipeProcessTime;
+        public int FullProcessTime => InitialProcessTime + _additionalRecipeProcessTime - Mathf.RoundToInt((InitialProcessTime + _additionalRecipeProcessTime) * RelicEffectBonusProcessTime);
         public int CurrentProcessTime => _currentProcessTime;
         public RecipeTemplate CurrentRecipe => _currentRecipe;
 

@@ -17,7 +17,11 @@ public class IncreaseMachineProcessTimeEffect : RelicEffect
 	public override void ApplyEffect(MachineBehavior behavior)
 	{
 		base.ApplyEffect(behavior);
-		behavior.BonusProcessTime *= Mathf.RoundToInt(behavior.BonusProcessTime * _bonusProcessTime);
+		if (!behavior.RelicEffects.Contains(this))
+		{
+			behavior.RelicEffectBonusProcessTime = Mathf.Clamp(behavior.RelicEffectBonusProcessTime + behavior.RelicEffectBonusProcessTime * _bonusProcessTime, 0, 1);
+			behavior.RelicEffects.Add(this);
+		}
 	}
 }
 
