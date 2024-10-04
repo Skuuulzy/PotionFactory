@@ -13,4 +13,5 @@ MonoBehaviour:
   m_Name: TeslaRelicBehavior
   m_EditorClassIdentifier: 
   _description: Increases machines efficiency by 25%
-  _percentageEffect: 0.25
+  _effects:
+  - {fileID: 11400000, guid: 776fe9773993a3d47b2532d59c1ab213, type: 2}

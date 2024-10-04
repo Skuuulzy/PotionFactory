@@ -314,9 +314,8 @@ namespace Components.Grid
             _currentRelicPreview.transform.name = $"{template.RelicName}_{_instancedRelics.Count}";
             _currentRelicPreview.transform.parent = _objectsHolder;
 
-            _currentRelicPreview.ConfirmPlacement();
-            _currentRelicPreview.DrawZoneGizmos(chosenCell, 5, _gridXValue, _gridYValue, _grid);
-            InstantiateNewRelicPreview();
+            _currentRelicPreview.ConfirmPlacement(chosenCell, 5, _gridXValue, _gridYValue, _grid);
+			InstantiateNewRelicPreview();
 
 
             //Remove one machine from the inventory

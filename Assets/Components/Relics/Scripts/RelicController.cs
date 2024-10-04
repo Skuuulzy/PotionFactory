@@ -43,16 +43,18 @@ namespace Components.Relics
 
 		}
 
-		public void ConfirmPlacement()
+		public void ConfirmPlacement(Cell chosenCell, int radius, int mapWidth, int mapHeight, Grid.Grid grid)
 		{
 			_initialized = true;
 			_relic.OnTick += Tick;
+			DrawZoneGizmos(chosenCell, radius, mapWidth, mapHeight, grid);
+
 			CheckRelicType();
 		}
 
 		private void CheckRelicType()
 		{
-			foreach(RelicEffect effect in _template.RelicBehavior.Effects)
+			foreach (RelicEffect effect in _template.RelicBehavior.Effects)
 			{
 				switch (effect.Type)
 				{
@@ -107,7 +109,7 @@ namespace Components.Relics
 		/// <param name="originX">X-coordinate of the origin cell.</param>
 		/// <param name="originY">Y-coordinate of the origin cell.</param>
 		/// <param name="radius">The radius of the zone.</param>
-		public void DrawZoneGizmos(Cell chosenCell, int radius, int mapWidth, int mapHeight, Grid.Grid grid)
+		private void DrawZoneGizmos(Cell chosenCell, int radius, int mapWidth, int mapHeight, Grid.Grid grid)
 		{
 			_chosenCell = chosenCell;
 			_radius = radius;
