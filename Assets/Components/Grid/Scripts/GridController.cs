@@ -48,6 +48,7 @@ namespace Components.Grid
 
 		[Header("Ingredients")]
 		[SerializeField] private int _extractorsOnGridCount = 4;
+		[SerializeField] private int _sellersOnGridCount = 4;
 		
 		// Grid
 		private Grid _grid;
@@ -456,6 +457,7 @@ namespace Components.Grid
             _tileController.SelectATileType();
 
             PlaceExtractors();
+			PlaceSellers();
         }
         
         private void ClearGrid()
@@ -545,7 +547,7 @@ namespace Components.Grid
 					TileController tile = _tileController.GenerateTile(chosenCell, _grid, _groundHolder, _cellSize);
 					
 					// Get the zone where the extractors can be placed
-					if ((x == 0 && z <= _grid.GetWidth() / 2) || (x == _grid.GetWidth() - 1 && z <= _grid.GetWidth() / 2) || z == 0)
+					if ((x == 0 && z <= _grid.GetWidth() / 2) || z == _grid.GetHeight() - 1 || z == 0)
 					{
 						extractorPotentialCoordinates.Add(new(x, z));
 						continue;
@@ -585,9 +587,9 @@ namespace Components.Grid
 		            {
 			            _currentMachinePreview.RotatePreview(270);
 		            }
-		            if (chosenCell.X == _grid.GetWidth() - 1)
+		            if (chosenCell.Y == _grid.GetHeight() - 1)
 		            {
-			            _currentMachinePreview.RotatePreview(180);
+			            _currentMachinePreview.RotatePreview(90);
 		            }
 		            
 		            AddMachineToGrid(extractorTemplate, chosenCell, false);
@@ -599,5 +601,42 @@ namespace Components.Grid
 	            }
             }
         }
-    }
+
+		private void PlaceSellers()
+		{
+			List<(int, int)> sellersPotentialCoordinates = new List<(int, int)>();
+			// Instantiate ground blocks
+			for (int x = 0; x < _grid.GetWidth(); x++)
+			{
+				for (int z = 0; z < _grid.GetHeight(); z++)
+				{
+					_grid.TryGetCellByCoordinates(x, z, out var chosenCell);
+
+					TileController tile = _tileController.GenerateTile(chosenCell, _grid, _groundHolder, _cellSize);
+
+					// Get the zone where the extractors can be placed
+					if ((x == _grid.GetWidth() - 1 ))
+					{
+						sellersPotentialCoordinates.Add(new(x, z));
+						continue;
+					}
+				}
+			}
+
+			var randomExtractorCoordinates = ListExtensionsMethods.GetRandomIndexes(sellersPotentialCoordinates.Count, _sellersOnGridCount);
+			for (int i = 0; i < sellersPotentialCoordinates.Count; i++)
+			{
+				// We want to place an extractor here.
+				if (randomExtractorCoordinates.Contains(i))
+				{
+					_grid.TryGetCellByCoordinates(sellersPotentialCoordinates[i].Item1, sellersPotentialCoordinates[i].Item2, out var chosenCell);
+					var destructorTemplate = ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("Destructor");
+					_currentMachinePreview = Instantiate(_machineControllerPrefab);
+					_currentMachinePreview.InstantiatePreview(destructorTemplate, _cellSize);
+					AddMachineToGrid(destructorTemplate, chosenCell, false);
+				}
+			}
+		}
+
+	}
 }
