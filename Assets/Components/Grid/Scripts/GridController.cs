@@ -605,6 +605,18 @@ namespace Components.Grid
 		private void PlaceSellers()
 		{
 			List<(int, int)> sellersPotentialCoordinates = new List<(int, int)>();
+			var ingredientsFromRecipes = ScriptableObjectDatabase.GetAllScriptableObjectOfType<RecipeTemplate>().Select(template => template.OutIngredient).ToList();
+			var randomIngredientsIndexes = ListExtensionsMethods.GetRandomIndexes(ingredientsFromRecipes.Count, _sellersOnGridCount);
+			Queue<IngredientTemplate> selectedIngredients = new Queue<IngredientTemplate>();
+
+			for (int i = 0; i < ingredientsFromRecipes.Count; i++)
+			{
+				if (randomIngredientsIndexes.Contains(i))
+				{
+					selectedIngredients.Enqueue(ingredientsFromRecipes[i]);
+				}
+			}
+
 			// Instantiate ground blocks
 			for (int x = 0; x < _grid.GetWidth(); x++)
 			{
@@ -629,11 +641,17 @@ namespace Components.Grid
 				// We want to place an extractor here.
 				if (randomExtractorCoordinates.Contains(i))
 				{
+					var ingredient = selectedIngredients.Dequeue();
 					_grid.TryGetCellByCoordinates(sellersPotentialCoordinates[i].Item1, sellersPotentialCoordinates[i].Item2, out var chosenCell);
 					var destructorTemplate = ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("Destructor");
 					_currentMachinePreview = Instantiate(_machineControllerPrefab);
 					_currentMachinePreview.InstantiatePreview(destructorTemplate, _cellSize);
 					AddMachineToGrid(destructorTemplate, chosenCell, false);
+
+					if (chosenCell.Node.Machine.Behavior is DestructorMachineBehaviour destructorMachineBehaviour)
+					{
+						destructorMachineBehaviour.SetSpecialIngredientTemplate(ingredient);
+					}
 				}
 			}
 		}
