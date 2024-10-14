@@ -4,6 +4,7 @@ using Components.Interactions.Clickable;
 using Components.Ingredients;
 using Components.Tick;
 using UnityEngine;
+using Components.Machines.Behaviors;
 
 namespace Components.Machines
 {
@@ -69,7 +70,7 @@ namespace Components.Machines
             _machine.OnItemAdded += ShowItem;
             _machine.Behavior.SetInitialProcessTime(_machine.Template.ProcessTime);
             _machine.LinkNodeData();
-            
+
             AddMachineToChain();
         }
 

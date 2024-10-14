@@ -8,13 +8,15 @@ namespace Components.Machines.Behaviors
     public class DestructorMachineBehaviour : MachineBehavior
     {
         private IngredientTemplate _specialIngredientTemplate;
+
+        public IngredientTemplate SpecialIngredientTemplate => _specialIngredientTemplate;
         public override void Process(Machine machine)
         {
             // Sell items
             int sellPrice = 0;
             foreach(IngredientTemplate ingredientTemplate in machine.Ingredients)
             {
-                if(ingredientTemplate.Name == _specialIngredientTemplate.Name)
+                if(ingredientTemplate != null && ingredientTemplate.Name == _specialIngredientTemplate.Name)
                 {
                     sellPrice += ingredientTemplate.Price * 2;
                 }
