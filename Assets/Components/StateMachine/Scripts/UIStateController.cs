@@ -1,3 +1,4 @@
+using Components.Economy;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,9 +10,18 @@ public class UIStateController : MonoBehaviour
 	[SerializeField] private Image _stateCountdownImage;
 	[SerializeField] private Button _finishStateButton;
 
+	[Header("GameOver")]
+	[SerializeField] private GameObject _gameOverGO;
+
 	private void Awake()
 	{
 		BaseState.OnStateStarted += DisplayNewState;
+		EconomyController.OnGameOver += HandleGameOver;
+	}
+
+	private void OnDestroy()
+	{
+		EconomyController.OnGameOver -= HandleGameOver;
 	}
 
 	private void DisplayNewState(BaseState state)
@@ -40,5 +50,10 @@ public class UIStateController : MonoBehaviour
 	{
 		_finishStateButton.gameObject.SetActive(true);
 		_finishStateButton.onClick.AddListener(state.SetStateFinished);
+	}
+
+	private void HandleGameOver()
+	{
+		_gameOverGO.SetActive(true);
 	}
 }
