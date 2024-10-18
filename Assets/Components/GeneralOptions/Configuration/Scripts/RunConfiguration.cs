@@ -22,7 +22,7 @@ public class RunConfiguration : ScriptableObject
 		List<RecipeTemplate> allRecipes = ScriptableObjectDatabase.GetAllScriptableObjectOfType<RecipeTemplate>().ToList();
 
 		//First filter : Based of number of transformation asked
-		switch (runStateConfiguration._typeOfNumberTransformation)
+		switch (runStateConfiguration.TypeOfNumberTransformation)
 		{
 			case TypeOfNumberTransformation.Inferior:
 				allRecipes = allRecipes.Except(allRecipes.Where(x => x.OutIngredient.NumberOfTransformation > runStateConfiguration.NumberOfTransformationAsked)).ToList();
@@ -50,7 +50,8 @@ public class RunConfiguration : ScriptableObject
 	{
 		public int StateNumber;
 		public int NumberOfTransformationAsked;
-		public TypeOfNumberTransformation _typeOfNumberTransformation;
+		public TypeOfNumberTransformation TypeOfNumberTransformation;
+		public int MoneyObjective;
 	}
 
 	[Serializable]
