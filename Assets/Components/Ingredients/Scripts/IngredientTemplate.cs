@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace Components.Ingredients
@@ -7,6 +8,7 @@ namespace Components.Ingredients
 	{
 		[SerializeField] private string _name;
 		[SerializeField] private int _price;
+		[SerializeField] private int _nbOfTransfo;
 		[SerializeField] private bool _isLiquid;
 		[SerializeField] private float _executionTimeModifier;
 		
@@ -18,17 +20,24 @@ namespace Components.Ingredients
 
 		public int Price => _price;
 		public string Name => _name;
+		public int NumberOfTransformation => _nbOfTransfo;
 		public bool IsLiquid => _isLiquid;
 		public float ExecutionTimeModifier => _executionTimeModifier;
 		public GameObject View => _3dView;
 		public Sprite Icon => _icon;
 
-		public void CreateFromCSV(string ingredientName, int price, bool isLiquid, float executionTimeModifier)
+		public void CreateFromCSV(string ingredientName, int price, int nbTransfor, bool isLiquid, float executionTimeModifier)
 		{
 			_name = ingredientName;
 			_price = price;
+			_nbOfTransfo = nbTransfor;
 			_isLiquid = isLiquid;
 			_executionTimeModifier = executionTimeModifier;
+		}
+
+		internal string GetName()
+		{
+			throw new NotImplementedException();
 		}
 	}
 }

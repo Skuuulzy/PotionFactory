@@ -1,6 +1,4 @@
 ﻿using System;
-using static UnityEngine.CullingGroup;
-using System.Security.Cryptography.X509Certificates;
 
 public abstract partial class BaseState : IState
 {
@@ -10,8 +8,10 @@ public abstract partial class BaseState : IState
 	public static Action<BaseState> OnStateStarted;
 	public static Action OnStateEnded;
 	protected string _stateName;
+	private int _stateIndex;
 
 	public string StateName => _stateName;
+	public int StateIndex => _stateIndex;
 
 	public virtual void SetName()
 	{
@@ -21,19 +21,20 @@ public abstract partial class BaseState : IState
 	public virtual void OnEnter()
 	{
 		SetName();
+		_stateIndex++;
 		OnStateStarted?.Invoke(this);
 	}
 
 	public virtual void Update()
 	{
 
-		//noop
+		//noop 
 	}
 
 	public virtual void FixedUpdate()
 	{
 
-		//noop
+		//noop 
 	}
 
 	public virtual void OnExit()

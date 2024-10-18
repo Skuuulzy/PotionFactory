@@ -1,8 +1,4 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
-using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -20,14 +16,14 @@ public class UIStateController : MonoBehaviour
 
 	private void DisplayNewState(BaseState state)
 	{
-		_stateNameText.text = state.StateName;
+		_stateNameText.text = $"{state.StateName} : {state.StateIndex}";
 		_stateUITitleAnimator.SetTrigger("DisplayState");
 	}
 
 	public void SetCountdownTime(float currentTime, float duration)
 	{
-		//Check if the timer is display
-		if(_stateCountdownImage.gameObject.activeSelf == false)
+		//Check if the timer is display 
+		if (_stateCountdownImage.gameObject.activeSelf == false)
 		{
 			_stateCountdownImage.gameObject.SetActive(true);
 		}
