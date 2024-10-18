@@ -1,5 +1,6 @@
 using Components.Economy;
 using Components.Ingredients;
+using System;
 using UnityEngine;
 
 namespace Components.Machines.Behaviors
@@ -10,6 +11,8 @@ namespace Components.Machines.Behaviors
         private IngredientTemplate _specialIngredientTemplate;
 
         public IngredientTemplate SpecialIngredientTemplate => _specialIngredientTemplate;
+
+        public Action<IngredientTemplate> OnSpecialIngredientChanged;
         public override void Process(Machine machine)
         {
             // Sell items
@@ -35,6 +38,7 @@ namespace Components.Machines.Behaviors
         public void SetSpecialIngredientTemplate(IngredientTemplate specialIngredient)
         {
             _specialIngredientTemplate = specialIngredient;
-        }
+            OnSpecialIngredientChanged?.Invoke(specialIngredient);
+		}
     }
 }
