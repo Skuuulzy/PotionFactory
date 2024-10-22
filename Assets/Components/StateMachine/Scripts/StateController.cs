@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using VComponent.Tools.Timer;
 
 public class StateController : MonoBehaviour
@@ -103,4 +104,9 @@ public class StateController : MonoBehaviour
 
 	void At(IState from, IState to, IPredicate condition) => _stateMachine.AddTransition(from, to, condition);
 	void Any(IState to, IPredicate condition) => _stateMachine.AddAnyTransition(to, condition);
+
+	public void LaunchMainMenu()
+	{
+		SceneManager.LoadScene("Main_Menu", LoadSceneMode.Single);
+	}
 }
