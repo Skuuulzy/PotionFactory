@@ -21,6 +21,7 @@ public class UIStateController : MonoBehaviour
 
 	private void OnDestroy()
 	{
+		BaseState.OnStateStarted -= DisplayNewState;
 		EconomyController.OnGameOver -= HandleGameOver;
 	}
 
