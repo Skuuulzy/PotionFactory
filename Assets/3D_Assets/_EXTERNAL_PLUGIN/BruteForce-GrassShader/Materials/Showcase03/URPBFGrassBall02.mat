@@ -12,10 +12,11 @@ Material:
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
-  - USE_CS
-  - USE_RT
+  - USE_AL
   - USE_S
   - USE_SC
+  - USE_SS
+  - USE_WC
   m_InvalidKeywords:
   - _RTEFFECT_ON
   m_LightmapFlags: 4
@@ -24,7 +25,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
-  m_LockedProperties: 
+  m_LockedProperties: _TilingN3
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -97,65 +98,65 @@ Material:
     - _FadeAmplitude: 28
     - _FadeDistance: 16
     - _FadeDistanceEnd: 50
-    - _FadeDistanceStart: 20
+    - _FadeDistanceStart: 15
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
     - _GrassCut: 0
-    - _GrassSaturation: 3.5
-    - _GrassShading: 0
-    - _GrassThinness: 1.057
-    - _GrassThinnessIntersection: 0.45
-    - _LightIntensity: 0.06
+    - _GrassSaturation: 4
+    - _GrassShading: 0.1
+    - _GrassThinness: 0.7
+    - _GrassThinnessIntersection: 0.5
+    - _LightIntensity: 0
     - _Metallic: 0
-    - _MinimumNumberStacks: 2
+    - _MinimumNumberStacks: 10
     - _Mode: 0
     - _NearCameraSmoosh: 0.5
     - _NoisePower: 1.24
     - _NumberOfStacks: 17
     - _OcclusionStrength: 1
-    - _OffsetValue: 0.2
+    - _OffsetValue: 0.3
     - _Parallax: 0.02
-    - _ProceduralDistance: 5.5
-    - _ProceduralStrength: 1.5
+    - _ProceduralDistance: 50
+    - _ProceduralStrength: 1
     - _RTEffect: 1
-    - _RimMax: 0.591
-    - _RimMin: 0.11
-    - _RimPower: 3.15
+    - _RimMax: 0.513
+    - _RimMin: 0.247
+    - _RimPower: 1.76
     - _ShadowFuziness: 1
     - _ShadowMax: 0
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
-    - _TilingN1: 3.67
+    - _TilingN1: 3.5
     - _TilingN2: 0.05
     - _TilingN3: 0.3
     - _UVSec: 0
-    - _UseAmbientLight: 0
-    - _UseCS: 1
+    - _UseAmbientLight: 1
+    - _UseCS: 0
     - _UsePR: 0
     - _UsePreciseDepth: 0
-    - _UseRT: 1
+    - _UseRT: 0
     - _UseShadow: 1
     - _UseShadowCast: 1
-    - _UseSuperStack: 0
+    - _UseSuperStack: 1
     - _UseTP: 0
     - _UseVP: 0
     - _UseVR: 0
-    - _UseWC: 0
+    - _UseWC: 1
     - _WindForce: 0.2
     - _WindMovement: 0.2
     - _WorldRotation: 0
-    - _WorldScale: 10
+    - _WorldScale: 15
     - _ZWrite: 1
     - __NumberOfStacks: 17
     m_Colors:
-    - _Color: {r: 0.6893742, g: 0.69411767, b: 0.57254905, a: 1}
+    - _Color: {r: 0.6290212, g: 0.7075472, b: 0.59073514, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _GroundColor: {r: 0.95699996, g: 0.8818866, b: 0.69860995, a: 1}
+    - _GroundColor: {r: 0.8601882, g: 0.8773585, b: 0.71595764, a: 1}
     - _OffsetVector: {r: 0, g: 0, b: 0, a: 0}
     - _PJShadowColor: {r: 0, g: 0, b: 0, a: 1}
-    - _ProjectedShadowColor: {r: 0.46226418, g: 0.3019771, b: 0.15917587, a: 1}
-    - _RimColor: {r: 0.277, g: 0.25819692, b: 0.1355532, a: 1}
-    - _SelfShadowColor: {r: 0.284, g: 0.27240816, b: 0.066653065, a: 1}
+    - _ProjectedShadowColor: {r: 0.6226415, g: 0.5492044, b: 0.17328231, a: 1}
+    - _RimColor: {r: 0.33962262, g: 0.31463152, b: 0.27714488, a: 1}
+    - _SelfShadowColor: {r: 0.35779387, g: 0.38679248, b: 0, a: 1}
   m_BuildTextureStacks: []

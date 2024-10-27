@@ -2,20 +2,29 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!21 &2100000
 Material:
-  serializedVersion: 6
+  serializedVersion: 8
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: URPBFGrassBall01
   m_Shader: {fileID: 4800000, guid: 2c2cefb6802b6cd429dfbe4041764676, type: 3}
-  m_ShaderKeywords: USE_CS USE_RT USE_S USE_SC _RTEFFECT_ON
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords:
+  - USE_CS
+  - USE_RT
+  - USE_S
+  - USE_SC
+  m_InvalidKeywords:
+  - _RTEFFECT_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -75,6 +84,7 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    m_Ints: []
     m_Floats:
     - _BumpScale: 1
     - _Cutoff: 0.5
@@ -92,7 +102,7 @@ Material:
     - _GrassShading: 0.155
     - _GrassThinness: 0.4
     - _GrassThinnessIntersection: 0.37
-    - _LightIntensity: 1
+    - _LightIntensity: 0
     - _Metallic: 0
     - _MinimumNumberStacks: 1
     - _Mode: 0
@@ -120,11 +130,13 @@ Material:
     - _UseAmbientLight: 0
     - _UseCS: 1
     - _UsePR: 0
+    - _UsePreciseDepth: 0
     - _UseRT: 1
     - _UseShadow: 1
     - _UseShadowCast: 1
     - _UseSuperStack: 0
     - _UseTP: 0
+    - _UseVP: 0
     - _UseVR: 0
     - _UseWC: 0
     - _WindForce: 0.2
@@ -142,3 +154,4 @@ Material:
     - _ProjectedShadowColor: {r: 0.078431375, g: 0.24705882, b: 0.05490196, a: 1}
     - _RimColor: {r: 0.32999995, g: 0.41799998, b: 0.19799998, a: 1}
     - _SelfShadowColor: {r: 0.32414353, g: 0.32599998, b: 0.15256798, a: 1}
+  m_BuildTextureStacks: []
