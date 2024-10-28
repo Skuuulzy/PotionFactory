@@ -10,8 +10,8 @@ namespace VComponent.Tools.CSVReader
 {
     public class RecipesDatabaseManager
     {
-        private readonly List<int> _ingredientsCSVIndexes = new List<int>() { 5, 8, 11 };
-
+        private readonly List<int> _ingredientsCSVIndexes = new() { 5, 8, 11 };
+        
         private RecipeTemplate CreateNewRecipeTemplate(RecipeTemplate template, string name)
         {
             AssetDatabase.CreateAsset(template, RecipePath(name));
@@ -61,7 +61,7 @@ namespace VComponent.Tools.CSVReader
                     recipesIngredients.Add(ingredient, ingredientCount);
                 }
 
-                var recipeTemplate = GetRecipe(name);
+                var recipeTemplate = ScriptableObjectDatabase.GetScriptableObject<RecipeTemplate>(name);
 
                 // If the asset does not exist create a new one
                 if (recipeTemplate == null)
@@ -77,11 +77,6 @@ namespace VComponent.Tools.CSVReader
 
             AssetDatabase.Refresh();
             AssetDatabase.SaveAssets();
-        }
-        
-        public static RecipeTemplate GetRecipe(string name)
-        {
-            return AssetDatabase.LoadAssetAtPath<RecipeTemplate>(RecipePath(name));
         }
 
         private static string RecipePath(string ingredientName)

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Components.Grid.Obstacle;
 using Components.Grid.Tile;
 using Components.Ingredients;
@@ -21,12 +22,14 @@ namespace Components.Grid
 		[SerializeField] private ObstacleController _obstacleController; 
 		[SerializeField] private TileController _tileController; 
 		[SerializeField] private Node _node; 
-		[SerializeField] private IngredientTemplate _ingredient; 
+		[SerializeField] private IngredientTemplate _ingredient;
+        [SerializeField] private List<RelicEffect> _relicEffects; 
        
         public ObstacleController ObstacleController => _obstacleController;  
         public TileController TileController => _tileController;  
         public Node Node => _node;
         public IngredientTemplate Ingredient => _ingredient;
+        public List<RelicEffect> RelicEffects => _relicEffects;
 
         public Cell(int x, int y, float size, bool containsObject)
         {
@@ -34,6 +37,7 @@ namespace Components.Grid
             Y = y;
             Size = size;
             ContainsObject = containsObject;
+            _relicEffects = new List<RelicEffect>();
         }
 
         public void AddObstacleToCell(ObstacleController obstacle)
@@ -88,6 +92,15 @@ namespace Components.Grid
 	        ContainsObject = false;
 	        ContainsIngredient = false;
 	        _ingredient = null;
+        }
+
+        public void AddRelicEffectToCell(RelicEffect effect)
+        {
+            _relicEffects.Add(effect);
+            if(_node != null)
+			{
+                effect.ApplyEffect(_node.Machine.Behavior);
+			}
         }
     }
 

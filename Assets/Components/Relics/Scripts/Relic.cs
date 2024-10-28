@@ -1,7 +1,5 @@
 using Components.Tick;
 using System;
-
-using System.Collections.Generic;
 using UnityEngine;
 using Sirenix.OdinInspector;
 

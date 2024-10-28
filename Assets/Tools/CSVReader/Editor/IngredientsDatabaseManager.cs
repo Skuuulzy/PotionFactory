@@ -41,6 +41,7 @@ namespace VComponent.Tools.CSVReader
                 // Parse the data
                 var name = csvDataLine[i][0];
                 var price = int.Parse(csvDataLine[i][1]);
+                var nbOfTransformation = int.Parse(csvDataLine[i][2]);
                 var isLiquid = csvDataLine[i][3] != "FALSE";
                 var executionTimeModifier = float.Parse(csvDataLine[i][6]);
 
@@ -52,7 +53,7 @@ namespace VComponent.Tools.CSVReader
                     ingredientTemplate = CreateNewIngredientTemplate(ScriptableObject.CreateInstance<IngredientTemplate>(), name);
                 }
 
-                ingredientTemplate.CreateFromCSV(name, price, isLiquid, executionTimeModifier);
+                ingredientTemplate.CreateFromCSV(name, price, nbOfTransformation, isLiquid, executionTimeModifier);
 
                 // Mark the asset as dirty to ensure Unity knows it has been modified
                 EditorUtility.SetDirty(ingredientTemplate);
@@ -64,7 +65,7 @@ namespace VComponent.Tools.CSVReader
 
         public static IngredientTemplate GetIngredient(string name)
         {
-            return AssetDatabase.LoadAssetAtPath<IngredientTemplate>(IngredientPath(name));
+            return ScriptableObjectDatabase.GetScriptableObject<IngredientTemplate>(name);
         }
         
         private static string IngredientPath(string ingredientName)

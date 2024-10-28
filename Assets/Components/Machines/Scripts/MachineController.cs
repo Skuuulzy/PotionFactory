@@ -4,6 +4,7 @@ using Components.Interactions.Clickable;
 using Components.Ingredients;
 using Components.Tick;
 using UnityEngine;
+using Components.Machines.Behaviors;
 
 namespace Components.Machines
 {
@@ -67,8 +68,15 @@ namespace Components.Machines
             _machine.OnTick += Tick;
             _machine.OnPropagateTick += PropagateTick;
             _machine.OnItemAdded += ShowItem;
+            _machine.Behavior.SetInitialProcessTime(_machine.Template.ProcessTime);
             _machine.LinkNodeData();
-            
+
+
+            if(_machine.Behavior is DestructorMachineBehaviour destructor)
+            {
+                destructor.OnSpecialIngredientChanged += ShowItem;
+			}
+
             AddMachineToChain();
         }
 
@@ -206,6 +214,12 @@ namespace Components.Machines
                 _ingredientController.DestroyRepresentation();
             }
         }
+
+        //TO Change : special for destructor behavior
+        private void ShowItem(IngredientTemplate ingredient)
+        {
+			_ingredientController.CreateFavoriteSellerItemRepresentationFromTemplate(ingredient);
+		}
         
         // ------------------------------------------------------------------------- CLICKABLE BEHAVIOUR -------------------------------------------------------------------------
         public void Clicked()
