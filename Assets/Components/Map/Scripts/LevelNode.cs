@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,6 +13,8 @@ namespace Components.Map
         private bool _isUnlocked;
         public List<LevelNode> ConnectedNodes => _connectedNodes;
 
+        public static Action<LevelNode> OnNodeSelected;
+
         /// <summary>
         /// Initializes the node, setting up its locked or unlocked state.
         /// </summary>
@@ -19,21 +22,21 @@ namespace Components.Map
         {
             _isUnlocked = isUnlocked;
             _button.interactable = _isUnlocked;
-            _button.onClick.AddListener(OnNodeSelected);
+            _button.onClick.AddListener(SelectNode);
         }
 
         /// <summary>
         /// Unlocks the connected nodes when this node is selected.
         /// </summary>
-        private void OnNodeSelected()
+        private void SelectNode()
         {
-            // Logic to trigger level start here
-
             // Unlock connected nodes
             foreach (var node in _connectedNodes)
             {
                 node.UnlockNode();
             }
+
+            OnNodeSelected?.Invoke(this);
         }
 
         /// <summary>
@@ -44,6 +47,14 @@ namespace Components.Map
             _isUnlocked = true;
             _button.interactable = true;
         }
+
+        public void LockNode()
+        {
+			_isUnlocked = false;
+			_button.interactable = false;
+		}
+
+
     }
 
 }

@@ -3,107 +3,193 @@ using UnityEngine;
 
 namespace Components.Map
 {
-    public class MapGenerator : MonoBehaviour
-    {
-        [SerializeField] private GameObject _nodePrefab; // Prefab du LevelNode
-        [SerializeField] private int _nodeCount = 10; // Nombre total de nœuds
-        [SerializeField] private Transform _mapParent; // Parent pour les nœuds dans l’UI
-        [SerializeField] private float _minDistance = 50f; // Distance minimale entre nœuds
-        [SerializeField] private float _maxDistance = 250f; // Distance maximale du centre pour chaque nœud
 
-        private List<LevelNode> _nodes = new List<LevelNode>();
-        private System.Random _random = new System.Random();
+	public class MapGenerator : MonoBehaviour
+	{
+		[SerializeField] private RectTransform _nodeParent;
+		[SerializeField] private RectTransform _nodeLineParent;
+		[SerializeField] private GameObject _nodePrefab;
+		[SerializeField] private GameObject _linePrefab;
+		[SerializeField] private int _nodeCount = 20;
+		[SerializeField] private float _minDistance = 50f;
+		[SerializeField] private float _maxDistance = 200f;
 
-        private void Start()
-        {
-            GenerateNodesWithDistanceConstraints();
-            ConnectNodesRandomly();
-            SetStartingNode();
-        }
+		private List<LevelNode> _nodes = new List<LevelNode>();
 
-        /// <summary>
-        /// Génère des nœuds aléatoirement tout en respectant les contraintes de distance.
-        /// </summary>
-        private void GenerateNodesWithDistanceConstraints()
-        {
-            for (int i = 0; i < _nodeCount; i++)
-            {
-                Vector2 position;
-                bool positionValid;
+		private void Start()
+		{
+			GenerateNodes();
+			EnsureConnectivity();
+			DrawConnections();
 
-                // Tente de placer chaque nœud en respectant les distances min et max
-                do
-                {
-                    position = new Vector2(
-                        Random.Range(-_maxDistance, _maxDistance),
-                        Random.Range(-_maxDistance, _maxDistance)
-                    );
+			LevelNode.OnNodeSelected += HandleNodeSelected;
+		}
 
-                    positionValid = IsPositionValid(position);
 
-                } while (!positionValid); // Boucle jusqu'à ce qu'une position valide soit trouvée
 
-                GameObject nodeObj = Instantiate(_nodePrefab, _mapParent);
-                nodeObj.transform.localPosition = position;
+		private void GenerateNodes()
+		{
+			// Génération des nœuds avec positionnement aléatoire
+			for (int i = 0; i < _nodeCount; i++)
+			{
+				GameObject nodeObj = Instantiate(_nodePrefab, _nodeParent);
+				RectTransform rectTransform = nodeObj.GetComponent<RectTransform>();
+				Vector2 position;
 
-                LevelNode levelNode = nodeObj.GetComponent<LevelNode>();
-                _nodes.Add(levelNode);
-                levelNode.Initialize(false); // Début avec tous les nœuds verrouillés
-            }
-        }
+				// Boucle de positionnement pour éviter le chevauchement et les distances aberrantes
+				bool positionValid;
+				int attempt = 0;
+				do
+				{
+					position = new Vector2(
+						Random.Range(-(_nodeParent.rect.width - 100) / 2, (_nodeParent.rect.width - 100) / 2),
+						Random.Range(-(_nodeParent.rect.height - 100) / 2, (_nodeParent.rect.height - 100) / 2)
+					);
+					positionValid = IsPositionValid(position);
+					attempt++;
+				} while (!positionValid && attempt < 100);
 
-        /// <summary>
-        /// Vérifie si la position est valide en respectant les distances min et max.
-        /// </summary>
-        private bool IsPositionValid(Vector2 newPosition)
-        {
-            // Vérifie que la position est dans la distance maximale du centre
-            if (newPosition.magnitude > _maxDistance) return false;
+				rectTransform.localPosition = position;
+				LevelNode node = nodeObj.GetComponent<LevelNode>();
+				_nodes.Add(node);
 
-            // Vérifie la distance avec les autres nœuds
-            foreach (var node in _nodes)
-            {
-                if (Vector2.Distance(newPosition, node.transform.localPosition) < _minDistance)
-                {
-                    return false;
-                }
-            }
+				//Chose any starting point
+				node.Initialize(true);
+			}
+		}
 
-            return true;
-        }
+		private bool IsPositionValid(Vector2 position)
+		{
+			foreach (var node in _nodes)
+			{
+				if (Vector2.Distance(node.transform.localPosition, position) < _minDistance)
+				{
+					return false;
+				}
+			}
+			return true;
+		}
 
-        /// <summary>
-        /// Connecte les nœuds de manière aléatoire en s'assurant qu'aucun nœud n'est isolé.
-        /// </summary>
-        private void ConnectNodesRandomly()
-        {
-            for (int i = 0; i < _nodeCount; i++)
-            {
-                LevelNode currentNode = _nodes[i];
-                int connections = _random.Next(1, 3); // 1 à 2 connexions pour chaque nœud
 
-                for (int j = 0; j < connections; j++)
-                {
-                    LevelNode randomNode = _nodes[_random.Next(_nodeCount)];
+		private void EnsureConnectivity()
+		{
+			// Étape 1: Créer un arbre de connexions
+			HashSet<LevelNode> visitedNodes = new HashSet<LevelNode>();
+			List<LevelNode> treeNodes = new List<LevelNode>();
 
-                    // Évite les connexions doubles ou les boucles vers soi-même
-                    if (randomNode != currentNode && !currentNode.ConnectedNodes.Contains(randomNode))
-                    {
-                        currentNode.ConnectedNodes.Add(randomNode);
-                        randomNode.ConnectedNodes.Add(currentNode); // Connexion bidirectionnelle
-                    }
-                }
-            }
-        }
+			// Commencer par un nœud aléatoire
+			LevelNode startingNode = _nodes[Random.Range(0, _nodes.Count)];
+			CreateTree(startingNode, visitedNodes, treeNodes);
 
-        /// <summary>
-        /// Désigne un nœud de départ aléatoire.
-        /// </summary>
-        private void SetStartingNode()
-        {
-            int startIndex = _random.Next(_nodeCount);
-            _nodes[startIndex].Initialize(true); // Débloque le nœud de départ
-        }
-    }
+			// Étape 2: Ajouter des connexions aléatoires, mais en vérifiant les conditions
+			foreach (var node in _nodes)
+			{
+				// Ne pas ajouter des connexions si le nœud a déjà 4 voisins
+				if (node.ConnectedNodes.Count < 4)
+				{
+					// Connexion aléatoire avec des nœuds proches
+					foreach (var potentialNeighbor in _nodes)
+					{
+						if (node == potentialNeighbor) continue;
 
+						float distance = Vector2.Distance(node.transform.localPosition, potentialNeighbor.transform.localPosition);
+
+						// Vérifiez si les nœuds sont à proximité et ajoutez une connexion basée sur la probabilité
+						if (distance <= _maxDistance && Random.value < 0.05f && potentialNeighbor.ConnectedNodes.Count < 4) // 5% de chance
+						{
+							// Vérifiez s'ils ne sont pas déjà connectés
+							if (!node.ConnectedNodes.Contains(potentialNeighbor))
+							{
+								node.ConnectedNodes.Add(potentialNeighbor);
+								potentialNeighbor.ConnectedNodes.Add(node);
+							}
+						}
+					}
+				}
+			}
+		}
+
+		private void CreateTree(LevelNode currentNode, HashSet<LevelNode> visitedNodes, List<LevelNode> treeNodes)
+		{
+			visitedNodes.Add(currentNode);
+			treeNodes.Add(currentNode);
+
+			// Crée des connexions à partir de nœuds non visités
+			foreach (var potentialNeighbor in _nodes)
+			{
+				if (currentNode == potentialNeighbor || visitedNodes.Contains(potentialNeighbor)) continue;
+
+				float distance = Vector2.Distance(currentNode.transform.localPosition, potentialNeighbor.transform.localPosition);
+				if (distance <= _maxDistance)
+				{
+					currentNode.ConnectedNodes.Add(potentialNeighbor);
+					potentialNeighbor.ConnectedNodes.Add(currentNode);
+
+					// Appel récursif
+					CreateTree(potentialNeighbor, visitedNodes, treeNodes);
+				}
+			}
+		}
+
+		private void DFS(LevelNode node, HashSet<LevelNode> visitedNodes, List<LevelNode> group)
+		{
+			visitedNodes.Add(node);
+			group.Add(node);
+
+			foreach (var connectedNode in node.ConnectedNodes)
+			{
+				if (!visitedNodes.Contains(connectedNode))
+				{
+					DFS(connectedNode, visitedNodes, group);
+				}
+			}
+		}
+
+		private void DrawConnections()
+		{
+			HashSet<(LevelNode, LevelNode)> drawnConnections = new HashSet<(LevelNode, LevelNode)>();
+
+			foreach (var node in _nodes)
+			{
+				foreach (var connectedNode in node.ConnectedNodes)
+				{
+					if (!drawnConnections.Contains((node, connectedNode)) && !drawnConnections.Contains((connectedNode, node)))
+					{
+						GameObject lineObj = Instantiate(_linePrefab, _nodeLineParent);
+						RectTransform lineRect = lineObj.GetComponent<RectTransform>();
+
+						Vector2 startPos = node.transform.localPosition;
+						Vector2 endPos = connectedNode.transform.localPosition;
+						Vector2 midPoint = (startPos + endPos) / 2;
+
+						lineRect.localPosition = midPoint;
+
+						float distance = Vector2.Distance(startPos, endPos);
+						lineRect.sizeDelta = new Vector2(distance, lineRect.sizeDelta.y);
+
+						float angle = Mathf.Atan2(endPos.y - startPos.y, endPos.x - startPos.x) * Mathf.Rad2Deg;
+						lineRect.rotation = Quaternion.Euler(0, 0, angle);
+
+						drawnConnections.Add((node, connectedNode));
+					}
+				}
+			}
+		}
+
+		private void HandleNodeSelected(LevelNode nodeSelected)
+		{
+			foreach(var node in _nodes)
+			{
+				if(node == nodeSelected || nodeSelected.ConnectedNodes.Contains(node))
+				{
+					continue;
+				}
+				else
+				{
+					node.LockNode();
+				}
+			}
+		}
+
+	}
 }
