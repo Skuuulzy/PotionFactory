@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Components.Bundle;
 using Components.Ingredients;
 using Components.Machines;
 using Components.Recipes;
@@ -16,6 +17,7 @@ namespace Database
         public const string INGREDIENTS_SO_PATH = "Components/Ingredients/Resources/";
         public const string RECIPES_SO_PATH = "Components/Recipes/Resources/";
         public const string MACHINE_SO_PATH = "Components/Machines/Resources/";
+        public const string BUNDLE_SO_PATH = "Components/Bundles/Resources/";
 
         
         // -------------------------------------- DATA BASE CONSTRUCTION ---------------------------------------------
@@ -27,6 +29,7 @@ namespace Database
             LoadAllScriptableObjects<MachineTemplate>();
             LoadAllScriptableObjects<ConsumableTemplate>();
             LoadAllScriptableObjects<RelicTemplate>();
+            LoadAllScriptableObjects<IngredientsBundle>();
         }
 
         private static void LoadAllScriptableObjects<T>() where T : ScriptableObject

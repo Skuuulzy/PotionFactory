@@ -21,10 +21,8 @@ namespace Components.Map
         /// <summary>
         /// Initializes the node, setting up its locked or unlocked state.
         /// </summary>
-        public void Initialize(bool isUnlocked, IngredientsBundle ingredientsBundle)
+        public void Initialize(IngredientsBundle ingredientsBundle)
         {
-            _isUnlocked = isUnlocked;
-            _button.interactable = _isUnlocked;
             _ingredientsBundle = ingredientsBundle;
         }
 

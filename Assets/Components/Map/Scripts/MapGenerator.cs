@@ -1,6 +1,10 @@
 using Components.Bundle;
+using Components.Recipes;
+using Database;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net.Sockets;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -25,18 +29,24 @@ namespace Components.Map
 
 		private void Start()
 		{
+			LevelNode.OnNodeSelected += HandleNodeSelected;
+			
 			GenerateNodes();
 			EnsureConnectivity();
 			DrawConnections();
+			SelectStartingNode();
 
-			LevelNode.OnNodeSelected += HandleNodeSelected;
 		}
 
-
+		private void OnDestroy()
+		{
+			LevelNode.OnNodeSelected -= HandleNodeSelected;
+		}
 
 		private void GenerateNodes()
 		{
-			var ingredientsBundles = new List<IngredientsBundle>(Resources.LoadAll<IngredientsBundle>("Components/Bundles"));
+
+		
 
 			// Génération des nœuds avec positionnement aléatoire
 			for (int i = 0; i < _nodeCount; i++)
@@ -62,9 +72,7 @@ namespace Components.Map
 				LevelNode node = nodeObj.GetComponent<LevelNode>();
 				_nodes.Add(node);
 
-				int randomIndex = UnityEngine.Random.Range(0, ingredientsBundles.Count);
-				//Chose any starting point
-				node.Initialize(true, ingredientsBundles[randomIndex]);
+
 			}
 		}
 
@@ -202,13 +210,48 @@ namespace Components.Map
 				}
 			}
 
-			_confirmButton.interactable = true;
+			if( _selectedNode.IngredientsBundle != null ) 
+			{
+				_confirmButton.interactable = true;
+			}
+			
+		}
+
+		private void SelectStartingNode()
+		{
+			if (_nodes == null || _nodes.Count == 0)
+			{
+				Debug.LogWarning("La liste de nœuds est vide. Impossible de définir un nœud de départ.");
+				return;
+			}
+
+			// Trouver le nœud avec le plus de connexions
+			LevelNode startingNode = _nodes.OrderByDescending(node => node.ConnectedNodes.Count).FirstOrDefault();
+
+			// Afficher le nœud de départ sélectionné
+			if (startingNode != null)
+			{
+				Debug.Log($"Nœud de départ sélectionné : {startingNode.name} avec {startingNode.ConnectedNodes.Count} connexions.");
+			}
+
+			
+
+			List<IngredientsBundle> ingredientsBundles = ScriptableObjectDatabase.GetAllScriptableObjectOfType<IngredientsBundle>().ToList();
+			foreach (var node in startingNode.ConnectedNodes) 
+			{
+				int randomIndex = UnityEngine.Random.Range(0, ingredientsBundles.Count);
+
+				//Chose any starting point
+				node.Initialize(ingredientsBundles[randomIndex]);
+				ingredientsBundles.RemoveAt(randomIndex);
+			}
+
+			startingNode.SelectNode();
 		}
 
 		public void Confirm()
 		{
 			OnMapChoiceConfirm?.Invoke(_selectedNode.IngredientsBundle);
 		}
-
 	}
 }
