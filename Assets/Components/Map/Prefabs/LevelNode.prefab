@@ -51,6 +51,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _button: {fileID: 954730863578840856}
   _connectedNodes: []
+  _ingredientsBundle: {fileID: 0}
+  _machineBundle: {fileID: 0}
 --- !u!1 &4127016415732367846
 GameObject:
   m_ObjectHideFlags: 0
@@ -170,4 +172,16 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2020321740535809075}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 6758057304294289576}
+        m_TargetAssemblyTypeName: Components.Map.LevelNode, Assembly-CSharp
+        m_MethodName: SelectNode
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2

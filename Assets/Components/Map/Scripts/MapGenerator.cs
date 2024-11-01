@@ -1,5 +1,8 @@
+using Components.Bundle;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Components.Map
 {
@@ -13,8 +16,12 @@ namespace Components.Map
 		[SerializeField] private int _nodeCount = 20;
 		[SerializeField] private float _minDistance = 50f;
 		[SerializeField] private float _maxDistance = 200f;
+		[SerializeField] private Button _confirmButton;
 
 		private List<LevelNode> _nodes = new List<LevelNode>();
+		private LevelNode _selectedNode;
+
+		public static Action<IngredientsBundle> OnMapChoiceConfirm;
 
 		private void Start()
 		{
@@ -29,6 +36,8 @@ namespace Components.Map
 
 		private void GenerateNodes()
 		{
+			var ingredientsBundles = new List<IngredientsBundle>(Resources.LoadAll<IngredientsBundle>("Components/Bundles"));
+
 			// Génération des nœuds avec positionnement aléatoire
 			for (int i = 0; i < _nodeCount; i++)
 			{
@@ -42,8 +51,8 @@ namespace Components.Map
 				do
 				{
 					position = new Vector2(
-						Random.Range(-(_nodeParent.rect.width - 100) / 2, (_nodeParent.rect.width - 100) / 2),
-						Random.Range(-(_nodeParent.rect.height - 100) / 2, (_nodeParent.rect.height - 100) / 2)
+                        UnityEngine.Random.Range(-(_nodeParent.rect.width - 100) / 2, (_nodeParent.rect.width - 100) / 2),
+                        UnityEngine.Random.Range(-(_nodeParent.rect.height - 100) / 2, (_nodeParent.rect.height - 100) / 2)
 					);
 					positionValid = IsPositionValid(position);
 					attempt++;
@@ -53,8 +62,9 @@ namespace Components.Map
 				LevelNode node = nodeObj.GetComponent<LevelNode>();
 				_nodes.Add(node);
 
+				int randomIndex = UnityEngine.Random.Range(0, ingredientsBundles.Count);
 				//Chose any starting point
-				node.Initialize(true);
+				node.Initialize(true, ingredientsBundles[randomIndex]);
 			}
 		}
 
@@ -78,7 +88,7 @@ namespace Components.Map
 			List<LevelNode> treeNodes = new List<LevelNode>();
 
 			// Commencer par un nœud aléatoire
-			LevelNode startingNode = _nodes[Random.Range(0, _nodes.Count)];
+			LevelNode startingNode = _nodes[UnityEngine.Random.Range(0, _nodes.Count)];
 			CreateTree(startingNode, visitedNodes, treeNodes);
 
 			// Étape 2: Ajouter des connexions aléatoires, mais en vérifiant les conditions
@@ -95,7 +105,7 @@ namespace Components.Map
 						float distance = Vector2.Distance(node.transform.localPosition, potentialNeighbor.transform.localPosition);
 
 						// Vérifiez si les nœuds sont à proximité et ajoutez une connexion basée sur la probabilité
-						if (distance <= _maxDistance && Random.value < 0.05f && potentialNeighbor.ConnectedNodes.Count < 4) // 5% de chance
+						if (distance <= _maxDistance && UnityEngine.Random.value < 0.3f && potentialNeighbor.ConnectedNodes.Count < 4) // 5% de chance
 						{
 							// Vérifiez s'ils ne sont pas déjà connectés
 							if (!node.ConnectedNodes.Contains(potentialNeighbor))
@@ -178,6 +188,8 @@ namespace Components.Map
 
 		private void HandleNodeSelected(LevelNode nodeSelected)
 		{
+			_selectedNode = nodeSelected;
+
 			foreach(var node in _nodes)
 			{
 				if(node == nodeSelected || nodeSelected.ConnectedNodes.Contains(node))
@@ -189,6 +201,13 @@ namespace Components.Map
 					node.LockNode();
 				}
 			}
+
+			_confirmButton.interactable = true;
+		}
+
+		public void Confirm()
+		{
+			OnMapChoiceConfirm?.Invoke(_selectedNode.IngredientsBundle);
 		}
 
 	}

@@ -1,3 +1,4 @@
+using Components.Bundle;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,26 +10,28 @@ namespace Components.Map
     {
         [SerializeField] private Button _button;
         [SerializeField] private List<LevelNode> _connectedNodes;
+        [SerializeField] private IngredientsBundle _ingredientsBundle;
 
         private bool _isUnlocked;
         public List<LevelNode> ConnectedNodes => _connectedNodes;
+        public IngredientsBundle IngredientsBundle => _ingredientsBundle;
 
         public static Action<LevelNode> OnNodeSelected;
 
         /// <summary>
         /// Initializes the node, setting up its locked or unlocked state.
         /// </summary>
-        public void Initialize(bool isUnlocked)
+        public void Initialize(bool isUnlocked, IngredientsBundle ingredientsBundle)
         {
             _isUnlocked = isUnlocked;
             _button.interactable = _isUnlocked;
-            _button.onClick.AddListener(SelectNode);
+            _ingredientsBundle = ingredientsBundle;
         }
 
         /// <summary>
         /// Unlocks the connected nodes when this node is selected.
         /// </summary>
-        private void SelectNode()
+        public void SelectNode()
         {
             // Unlock connected nodes
             foreach (var node in _connectedNodes)
