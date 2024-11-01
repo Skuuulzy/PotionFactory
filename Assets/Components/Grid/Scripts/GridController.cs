@@ -614,7 +614,7 @@ namespace Components.Grid
 
 					//Debug.Log($"Going to place on ({chosenCell.X}, {chosenCell.Y}) an extractor with ingredient: {ingredient}"); 
 
-					var extractorTemplate = ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("Extractor");
+					var extractorTemplate = ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("Dispenser");
 
 					_currentMachinePreview = Instantiate(_machineControllerPrefab);
 					_currentMachinePreview.InstantiatePreview(extractorTemplate, _cellSize);
