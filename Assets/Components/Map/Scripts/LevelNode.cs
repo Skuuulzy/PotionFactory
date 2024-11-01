@@ -31,19 +31,26 @@ namespace Components.Map
         /// </summary>
         public void SelectNode()
         {
-            // Unlock connected nodes
-            foreach (var node in _connectedNodes)
-            {
-                node.UnlockNode();
-            }
-
+            _button.image.color = Color.green;
             OnNodeSelected?.Invoke(this);
         }
+
+        public void SelectNodeAsFirst()
+		{
+            _button.interactable = false;
+            _button.image.color = Color.yellow;
+        }
+
+        public void UnselectNode()
+		{
+            _button.image.color = Color.white;
+        }
+
 
         /// <summary>
         /// Unlocks this node, making it selectable.
         /// </summary>
-        private void UnlockNode()
+        public void UnlockNode()
         {
             _isUnlocked = true;
             _button.interactable = true;
@@ -53,6 +60,7 @@ namespace Components.Map
         {
 			_isUnlocked = false;
 			_button.interactable = false;
+            _button.image.color = Color.black;
 		}
 
 

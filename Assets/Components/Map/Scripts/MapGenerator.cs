@@ -24,8 +24,11 @@ namespace Components.Map
 
 		private List<LevelNode> _nodes = new List<LevelNode>();
 		private LevelNode _selectedNode;
+		private LevelNode _startingSelectedNode;
 
-		public static Action<IngredientsBundle> OnMapChoiceConfirm;
+		//Need to change this poor bool 
+		private bool _isFirstGameChoice;
+		public static Action<IngredientsBundle, bool> OnMapChoiceConfirm;
 
 		private void Start()
 		{
@@ -34,7 +37,7 @@ namespace Components.Map
 			GenerateNodes();
 			EnsureConnectivity();
 			DrawConnections();
-			SelectStartingNode();
+			SelectStartingRoundNode();
 
 		}
 
@@ -45,9 +48,6 @@ namespace Components.Map
 
 		private void GenerateNodes()
 		{
-
-		
-
 			// Génération des nœuds avec positionnement aléatoire
 			for (int i = 0; i < _nodeCount; i++)
 			{
@@ -196,28 +196,35 @@ namespace Components.Map
 
 		private void HandleNodeSelected(LevelNode nodeSelected)
 		{
-			_selectedNode = nodeSelected;
-
-			foreach(var node in _nodes)
+			if(_selectedNode != _startingSelectedNode && _selectedNode != nodeSelected)
 			{
-				if(node == nodeSelected || nodeSelected.ConnectedNodes.Contains(node))
+				_selectedNode.UnselectNode();
+			}
+
+			_selectedNode = nodeSelected;			
+		}
+
+		private void SelectNodeAsDefaultForRound(LevelNode nodeSelected)
+		{
+			_startingSelectedNode = nodeSelected;
+
+			foreach (var node in _nodes)
+			{
+				if (node == nodeSelected || nodeSelected.ConnectedNodes.Contains(node))
 				{
-					continue;
+					node.UnlockNode();
 				}
 				else
 				{
 					node.LockNode();
 				}
 			}
-
-			if( _selectedNode.IngredientsBundle != null ) 
-			{
-				_confirmButton.interactable = true;
-			}
-			
+			_selectedNode = _startingSelectedNode;
+			_startingSelectedNode.SelectNodeAsFirst();
 		}
 
-		private void SelectStartingNode()
+		//Use for starting round only
+		private void SelectStartingRoundNode()
 		{
 			if (_nodes == null || _nodes.Count == 0)
 			{
@@ -232,9 +239,7 @@ namespace Components.Map
 			if (startingNode != null)
 			{
 				Debug.Log($"Nœud de départ sélectionné : {startingNode.name} avec {startingNode.ConnectedNodes.Count} connexions.");
-			}
-
-			
+			}			
 
 			List<IngredientsBundle> ingredientsBundles = ScriptableObjectDatabase.GetAllScriptableObjectOfType<IngredientsBundle>().ToList();
 			foreach (var node in startingNode.ConnectedNodes) 
@@ -245,13 +250,21 @@ namespace Components.Map
 				node.Initialize(ingredientsBundles[randomIndex]);
 				ingredientsBundles.RemoveAt(randomIndex);
 			}
+			_isFirstGameChoice = true;
+			SelectNodeAsDefaultForRound(startingNode);
+		}
 
-			startingNode.SelectNode();
+		//Use for every rounds except the first one of the game
+		private void SelectNewRoundNode(LevelNode startingNode)
+		{
+			_isFirstGameChoice = false;
+			SelectNodeAsDefaultForRound(startingNode);
 		}
 
 		public void Confirm()
 		{
-			OnMapChoiceConfirm?.Invoke(_selectedNode.IngredientsBundle);
+			OnMapChoiceConfirm?.Invoke(_selectedNode.IngredientsBundle, _isFirstGameChoice);
+			this.gameObject.SetActive(false);
 		}
 	}
 }

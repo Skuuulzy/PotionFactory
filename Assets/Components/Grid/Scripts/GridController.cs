@@ -17,6 +17,8 @@ using Components.Relics;
 using Components.Tools.ExtensionMethods;
 using Components.Consumable;
 using Database;
+using Components.Map;
+using Components.Bundle;
 
 namespace Components.Grid
 {
@@ -76,17 +78,17 @@ namespace Components.Grid
 
 		private bool _isFactoryState = true;
 		// ------------------------------------------------------------------------- MONO -------------------------------------------------------------------------------- 
+
 		private void Start()
 		{
 			_camera = UnityEngine.Camera.main;
 			MachineManager.OnChangeSelectedMachine += UpdateSelection;
 			RelicManager.OnChangeSelectedRelic += UpdateSelection;
 			ConsumableManager.OnChangeSelectedConsumable += UpdateSelection;
-			GenerateGrid();
-
 			PlanningFactoryState.OnPlanningFactoryStateStarted += HandlePlanningFactoryState;
 			ShopState.OnShopStateStarted += HandleShopState;
 			MachineContextualUIView.OnSellMachine += HandleMachineSold;
+			MapGenerator.OnMapChoiceConfirm += HandleMapChoiceConfirm;
 		}
 
 		private void OnDestroy()
@@ -95,9 +97,8 @@ namespace Components.Grid
 			ShopState.OnShopStateStarted -= HandleShopState;
 			MachineContextualUIView.OnSellMachine -= HandleMachineSold;
 			ConsumableManager.OnChangeSelectedConsumable -= UpdateSelection;
-
-
 			RelicManager.OnChangeSelectedRelic -= UpdateSelection;
+			MapGenerator.OnMapChoiceConfirm-= HandleMapChoiceConfirm;
 		}
 
 		private void Update()
@@ -463,9 +464,9 @@ namespace Components.Grid
 			_grid = new Grid(_gridXValue, _gridYValue, _cellSize, _startPosition, _groundHolder, _showDebug);
 			_tileController.SelectATileType();
 
-			PlaceExtractors();
-			PlaceSellers();
+			
 		}
+
 
 		private void ClearGrid()
 		{
@@ -553,24 +554,9 @@ namespace Components.Grid
 		}
 
 		// -------------------------------------------------------------------------- EXTRACTOR -------------------------------------------------------------------------- 
-		private void PlaceExtractors()
-		{
-			var ingredientsFromRecipes = ScriptableObjectDatabase.GetAllScriptableObjectOfType<RecipeTemplate>().Select(template => template.OutIngredient);
-			var allIngredients = ScriptableObjectDatabase.GetAllScriptableObjectOfType<IngredientTemplate>();
-
-			var baseIngredient = allIngredients.Except(ingredientsFromRecipes).ToList();
-			var randomIngredientsIndexes = ListExtensionsMethods.GetRandomIndexes(baseIngredient.Count, _extractorsOnGridCount);
-
-			Queue<IngredientTemplate> selectedIngredients = new Queue<IngredientTemplate>();
+		private void PlaceExtractors(List<IngredientTemplate> ingredientsToInstantiate)
+		{			
 			_extractorBehaviours = new List<ExtractorMachineBehaviour>();
-
-			for (int i = 0; i < baseIngredient.Count; i++)
-			{
-				if (randomIngredientsIndexes.Contains(i))
-				{
-					selectedIngredients.Enqueue(baseIngredient[i]);
-				}
-			}
 
 			List<(int, int)> extractorPotentialCoordinates = new List<(int, int)>();
 
@@ -603,14 +589,14 @@ namespace Components.Grid
 				}
 			}
 
-			var randomExtractorCoordinates = ListExtensionsMethods.GetRandomIndexes(extractorPotentialCoordinates.Count, _extractorsOnGridCount);
+			var randomExtractorCoordinates = ListExtensionsMethods.GetRandomIndexes(extractorPotentialCoordinates.Count, ingredientsToInstantiate.Count);
+			int extractorIndex = 0;
 			for (int i = 0; i < extractorPotentialCoordinates.Count; i++)
 			{
 				// We want to place an extractor here. 
 				if (randomExtractorCoordinates.Contains(i))
 				{
 					_grid.TryGetCellByCoordinates(extractorPotentialCoordinates[i].Item1, extractorPotentialCoordinates[i].Item2, out var chosenCell);
-					var ingredient = selectedIngredients.Dequeue();
 
 					//Debug.Log($"Going to place on ({chosenCell.X}, {chosenCell.Y}) an extractor with ingredient: {ingredient}"); 
 
@@ -633,9 +619,10 @@ namespace Components.Grid
 
 					if (chosenCell.Node.Machine.Behavior is ExtractorMachineBehaviour extractorMachineBehaviour)
 					{
-						extractorMachineBehaviour.Init(ingredient);
+						extractorMachineBehaviour.Init(ingredientsToInstantiate[extractorIndex]);
 						_extractorBehaviours.Add(extractorMachineBehaviour);
 					}
+					extractorIndex++;
 				}
 			}
 		}
@@ -693,6 +680,19 @@ namespace Components.Grid
 					}
 				}
 			}
+		}
+
+		// -------------------------------------------------------------------------- MAP CHOICES -------------------------------------------------------------------------- 
+
+		private void HandleMapChoiceConfirm(IngredientsBundle bundle,bool isFirstGameChoice)
+		{
+			if (isFirstGameChoice)
+			{
+				GenerateGrid();
+			}
+
+			PlaceExtractors(bundle.IngredientsTemplatesList);
+			PlaceSellers();
 		}
 
 	}

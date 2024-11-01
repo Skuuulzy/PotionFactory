@@ -24,12 +24,12 @@ namespace Database
         static ScriptableObjectDatabase()
         {
             // This static constructor will be called at the first time GetScriptableObject is called. Some nice lazy initialization here.
+            LoadAllScriptableObjects<IngredientsBundle>();
             LoadAllScriptableObjects<IngredientTemplate>();
             LoadAllScriptableObjects<RecipeTemplate>();
             LoadAllScriptableObjects<MachineTemplate>();
             LoadAllScriptableObjects<ConsumableTemplate>();
             LoadAllScriptableObjects<RelicTemplate>();
-            LoadAllScriptableObjects<IngredientsBundle>();
         }
 
         private static void LoadAllScriptableObjects<T>() where T : ScriptableObject
