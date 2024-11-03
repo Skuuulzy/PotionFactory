@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Components.Machines.Behaviors;
 using Components.Machines.UIView;
 using UnityEngine;
@@ -39,6 +40,34 @@ namespace Components.Machines
         public Sprite UIView => _uiView;
 
         public List<Node> Nodes => GetNodeInstance();
+        
+        /// Return the size of the machine based on his nodes.
+        public (int width, int length) Size()
+        {
+            int minX = _nodes.Min(node => node.LocalPosition.x);
+            int maxX = _nodes.Max(node => node.LocalPosition.x);
+            int minY = _nodes.Min(node => node.LocalPosition.y);
+            int maxY = _nodes.Max(node => node.LocalPosition.y);
+        
+            int width = maxX - minX + 1;
+            int length = maxY - minY + 1;
+        
+            return (width, length);
+        }
+        
+        /// Return the coordinates of the center of the machine.
+        public (float X, float Z) Center()
+        {
+            int minX = _nodes.Min(node => node.LocalPosition.x);
+            int maxX = _nodes.Max(node => node.LocalPosition.x);
+            int minY = _nodes.Min(node => node.LocalPosition.y);
+            int maxY = _nodes.Max(node => node.LocalPosition.y);
+
+            float centerX = (minX + maxX) / 2f;
+            float centerZ = (minY + maxY) / 2f;
+
+            return (centerX, centerZ);
+        }
 
         public int MaxItemCount => _maxItemCount;
         public int ProcessTime => _processTime;
@@ -67,5 +96,7 @@ namespace Components.Machines
         {
             return _behavior.Clone();
         }
+        
+
     }
 }

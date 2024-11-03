@@ -85,6 +85,7 @@ MonoBehaviour:
     _nodes: []
     _controller: {fileID: 0}
     _behavior: {fileID: 0}
+  _selectionCollider: {fileID: 4502245881420147783}
   _ingredientController: {fileID: 6873847992688000341}
   _inPreview: {fileID: 5845855907689696922, guid: 7d9dacce9fb4b6541b0ddc03f11c6615,
     type: 3}
@@ -122,7 +123,7 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0.5, z: 0}
+  m_Center: {x: 1, y: 0.5, z: 1}
 --- !u!1001 &2699495612458625337
 PrefabInstance:
   m_ObjectHideFlags: 0
