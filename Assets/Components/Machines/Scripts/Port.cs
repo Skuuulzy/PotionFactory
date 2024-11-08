@@ -35,7 +35,7 @@ namespace Components.Machines
             _node = node;
         }
 
-        public void SetConnectedPort(Port connectedPort)
+        public void ConnectTo(Port connectedPort)
         {
             // The two port have the same connection type
             if (_way == connectedPort.Way || _connectedPort == connectedPort)
@@ -45,7 +45,7 @@ namespace Components.Machines
             
             _connectedPort = connectedPort;
             // Tell to the other port too.
-            connectedPort.SetConnectedPort(this);
+            connectedPort.ConnectTo(this);
         }
     }
 }

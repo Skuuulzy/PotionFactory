@@ -26,7 +26,7 @@ namespace Components.Grid
 		[SerializeField] private int _gridXValue = 64;
 		[SerializeField] private int _gridYValue = 64;
 		[SerializeField] private float _cellSize = 10;
-		[SerializeField] private Vector3 _startPosition = new(0, 0);
+		[SerializeField] private Vector3 _originPosition = new(0, 0);
 		[SerializeField] private bool _showDebug;
 
 		[Header("Prefabs")]
@@ -52,6 +52,9 @@ namespace Components.Grid
 
 		[Header("Configuration")]
 		[SerializeField] private RunConfiguration _runConfiguration;
+
+		[Header("Movement Parameters")] 
+		[SerializeField] private bool _snapping;
 
 		// Grid 
 		private Grid _grid;
@@ -214,7 +217,18 @@ namespace Components.Grid
 			// Update the object's position 
 			if (_currentMachinePreview != null)
 			{
-				_currentMachinePreview.transform.position = worldMousePosition;
+				if (_snapping)
+				{
+					if (_grid.TryGetCellByPosition(worldMousePosition, out Cell cell))
+					{
+
+						_currentMachinePreview.transform.position = cell.GetCenterPosition(_originPosition);
+					}
+				}
+				else
+				{
+					_currentMachinePreview.transform.position = worldMousePosition;
+				}
 			}
 			else if (_currentRelicPreview != null)
 			{
@@ -340,7 +354,7 @@ namespace Components.Grid
 			_currentMachinePreview.transform.name = $"{machine.Name}_{_instancedObjects.Count}";
 			_currentMachinePreview.transform.parent = _objectsHolder;
 
-			// Adding nodes to the cells 
+			// Adding nodes to the cells.
 			foreach (var node in _currentMachinePreview.Machine.Nodes)
 			{
 				var nodeGridPosition = node.SetGridPosition(new Vector2Int(originCell.X, originCell.Y));
@@ -348,23 +362,23 @@ namespace Components.Grid
 				if (_grid.TryGetCellByCoordinates(nodeGridPosition.x, nodeGridPosition.y, out Cell overlapCell))
 				{
 					overlapCell.AddNodeToCell(node);
-
+					
 					// Add potential connected ports 
 					foreach (var port in node.Ports)
 					{
 						switch (port.Side)
 						{
 							case Side.DOWN:
-								TryBindConnectedPort(port, new Vector2Int(nodeGridPosition.x, nodeGridPosition.y - 1));
+								TryConnectPort(port, new Vector2Int(nodeGridPosition.x, nodeGridPosition.y - 1));
 								break;
 							case Side.UP:
-								TryBindConnectedPort(port, new Vector2Int(nodeGridPosition.x, nodeGridPosition.y + 1));
+								TryConnectPort(port, new Vector2Int(nodeGridPosition.x, nodeGridPosition.y + 1));
 								break;
 							case Side.RIGHT:
-								TryBindConnectedPort(port, new Vector2Int(nodeGridPosition.x + 1, nodeGridPosition.y));
+								TryConnectPort(port, new Vector2Int(nodeGridPosition.x + 1, nodeGridPosition.y));
 								break;
 							case Side.LEFT:
-								TryBindConnectedPort(port, new Vector2Int(nodeGridPosition.x - 1, nodeGridPosition.y));
+								TryConnectPort(port, new Vector2Int(nodeGridPosition.x - 1, nodeGridPosition.y));
 								break;
 							case Side.NONE:
 								break;
@@ -394,7 +408,7 @@ namespace Components.Grid
 			}
 		}
 
-		private void TryBindConnectedPort(Port port, Vector2Int neighbourPosition)
+		private void TryConnectPort(Port port, Vector2Int neighbourPosition)
 		{
 			if (_grid.TryGetCellByCoordinates(neighbourPosition.x, neighbourPosition.y, out Cell neighbourCell))
 			{
@@ -404,11 +418,69 @@ namespace Components.Grid
 					{
 						if (potentialPort.Side == port.Side.Opposite())
 						{
-							port.SetConnectedPort(potentialPort);
+							port.ConnectTo(potentialPort);
 						}
 					}
 				}
 			}
+		}
+
+		private bool TryGetAllPotentialConnection(List<Port> machinePorts, Vector2Int gridPosition, out List<Port> potentialPorts)
+		{
+			potentialPorts = new List<Port>();
+			
+			foreach (var port in machinePorts)
+			{
+				var potentialNeighbourPosition = new Vector2Int();
+				
+				switch (port.Side)
+				{
+					case Side.DOWN:
+						potentialNeighbourPosition = new Vector2Int(gridPosition.x, gridPosition.y - 1);
+						break;
+					case Side.UP:
+						potentialNeighbourPosition = new Vector2Int(gridPosition.x, gridPosition.y + 1);
+						break;
+					case Side.RIGHT:
+						potentialNeighbourPosition = new Vector2Int(gridPosition.x + 1, gridPosition.y);
+						break;
+					case Side.LEFT:
+						potentialNeighbourPosition = new Vector2Int(gridPosition.x - 1, gridPosition.y);
+						break;
+					case Side.NONE:
+						break;
+					default:
+						throw new ArgumentOutOfRangeException();
+				}
+
+				if (TryGetPotentialConnection(port, potentialNeighbourPosition, out Port potentialPort))
+				{
+					potentialPorts.Add(potentialPort);
+				}
+			}
+
+			return potentialPorts.Count > 0;
+		}
+		
+		private bool TryGetPotentialConnection(Port port, Vector2Int neighbourPosition, out Port potentialPort)
+		{
+			if (_grid.TryGetCellByCoordinates(neighbourPosition.x, neighbourPosition.y, out Cell neighbourCell))
+			{
+				if (neighbourCell.ContainsNode)
+				{
+					foreach (var neighbourPort in neighbourCell.Node.Ports)
+					{
+						if (neighbourPort.Side == port.Side.Opposite())
+						{
+							potentialPort = neighbourPort;
+							return true;
+						}
+					}
+				}
+			}
+
+			potentialPort = null;
+			return false;
 		}
 
 		private void RemoveMachineFromGrid()
@@ -416,7 +488,6 @@ namespace Components.Grid
 			if (_currentMachinePreview)
 			{
 				DeletePreview();
-				return;
 			}
 		}
 
@@ -460,7 +531,7 @@ namespace Components.Grid
 				ClearGrid();
 			}
 
-			_grid = new Grid(_gridXValue, _gridYValue, _cellSize, _startPosition, _groundHolder, _showDebug);
+			_grid = new Grid(_gridXValue, _gridYValue, _cellSize, _originPosition, _groundHolder, _showDebug);
 			_tileController.SelectATileType();
 
 			PlaceExtractors();
