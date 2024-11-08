@@ -54,7 +54,8 @@ namespace Components.Map
         {
             _isUnlocked = true;
             _button.interactable = true;
-        }
+            UnselectNode();
+		}
 
         public void LockNode()
         {
@@ -63,8 +64,11 @@ namespace Components.Map
             _button.image.color = Color.black;
 		}
 
-
-    }
+		internal void ResetIngredientBundle()
+		{
+            _ingredientsBundle = null;
+		}
+	}
 
 }
 

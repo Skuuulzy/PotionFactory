@@ -684,7 +684,7 @@ namespace Components.Grid
 
 		// -------------------------------------------------------------------------- MAP CHOICES -------------------------------------------------------------------------- 
 
-		private void HandleMapChoiceConfirm(IngredientsBundle bundle,bool isFirstGameChoice)
+		private void HandleMapChoiceConfirm(IngredientsBundle bundle, bool isFirstGameChoice)
 		{
 			if (isFirstGameChoice)
 			{

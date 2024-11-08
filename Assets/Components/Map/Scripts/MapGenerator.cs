@@ -13,6 +13,7 @@ namespace Components.Map
 
 	public class MapGenerator : MonoBehaviour
 	{
+		[SerializeField] private GameObject _mapGameObject;
 		[SerializeField] private RectTransform _nodeParent;
 		[SerializeField] private RectTransform _nodeLineParent;
 		[SerializeField] private GameObject _nodePrefab;
@@ -25,20 +26,42 @@ namespace Components.Map
 		private List<LevelNode> _nodes = new List<LevelNode>();
 		private LevelNode _selectedNode;
 		private LevelNode _startingSelectedNode;
+		private bool _isFirstGameChoice;
+
+		private List<IngredientsBundle> _startingGameIngredientsBundles;
+		private List<IngredientsBundle> _startingRoundIngredientsBundles;
 
 		//Need to change this poor bool 
-		private bool _isFirstGameChoice;
 		public static Action<IngredientsBundle, bool> OnMapChoiceConfirm;
 
-		private void Start()
+		private void Awake()
 		{
 			LevelNode.OnNodeSelected += HandleNodeSelected;
-			
-			GenerateNodes();
-			EnsureConnectivity();
-			DrawConnections();
-			SelectStartingRoundNode();
+			MapState.OnMapStateStarted += Init;
 
+			//Set up ingredients bundles list
+			_startingGameIngredientsBundles = ScriptableObjectDatabase.GetAllScriptableObjectOfType<IngredientsBundle>().Where(bundle => bundle.IsStartingGameBundle).ToList();
+			_startingRoundIngredientsBundles = ScriptableObjectDatabase.GetAllScriptableObjectOfType<IngredientsBundle>().Where(bundle => !bundle.IsStartingGameBundle).ToList();
+		}
+
+		private void Init(MapState state)
+		{
+			_mapGameObject.SetActive(true);
+
+			//First map generation
+			if (state.StateIndex == 1)
+			{
+				_isFirstGameChoice = true;
+				GenerateNodes();
+				EnsureConnectivity();
+				DrawConnections();
+				SelectStartingRoundNode();
+			}
+			else
+			{
+				_isFirstGameChoice = false;
+				SelectNewRoundNode(_selectedNode);
+			}
 		}
 
 		private void OnDestroy()
@@ -239,32 +262,55 @@ namespace Components.Map
 			if (startingNode != null)
 			{
 				Debug.Log($"Nœud de départ sélectionné : {startingNode.name} avec {startingNode.ConnectedNodes.Count} connexions.");
-			}			
-
-			List<IngredientsBundle> ingredientsBundles = ScriptableObjectDatabase.GetAllScriptableObjectOfType<IngredientsBundle>().ToList();
-			foreach (var node in startingNode.ConnectedNodes) 
-			{
-				int randomIndex = UnityEngine.Random.Range(0, ingredientsBundles.Count);
-
-				//Chose any starting point
-				node.Initialize(ingredientsBundles[randomIndex]);
-				ingredientsBundles.RemoveAt(randomIndex);
 			}
-			_isFirstGameChoice = true;
+
+			foreach (var node in _nodes) 
+			{
+				//Bind a starting game bundle to every connected nodes of starting node
+				if (startingNode.ConnectedNodes.Contains(node))
+				{
+					int randomIndex = UnityEngine.Random.Range(0, _startingGameIngredientsBundles.Count);
+
+					node.Initialize(_startingGameIngredientsBundles[randomIndex]);
+					_startingGameIngredientsBundles.RemoveAt(randomIndex);
+				}
+				//Bind a starting round bundle to every one else
+				else
+				{
+					int randomIndex = UnityEngine.Random.Range(0, _startingRoundIngredientsBundles.Count);
+					node.Initialize(_startingRoundIngredientsBundles[randomIndex]);
+				}
+			}
+
 			SelectNodeAsDefaultForRound(startingNode);
 		}
 
 		//Use for every rounds except the first one of the game
 		private void SelectNewRoundNode(LevelNode startingNode)
 		{
-			_isFirstGameChoice = false;
+			foreach(var node in _nodes)
+			{
+				if(node.IngredientsBundle == null)
+				{
+					int randomIndex = UnityEngine.Random.Range(0, _startingRoundIngredientsBundles.Count);
+					node.Initialize(_startingRoundIngredientsBundles[randomIndex]);
+				}
+				//Need to change the starting game bundle by starting round bundle
+				else if (node.IngredientsBundle.IsStartingGameBundle)
+				{
+					int randomIndex = UnityEngine.Random.Range(0, _startingRoundIngredientsBundles.Count);
+					node.Initialize(_startingRoundIngredientsBundles[randomIndex]);
+				}
+			}
+
+			startingNode.ResetIngredientBundle();
 			SelectNodeAsDefaultForRound(startingNode);
 		}
 
 		public void Confirm()
 		{
 			OnMapChoiceConfirm?.Invoke(_selectedNode.IngredientsBundle, _isFirstGameChoice);
-			this.gameObject.SetActive(false);
+			_mapGameObject.SetActive(false);
 		}
 	}
 }

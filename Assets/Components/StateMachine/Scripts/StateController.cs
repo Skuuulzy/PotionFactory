@@ -43,7 +43,8 @@ public class StateController : MonoBehaviour
 		At(mapState, planningFactoryState, new FuncPredicate(() => mapState.IsFinished));
 		At(planningFactoryState, resolutionFactoryState, new FuncPredicate(() => planningFactoryState.IsFinished));
 		At(resolutionFactoryState, shopState, new FuncPredicate(() => resolutionFactoryState.IsFinished));
-		At(shopState, planningFactoryState, new FuncPredicate(() => shopState.IsFinished));
+		At(shopState, planningFactoryState, new FuncPredicate(() => shopState.IsFinished && shopState.StateIndex % 4 != 0));
+		At(shopState, mapState, new FuncPredicate(() => shopState.IsFinished && shopState.StateIndex % 4 == 0));
 
 		StartStateMachine(mapState);
 	}

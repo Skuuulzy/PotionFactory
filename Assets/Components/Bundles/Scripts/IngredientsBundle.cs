@@ -10,9 +10,11 @@ namespace Components.Bundle
 	{
 		[SerializeField] private List<IngredientTemplate> _ingredientsTemplateList;
 		[SerializeField] private List<MachineTemplate> _machinesTemplateList;
+		[SerializeField] private bool _isStartingBundle;
 
 
 		public List<IngredientTemplate> IngredientsTemplatesList => _ingredientsTemplateList;
 		public List<MachineTemplate> MachinesTemplateList => _machinesTemplateList;
+		public bool IsStartingGameBundle => _isStartingBundle;
 	}
 }
