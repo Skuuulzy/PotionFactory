@@ -1,4 +1,5 @@
 using Components.Bundle;
+using Components.Ingredients;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,17 +7,18 @@ using UnityEngine.UI;
 
 namespace Components.Map
 {
-    public class LevelNode : MonoBehaviour
+	public class LevelNode : MonoBehaviour
     {
         [SerializeField] private Button _button;
         [SerializeField] private List<LevelNode> _connectedNodes;
         [SerializeField] private IngredientsBundle _ingredientsBundle;
-        [SerializeField] private Image _ingredientImage;
+        [SerializeField] private LevelNodeView _view;
 
-        private bool _isUnlocked;
+
         public List<LevelNode> ConnectedNodes => _connectedNodes;
         public IngredientsBundle IngredientsBundle => _ingredientsBundle;
 
+		public static Action OnResetNode;
         public static Action<LevelNode> OnNodeSelected;
 
         /// <summary>
@@ -25,13 +27,7 @@ namespace Components.Map
         public void Initialize(IngredientsBundle ingredientsBundle)
         {
             _ingredientsBundle = ingredientsBundle;
-
-            if (!ingredientsBundle.IsStartingGameBundle)
-            {
-                _ingredientImage.gameObject.SetActive(true);
-				_ingredientImage.sprite = ingredientsBundle.IngredientsTemplatesList[0].Icon;
-			}
-
+			_view.Init(ingredientsBundle);
 		}
 
         /// <summary>
@@ -60,22 +56,20 @@ namespace Components.Map
         /// </summary>
         public void UnlockNode()
         {
-            _isUnlocked = true;
             _button.interactable = true;
             UnselectNode();
 		}
 
         public void LockNode()
         {
-			_isUnlocked = false;
 			_button.interactable = false;
             _button.image.color = Color.black;
 		}
 
-		internal void ResetIngredientBundle()
+		public void ResetIngredientBundle()
 		{
             _ingredientsBundle = null;
-			_ingredientImage.gameObject.SetActive(false);
+			OnResetNode?.Invoke();
 		}
 	}
 
