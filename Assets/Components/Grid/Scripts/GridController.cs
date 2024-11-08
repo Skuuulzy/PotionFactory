@@ -59,6 +59,7 @@ namespace Components.Grid
 		private Grid _grid;
 		private readonly List<MachineController> _instancedObjects = new();
 		private readonly List<RelicController> _instancedRelics = new();
+		private List<(int, int)> _extractorPotentialCoordinates = new List<(int, int)>();
 
 		// Preview 
 		private MachineController _currentMachinePreview;
@@ -558,7 +559,7 @@ namespace Components.Grid
 		{			
 			_extractorBehaviours = new List<ExtractorMachineBehaviour>();
 
-			List<(int, int)> extractorPotentialCoordinates = new List<(int, int)>();
+			_extractorPotentialCoordinates = new List<(int, int)>();
 
 			// Instantiate ground blocks 
 			for (int x = 0; x < _grid.GetWidth(); x++)
@@ -572,7 +573,7 @@ namespace Components.Grid
 					// Get the zone where the extractors can be placed 
 					if ((x == 0 && z <= _grid.GetWidth() / 2) || z == _grid.GetHeight() - 1 || z == 0)
 					{
-						extractorPotentialCoordinates.Add(new(x, z));
+						_extractorPotentialCoordinates.Add(new(x, z));
 						continue;
 					}
 
@@ -589,14 +590,61 @@ namespace Components.Grid
 				}
 			}
 
-			var randomExtractorCoordinates = ListExtensionsMethods.GetRandomIndexes(extractorPotentialCoordinates.Count, ingredientsToInstantiate.Count);
+			var randomExtractorCoordinates = ListExtensionsMethods.GetRandomIndexes(_extractorPotentialCoordinates.Count, ingredientsToInstantiate.Count);
 			int extractorIndex = 0;
-			for (int i = 0; i < extractorPotentialCoordinates.Count; i++)
+			for (int i = 0; i < _extractorPotentialCoordinates.Count; i++)
 			{
 				// We want to place an extractor here. 
 				if (randomExtractorCoordinates.Contains(i))
 				{
-					_grid.TryGetCellByCoordinates(extractorPotentialCoordinates[i].Item1, extractorPotentialCoordinates[i].Item2, out var chosenCell);
+					_grid.TryGetCellByCoordinates(_extractorPotentialCoordinates[i].Item1, _extractorPotentialCoordinates[i].Item2, out var chosenCell);
+
+					//Debug.Log($"Going to place on ({chosenCell.X}, {chosenCell.Y}) an extractor with ingredient: {ingredient}"); 
+
+					var extractorTemplate = ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("Extractor");
+
+					_currentMachinePreview = Instantiate(_machineControllerPrefab);
+					_currentMachinePreview.InstantiatePreview(extractorTemplate, _cellSize);
+
+					// Make sure that the machine are correctly oriented. 
+					if (chosenCell.Y == 0)
+					{
+						_currentMachinePreview.RotatePreview(270);
+					}
+					if (chosenCell.Y == _grid.GetHeight() - 1)
+					{
+						_currentMachinePreview.RotatePreview(90);
+					}
+
+					AddMachineToGrid(extractorTemplate, chosenCell, false);
+
+					if (chosenCell.Node.Machine.Behavior is ExtractorMachineBehaviour extractorMachineBehaviour)
+					{
+						extractorMachineBehaviour.Init(ingredientsToInstantiate[extractorIndex]);
+						_extractorBehaviours.Add(extractorMachineBehaviour);
+					}
+					extractorIndex++;
+				}
+			}
+
+			//Clear the _extractorPotentialCoordinates from selected coordinate to use it after
+			foreach (var coordinate in randomExtractorCoordinates)
+			{
+				_extractorPotentialCoordinates.RemoveAt(coordinate);
+			}
+			
+		}
+
+		private void AddExtractors(List<IngredientTemplate> ingredientsToInstantiate)
+		{
+			var randomExtractorCoordinates = ListExtensionsMethods.GetRandomIndexes(_extractorPotentialCoordinates.Count, ingredientsToInstantiate.Count);
+			int extractorIndex = 0;
+			for (int i = 0; i < _extractorPotentialCoordinates.Count; i++)
+			{
+				// We want to place an extractor here. 
+				if (randomExtractorCoordinates.Contains(i))
+				{
+					_grid.TryGetCellByCoordinates(_extractorPotentialCoordinates[i].Item1, _extractorPotentialCoordinates[i].Item2, out var chosenCell);
 
 					//Debug.Log($"Going to place on ({chosenCell.X}, {chosenCell.Y}) an extractor with ingredient: {ingredient}"); 
 
@@ -689,10 +737,13 @@ namespace Components.Grid
 			if (isFirstGameChoice)
 			{
 				GenerateGrid();
+				PlaceExtractors(bundle.IngredientsTemplatesList);
+				PlaceSellers();
 			}
-
-			PlaceExtractors(bundle.IngredientsTemplatesList);
-			PlaceSellers();
+			else
+			{
+				AddExtractors(bundle.IngredientsTemplatesList);
+			}
 		}
 
 	}

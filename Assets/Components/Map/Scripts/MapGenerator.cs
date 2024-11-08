@@ -34,6 +34,7 @@ namespace Components.Map
 		//Need to change this poor bool 
 		public static Action<IngredientsBundle, bool> OnMapChoiceConfirm;
 
+		//------------------------------------------------------------------------------------------- MONO -------------------------------------------------------------------------------------------
 		private void Awake()
 		{
 			LevelNode.OnNodeSelected += HandleNodeSelected;
@@ -43,7 +44,13 @@ namespace Components.Map
 			_startingGameIngredientsBundles = ScriptableObjectDatabase.GetAllScriptableObjectOfType<IngredientsBundle>().Where(bundle => bundle.IsStartingGameBundle).ToList();
 			_startingRoundIngredientsBundles = ScriptableObjectDatabase.GetAllScriptableObjectOfType<IngredientsBundle>().Where(bundle => !bundle.IsStartingGameBundle).ToList();
 		}
+		private void OnDestroy()
+		{
+			LevelNode.OnNodeSelected -= HandleNodeSelected;
+			MapState.OnMapStateStarted -= Init;
+		}
 
+		//------------------------------------------------------------------------------------------- INITIALISATION -------------------------------------------------------------------------------------------
 		private void Init(MapState state)
 		{
 			_mapGameObject.SetActive(true);
@@ -55,20 +62,15 @@ namespace Components.Map
 				GenerateNodes();
 				EnsureConnectivity();
 				DrawConnections();
-				SelectStartingRoundNode();
+				SelectStartingGameNode();
 			}
 			else
 			{
 				_isFirstGameChoice = false;
-				SelectNewRoundNode(_selectedNode);
+				SelectStartingRoundNode(_selectedNode);
 			}
 		}
-
-		private void OnDestroy()
-		{
-			LevelNode.OnNodeSelected -= HandleNodeSelected;
-		}
-
+		//------------------------------------------------------------------------------------------- MAP GENERATION -------------------------------------------------------------------------------------------
 		private void GenerateNodes()
 		{
 			// Génération des nœuds avec positionnement aléatoire
@@ -217,16 +219,18 @@ namespace Components.Map
 			}
 		}
 
+
+		//------------------------------------------------------------------------------------------- NODE SELECTION -------------------------------------------------------------------------------------------
 		private void HandleNodeSelected(LevelNode nodeSelected)
 		{
-			if(_selectedNode != _startingSelectedNode && _selectedNode != nodeSelected)
+			if (_selectedNode != _startingSelectedNode && _selectedNode != nodeSelected)
 			{
 				_selectedNode.UnselectNode();
 			}
 
-			_selectedNode = nodeSelected;			
+			_selectedNode = nodeSelected;
 		}
-
+		
 		private void SelectNodeAsDefaultForRound(LevelNode nodeSelected)
 		{
 			_startingSelectedNode = nodeSelected;
@@ -247,7 +251,7 @@ namespace Components.Map
 		}
 
 		//Use for starting round only
-		private void SelectStartingRoundNode()
+		private void SelectStartingGameNode()
 		{
 			if (_nodes == null || _nodes.Count == 0)
 			{
@@ -274,6 +278,12 @@ namespace Components.Map
 					node.Initialize(_startingGameIngredientsBundles[randomIndex]);
 					_startingGameIngredientsBundles.RemoveAt(randomIndex);
 				}
+
+				else if(node == startingNode)
+				{
+					node.ResetIngredientBundle();
+				}
+
 				//Bind a starting round bundle to every one else
 				else
 				{
@@ -286,7 +296,7 @@ namespace Components.Map
 		}
 
 		//Use for every rounds except the first one of the game
-		private void SelectNewRoundNode(LevelNode startingNode)
+		private void SelectStartingRoundNode(LevelNode startingNode)
 		{
 			foreach(var node in _nodes)
 			{
@@ -306,6 +316,8 @@ namespace Components.Map
 			startingNode.ResetIngredientBundle();
 			SelectNodeAsDefaultForRound(startingNode);
 		}
+
+		//------------------------------------------------------------------------------------------- CONFIRM -------------------------------------------------------------------------------------------
 
 		public void Confirm()
 		{

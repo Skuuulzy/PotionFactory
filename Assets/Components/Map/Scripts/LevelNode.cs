@@ -11,6 +11,7 @@ namespace Components.Map
         [SerializeField] private Button _button;
         [SerializeField] private List<LevelNode> _connectedNodes;
         [SerializeField] private IngredientsBundle _ingredientsBundle;
+        [SerializeField] private Image _ingredientImage;
 
         private bool _isUnlocked;
         public List<LevelNode> ConnectedNodes => _connectedNodes;
@@ -24,7 +25,14 @@ namespace Components.Map
         public void Initialize(IngredientsBundle ingredientsBundle)
         {
             _ingredientsBundle = ingredientsBundle;
-        }
+
+            if (!ingredientsBundle.IsStartingGameBundle)
+            {
+                _ingredientImage.gameObject.SetActive(true);
+				_ingredientImage.sprite = ingredientsBundle.IngredientsTemplatesList[0].Icon;
+			}
+
+		}
 
         /// <summary>
         /// Unlocks the connected nodes when this node is selected.
@@ -67,6 +75,7 @@ namespace Components.Map
 		internal void ResetIngredientBundle()
 		{
             _ingredientsBundle = null;
+			_ingredientImage.gameObject.SetActive(false);
 		}
 	}
 
