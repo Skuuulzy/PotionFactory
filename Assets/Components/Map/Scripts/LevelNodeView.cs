@@ -14,15 +14,6 @@ namespace Components.Map
 		[SerializeField] private List<Image> _starterBundleMachineImageList;
 
 		private bool _isStarterBundle;
-		public void Awake()
-		{;
-			LevelNode.OnResetNode += HandleResetLevelNode;
-		}
-
-		private void OnDestroy()
-		{
-			LevelNode.OnResetNode -= HandleResetLevelNode;
-		}
 
 		public void Init(IngredientsBundle ingredientsBundle)
 		{

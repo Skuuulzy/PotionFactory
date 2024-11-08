@@ -223,6 +223,7 @@ namespace Components.Map
 		//------------------------------------------------------------------------------------------- NODE SELECTION -------------------------------------------------------------------------------------------
 		private void HandleNodeSelected(LevelNode nodeSelected)
 		{
+			_confirmButton.interactable = true;
 			if (_selectedNode != _startingSelectedNode && _selectedNode != nodeSelected)
 			{
 				_selectedNode.UnselectNode();
@@ -248,6 +249,7 @@ namespace Components.Map
 			}
 			_selectedNode = _startingSelectedNode;
 			_startingSelectedNode.SelectNodeAsFirst();
+			_confirmButton.interactable = false;
 		}
 
 		//Use for starting round only

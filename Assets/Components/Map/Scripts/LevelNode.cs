@@ -69,7 +69,7 @@ namespace Components.Map
 		public void ResetIngredientBundle()
 		{
             _ingredientsBundle = null;
-			OnResetNode?.Invoke();
+            _view.HandleResetLevelNode();
 		}
 	}
 
