@@ -10,9 +10,11 @@ namespace Components.Grid
         [Header("Movement Parameters")] 
         [SerializeField] private bool _snapping;
         
+        [Header("Components")]
         [SerializeField] private GridController _gridController;
         [SerializeField] private MachineController _machineControllerPrefab;
 
+        
         private UnityEngine.Camera _camera;
         
         private MachineController _currentMachinePreview;
@@ -20,13 +22,15 @@ namespace Components.Grid
         
         private bool _isFactoryState = true;
 
+        
         private Grid Grid => _gridController.Grid;
         
+        // ------------------------------------------------------------------------- MONO -------------------------------------------------------------------------------- 
         private void Start()
         {
             _camera = UnityEngine.Camera.main;
             
-            MachineManager.OnChangeSelectedMachine += UpdateSelection;
+            MachineManager.OnChangeSelectedMachine += InstantiatePreview;
             PlanningFactoryState.OnPlanningFactoryStateStarted += HandlePlanningFactoryState;
             ShopState.OnShopStateStarted += HandleShopState;
         }
@@ -34,19 +38,16 @@ namespace Components.Grid
         private void Update()
         {
             //Can't interact with anything if we are not in factory state 
-            if (_isFactoryState == false)
+            if (!_isFactoryState)
             {
                 return;
             }
-
-            if (_currentMachinePreview != null)
-            {
-                MoveSelection();
-            }
+            
+            MovePreview();
 
             if (Input.GetMouseButton(1))
             {
-                RemoveMachineFromGrid();
+                DestroyPreview();
             }
             if (Input.GetMouseButton(0))
             {
@@ -54,46 +55,28 @@ namespace Components.Grid
             }
             if (Input.GetMouseButtonDown(2))
             {
-                RotateSelection();
+                RotatePreview();
             }
-
         }
         
         private void OnDestroy()
         {
-            MachineManager.OnChangeSelectedMachine -= UpdateSelection;
+            MachineManager.OnChangeSelectedMachine -= InstantiatePreview;
             PlanningFactoryState.OnPlanningFactoryStateStarted -= HandlePlanningFactoryState;
             ShopState.OnShopStateStarted -= HandleShopState;
         }
-
-        private void InstantiateNewPreview()
+        
+        // ------------------------------------------------------------------------- PREVIEW BEHAVIOUR -------------------------------------------------------------------------------- 
+        private void InstantiatePreview(MachineTemplate template)
         {
-            if (MachineManager.Instance.SelectedMachine == null)
-            {
-                _currentMachinePreview = null;
-                return;
-            }
-
+            DestroyPreview();
+            
             _currentMachinePreview = Instantiate(_machineControllerPrefab);
-            _currentMachinePreview.InstantiatePreview(MachineManager.Instance.SelectedMachine, Grid.GetCellSize());
+            _currentMachinePreview.InstantiatePreview(template, Grid.GetCellSize());
             _currentMachinePreview.RotatePreview(_currentRotation);
         }
-        
-        private void UpdateSelection(MachineTemplate newTemplate)
-        {
-            DeletePreview();
-            _currentMachinePreview = Instantiate(_machineControllerPrefab);
-            _currentMachinePreview.InstantiatePreview(newTemplate, Grid.GetCellSize());
-            _currentRotation = 0;
-        }
-        
-        private void DeletePreview()
-        {
-            DestroySelection();
-            _currentMachinePreview = null;
-        }
-        
-        private void MoveSelection()
+
+        private void MovePreview()
         {
             if (!_currentMachinePreview)
             {
@@ -106,24 +89,20 @@ namespace Components.Grid
             }
 
             // Update the object's position 
-            if (_currentMachinePreview != null)
+            if (_snapping)
             {
-                if (_snapping)
+                if (Grid.TryGetCellByPosition(worldMousePosition, out Cell cell))
                 {
-                    if (Grid.TryGetCellByPosition(worldMousePosition, out Cell cell))
-                    {
-
-                        _currentMachinePreview.transform.position = cell.GetCenterPosition(_gridController.OriginPosition);
-                    }
-                }
-                else
-                {
-                    _currentMachinePreview.transform.position = worldMousePosition;
+                    _currentMachinePreview.transform.position = cell.GetCenterPosition(_gridController.OriginPosition);
                 }
             }
+            else
+            {
+                _currentMachinePreview.transform.position = worldMousePosition;
+            }
         }
-
-        private void RotateSelection()
+        
+        private void RotatePreview()
         {
             if (!_currentMachinePreview)
             {
@@ -138,15 +117,16 @@ namespace Components.Grid
                 _currentMachinePreview.RotatePreview(_currentRotation);
             }
         }
-        
-        private void DestroySelection()
+
+        private void DestroyPreview()
         {
-            if (_currentMachinePreview != null)
+            if (_currentMachinePreview)
             {
                 Destroy(_currentMachinePreview.gameObject);
             }
         }
         
+        // ------------------------------------------------------------------------- GRID COMMUNICATION -------------------------------------------------------------------------------- 
         private void AddSelectedMachineToGrid()
         {
             if (!_currentMachinePreview)
@@ -185,23 +165,18 @@ namespace Components.Grid
             }
 
             _gridController.AddMachineToGrid(_currentMachinePreview, chosenCell, true);
+
+            var machineTemplate = _currentMachinePreview.Machine.Template;
+            _currentMachinePreview = null;
             
-            //Check if we don"t have any left of this machine in player inventory  
-            if (InventoryController.Instance.CountMachineOfType(_currentMachinePreview.Machine.Template) > 0)
+            //Instantiate the same machine type if we have enough in the inventory.
+            if (InventoryController.Instance.CountMachineOfType(machineTemplate) > 0)
             {
-                InstantiateNewPreview();
+                InstantiatePreview(machineTemplate);
             }
         }
         
-        private void RemoveMachineFromGrid()
-        {
-            if (_currentMachinePreview)
-            {
-                DeletePreview();
-            }
-        }
-        
-        // ------------------------------------------------------------------------- HANDLERS -------------------------------------------------------------------------------- 
+        // ------------------------------------------------------------------------- EVENT HANDLERS -------------------------------------------------------------------------------- 
         private void HandlePlanningFactoryState(PlanningFactoryState obj)
         {
             _isFactoryState = true;
