@@ -57,39 +57,36 @@ namespace Components.Grid
 		[SerializeField] private bool _snapping;
 
 		// Grid 
-		private Grid _grid;
 		private readonly List<MachineController> _instancedObjects = new();
 		private readonly List<RelicController> _instancedRelics = new();
 
 		// Preview 
-		private MachineController _currentMachinePreview;
 		private RelicController _currentRelicPreview;
 		private ConsumableController _currentConsumablePreview;
 
 		private int _currentRotation;
 		private UnityEngine.Camera _camera;
 
-		// Actions 
-		public Action<Machine> OnMachineAdded;
-		public Action<Machine> OnMachineRemoved;
-
 		//Sellers and Extractor list
 		private List<DestructorMachineBehaviour> _sellersBehaviours;
 		private List<ExtractorMachineBehaviour> _extractorBehaviours;
 
 		private bool _isFactoryState = true;
+
+		public Grid Grid { get; private set; }
+		public Vector3 OriginPosition => _originPosition;
+
 		// ------------------------------------------------------------------------- MONO -------------------------------------------------------------------------------- 
 		private void Start()
 		{
 			_camera = UnityEngine.Camera.main;
-			MachineManager.OnChangeSelectedMachine += UpdateSelection;
-			RelicManager.OnChangeSelectedRelic += UpdateSelection;
-			ConsumableManager.OnChangeSelectedConsumable += UpdateSelection;
 			GenerateGrid();
-
+			
 			PlanningFactoryState.OnPlanningFactoryStateStarted += HandlePlanningFactoryState;
 			ShopState.OnShopStateStarted += HandleShopState;
 			MachineContextualUIView.OnSellMachine += HandleMachineSold;
+			ConsumableManager.OnChangeSelectedConsumable += UpdateSelection;
+			RelicManager.OnChangeSelectedRelic += UpdateSelection;
 		}
 
 		private void OnDestroy()
@@ -98,8 +95,6 @@ namespace Components.Grid
 			ShopState.OnShopStateStarted -= HandleShopState;
 			MachineContextualUIView.OnSellMachine -= HandleMachineSold;
 			ConsumableManager.OnChangeSelectedConsumable -= UpdateSelection;
-
-
 			RelicManager.OnChangeSelectedRelic -= UpdateSelection;
 		}
 
@@ -111,55 +106,23 @@ namespace Components.Grid
 				return;
 			}
 
-			if (_currentMachinePreview != null || _currentRelicPreview != null || _currentConsumablePreview != null)
+			if (_currentRelicPreview != null || _currentConsumablePreview != null)
 			{
 				MoveSelection();
 			}
-
-			if (Input.GetMouseButton(1))
-			{
-				RemoveMachineFromGrid();
-			}
 			if (Input.GetMouseButton(0))
 			{
-				AddSelectedMachineToGrid();
 				AddSelectedRelicToGrid();
 				AddSelectedConsumableToGrid();
 			}
-			if (Input.GetMouseButtonDown(2))
-			{
-				RotateSelection();
-			}
-
 		}
 
 		// ------------------------------------------------------------------------- SELECTION --------------------------------------------------------------------------- 
-		private void InstantiateNewPreview()
-		{
-			if (MachineManager.Instance.SelectedMachine == null)
-			{
-				_currentMachinePreview = null;
-				return;
-			}
-
-			_currentMachinePreview = Instantiate(_machineControllerPrefab);
-			_currentMachinePreview.InstantiatePreview(MachineManager.Instance.SelectedMachine, _cellSize);
-			_currentMachinePreview.RotatePreview(_currentRotation);
-		}
-
 		private void InstantiateNewRelicPreview()
 		{
 			_currentRelicPreview = Instantiate(_relicControllerPrefab);
 			_currentRelicPreview.InstantiatePreview(RelicManager.Instance.SelectedRelic, _cellSize);
 			_currentRelicPreview.RotatePreview(_currentRotation);
-		}
-
-		private void UpdateSelection(MachineTemplate newTemplate)
-		{
-			DeletePreview();
-			_currentMachinePreview = Instantiate(_machineControllerPrefab);
-			_currentMachinePreview.InstantiatePreview(newTemplate, _cellSize);
-			_currentRotation = 0;
 		}
 
 		private void UpdateSelection(RelicTemplate relicTemplate)
@@ -179,10 +142,6 @@ namespace Components.Grid
 
 		private void DestroySelection()
 		{
-			if (_currentMachinePreview != null)
-			{
-				Destroy(_currentMachinePreview.gameObject);
-			}
 			if (_currentRelicPreview != null)
 			{
 				Destroy(_currentRelicPreview.gameObject);
@@ -191,20 +150,18 @@ namespace Components.Grid
 			{
 				Destroy(_currentConsumablePreview.gameObject);
 			}
-
 		}
 
 		private void DeletePreview()
 		{
 			DestroySelection();
-			_currentMachinePreview = null;
 			_currentRelicPreview = null;
 			_currentConsumablePreview = null;
 		}
 
 		private void MoveSelection()
 		{
-			if (!_currentMachinePreview && !_currentRelicPreview && !_currentConsumablePreview)
+			if (!_currentRelicPreview && !_currentConsumablePreview)
 			{
 				return;
 			}
@@ -214,23 +171,7 @@ namespace Components.Grid
 				return;
 			}
 
-			// Update the object's position 
-			if (_currentMachinePreview != null)
-			{
-				if (_snapping)
-				{
-					if (_grid.TryGetCellByPosition(worldMousePosition, out Cell cell))
-					{
-
-						_currentMachinePreview.transform.position = cell.GetCenterPosition(_originPosition);
-					}
-				}
-				else
-				{
-					_currentMachinePreview.transform.position = worldMousePosition;
-				}
-			}
-			else if (_currentRelicPreview != null)
+			if (_currentRelicPreview != null)
 			{
 				_currentRelicPreview.transform.position = worldMousePosition;
 			}
@@ -240,67 +181,7 @@ namespace Components.Grid
 			}
 		}
 
-		private void RotateSelection()
-		{
-			if (!_currentMachinePreview && !_currentRelicPreview)
-			{
-				return;
-			}
-
-			_currentRotation += 90;
-			_currentRotation %= 360;
-
-			if (_currentMachinePreview != null)
-			{
-				_currentMachinePreview.RotatePreview(_currentRotation);
-			}
-			else if (_currentRelicPreview != null)
-			{
-				_currentMachinePreview.RotatePreview(_currentRotation);
-			}
-		}
-
 		// ------------------------------------------------------------------------- INPUT HANDLERS ------------------------------------------------------------------------- 
-		private void AddSelectedMachineToGrid()
-		{
-			if (!_currentMachinePreview)
-			{
-				return;
-			}
-
-			// Try to get the position on the grid. 
-			if (!UtilsClass.ScreenToWorldPositionIgnoringUI(Input.mousePosition, _camera, out Vector3 worldMousePosition))
-			{
-				return;
-			}
-
-			// Try getting the cell 
-			if (!_grid.TryGetCellByPosition(worldMousePosition, out Cell chosenCell))
-			{
-				return;
-			}
-
-			// Check if the machine can be placed on the grid. 
-			foreach (var node in _currentMachinePreview.Machine.Nodes)
-			{
-				var nodeGridPosition = node.SetGridPosition(new Vector2Int(chosenCell.X, chosenCell.Y));
-
-				// One node does not overlap a constructable cell. 
-				if (!_grid.TryGetCellByCoordinates(nodeGridPosition.x, nodeGridPosition.y, out Cell overlapCell))
-				{
-					return;
-				}
-
-				// One node of the machine overlap a cell that already contain an object. 
-				if (overlapCell.ContainsObject)
-				{
-					return;
-				}
-			}
-
-			AddMachineToGrid(MachineManager.Instance.SelectedMachine, chosenCell, true);
-		}
-
 		private void AddSelectedRelicToGrid()
 		{
 			if (!_currentRelicPreview)
@@ -315,7 +196,7 @@ namespace Components.Grid
 			}
 
 			// Try getting the cell 
-			if (!_grid.TryGetCellByPosition(worldMousePosition, out Cell chosenCell))
+			if (!Grid.TryGetCellByPosition(worldMousePosition, out Cell chosenCell))
 			{
 				return;
 			}
@@ -332,11 +213,11 @@ namespace Components.Grid
 		private void AddRelicToGrid(RelicTemplate template, Cell chosenCell)
 		{
 			_instancedRelics.Add(_currentRelicPreview);
-			_currentRelicPreview.transform.position = _grid.GetWorldPosition(chosenCell.X, chosenCell.Y) + new Vector3(_cellSize / 2, 0, _cellSize / 2);
+			_currentRelicPreview.transform.position = Grid.GetWorldPosition(chosenCell.X, chosenCell.Y) + new Vector3(_cellSize / 2, 0, _cellSize / 2);
 			_currentRelicPreview.transform.name = $"{template.RelicName}_{_instancedRelics.Count}";
 			_currentRelicPreview.transform.parent = _objectsHolder;
 
-			_currentRelicPreview.ConfirmPlacement(chosenCell, 5, _gridXValue, _gridYValue, _grid);
+			_currentRelicPreview.ConfirmPlacement(chosenCell, 5, _gridXValue, _gridYValue, Grid);
 			InstantiateNewRelicPreview();
 
 
@@ -346,20 +227,20 @@ namespace Components.Grid
 
 		}
 
-		private void AddMachineToGrid(MachineTemplate machine, Cell originCell, bool fetchFromInventory)
+		public void AddMachineToGrid(MachineController machineController, Cell originCell, bool fetchFromInventory)
 		{
-			_instancedObjects.Add(_currentMachinePreview);
+			_instancedObjects.Add(machineController);
 
-			_currentMachinePreview.transform.position = _grid.GetWorldPosition(originCell.X, originCell.Y) + new Vector3(_cellSize / 2, 0, _cellSize / 2);
-			_currentMachinePreview.transform.name = $"{machine.Name}_{_instancedObjects.Count}";
-			_currentMachinePreview.transform.parent = _objectsHolder;
+			machineController.transform.position = Grid.GetWorldPosition(originCell.X, originCell.Y) + new Vector3(_cellSize / 2, 0, _cellSize / 2);
+			machineController.transform.name = $"{machineController.Machine.Template.Name}_{_instancedObjects.Count}";
+			machineController.transform.parent = _objectsHolder;
 
 			// Adding nodes to the cells.
-			foreach (var node in _currentMachinePreview.Machine.Nodes)
+			foreach (var node in machineController.Machine.Nodes)
 			{
 				var nodeGridPosition = node.SetGridPosition(new Vector2Int(originCell.X, originCell.Y));
 
-				if (_grid.TryGetCellByCoordinates(nodeGridPosition.x, nodeGridPosition.y, out Cell overlapCell))
+				if (Grid.TryGetCellByCoordinates(nodeGridPosition.x, nodeGridPosition.y, out Cell overlapCell))
 				{
 					overlapCell.AddNodeToCell(node);
 					
@@ -389,28 +270,20 @@ namespace Components.Grid
 				}
 			}
 			//originCell. 
-			_currentMachinePreview.ConfirmPlacement();
-
-			InstantiateNewPreview();
-
+			machineController.ConfirmPlacement();
+			
 			if (!fetchFromInventory)
 			{
 				return;
 			}
 
 			//Remove one machine from the inventory 
-			InventoryController.Instance.DecreaseMachineToPlayerInventory(machine, 1);
-
-			//Check if we don"t have any left of this machine in player inventory  
-			if (InventoryController.Instance.CountMachineOfType(machine) == 0)
-			{
-				DeletePreview();
-			}
+			InventoryController.Instance.DecreaseMachineToPlayerInventory(machineController.Machine.Template, 1);
 		}
 
 		private void TryConnectPort(Port port, Vector2Int neighbourPosition)
 		{
-			if (_grid.TryGetCellByCoordinates(neighbourPosition.x, neighbourPosition.y, out Cell neighbourCell))
+			if (Grid.TryGetCellByCoordinates(neighbourPosition.x, neighbourPosition.y, out Cell neighbourCell))
 			{
 				if (neighbourCell.ContainsNode)
 				{
@@ -464,7 +337,7 @@ namespace Components.Grid
 		
 		private bool TryGetPotentialConnection(Port port, Vector2Int neighbourPosition, out Port potentialPort)
 		{
-			if (_grid.TryGetCellByCoordinates(neighbourPosition.x, neighbourPosition.y, out Cell neighbourCell))
+			if (Grid.TryGetCellByCoordinates(neighbourPosition.x, neighbourPosition.y, out Cell neighbourCell))
 			{
 				if (neighbourCell.ContainsNode)
 				{
@@ -483,14 +356,6 @@ namespace Components.Grid
 			return false;
 		}
 
-		private void RemoveMachineFromGrid()
-		{
-			if (_currentMachinePreview)
-			{
-				DeletePreview();
-			}
-		}
-
 		private void AddSelectedConsumableToGrid()
 		{
 			if (!_currentConsumablePreview)
@@ -505,7 +370,7 @@ namespace Components.Grid
 			}
 
 			// Try getting the cell 
-			if (!_grid.TryGetCellByPosition(worldMousePosition, out Cell chosenCell))
+			if (!Grid.TryGetCellByPosition(worldMousePosition, out Cell chosenCell))
 			{
 				return;
 			}
@@ -526,12 +391,12 @@ namespace Components.Grid
 		[PropertySpace, Button(ButtonSizes.Medium)]
 		private void GenerateGrid()
 		{
-			if (_grid != null)
+			if (Grid != null)
 			{
 				ClearGrid();
 			}
 
-			_grid = new Grid(_gridXValue, _gridYValue, _cellSize, _originPosition, _groundHolder, _showDebug);
+			Grid = new Grid(_gridXValue, _gridYValue, _cellSize, _originPosition, _groundHolder, _showDebug);
 			_tileController.SelectATileType();
 
 			PlaceExtractors();
@@ -560,7 +425,7 @@ namespace Components.Grid
 				Destroy(objectTile.gameObject);
 			}
 
-			_grid.ClearCellsData();
+			Grid.ClearCellsData();
 			_instancedObjects.Clear();
 		}
 
@@ -608,7 +473,7 @@ namespace Components.Grid
 			//Reset all cell linked to the machine. 
 			foreach (var node in machineToSell.Nodes)
 			{
-				if (!_grid.TryGetCellByCoordinates(node.GridPosition.x, node.GridPosition.y, out Cell linkedCell))
+				if (!Grid.TryGetCellByCoordinates(node.GridPosition.x, node.GridPosition.y, out Cell linkedCell))
 				{
 					continue;
 				}
@@ -646,16 +511,16 @@ namespace Components.Grid
 			List<(int, int)> extractorPotentialCoordinates = new List<(int, int)>();
 
 			// Instantiate ground blocks 
-			for (int x = 0; x < _grid.GetWidth(); x++)
+			for (int x = 0; x < Grid.GetWidth(); x++)
 			{
-				for (int z = 0; z < _grid.GetHeight(); z++)
+				for (int z = 0; z < Grid.GetHeight(); z++)
 				{
-					_grid.TryGetCellByCoordinates(x, z, out var chosenCell);
+					Grid.TryGetCellByCoordinates(x, z, out var chosenCell);
 
-					TileController tile = _tileController.GenerateTile(chosenCell, _grid, _groundHolder, _cellSize);
+					TileController tile = _tileController.GenerateTile(chosenCell, Grid, _groundHolder, _cellSize);
 
 					// Get the zone where the extractors can be placed 
-					if ((x == 0 && z <= _grid.GetWidth() / 2) || z == _grid.GetHeight() - 1 || z == 0)
+					if ((x == 0 && z <= Grid.GetWidth() / 2) || z == Grid.GetHeight() - 1 || z == 0)
 					{
 						extractorPotentialCoordinates.Add(new(x, z));
 						continue;
@@ -667,9 +532,9 @@ namespace Components.Grid
 						continue;
 					}
 
-					if (x != 1 && x != _grid.GetWidth() - 2 && z != 1 && z != _grid.GetHeight() - 2)
+					if (x != 1 && x != Grid.GetWidth() - 2 && z != 1 && z != Grid.GetHeight() - 2)
 					{
-						_obstacleController.GenerateObstacle(_grid, chosenCell, _obstacleHolder, _cellSize);
+						_obstacleController.GenerateObstacle(Grid, chosenCell, _obstacleHolder, _cellSize);
 					}
 				}
 			}
@@ -680,27 +545,27 @@ namespace Components.Grid
 				// We want to place an extractor here. 
 				if (randomExtractorCoordinates.Contains(i))
 				{
-					_grid.TryGetCellByCoordinates(extractorPotentialCoordinates[i].Item1, extractorPotentialCoordinates[i].Item2, out var chosenCell);
+					Grid.TryGetCellByCoordinates(extractorPotentialCoordinates[i].Item1, extractorPotentialCoordinates[i].Item2, out var chosenCell);
 					var ingredient = selectedIngredients.Dequeue();
 
 					//Debug.Log($"Going to place on ({chosenCell.X}, {chosenCell.Y}) an extractor with ingredient: {ingredient}"); 
 
 					var extractorTemplate = ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("Dispenser");
 
-					_currentMachinePreview = Instantiate(_machineControllerPrefab);
-					_currentMachinePreview.InstantiatePreview(extractorTemplate, _cellSize);
+					var machine = Instantiate(_machineControllerPrefab);
+					machine.InstantiatePreview(extractorTemplate, _cellSize);
 
 					// Make sure that the machine are correctly oriented. 
 					if (chosenCell.Y == 0)
 					{
-						_currentMachinePreview.RotatePreview(270);
+						machine.RotatePreview(270);
 					}
-					if (chosenCell.Y == _grid.GetHeight() - 1)
+					if (chosenCell.Y == Grid.GetHeight() - 1)
 					{
-						_currentMachinePreview.RotatePreview(90);
+						machine.RotatePreview(90);
 					}
 
-					AddMachineToGrid(extractorTemplate, chosenCell, false);
+					AddMachineToGrid(machine, chosenCell, false);
 
 					if (chosenCell.Node.Machine.Behavior is ExtractorMachineBehaviour extractorMachineBehaviour)
 					{
@@ -728,16 +593,16 @@ namespace Components.Grid
 			}
 
 			// Instantiate ground blocks 
-			for (int x = 0; x < _grid.GetWidth(); x++)
+			for (int x = 0; x < Grid.GetWidth(); x++)
 			{
-				for (int z = 0; z < _grid.GetHeight(); z++)
+				for (int z = 0; z < Grid.GetHeight(); z++)
 				{
-					_grid.TryGetCellByCoordinates(x, z, out var chosenCell);
+					Grid.TryGetCellByCoordinates(x, z, out var chosenCell);
 
-					TileController tile = _tileController.GenerateTile(chosenCell, _grid, _groundHolder, _cellSize);
+					TileController tile = _tileController.GenerateTile(chosenCell, Grid, _groundHolder, _cellSize);
 
 					// Get the zone where the extractors can be placed 
-					if ((x == _grid.GetWidth() - 1))
+					if ((x == Grid.GetWidth() - 1))
 					{
 						sellersPotentialCoordinates.Add(new(x, z));
 						continue;
@@ -752,11 +617,12 @@ namespace Components.Grid
 				if (randomExtractorCoordinates.Contains(i))
 				{
 					var ingredient = selectedIngredients.Dequeue();
-					_grid.TryGetCellByCoordinates(sellersPotentialCoordinates[i].Item1, sellersPotentialCoordinates[i].Item2, out var chosenCell);
+					Grid.TryGetCellByCoordinates(sellersPotentialCoordinates[i].Item1, sellersPotentialCoordinates[i].Item2, out var chosenCell);
 					var destructorTemplate = ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("Destructor");
-					_currentMachinePreview = Instantiate(_machineControllerPrefab);
-					_currentMachinePreview.InstantiatePreview(destructorTemplate, _cellSize);
-					AddMachineToGrid(destructorTemplate, chosenCell, false);
+					
+					var machine = Instantiate(_machineControllerPrefab);
+					machine.InstantiatePreview(destructorTemplate, _cellSize);
+					AddMachineToGrid(machine, chosenCell, false);
 
 					if (chosenCell.Node.Machine.Behavior is DestructorMachineBehaviour destructorMachineBehaviour)
 					{
