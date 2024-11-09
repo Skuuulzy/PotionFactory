@@ -298,37 +298,40 @@ namespace Components.Grid
 			}
 		}
 
-		private bool TryGetAllPotentialConnection(List<Port> machinePorts, Vector2Int gridPosition, out List<Port> potentialPorts)
+		public bool TryGetAllPotentialConnection(List<Node> machineNodes, Vector2Int gridPosition, out List<Port> potentialPorts)
 		{
 			potentialPorts = new List<Port>();
 			
-			foreach (var port in machinePorts)
+			foreach (var node in machineNodes)
 			{
-				var potentialNeighbourPosition = new Vector2Int();
+				foreach (var port in node.Ports)
+				{
+					var potentialNeighbourPosition = new Vector2Int();
 				
-				switch (port.Side)
-				{
-					case Side.DOWN:
-						potentialNeighbourPosition = new Vector2Int(gridPosition.x, gridPosition.y - 1);
-						break;
-					case Side.UP:
-						potentialNeighbourPosition = new Vector2Int(gridPosition.x, gridPosition.y + 1);
-						break;
-					case Side.RIGHT:
-						potentialNeighbourPosition = new Vector2Int(gridPosition.x + 1, gridPosition.y);
-						break;
-					case Side.LEFT:
-						potentialNeighbourPosition = new Vector2Int(gridPosition.x - 1, gridPosition.y);
-						break;
-					case Side.NONE:
-						break;
-					default:
-						throw new ArgumentOutOfRangeException();
-				}
+					switch (port.Side)
+					{
+						case Side.DOWN:
+							potentialNeighbourPosition = new Vector2Int(gridPosition.x, gridPosition.y - 1);
+							break;
+						case Side.UP:
+							potentialNeighbourPosition = new Vector2Int(gridPosition.x, gridPosition.y + 1);
+							break;
+						case Side.RIGHT:
+							potentialNeighbourPosition = new Vector2Int(gridPosition.x + 1, gridPosition.y);
+							break;
+						case Side.LEFT:
+							potentialNeighbourPosition = new Vector2Int(gridPosition.x - 1, gridPosition.y);
+							break;
+						case Side.NONE:
+							break;
+						default:
+							throw new ArgumentOutOfRangeException();
+					}
 
-				if (TryGetPotentialConnection(port, potentialNeighbourPosition, out Port potentialPort))
-				{
-					potentialPorts.Add(potentialPort);
+					if (TryGetPotentialConnection(port, potentialNeighbourPosition, out Port potentialPort))
+					{
+						potentialPorts.Add(potentialPort);
+					}
 				}
 			}
 
