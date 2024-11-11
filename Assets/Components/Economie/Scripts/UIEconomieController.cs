@@ -6,22 +6,22 @@ namespace Components.Economy
     public class UIEconomieController : MonoBehaviour
     {
         [SerializeField] private TextMeshProUGUI _playerMoneyText;
-        [SerializeField] private TextMeshProUGUI _playerStateMoneyText;
-        [SerializeField] private TextMeshProUGUI _moneyStateObjectiveText;
+        [SerializeField] private TextMeshProUGUI _playerStateScoreText;
+        [SerializeField] private TextMeshProUGUI _scoreStateObjectiveText;
 
         private void Start()
         {
 	        _playerMoneyText.text = "0";
             EconomyController.OnPlayerMoneyUpdated += UpdateUIPlayerMoney;
-            EconomyController.OnStatePlayerMoneyUpdated += UpdateUIStatePlayerMoney;
-            EconomyController.OnMoneyStateObjectiveUpdated += UpdateMoneyStateObjective;
+            EconomyController.OnStatePlayerScoreUpdated += UpdateUIStatePlayerScore;
+            EconomyController.OnScoreStateObjectiveUpdated += UpdateScoreStateObjective;
 		}
 
 		private void OnDestroy()
 		{
             EconomyController.OnPlayerMoneyUpdated -= UpdateUIPlayerMoney;
-            EconomyController.OnStatePlayerMoneyUpdated -= UpdateUIStatePlayerMoney;
-            EconomyController.OnMoneyStateObjectiveUpdated -= UpdateMoneyStateObjective;
+            EconomyController.OnStatePlayerScoreUpdated -= UpdateUIStatePlayerScore;
+            EconomyController.OnScoreStateObjectiveUpdated -= UpdateScoreStateObjective;
 		}
 
 		private void UpdateUIPlayerMoney(int playerMoney)
@@ -29,19 +29,23 @@ namespace Components.Economy
             _playerMoneyText.text = $"{playerMoney}";
 		}
 
-		private void UpdateUIStatePlayerMoney(int playerStateMoney)
+		private void UpdateUIStatePlayerScore(int playerStateMoney)
 		{
-			_playerStateMoneyText.text = $"{playerStateMoney}";
+			_playerStateScoreText.text = $"{playerStateMoney}";
 		}
 
-		private void UpdateMoneyStateObjective(int money)
+		private void UpdateScoreStateObjective(int money)
 		{
-			_moneyStateObjectiveText.text = $"Objective {money}";
+			_scoreStateObjectiveText.text = $"Objective {money}";
 		}
 
+		public void DebugAddScore()
+		{
+			EconomyController.Instance.AddScore(1000);
+		}
 		public void DebugAddMoney()
 		{
-			EconomyController.Instance.AddMoney(1000);
+			EconomyController.Instance.AddMoney(10);
 		}
-    }
+	}
 }

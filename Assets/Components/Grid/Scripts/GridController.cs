@@ -550,7 +550,7 @@ namespace Components.Grid
 			_instancedObjects.Remove(machineToSell.Controller);
 			Destroy(machineToSell.Controller.gameObject);
 
-			EconomyController.Instance.AddMoney(sellPrice);
+			EconomyController.Instance.AddScore(sellPrice);
 			machineToSell = null;
 		}
 

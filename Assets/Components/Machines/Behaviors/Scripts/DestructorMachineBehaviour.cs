@@ -29,7 +29,7 @@ namespace Components.Machines.Behaviors
 				}             
             }
             
-            EconomyController.Instance.AddMoney(sellPrice);
+            EconomyController.Instance.AddScore(sellPrice);
             
             // Clear the machine items
             machine.RemoveAllItems();
