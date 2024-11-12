@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Components.Bundle;
 using Components.Ingredients;
 using Components.Machines;
 using Components.Recipes;
@@ -16,12 +17,14 @@ namespace Database
         public const string INGREDIENTS_SO_PATH = "Components/Ingredients/Resources/";
         public const string RECIPES_SO_PATH = "Components/Recipes/Resources/";
         public const string MACHINE_SO_PATH = "Components/Machines/Resources/";
+        public const string BUNDLE_SO_PATH = "Components/Bundles/Resources/";
 
         
         // -------------------------------------- DATA BASE CONSTRUCTION ---------------------------------------------
         static ScriptableObjectDatabase()
         {
             // This static constructor will be called at the first time GetScriptableObject is called. Some nice lazy initialization here.
+            LoadAllScriptableObjects<IngredientsBundle>();
             LoadAllScriptableObjects<IngredientTemplate>();
             LoadAllScriptableObjects<RecipeTemplate>();
             LoadAllScriptableObjects<MachineTemplate>();

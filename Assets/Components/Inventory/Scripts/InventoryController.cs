@@ -1,4 +1,6 @@
+using Components.Bundle;
 using Components.Machines;
+using Components.Map;
 using Components.Shop.ShopItems;
 using System;
 using System.Collections;
@@ -41,7 +43,16 @@ namespace Components.Inventory
 			{
 				AddMachineToPlayerInventory(kvp.Key, kvp.Value);
 			}
+
+			MapGenerator.OnMapChoiceConfirm += HandleMapChoiceConfirm;
 		}
+
+		private void OnDestroy()
+		{
+			MapGenerator.OnMapChoiceConfirm -= HandleMapChoiceConfirm;
+		}
+
+
 
 		//--------------------------------------------------------- ADDING AND REMOVING MACHINES CONSUMABLE AND RELICS --------------------------------------------------------------
 
@@ -106,6 +117,19 @@ namespace Components.Inventory
 			_relicTemplatesList.Remove(relicTemplate);
 			OnRelicRemoved?.Invoke(relicTemplate);
 
+		}
+
+		private void HandleMapChoiceConfirm(IngredientsBundle bundle, bool isFirstChoice)
+		{
+			if(bundle.MachinesTemplateList.Count == 0)
+			{
+				return;
+			}
+
+			foreach(MachineTemplate machineTemplate in bundle.MachinesTemplateList)
+			{
+				AddMachineToPlayerInventory(machineTemplate, 1);
+			}
 		}
 	}
 }
