@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Components.Recipes.Grimoire
 {
-    public class GrimoireUIController : MonoBehaviour
+    public class UIGrimoireController : MonoBehaviour
     {
         [SerializeField] private Transform _entriesHolder;
         [SerializeField] private GrimoireEntryView _entryViewPrefab;

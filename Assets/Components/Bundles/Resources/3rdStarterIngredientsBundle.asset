@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf8d0ce6031bd984c9e40dce46dae368, type: 3}
+  m_Name: 3rdStarterIngredientsBundle
+  m_EditorClassIdentifier: 
+  _bundleName: 3rd ingredients bundle
+  _ingredientsTemplateList:
+  - {fileID: 11400000, guid: 1ca3930523cd32b40809d45aa6b76170, type: 2}
+  - {fileID: 11400000, guid: fb534f1a76860384fb7770909321f5ec, type: 2}
+  - {fileID: 11400000, guid: 5950eaaf29d27e64689295ed30b8510b, type: 2}
+  - {fileID: 11400000, guid: 4c4b8ebd182bb1449930284c55e9287b, type: 2}
+  _machinesTemplateList:
+  - {fileID: 11400000, guid: d9b4f87b93b82084995dc89e7e2e31b6, type: 2}
+  - {fileID: 11400000, guid: e3c8fe1fe18466341a8e21c615ad5cfc, type: 2}
+  _isStartingBundle: 1
