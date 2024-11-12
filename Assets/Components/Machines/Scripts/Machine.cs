@@ -16,6 +16,8 @@ namespace Components.Machines
         [SerializeField] private List<Node> _nodes;
         [SerializeField, ReadOnly] private MachineController _controller;
         [SerializeField] private MachineBehavior _behavior;
+
+        [ShowInInspector] private int _internalRotationDebug;
         
         private readonly MachineTemplate _template;
         
@@ -45,6 +47,7 @@ namespace Components.Machines
 
         public void UpdateNodesRotation(int rotation)
         {
+            _internalRotationDebug = rotation;
             ReplaceNodesViaRotation(rotation, true);
         }
 

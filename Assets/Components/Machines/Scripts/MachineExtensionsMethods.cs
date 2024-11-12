@@ -103,20 +103,69 @@ namespace Components.Machines
             }
         }
 
-        public static int Angle(this Side side)
+        public static int AngleFromSide(this Side side)
         {
             switch (side)
             {
+                case Side.LEFT:
+                case Side.RIGHT:
+                    return 0;
                 case Side.DOWN:
                     return 90;
                 case Side.UP:
                     return 270;
-                case Side.RIGHT:
-                case Side.LEFT:
-                    return 0;
+                    
+                // This should be it but the preview arrow are not oriented correctly if used.   
+                //case Side.RIGHT:
+                    //return 180;
+                
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(side), side, null);
+                    Debug.LogError($"Cannot determine an angle from the side:{side}");
+                    return -1;
             }
+        }
+
+        public static Side SideFromAngle(this int angle)
+        {
+            switch (angle)
+            {
+                case 0:
+                    return Side.RIGHT;
+                case 90:
+                    return Side.DOWN;
+                case 180:
+                    return Side.LEFT;
+                case 270:
+                    return Side.UP;
+                default:
+                    Debug.LogError($"Cannot determine a side from the angle:{angle}");
+                    return Side.NONE;
+            }
+        }
+
+        public static Vector2Int GetNeighbourPosition(this Side side, Vector2Int position)
+        {
+            switch (side)
+            {
+                case Side.DOWN:
+                    return new Vector2Int(position.x, position.y - 1);
+                case Side.UP:
+                    return new Vector2Int(position.x, position.y + 1);
+                case Side.RIGHT:
+                    return new Vector2Int(position.x + 1, position.y);
+                case Side.LEFT:
+                    return new Vector2Int(position.x - 1, position.y);
+                default:
+                    Debug.LogError($"Cannot determine neighbour position at side: {side} from position: {position}");
+                    return Vector2Int.zero;
+            }
+        }
+        
+        public static int NormalizeAngle(this int angle)
+        {
+            angle %= 360;
+            if (angle < 0) angle += 360;
+            return angle;
         }
     }
 }

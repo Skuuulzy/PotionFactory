@@ -107,6 +107,8 @@ namespace Components.Grid
         {
 	        return new Vector3(X + Size / 2, 0, Y + Size / 2) * Size + originPosition;
         }
+
+        public Vector2Int Position => new(X, Y);
     }
 
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using CodeMonkey.Utils;
 using Components.Inventory;
 using Components.Machines;
+using Database;
 using UnityEngine;
 
 namespace Components.Grid
@@ -18,6 +19,7 @@ namespace Components.Grid
         [SerializeField] private Transform _previewHolder;
 
         [Header("Special Rotation Behaviour")] 
+        [SerializeField] private bool _useSubMachine;
         [SerializeField] private SerializableDictionary<MachineTemplate, List<RotationSubMachine>> _subMachineRotation;
         
         private UnityEngine.Camera _camera;
@@ -25,11 +27,12 @@ namespace Components.Grid
         private MachineController _currentMachinePreview;
         private MachineController _currentSubMachinePreview;
         
-        private int _currentInputRotation;
-        private int _currentMachineRotation;
+        [SerializeField] private int _currentInputRotation;
+        [SerializeField] private int _currentMachineRotation;
         
         private bool _isFactoryState = true;
 
+        private Vector3 _lastCellPosition = new(-1, -1, -1);
         
         private Grid Grid => _gridController.Grid;
 
@@ -92,13 +95,6 @@ namespace Components.Grid
             _currentMachinePreview = InstantiateMachine(template, _currentInputRotation);
         }
         
-        private void InstantiateSubPreview(MachineTemplate template, int rotation)
-        {
-            DestroySubPreview();
-            _currentSubMachinePreview = InstantiateMachine(template, rotation);
-            _currentMachineRotation = rotation;
-        }
-
         private void ShowPreview(bool show)
         {
             _currentMachinePreview.gameObject.SetActive(show);
@@ -125,7 +121,16 @@ namespace Components.Grid
             {
                 if (Grid.TryGetCellByPosition(worldMousePosition, out Cell cell))
                 {
-                    _previewHolder.transform.position = cell.GetCenterPosition(_gridController.OriginPosition);
+                    var cellPosition = cell.GetCenterPosition(_gridController.OriginPosition);
+
+                    // Preventing the computation when staying on the same cell.
+                    if (cellPosition == _lastCellPosition)
+                    {
+                        return;
+                    }
+                    
+                    _previewHolder.transform.position = cellPosition;
+                    _lastCellPosition = cellPosition;
                 }
             }
             else
@@ -133,37 +138,11 @@ namespace Components.Grid
                 _previewHolder.transform.position = worldMousePosition;
             }
 
-            if (!_currentMachinePreview)
+            // Checking for special rotational behaviors.
+            if (_useSubMachine && _currentMachinePreview && _subMachineRotation.ContainsKey(_currentMachinePreview.Machine.Template))
             {
-                return;
+                CheckForSubPreview(worldMousePosition);
             }
-            
-            // Check for special rotation behaviour
-            if (_subMachineRotation.ContainsKey(_currentMachinePreview.Machine.Template))
-            {
-                foreach (var rotationSubMachine in _subMachineRotation[_currentMachinePreview.Machine.Template])
-                {
-                    if (rotationSubMachine.TargetInputRotation != _currentInputRotation) 
-                        continue;
-                    
-                    var potentialSubMachine = rotationSubMachine.Machine;
-
-                    // Get the grid position
-                    if (!Grid.TryGetCellByPosition(worldMousePosition, out var cell)) 
-                        continue;
-                    
-                    // Check for potential neighbour
-                    if (!_gridController.TryGetAllPotentialConnection(potentialSubMachine.Nodes, new Vector2Int(cell.X, cell.Y), out _))
-                        continue;
-                    
-                    InstantiateSubPreview(potentialSubMachine, 0);
-                    ShowPreview(false);
-                            
-                    return;
-                }
-            }
-            
-            ShowPreview(true);
         }
         
         private void RotatePreview()
@@ -175,6 +154,8 @@ namespace Components.Grid
 
             _currentInputRotation += 90;
             _currentInputRotation %= 360;
+
+            _currentMachineRotation = _currentInputRotation;
             
             if (_currentMachinePreview != null)
             {
@@ -190,6 +171,14 @@ namespace Components.Grid
             }
         }
         
+        // ------------------------------------------------------------------------- SUB PREVIEW BEHAVIOUR -------------------------------------------------------------------------------- 
+        private void InstantiateSubPreview(MachineTemplate template, int rotation)
+        {
+            DestroySubPreview();
+            _currentSubMachinePreview = InstantiateMachine(template, rotation);
+            _currentMachineRotation = rotation;
+        }
+        
         private void DestroySubPreview()
         {
             if (_currentSubMachinePreview)
@@ -197,7 +186,35 @@ namespace Components.Grid
                 Destroy(_currentSubMachinePreview.gameObject);
             }
         }
-        
+
+        private void CheckForSubPreview(Vector3 worldMousePosition)
+        {
+            // Get the grid position
+            if (!Grid.TryGetCellByPosition(worldMousePosition, out var cell))
+                return;
+
+            var leftLocalAngle = (_currentInputRotation - 90).NormalizeAngle();
+            var rightLocalAngle = (_currentInputRotation + 90).NormalizeAngle();
+            
+            if (_gridController.ScanForPotentialConnection(cell.Position, leftLocalAngle.SideFromAngle(), Way.OUT))
+            {
+                InstantiateSubPreview(ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("ConveyorLeftToUp"), rightLocalAngle);
+                ShowPreview(false);
+                
+                return;
+            }
+            
+            if (_gridController.ScanForPotentialConnection(cell.Position, rightLocalAngle.SideFromAngle(), Way.OUT))
+            {
+                InstantiateSubPreview(ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("ConveyorLeftToDown"), leftLocalAngle);
+                ShowPreview(false);
+                
+                return;
+            }
+            
+            ShowPreview(true);
+        }
+
         // ------------------------------------------------------------------------- GRID COMMUNICATION -------------------------------------------------------------------------------- 
         private void AddSelectedMachineToGrid()
         {

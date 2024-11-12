@@ -12,7 +12,8 @@
     public enum Way
     {
         IN,
-        OUT
+        OUT,
+        NONE
     }
     
     public enum MachineType

@@ -37,13 +37,21 @@ namespace Components.Machines
 
         public void ConnectTo(Port connectedPort)
         {
-            // The two port have the same connection type
-            if (_way == connectedPort.Way || _connectedPort == connectedPort)
+            // Prevent recursive call. Not sure if this a design error. 
+            if (_connectedPort == connectedPort)
             {
                 return;
             }
             
+            // The two port have the same connection type.
+            if (_way == connectedPort.Way)
+            {
+                Debug.LogError("Unable to connect those ports, they have the same way !");
+                return;
+            }
+            
             _connectedPort = connectedPort;
+            
             // Tell to the other port too.
             connectedPort.ConnectTo(this);
         }

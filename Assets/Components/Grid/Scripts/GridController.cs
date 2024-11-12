@@ -269,16 +269,14 @@ namespace Components.Grid
 					}
 				}
 			}
-			//originCell. 
+			
 			machineController.ConfirmPlacement();
 			
-			if (!fetchFromInventory)
+			if (fetchFromInventory)
 			{
-				return;
+				//Remove one machine from the inventory 
+				InventoryController.Instance.DecreaseMachineToPlayerInventory(machineController.Machine.Template, 1);
 			}
-
-			//Remove one machine from the inventory 
-			InventoryController.Instance.DecreaseMachineToPlayerInventory(machineController.Machine.Template, 1);
 		}
 
 		private void TryConnectPort(Port port, Vector2Int neighbourPosition)
@@ -430,6 +428,27 @@ namespace Components.Grid
 
 			Grid.ClearCellsData();
 			_instancedObjects.Clear();
+		}
+
+		public bool ScanForPotentialConnection(Vector2Int cellPosition, Side sideToScan, Way desiredWay)
+		{
+			var neighbourPosition = sideToScan.GetNeighbourPosition(cellPosition);
+			
+			if (Grid.TryGetCellByCoordinates(neighbourPosition.x, neighbourPosition.y, out var cell))
+			{
+				if (cell.ContainsNode)
+				{
+					foreach (var port in cell.Node.Ports)
+					{
+						if (port.Side == sideToScan.Opposite() && port.Way == desiredWay)
+						{
+							return true;
+						}
+					}
+				}
+			}
+
+			return false;
 		}
 
 		// ------------------------------------------------------------------------- STATES METHODS ---------------------------------------------------------------------- 
