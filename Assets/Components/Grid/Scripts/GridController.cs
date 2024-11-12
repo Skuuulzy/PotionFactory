@@ -604,26 +604,26 @@ namespace Components.Grid
 				// We want to place an extractor here. 
 				if (randomExtractorCoordinates.Contains(i))
 				{
-					_grid.TryGetCellByCoordinates(_extractorPotentialCoordinates[i].Item1, _extractorPotentialCoordinates[i].Item2, out var chosenCell);
+					Grid.TryGetCellByCoordinates(_extractorPotentialCoordinates[i].Item1, _extractorPotentialCoordinates[i].Item2, out var chosenCell);
 
 					//Debug.Log($"Going to place on ({chosenCell.X}, {chosenCell.Y}) an extractor with ingredient: {ingredient}"); 
 
-					var extractorTemplate = ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("Extractor");
+					var extractorTemplate = ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("Dispenser");
 
-					_currentMachinePreview = Instantiate(_machineControllerPrefab);
-					_currentMachinePreview.InstantiatePreview(extractorTemplate, _cellSize);
+					var machine = Instantiate(_machineControllerPrefab);
+					machine.InstantiatePreview(extractorTemplate, _cellSize);
 
 					// Make sure that the machine are correctly oriented. 
 					if (chosenCell.Y == 0)
 					{
-						_currentMachinePreview.RotatePreview(270);
+						machine.RotatePreview(270);
 					}
-					if (chosenCell.Y == _grid.GetHeight() - 1)
+					if (chosenCell.Y == Grid.GetHeight() - 1)
 					{
-						_currentMachinePreview.RotatePreview(90);
+						machine.RotatePreview(90);
 					}
 
-					AddMachineToGrid(extractorTemplate, chosenCell, false);
+					AddMachineToGrid(machine, chosenCell, false);
 
 					if (chosenCell.Node.Machine.Behavior is ExtractorMachineBehaviour extractorMachineBehaviour)
 					{

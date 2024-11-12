@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using CodeMonkey.Utils;
 using Components.Inventory;
 using Components.Machines;
+using Components.Map;
 using Database;
 using UnityEngine;
 
@@ -51,7 +52,7 @@ namespace Components.Grid
         private void Update()
         {
             //Can't interact with anything if we are not in factory state 
-            if (!_isFactoryState)
+            if (!_isFactoryState || Grid == null)
             {
                 return;
             }
