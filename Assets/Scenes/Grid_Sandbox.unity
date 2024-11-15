@@ -2274,12 +2274,23 @@ PrefabInstance:
       propertyPath: m_Name
       value: UIStateController
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 8891006847143582540, guid: 610a453a4b89c6848b363cb792b4894a, type: 3}
+    m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 610a453a4b89c6848b363cb792b4894a, type: 3}
+--- !u!114 &3061453988998842679 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8891006847143582540, guid: 610a453a4b89c6848b363cb792b4894a,
+    type: 3}
+  m_PrefabInstance: {fileID: 3061453988998842678}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a08017b9b7e3ff9409201367c7e4a84e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &3810620071360970218
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2694,7 +2705,7 @@ PrefabInstance:
         type: 3}
       propertyPath: _uiStateController
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 3061453988998842679}
     - target: {fileID: 6163826407555121162, guid: bc2c6f6d7f401c0478445e371db8a800,
         type: 3}
       propertyPath: _planningFactoryStateTime
