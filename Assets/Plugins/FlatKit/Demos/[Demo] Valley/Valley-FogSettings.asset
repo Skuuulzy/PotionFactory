@@ -48,16 +48,15 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _DistanceFogIntensity: 0.694
+    - _DistanceFogIntensity: 0.721
     - _DistanceHeightBlend: 0.251
     - _Far: 150
-    - _HeightFogIntensity: 0.631
+    - _HeightFogIntensity: 0
     - _HighWorldY: 35
     - _LowWorldY: 0
     - _Near: 27
     m_Colors: []
   m_BuildTextureStacks: []
-  m_AllowLocking: 1
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -142,4 +141,4 @@ MonoBehaviour:
   distanceHeightBlend: 0.251
   renderEvent: 550
   applyInSceneView: 1
-  effectMaterial: {fileID: -5893212418065708504}
+  effectMaterial: {fileID: 0}
