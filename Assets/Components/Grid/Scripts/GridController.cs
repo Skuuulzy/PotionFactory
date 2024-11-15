@@ -510,7 +510,7 @@ namespace Components.Grid
 			_instancedObjects.Remove(machineToSell.Controller);
 			Destroy(machineToSell.Controller.gameObject);
 
-			EconomyController.Instance.AddScore(sellPrice);
+			InventoryController.Instance.AddMachineToPlayerInventory(machineToSell.Template, 1);
 			machineToSell = null;
 		}
 
