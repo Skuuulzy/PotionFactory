@@ -81,7 +81,7 @@ MonoBehaviour:
   _gridXValue: 24
   _gridYValue: 24
   _cellSize: 1
-  _startPosition: {x: 0, y: 0, z: 0}
+  _originPosition: {x: 0, y: 0, z: 0}
   _showDebug: 0
   _groundTile: {fileID: 5488635875282986484, guid: 763f6990e5d7f74418e2a1161ea2cfeb,
     type: 3}
@@ -98,6 +98,9 @@ MonoBehaviour:
   _obstacleController: {fileID: 11400000, guid: 4e515b2a00523b04699a5b6777c492a2,
     type: 2}
   _extractorsOnGridCount: 4
+  _sellersOnGridCount: 4
+  _runConfiguration: {fileID: 0}
+  _snapping: 1
 --- !u!1 &3142047636322267640
 GameObject:
   m_ObjectHideFlags: 0

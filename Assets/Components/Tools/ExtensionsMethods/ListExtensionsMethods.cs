@@ -16,7 +16,7 @@ namespace Components.Tools.ExtensionMethods
         
             while (selectedIndexes.Count < numberOfIndexes)
             {
-                int randomIndex = random.Next(0, listCount);
+                int randomIndex = random.Next(0, listCount - 1);
                 selectedIndexes.Add(randomIndex); // HashSet prevents duplicates automatically
             }
         

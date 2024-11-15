@@ -102,6 +102,13 @@ namespace Components.Grid
                 effect.ApplyEffect(_node.Machine.Behavior);
 			}
         }
+
+        public Vector3 GetCenterPosition(Vector3 originPosition)
+        {
+	        return new Vector3(X + Size / 2, 0, Y + Size / 2) * Size + originPosition;
+        }
+
+        public Vector2Int Position => new(X, Y);
     }
 
 

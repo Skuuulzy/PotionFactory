@@ -1,7 +1,4 @@
 using System;
-using System.Collections.Generic;
-using Database;
-using UnityEngine;
 using VComponent.Tools.Singletons;
 
 namespace Components.Machines

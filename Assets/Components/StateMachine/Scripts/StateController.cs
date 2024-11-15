@@ -1,4 +1,6 @@
+using Components.Map;
 using Cysharp.Threading.Tasks;
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using VComponent.Tools.Timer;
@@ -23,6 +25,7 @@ public class StateController : MonoBehaviour
 			return;
 		}
 
+		MapState.OnMapStateStarted += HandleMapState;
 		PlanningFactoryState.OnPlanningFactoryStateStarted += HandlePlanningFactoryState;
 		ResolutionFactoryState.OnResolutionFactoryStateStarted += HandleResolutionFactoryState;
 		ShopState.OnShopStateStarted += HandleShopState;
@@ -31,17 +34,22 @@ public class StateController : MonoBehaviour
 		_stateMachine = new StateMachine();
 
 		//Declare state 
+		MapState mapState = new MapState();
 		PlanningFactoryState planningFactoryState = new PlanningFactoryState();
 		ResolutionFactoryState resolutionFactoryState = new ResolutionFactoryState();
 		ShopState shopState = new ShopState();
 
 		//Define transitions  
+		At(mapState, planningFactoryState, new FuncPredicate(() => mapState.IsFinished));
 		At(planningFactoryState, resolutionFactoryState, new FuncPredicate(() => planningFactoryState.IsFinished));
 		At(resolutionFactoryState, shopState, new FuncPredicate(() => resolutionFactoryState.IsFinished));
-		At(shopState, planningFactoryState, new FuncPredicate(() => shopState.IsFinished));
+		At(shopState, planningFactoryState, new FuncPredicate(() => shopState.IsFinished && shopState.StateIndex % 4 != 0));
+		At(shopState, mapState, new FuncPredicate(() => shopState.IsFinished && shopState.StateIndex % 4 == 0));
 
-		StartStateMachine(planningFactoryState);
+		StartStateMachine(mapState);
 	}
+
+
 
 	private async void StartStateMachine(BaseState stateToStart)
 	{
@@ -74,6 +82,10 @@ public class StateController : MonoBehaviour
 	}
 
 	//------------------------------------------------------------------------ STATE STARTED -------------------------------------------------------------------------------------------- 
+	private void HandleMapState(MapState state)
+	{
+		MapGenerator.OnMapChoiceConfirm += state.MapChoiceConfirmed;
+	}
 
 	private void HandleShopState(ShopState state)
 	{

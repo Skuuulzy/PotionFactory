@@ -12,7 +12,8 @@
     public enum Way
     {
         IN,
-        OUT
+        OUT,
+        NONE
     }
     
     public enum MachineType
@@ -20,7 +21,7 @@
         CAULDRON,
         CONVEYOR,
         DESTRUCTOR,
-        DISPANCER,
+        DISPENSER,
         DISTILLER,
         EXTRACTOR,
         MIXER,
