@@ -111,9 +111,9 @@ namespace Components.Machines
                 case Side.RIGHT:
                     return 0;
                 case Side.DOWN:
-                    return 90;
-                case Side.UP:
                     return 270;
+                case Side.UP:
+                    return 90;
                     
                 // This should be it but the preview arrow are not oriented correctly if used.   
                 //case Side.RIGHT:
