@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using Components.Grid.Obstacle;
 using Components.Grid.Tile;
+using Components.Ingredients;
 using Components.Machines;
 using UnityEngine;
 
@@ -15,14 +17,19 @@ namespace Components.Grid
         public bool ContainsNode { get; private set; }
         public bool ContainsObstacle { get; private set; }
         public bool ContainsTile { get; private set; }
+        public bool ContainsIngredient { get; private set; }
 
 		[SerializeField] private ObstacleController _obstacleController; 
 		[SerializeField] private TileController _tileController; 
 		[SerializeField] private Node _node; 
+		[SerializeField] private IngredientTemplate _ingredient;
+        [SerializeField] private List<RelicEffect> _relicEffects; 
        
         public ObstacleController ObstacleController => _obstacleController;  
         public TileController TileController => _tileController;  
         public Node Node => _node;
+        public IngredientTemplate Ingredient => _ingredient;
+        public List<RelicEffect> RelicEffects => _relicEffects;
 
         public Cell(int x, int y, float size, bool containsObject)
         {
@@ -30,6 +37,7 @@ namespace Components.Grid
             Y = y;
             Size = size;
             ContainsObject = containsObject;
+            _relicEffects = new List<RelicEffect>();
         }
 
         public void AddObstacleToCell(ObstacleController obstacle)
@@ -58,7 +66,6 @@ namespace Components.Grid
 			ContainsTile = false;
 		}
 
-
 		public void AddNodeToCell(Node node)
         {
             ContainsNode = true;
@@ -73,7 +80,35 @@ namespace Components.Grid
             _node = null;
         }
 
+        public void AddIngredientToCell(IngredientTemplate ingredientTemplate)
+        {
+	        ContainsObject = true;
+	        ContainsIngredient = true;
+	        _ingredient = ingredientTemplate;
+        }
 
+        public void RemoveIngredientFromCell()
+        {
+	        ContainsObject = false;
+	        ContainsIngredient = false;
+	        _ingredient = null;
+        }
+
+        public void AddRelicEffectToCell(RelicEffect effect)
+        {
+            _relicEffects.Add(effect);
+            if(_node != null)
+			{
+                effect.ApplyEffect(_node.Machine.Behavior);
+			}
+        }
+
+        public Vector3 GetCenterPosition(Vector3 originPosition)
+        {
+	        return new Vector3(X + Size / 2, 0, Y + Size / 2) * Size + originPosition;
+        }
+
+        public Vector2Int Position => new(X, Y);
     }
 
 

@@ -1,4 +1,6 @@
+using Components.Bundle;
 using Components.Machines;
+using Components.Map;
 using Components.Shop.ShopItems;
 using System;
 using System.Collections;
@@ -35,24 +37,30 @@ namespace Components.Inventory
 			_playerMachinesDictionary = new Dictionary<MachineTemplate, int>();
 			_consumableTemplatesList = new List<ConsumableTemplate>();
 			_relicTemplatesList = new List<RelicTemplate>();
+			
 			//Creating the player inventory with a basic template
 			foreach(var kvp in _defaultPlayerInventory.MachineDictionary.ToDictionary())
 			{
 				AddMachineToPlayerInventory(kvp.Key, kvp.Value);
 			}
+
+			MapGenerator.OnMapChoiceConfirm += HandleMapChoiceConfirm;
 		}
 
-		//-------------------------------------------------------------------------------- ADDING AND REMOVING MACHINES CONSUMABLE AND RELICS -------------------------------------------------------------------------------------
+		private void OnDestroy()
+		{
+			MapGenerator.OnMapChoiceConfirm -= HandleMapChoiceConfirm;
+		}
+
+
+
+		//--------------------------------------------------------- ADDING AND REMOVING MACHINES CONSUMABLE AND RELICS --------------------------------------------------------------
 
 		public void AddMachineToPlayerInventory(MachineTemplate machineTemplate, int numberOfMachine)
 		{
-			if (_playerMachinesDictionary.ContainsKey(machineTemplate))
+			if (!_playerMachinesDictionary.TryAdd(machineTemplate, numberOfMachine))
 			{
                 _playerMachinesDictionary[machineTemplate] += numberOfMachine;
-			}
-			else
-			{
-				_playerMachinesDictionary.Add(machineTemplate, numberOfMachine);
 			}
 
 			OnMachineAddedOrRemoved?.Invoke(machineTemplate, _playerMachinesDictionary[machineTemplate]);
@@ -63,13 +71,17 @@ namespace Components.Inventory
 			if (_playerMachinesDictionary.ContainsKey(machineTemplate))
 			{
 				_playerMachinesDictionary[machineTemplate] -= numberOfMachine;
+				OnMachineAddedOrRemoved?.Invoke(machineTemplate, _playerMachinesDictionary[machineTemplate]);
 			}
 			else
 			{
 				Debug.LogError($"Can't remove this machine :{machineTemplate} because player doesn't has it in inventory");
 			}
+		}
 
-			OnMachineAddedOrRemoved?.Invoke(machineTemplate, _playerMachinesDictionary[machineTemplate]);
+		public int CountMachineOfType(MachineTemplate machineTemplate)
+		{
+			return _playerMachinesDictionary.GetValueOrDefault(machineTemplate, 0);
 		}
 
 		public void AddConsumableToPlayerInventory(ConsumableTemplate consumableTemplate, int v)
@@ -105,6 +117,19 @@ namespace Components.Inventory
 			_relicTemplatesList.Remove(relicTemplate);
 			OnRelicRemoved?.Invoke(relicTemplate);
 
+		}
+
+		private void HandleMapChoiceConfirm(IngredientsBundle bundle, bool isFirstChoice)
+		{
+			if(bundle.MachinesTemplateList.Count == 0)
+			{
+				return;
+			}
+
+			foreach(MachineTemplate machineTemplate in bundle.MachinesTemplateList)
+			{
+				AddMachineToPlayerInventory(machineTemplate, 1);
+			}
 		}
 	}
 }

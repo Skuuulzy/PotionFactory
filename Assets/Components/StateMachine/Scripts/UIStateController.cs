@@ -1,8 +1,5 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
+using Components.Economy;
 using TMPro;
-using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -13,21 +10,31 @@ public class UIStateController : MonoBehaviour
 	[SerializeField] private Image _stateCountdownImage;
 	[SerializeField] private Button _finishStateButton;
 
+	[Header("GameOver")]
+	[SerializeField] private GameObject _gameOverGO;
+
 	private void Awake()
 	{
 		BaseState.OnStateStarted += DisplayNewState;
+		EconomyController.OnGameOver += HandleGameOver;
+	}
+
+	private void OnDestroy()
+	{
+		BaseState.OnStateStarted -= DisplayNewState;
+		EconomyController.OnGameOver -= HandleGameOver;
 	}
 
 	private void DisplayNewState(BaseState state)
 	{
-		_stateNameText.text = state.StateName;
+		_stateNameText.text = $"{state.StateName} : {state.StateIndex}";
 		_stateUITitleAnimator.SetTrigger("DisplayState");
 	}
 
 	public void SetCountdownTime(float currentTime, float duration)
 	{
-		//Check if the timer is display
-		if(_stateCountdownImage.gameObject.activeSelf == false)
+		//Check if the timer is display 
+		if (_stateCountdownImage.gameObject.activeSelf == false)
 		{
 			_stateCountdownImage.gameObject.SetActive(true);
 		}
@@ -44,5 +51,10 @@ public class UIStateController : MonoBehaviour
 	{
 		_finishStateButton.gameObject.SetActive(true);
 		_finishStateButton.onClick.AddListener(state.SetStateFinished);
+	}
+
+	private void HandleGameOver()
+	{
+		_gameOverGO.SetActive(true);
 	}
 }

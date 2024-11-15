@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _name: Press
   _type: 7
-  _gridView: {fileID: 4070157535812024309, guid: 41a52d56237d5e040acd0c38b62496df,
+  _gridView: {fileID: 4070157535812024309, guid: af3c7da050a971a4a884c83d2436cc6e,
     type: 3}
-  _uiView: {fileID: 21300000, guid: 0b3b933b9932dde4eadfce2854c03d1e, type: 3}
+  _uiView: {fileID: 21300000, guid: d2c60d08339a9194eab23b7cb54ba23c, type: 3}
   _behavior: {fileID: 11400000, guid: 150ba0f5943b5cf478cf810bb3648a20, type: 2}
   _nodes:
   - _localPosition: {x: 0, y: 0}
@@ -27,8 +27,10 @@ MonoBehaviour:
     - _side: 2
       _way: 1
   _maxItemCount: -1
+  _processTime: 4
   _shopSpawnProbability: 0.8
   _shopPrice: 900
+  _cannotBeSell: 0
   _sellPrice: 100
   _contextualComponents:
   - {fileID: -7985585081776399288, guid: 587b9316180125b4597d80cce119472f, type: 3}

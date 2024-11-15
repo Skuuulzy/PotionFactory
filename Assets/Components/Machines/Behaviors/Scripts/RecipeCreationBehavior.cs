@@ -9,10 +9,14 @@ namespace Components.Machines.Behaviors
     public class RecipeCreationBehavior : MachineBehavior
     {
         private RecipeTemplate _currentRecipe;
+        
+        // TODO: Normalize behaviour with CurrentTick in MachineBehavior
         private int _currentProcessTime;
+        private int _additionalRecipeProcessTime;
 
-        public RecipeTemplate CurrentRecipe => _currentRecipe;
+        public int FullProcessTime => InitialProcessTime + _additionalRecipeProcessTime - Mathf.RoundToInt((InitialProcessTime + _additionalRecipeProcessTime) * RelicEffectBonusProcessTime);
         public int CurrentProcessTime => _currentProcessTime;
+        public RecipeTemplate CurrentRecipe => _currentRecipe;
 
         public override void Process(Machine machine)
         {
@@ -22,7 +26,9 @@ namespace Components.Machines.Behaviors
                 if (ScriptableObjectDatabase.TryFindRecipe(machine.Template, machine.Ingredients, out RecipeTemplate recipe))
                 {
                     _currentRecipe = recipe;
-                    Debug.Log($"Machine: {machine.Controller.name} found recipe: {_currentRecipe.name}. Start processing for {_processTime} ticks.");
+                    _additionalRecipeProcessTime = Mathf.RoundToInt(machine.Template.ProcessTime * recipe.ProcessTimeModifier);
+                    
+                    Debug.Log($"Machine: {machine.Controller.name} found recipe: {_currentRecipe.name}. Start processing for {FullProcessTime} ticks.");
                 }
                 else
                 {
@@ -33,7 +39,7 @@ namespace Components.Machines.Behaviors
             ProcessingRecipe = true;
             
             // Increment the process time until we reach it.
-            if (_currentProcessTime < _processTime)
+            if (_currentProcessTime < FullProcessTime)
             {
                 _currentProcessTime++;
                 return;

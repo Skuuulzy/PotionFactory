@@ -4,6 +4,7 @@ using Components.Interactions.Clickable;
 using Components.Ingredients;
 using Components.Tick;
 using UnityEngine;
+using Components.Machines.Behaviors;
 
 namespace Components.Machines
 {
@@ -33,7 +34,13 @@ namespace Components.Machines
             _view = Instantiate(machineTemplate.GridView, _3dViewHolder);
             _machine = new Machine(machineTemplate, this);
             _view.transform.localScale = new Vector3(scale, scale, scale);
-            
+
+            SetupSelectionCollider(machineTemplate);
+            SetupDirectionalArrows(machineTemplate);
+        }
+
+        private void SetupDirectionalArrows(MachineTemplate machineTemplate)
+        {
             _previewObjects = new List<GameObject>();
             
             foreach (var node in machineTemplate.Nodes)
@@ -41,8 +48,10 @@ namespace Components.Machines
                 foreach (var port in node.Ports)
                 {
                     var previewArrow = Instantiate(port.Way == Way.IN ? _inPreview : _outPreview, _view.transform);
+                    
                     previewArrow.transform.localPosition = new Vector3(node.LocalPosition.x, previewArrow.transform.position.y, node.LocalPosition.y);
-                    previewArrow.transform.Rotate(Vector3.up, port.Side.Angle());
+                    previewArrow.transform.Rotate(Vector3.up, port.Side.AngleFromSide());
+                    
                     _previewObjects.Add(previewArrow);
                 }
             }
@@ -60,6 +69,7 @@ namespace Components.Machines
             {
                 Destroy(previewObject);
             }
+            
             _previewObjects.Clear();
             
             _initialized = true;
@@ -67,11 +77,19 @@ namespace Components.Machines
             _machine.OnTick += Tick;
             _machine.OnPropagateTick += PropagateTick;
             _machine.OnItemAdded += ShowItem;
+            _machine.Behavior.SetInitialProcessTime(_machine.Template.ProcessTime);
             _machine.LinkNodeData();
-            
+
+
+            if(_machine.Behavior is DestructorMachineBehaviour destructor)
+            {
+                destructor.OnSpecialIngredientChanged += ShowItem;
+			}
+
             AddMachineToChain();
         }
 
+        // ------------------------------------------------------------------------- DESTROY -------------------------------------------------------------------------
         private void OnDestroy()
         {
             if (!_initialized)
@@ -86,6 +104,7 @@ namespace Components.Machines
             _machine.OnItemAdded -= ShowItem;
         }
 
+        // ------------------------------------------------------------------------- TICK -------------------------------------------------------------------------
         // Base tick called by the tick system.
         private void Tick()
         {
@@ -193,7 +212,6 @@ namespace Components.Machines
         }
 
         // ------------------------------------------------------------------------- ITEM -------------------------------------------------------------------------
-        
         // TODO: The ingredient should not be controlled by the machine but need to be independent and linked to a machine.
         private void ShowItem(bool show)
         {
@@ -206,8 +224,30 @@ namespace Components.Machines
                 _ingredientController.DestroyRepresentation();
             }
         }
+
+        //TO Change : special for destructor behavior
+        private void ShowItem(IngredientTemplate ingredient)
+        {
+			_ingredientController.CreateFavoriteSellerItemRepresentationFromTemplate(ingredient);
+		}
         
         // ------------------------------------------------------------------------- CLICKABLE BEHAVIOUR -------------------------------------------------------------------------
+        private void SetupSelectionCollider(MachineTemplate machineTemplate)
+        {
+            if (TryGetComponent(out BoxCollider boxCollider))
+            {
+                var machineSize = machineTemplate.Size();
+                boxCollider.size = new Vector3(machineSize.width, 1, machineSize.length);
+
+                var machineCenter = machineTemplate.Center();
+                boxCollider.center = new Vector3(machineCenter.X, 0.5f, machineCenter.Z);
+            }
+            else
+            {
+                Debug.LogError($"No selection box collider found on {name}. This machine cannot be selected.");
+            }
+        }
+        
         public void Clicked()
         {
             if (!_initialized)

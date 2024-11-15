@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Components.Machines.Behaviors;
 using Components.Machines.UIView;
 using UnityEngine;
@@ -18,11 +19,15 @@ namespace Components.Machines
 
         [Header("Structure")] 
         [SerializeField] private List<Node> _nodes;
-
-        [Header("Parameters")] 
+        
+        [Header("Process")]
         [SerializeField] private int _maxItemCount = -1;
+        [SerializeField] private int _processTime;
+        
+        [Header("Shop")]
         [SerializeField] private float _shopSpawnProbability;
         [SerializeField] private int _shopPrice = 200;
+        [SerializeField] private bool _cannotBeSell;
         [SerializeField] private int _sellPrice = 100;
 
         [Header("Contextual View")] 
@@ -35,11 +40,42 @@ namespace Components.Machines
         public Sprite UIView => _uiView;
 
         public List<Node> Nodes => GetNodeInstance();
+        
+        /// Return the size of the machine based on his nodes.
+        public (int width, int length) Size()
+        {
+            int minX = _nodes.Min(node => node.LocalPosition.x);
+            int maxX = _nodes.Max(node => node.LocalPosition.x);
+            int minY = _nodes.Min(node => node.LocalPosition.y);
+            int maxY = _nodes.Max(node => node.LocalPosition.y);
+        
+            int width = maxX - minX + 1;
+            int length = maxY - minY + 1;
+        
+            return (width, length);
+        }
+        
+        /// Return the coordinates of the center of the machine.
+        public (float X, float Z) Center()
+        {
+            int minX = _nodes.Min(node => node.LocalPosition.x);
+            int maxX = _nodes.Max(node => node.LocalPosition.x);
+            int minY = _nodes.Min(node => node.LocalPosition.y);
+            int maxY = _nodes.Max(node => node.LocalPosition.y);
+
+            float centerX = (minX + maxX) / 2f;
+            float centerZ = (minY + maxY) / 2f;
+
+            return (centerX, centerZ);
+        }
 
         public int MaxItemCount => _maxItemCount;
+        public int ProcessTime => _processTime;
+
         public float ShopSpawnProbability => _shopSpawnProbability;
         public int ShopPrice => _shopPrice;
         public int SellPrice => _sellPrice;
+        public bool CannotBeSell => _cannotBeSell;
 
         public List<UIContextualComponent> ContextualComponents => _contextualComponents;
 
@@ -60,5 +96,7 @@ namespace Components.Machines
         {
             return _behavior.Clone();
         }
+        
+
     }
 }

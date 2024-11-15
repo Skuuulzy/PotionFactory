@@ -1,5 +1,8 @@
+using Components.Map;
 using Cysharp.Threading.Tasks;
+using System;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using VComponent.Tools.Timer;
 
 public class StateController : MonoBehaviour
@@ -8,45 +11,51 @@ public class StateController : MonoBehaviour
 	[SerializeField] private UIStateController _uiStateController;
 	[SerializeField] private int _planningFactoryStateTime = 180;
 	[SerializeField] private int _resolutionFactoryStateTime = 120;
-	
+
 	private CountdownTimer _countdownTimer;
 
-	// StateMachine
+	// StateMachine 
 	private StateMachine _stateMachine;
 
-	//------------------------------------------------------------------------ MONO --------------------------------------------------------------------------------------------
+	//------------------------------------------------------------------------ MONO -------------------------------------------------------------------------------------------- 
 	private void Start()
-    {
-	    if (_disable)
-	    {
-		    return;
-	    }
-	    
-        PlanningFactoryState.OnPlanningFactoryStateStarted += HandlePlanningFactoryState;
-        ResolutionFactoryState.OnResolutionFactoryStateStarted += HandleResolutionFactoryState;
-        ShopState.OnShopStateStarted += HandleShopState;
+	{
+		if (_disable)
+		{
+			return;
+		}
 
-		//State Machine
+		MapState.OnMapStateStarted += HandleMapState;
+		PlanningFactoryState.OnPlanningFactoryStateStarted += HandlePlanningFactoryState;
+		ResolutionFactoryState.OnResolutionFactoryStateStarted += HandleResolutionFactoryState;
+		ShopState.OnShopStateStarted += HandleShopState;
+
+		//State Machine 
 		_stateMachine = new StateMachine();
 
-		//Declare state
+		//Declare state 
+		MapState mapState = new MapState();
 		PlanningFactoryState planningFactoryState = new PlanningFactoryState();
 		ResolutionFactoryState resolutionFactoryState = new ResolutionFactoryState();
 		ShopState shopState = new ShopState();
 
-		//Define transitions 
+		//Define transitions  
+		At(mapState, planningFactoryState, new FuncPredicate(() => mapState.IsFinished));
 		At(planningFactoryState, resolutionFactoryState, new FuncPredicate(() => planningFactoryState.IsFinished));
 		At(resolutionFactoryState, shopState, new FuncPredicate(() => resolutionFactoryState.IsFinished));
-		At(shopState, planningFactoryState, new FuncPredicate(() => shopState.IsFinished));
+		At(shopState, planningFactoryState, new FuncPredicate(() => shopState.IsFinished && shopState.StateIndex % 4 != 0));
+		At(shopState, mapState, new FuncPredicate(() => shopState.IsFinished && shopState.StateIndex % 4 == 0));
 
-		StartStateMachine(planningFactoryState);
+		StartStateMachine(mapState);
 	}
+
+
 
 	private async void StartStateMachine(BaseState stateToStart)
 	{
-		//Wait 1sec to let everyone subscribe to event
+		//Wait 1sec to let everyone subscribe to event 
 		await UniTask.WaitForSeconds(1);
-		//Set initial state
+		//Set initial state 
 		_stateMachine.SetState(stateToStart);
 	}
 
@@ -58,21 +67,25 @@ public class StateController : MonoBehaviour
 	}
 
 	private void Update()
-    {
-	    if (_disable)
-	    {
-		    return;
-	    }
-	    
+	{
+		if (_disable)
+		{
+			return;
+		}
+
 		_stateMachine.Update();
-		if (_countdownTimer != null )
+		if (_countdownTimer != null)
 		{
 			_countdownTimer.Tick(Time.deltaTime);
 			_uiStateController.SetCountdownTime(_countdownTimer.Time, _countdownTimer.InitialTime);
 		}
-    }
+	}
 
-	//------------------------------------------------------------------------ STATE STARTED --------------------------------------------------------------------------------------------
+	//------------------------------------------------------------------------ STATE STARTED -------------------------------------------------------------------------------------------- 
+	private void HandleMapState(MapState state)
+	{
+		MapGenerator.OnMapChoiceConfirm += state.MapChoiceConfirmed;
+	}
 
 	private void HandleShopState(ShopState state)
 	{
@@ -82,7 +95,6 @@ public class StateController : MonoBehaviour
 
 	private void HandlePlanningFactoryState(PlanningFactoryState state)
 	{
-		
 		_countdownTimer = new CountdownTimer(_planningFactoryStateTime);
 		BaseState.OnStateEnded += _countdownTimer.Stop;
 		_countdownTimer.OnTimerStop += state.SetStateFinished;
@@ -90,7 +102,6 @@ public class StateController : MonoBehaviour
 		_countdownTimer.Start();
 		_uiStateController.DisplayFinishStateButton(state);
 
-		
 	}
 
 	private void HandleResolutionFactoryState(ResolutionFactoryState state)
@@ -105,4 +116,9 @@ public class StateController : MonoBehaviour
 
 	void At(IState from, IState to, IPredicate condition) => _stateMachine.AddTransition(from, to, condition);
 	void Any(IState to, IPredicate condition) => _stateMachine.AddAnyTransition(to, condition);
+
+	public void LaunchMainMenu()
+	{
+		SceneManager.LoadScene("Main_Menu", LoadSceneMode.Single);
+	}
 }

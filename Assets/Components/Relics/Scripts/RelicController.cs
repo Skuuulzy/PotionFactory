@@ -1,5 +1,6 @@
 using Components.Grid;
 using Components.Interactions.Clickable;
+using Components.Relics.Behavior;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -25,14 +26,14 @@ namespace Components.Relics
 		private int _mapWidth;
 		private int _mapHeight;
 		private Grid.Grid _grid;
-
+		List<Cell> _zone;
 
 		// ------------------------------------------------------------------------- INIT -------------------------------------------------------------------------
 		public void InstantiatePreview(RelicTemplate relicTemplate, float scale)
 		{
 			_view = Instantiate(relicTemplate.GridView, _3dViewHolder);
 			_relic = new Relic(relicTemplate, this);
-			_view.transform.localScale = new Vector3(scale, scale, scale);
+			_view.transform.localScale = new Vector3(scale, _view.transform.localScale.y, scale);
 			_template = relicTemplate;
 		}
 
@@ -42,12 +43,33 @@ namespace Components.Relics
 
 		}
 
-		public void ConfirmPlacement()
+		public void ConfirmPlacement(Cell chosenCell, int radius, int mapWidth, int mapHeight, Grid.Grid grid)
 		{
-
 			_initialized = true;
-
 			_relic.OnTick += Tick;
+			DrawZoneGizmos(chosenCell, radius, mapWidth, mapHeight, grid);
+
+			CheckRelicType();
+		}
+
+		private void CheckRelicType()
+		{
+			foreach (RelicEffect effect in _template.RelicBehavior.Effects)
+			{
+				switch (effect.Type)
+				{
+					case RelicEffectType.MACHINE_RELIC_TYPE:
+						if(_zone == null)
+						{
+							_zone = GetZone(_chosenCell, _radius, _mapWidth, _mapHeight, _grid);
+							foreach(Cell cell in _zone)
+							{
+								cell.AddRelicEffectToCell(effect);
+							}
+						}
+						break;
+				}
+			}
 
 		}
 
@@ -87,7 +109,7 @@ namespace Components.Relics
 		/// <param name="originX">X-coordinate of the origin cell.</param>
 		/// <param name="originY">Y-coordinate of the origin cell.</param>
 		/// <param name="radius">The radius of the zone.</param>
-		public void DrawZoneGizmos(Cell chosenCell, int radius, int mapWidth, int mapHeight, Grid.Grid grid)
+		private void DrawZoneGizmos(Cell chosenCell, int radius, int mapWidth, int mapHeight, Grid.Grid grid)
 		{
 			_chosenCell = chosenCell;
 			_radius = radius;
@@ -104,10 +126,10 @@ namespace Components.Relics
 				return;
 			}
 
-			List<Cell> zone = GetZone(_chosenCell, _radius, _mapWidth, _mapHeight, _grid);
+			_zone = GetZone(_chosenCell, _radius, _mapWidth, _mapHeight, _grid);
 			Gizmos.color = Color.red;
 
-			foreach (Cell cell in zone)
+			foreach (Cell cell in _zone)
 			{
 				Vector3 cellPosition = new Vector3(cell.X + cell.Size / 2, 0 , cell.Y + cell.Size / 2);
 				Gizmos.DrawCube(cellPosition, new Vector3(1,0.1f,1));; // Draw a cube for each cell in the zone
