@@ -927,6 +927,8 @@ MonoBehaviour:
         Machine: {fileID: 11400000, guid: 90292e707a4abae45b7448b177ce587f, type: 2}
       - TargetInputRotation: 270
         Machine: {fileID: 11400000, guid: c121c9fa5531042449b8e215f2019e5f, type: 2}
+  _currentInputRotation: 0
+  _currentMachineRotation: 0
 --- !u!4 &943281390
 Transform:
   m_ObjectHideFlags: 0
@@ -2475,8 +2477,53 @@ PrefabInstance:
         type: 3}
     - target: {fileID: 2922091601394712576, guid: 0ef98c6108f43c54c81c54882a4836ec,
         type: 3}
+      propertyPath: _sellersCoordinates.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 2922091601394712576, guid: 0ef98c6108f43c54c81c54882a4836ec,
+        type: 3}
       propertyPath: _waterTileGenerationProbability
       value: 0.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 2922091601394712576, guid: 0ef98c6108f43c54c81c54882a4836ec,
+        type: 3}
+      propertyPath: _sellersCoordinates.Array.data[0].x
+      value: 23
+      objectReference: {fileID: 0}
+    - target: {fileID: 2922091601394712576, guid: 0ef98c6108f43c54c81c54882a4836ec,
+        type: 3}
+      propertyPath: _sellersCoordinates.Array.data[0].y
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 2922091601394712576, guid: 0ef98c6108f43c54c81c54882a4836ec,
+        type: 3}
+      propertyPath: _sellersCoordinates.Array.data[1].x
+      value: 23
+      objectReference: {fileID: 0}
+    - target: {fileID: 2922091601394712576, guid: 0ef98c6108f43c54c81c54882a4836ec,
+        type: 3}
+      propertyPath: _sellersCoordinates.Array.data[1].y
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2922091601394712576, guid: 0ef98c6108f43c54c81c54882a4836ec,
+        type: 3}
+      propertyPath: _sellersCoordinates.Array.data[2].x
+      value: 23
+      objectReference: {fileID: 0}
+    - target: {fileID: 2922091601394712576, guid: 0ef98c6108f43c54c81c54882a4836ec,
+        type: 3}
+      propertyPath: _sellersCoordinates.Array.data[2].y
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 2922091601394712576, guid: 0ef98c6108f43c54c81c54882a4836ec,
+        type: 3}
+      propertyPath: _sellersCoordinates.Array.data[3].x
+      value: 23
+      objectReference: {fileID: 0}
+    - target: {fileID: 2922091601394712576, guid: 0ef98c6108f43c54c81c54882a4836ec,
+        type: 3}
+      propertyPath: _sellersCoordinates.Array.data[3].y
+      value: 16
       objectReference: {fileID: 0}
     - target: {fileID: 8261476641421578247, guid: 0ef98c6108f43c54c81c54882a4836ec,
         type: 3}
