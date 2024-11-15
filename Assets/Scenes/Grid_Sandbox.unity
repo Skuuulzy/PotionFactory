@@ -217,12 +217,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!224 &319399929 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 9022945090145218068, guid: c3f3e7294973cde4180e3e86ba49d1a5,
-    type: 3}
-  m_PrefabInstance: {fileID: 2901243477890915105}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &250993071
 GameObject:
   m_ObjectHideFlags: 0
@@ -254,6 +248,12 @@ Transform:
   m_Children: []
   m_Father: {fileID: 943281390}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!224 &319399929 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 9022945090145218068, guid: c3f3e7294973cde4180e3e86ba49d1a5,
+    type: 3}
+  m_PrefabInstance: {fileID: 2901243477890915105}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &321831284
 GameObject:
   m_ObjectHideFlags: 0
@@ -755,7 +755,7 @@ GameObject:
   m_Component:
   - component: {fileID: 697047491}
   m_Layer: 0
-  m_Name: '----- UI -----'
+  m_Name: ----- UI -----
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1039,7 +1039,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1352410576}
   m_Layer: 0
-  m_Name: '----- MANAGERS -----'
+  m_Name: ----- MANAGERS -----
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

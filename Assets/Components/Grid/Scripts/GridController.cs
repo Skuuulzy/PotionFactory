@@ -86,7 +86,7 @@ namespace Components.Grid
 			_camera = UnityEngine.Camera.main;
 			PlanningFactoryState.OnPlanningFactoryStateStarted += HandlePlanningFactoryState;
 			ShopState.OnShopStateStarted += HandleShopState;
-			MachineContextualUIView.OnSellMachine += HandleMachineSold;
+			MachineContextualUIView.OnSellMachine += SellMachine;
 			ConsumableManager.OnChangeSelectedConsumable += UpdateSelection;
 			RelicManager.OnChangeSelectedRelic += UpdateSelection;
 			MapGenerator.OnMapChoiceConfirm += HandleMapChoiceConfirm;
@@ -96,7 +96,7 @@ namespace Components.Grid
 		{
 			PlanningFactoryState.OnPlanningFactoryStateStarted -= HandlePlanningFactoryState;
 			ShopState.OnShopStateStarted -= HandleShopState;
-			MachineContextualUIView.OnSellMachine -= HandleMachineSold;
+			MachineContextualUIView.OnSellMachine -= SellMachine;
 			ConsumableManager.OnChangeSelectedConsumable -= UpdateSelection;
 			RelicManager.OnChangeSelectedRelic -= UpdateSelection;
 			MapGenerator.OnMapChoiceConfirm-= HandleMapChoiceConfirm;
@@ -407,7 +407,6 @@ namespace Components.Grid
 			
 		}
 
-
 		private void ClearGrid()
 		{
 			foreach (var machineController in _instancedObjects)
@@ -494,7 +493,7 @@ namespace Components.Grid
 		}
 
 		// ------------------------------------------------------------------------ MACHINE METHODS ---------------------------------------------------------------------- 
-		private void HandleMachineSold(Machine machineToSell, int sellPrice)
+		public void SellMachine(Machine machineToSell, int sellPrice)
 		{
 			//Reset all cell linked to the machine. 
 			foreach (var node in machineToSell.Nodes)
@@ -511,6 +510,8 @@ namespace Components.Grid
 			Destroy(machineToSell.Controller.gameObject);
 
 			InventoryController.Instance.AddMachineToPlayerInventory(machineToSell.Template, 1);
+			
+			// For destroying the class instance, not sure if this a good way.
 			machineToSell = null;
 		}
 
