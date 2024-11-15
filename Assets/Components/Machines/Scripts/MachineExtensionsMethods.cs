@@ -103,7 +103,7 @@ namespace Components.Machines
             }
         }
 
-        public static int AngleFromSide(this Side side)
+        public static int AngleFromSide(this Side side, bool inverted = false)
         {
             switch (side)
             {
@@ -111,9 +111,9 @@ namespace Components.Machines
                 case Side.RIGHT:
                     return 0;
                 case Side.DOWN:
-                    return 270;
+                    return inverted ? 90 : 270;
                 case Side.UP:
-                    return 90;
+                    return inverted ? 270 :90;
                     
                 // This should be it but the preview arrow are not oriented correctly if used.   
                 //case Side.RIGHT:
@@ -124,6 +124,8 @@ namespace Components.Machines
                     return -1;
             }
         }
+        
+        
 
         public static Side SideFromAngle(this int angle)
         {

@@ -57,8 +57,11 @@ namespace Components.Grid
             {
                 return;
             }
-            
-            MovePreview();
+
+            if (!_cleanMode)
+            {
+                MovePreview();
+            }
 
             if (Input.GetMouseButtonDown(1))
             {
@@ -170,6 +173,17 @@ namespace Components.Grid
             if (_currentMachinePreview != null)
             {
                 _currentMachinePreview.RotatePreview(_currentInputRotation);
+            }
+            
+            // Checking for special rotational behaviors.
+            if (_useSubMachine && _currentMachinePreview && _subMachineRotation.ContainsKey(_currentMachinePreview.Machine.Template))
+            {
+                if (!UtilsClass.ScreenToWorldPositionIgnoringUI(Input.mousePosition, _camera, out Vector3 worldMousePosition))
+                {
+                    return;
+                }
+                
+                CheckForSubPreview(worldMousePosition);
             }
         }
 

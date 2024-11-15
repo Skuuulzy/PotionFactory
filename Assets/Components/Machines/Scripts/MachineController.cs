@@ -50,7 +50,9 @@ namespace Components.Machines
                     var previewArrow = Instantiate(port.Way == Way.IN ? _inPreview : _outPreview, _view.transform);
                     
                     previewArrow.transform.localPosition = new Vector3(node.LocalPosition.x, previewArrow.transform.position.y, node.LocalPosition.y);
-                    previewArrow.transform.Rotate(Vector3.up, port.Side.AngleFromSide());
+                    
+                    // TODO: Find why we need to invert the angle when the machine is only 1x1 (especially with curved conveyor).
+                    previewArrow.transform.Rotate(Vector3.up, port.Side.AngleFromSide(machineTemplate.Nodes.Count == 1));
                     
                     _previewObjects.Add(previewArrow);
                 }
