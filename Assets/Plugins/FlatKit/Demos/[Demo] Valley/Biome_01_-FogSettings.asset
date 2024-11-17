@@ -48,13 +48,13 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _DistanceFogIntensity: 0.7
+    - _DistanceFogIntensity: 0.8
     - _DistanceHeightBlend: 0.1
     - _Far: 50
     - _HeightFogIntensity: 0.4
     - _HighWorldY: 9
     - _LowWorldY: 0
-    - _Near: 27
+    - _Near: 28
     m_Colors: []
   m_BuildTextureStacks: []
 --- !u!114 &11400000
@@ -100,9 +100,9 @@ MonoBehaviour:
     m_ColorSpace: 0
     m_NumColorKeys: 2
     m_NumAlphaKeys: 3
-  near: 27
+  near: 28
   far: 50
-  distanceFogIntensity: 0.7
+  distanceFogIntensity: 0.8
   useHeight: 1
   heightGradient:
     serializedVersion: 2
