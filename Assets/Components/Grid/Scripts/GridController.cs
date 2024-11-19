@@ -5,7 +5,6 @@ using Components.Machines;
 using Sirenix.OdinInspector;
 using System;
 using System.Linq;
-using Components.Economy;
 using Components.Grid.Tile;
 using Components.Grid.Obstacle;
 using Components.Ingredients;
@@ -58,6 +57,9 @@ namespace Components.Grid
 		[Header("Movement Parameters")] 
 		[SerializeField] private bool _snapping;
 
+		[Header("Sellers Parameters")]
+		[SerializeField] private List<Vector2Int> _sellersCoordinates;
+
 		// Grid 
 		private readonly List<MachineController> _instancedObjects = new();
 		private readonly List<RelicController> _instancedRelics = new();
@@ -86,7 +88,7 @@ namespace Components.Grid
 			_camera = UnityEngine.Camera.main;
 			PlanningFactoryState.OnPlanningFactoryStateStarted += HandlePlanningFactoryState;
 			ShopState.OnShopStateStarted += HandleShopState;
-			MachineContextualUIView.OnSellMachine += HandleMachineSold;
+			MachineContextualUIView.OnSellMachine += SellMachine;
 			ConsumableManager.OnChangeSelectedConsumable += UpdateSelection;
 			RelicManager.OnChangeSelectedRelic += UpdateSelection;
 			MapGenerator.OnMapChoiceConfirm += HandleMapChoiceConfirm;
@@ -96,7 +98,7 @@ namespace Components.Grid
 		{
 			PlanningFactoryState.OnPlanningFactoryStateStarted -= HandlePlanningFactoryState;
 			ShopState.OnShopStateStarted -= HandleShopState;
-			MachineContextualUIView.OnSellMachine -= HandleMachineSold;
+			MachineContextualUIView.OnSellMachine -= SellMachine;
 			ConsumableManager.OnChangeSelectedConsumable -= UpdateSelection;
 			RelicManager.OnChangeSelectedRelic -= UpdateSelection;
 			MapGenerator.OnMapChoiceConfirm-= HandleMapChoiceConfirm;
@@ -407,7 +409,6 @@ namespace Components.Grid
 			
 		}
 
-
 		private void ClearGrid()
 		{
 			foreach (var machineController in _instancedObjects)
@@ -494,7 +495,7 @@ namespace Components.Grid
 		}
 
 		// ------------------------------------------------------------------------ MACHINE METHODS ---------------------------------------------------------------------- 
-		private void HandleMachineSold(Machine machineToSell, int sellPrice)
+		public void SellMachine(Machine machineToSell, int sellPrice)
 		{
 			//Reset all cell linked to the machine. 
 			foreach (var node in machineToSell.Nodes)
@@ -511,6 +512,8 @@ namespace Components.Grid
 			Destroy(machineToSell.Controller.gameObject);
 
 			InventoryController.Instance.AddMachineToPlayerInventory(machineToSell.Template, 1);
+			
+			// For destroying the class instance, not sure if this a good way.
 			machineToSell = null;
 		}
 
@@ -522,9 +525,9 @@ namespace Components.Grid
 			_extractorPotentialCoordinates = new List<(int, int)>();
 
 			// Instantiate ground blocks 
-			for (int x = 0; x < Grid.GetWidth(); x++)
+			for (int x = 0; x < Grid.GetWidth() - 4; x++)
 			{
-				for (int z = 0; z < Grid.GetHeight(); z++)
+				for (int z = 1; z < Grid.GetHeight(); z++)
 				{
 					Grid.TryGetCellByCoordinates(x, z, out var chosenCell);
 
@@ -637,7 +640,7 @@ namespace Components.Grid
 
 		private void PlaceSellers()
 		{
-			List<(int, int)> sellersPotentialCoordinates = new List<(int, int)>();
+			//List<(int, int)> sellersPotentialCoordinates = new List<(int, int)>();
 			var ingredientsFromRecipes = ScriptableObjectDatabase.GetAllScriptableObjectOfType<RecipeTemplate>().Select(template => template.OutIngredient).ToList();
 			var randomIngredientsIndexes = ListExtensionsMethods.GetRandomIndexes(ingredientsFromRecipes.Count, _sellersOnGridCount);
 			Queue<IngredientTemplate> selectedIngredients = new Queue<IngredientTemplate>();
@@ -660,33 +663,29 @@ namespace Components.Grid
 
 					TileController tile = _tileController.GenerateTile(chosenCell, Grid, _groundHolder, _cellSize);
 
-					// Get the zone where the extractors can be placed 
-					if ((x == Grid.GetWidth() - 1))
-					{
-						sellersPotentialCoordinates.Add(new(x, z));
-						continue;
-					}
+					//// Get the zone where the extractors can be placed 
+					//if ((x == Grid.GetWidth() - 1))
+					//{
+					//	sellersPotentialCoordinates.Add(new(x, z));
+					//	continue;
+					//}
 				}
 			}
 
-			var randomExtractorCoordinates = ListExtensionsMethods.GetRandomIndexes(sellersPotentialCoordinates.Count, _sellersOnGridCount);
-			for (int i = 0; i < sellersPotentialCoordinates.Count; i++)
+			//var randomExtractorCoordinates = ListExtensionsMethods.GetRandomIndexes(_sellersCoordinates.Count, _sellersOnGridCount);
+			for (int i = 0; i < _sellersCoordinates.Count; i++)
 			{
-				// We want to place an extractor here. 
-				if (randomExtractorCoordinates.Contains(i))
-				{
-					var ingredient = selectedIngredients.Dequeue();
-					Grid.TryGetCellByCoordinates(sellersPotentialCoordinates[i].Item1, sellersPotentialCoordinates[i].Item2, out var chosenCell);
-					var destructorTemplate = ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("Destructor");
-					
-					var machine = Instantiate(_machineControllerPrefab);
-					machine.InstantiatePreview(destructorTemplate, _cellSize);
-					AddMachineToGrid(machine, chosenCell, false);
+				var ingredient = selectedIngredients.Dequeue();
+				Grid.TryGetCellByCoordinates(_sellersCoordinates[i].x, _sellersCoordinates[i].y, out var chosenCell);
+				var destructorTemplate = ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("Destructor");
 
-					if (chosenCell.Node.Machine.Behavior is DestructorMachineBehaviour destructorMachineBehaviour)
-					{
-						_sellersBehaviours.Add(destructorMachineBehaviour);
-					}
+				var machine = Instantiate(_machineControllerPrefab);
+				machine.InstantiatePreview(destructorTemplate, _cellSize);
+				AddMachineToGrid(machine, chosenCell, false);
+
+				if (chosenCell.Node.Machine.Behavior is DestructorMachineBehaviour destructorMachineBehaviour)
+				{
+					_sellersBehaviours.Add(destructorMachineBehaviour);
 				}
 			}
 		}

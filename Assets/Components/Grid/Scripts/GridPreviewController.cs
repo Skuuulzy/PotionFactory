@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using CodeMonkey.Utils;
 using Components.Inventory;
 using Components.Machines;
-using Components.Map;
 using Database;
 using UnityEngine;
 
@@ -28,12 +27,13 @@ namespace Components.Grid
         private MachineController _currentMachinePreview;
         private MachineController _currentSubMachinePreview;
         
-        [SerializeField] private int _currentInputRotation;
-        [SerializeField] private int _currentMachineRotation;
+        private int _currentInputRotation;
+        private int _currentMachineRotation;
         
         private bool _isFactoryState = true;
-
         private Vector3 _lastCellPosition = new(-1, -1, -1);
+
+        private bool _cleanMode;
         
         private Grid Grid => _gridController.Grid;
 
@@ -47,6 +47,7 @@ namespace Components.Grid
             MachineManager.OnChangeSelectedMachine += InstantiatePreview;
             PlanningFactoryState.OnPlanningFactoryStateStarted += HandlePlanningFactoryState;
             ShopState.OnShopStateStarted += HandleShopState;
+            UIInventoryController.OnEnableCleanMode += HandleCleanMode;
         }
 
         private void Update()
@@ -56,28 +57,39 @@ namespace Components.Grid
             {
                 return;
             }
-            
-            MovePreview();
+
+            if (!_cleanMode)
+            {
+                MovePreview();
+            }
 
             if (Input.GetMouseButtonDown(1))
             {
                 DestroyPreview();
             }
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButton(0))
             {
-                AddSelectedMachineToGrid();
+                if (_cleanMode)
+                {
+                    TryDestroyHoveredMachine();
+                }
+                else
+                {
+                    AddSelectedMachineToGrid();
+                }
             }
             if (Input.GetMouseButtonDown(2))
             {
                 RotatePreview();
             }
         }
-        
+
         private void OnDestroy()
         {
             MachineManager.OnChangeSelectedMachine -= InstantiatePreview;
             PlanningFactoryState.OnPlanningFactoryStateStarted -= HandlePlanningFactoryState;
             ShopState.OnShopStateStarted -= HandleShopState;
+            UIInventoryController.OnEnableCleanMode -= HandleCleanMode;
         }
 
         private MachineController InstantiateMachine(MachineTemplate template, int rotation)
@@ -162,6 +174,17 @@ namespace Components.Grid
             {
                 _currentMachinePreview.RotatePreview(_currentInputRotation);
             }
+            
+            // Checking for special rotational behaviors.
+            if (_useSubMachine && _currentMachinePreview && _subMachineRotation.ContainsKey(_currentMachinePreview.Machine.Template))
+            {
+                if (!UtilsClass.ScreenToWorldPositionIgnoringUI(Input.mousePosition, _camera, out Vector3 worldMousePosition))
+                {
+                    return;
+                }
+                
+                CheckForSubPreview(worldMousePosition);
+            }
         }
 
         private void DestroyPreview()
@@ -235,9 +258,7 @@ namespace Components.Grid
             {
                 return;
             }
-
-
-
+            
             // Check if the machine can be placed on the grid. 
             foreach (var node in Preview.Machine.Nodes)
             {
@@ -252,7 +273,6 @@ namespace Components.Grid
                 // One node of the machine overlap a cell that already contain an object. 
                 if (overlapCell.ContainsObject)
                 {
-                    Debug.Log("Cannot place a machine, the cell is already occupied.");
                     return;
                 }
             }
@@ -268,15 +288,48 @@ namespace Components.Grid
             }
         }
         
+        private void TryDestroyHoveredMachine()
+        {
+            // Try to get the position on the grid. 
+            if (!UtilsClass.ScreenToWorldPositionIgnoringUI(Input.mousePosition, _camera, out Vector3 worldMousePosition))
+            {
+                return;
+            }
+
+            // Try getting the cell 
+            if (!Grid.TryGetCellByPosition(worldMousePosition, out Cell chosenCell))
+            {
+                return;
+            }
+
+            if (!chosenCell.ContainsNode)
+            {
+                return;
+            }
+            
+            _gridController.SellMachine(chosenCell.Node.Machine, 0);
+        }
+        
         // ------------------------------------------------------------------------- EVENT HANDLERS -------------------------------------------------------------------------------- 
-        private void HandlePlanningFactoryState(PlanningFactoryState obj)
+        private void HandlePlanningFactoryState(PlanningFactoryState _)
         {
             _isFactoryState = true;
         }
         
-        private void HandleShopState(ShopState obj)
+        private void HandleShopState(ShopState _)
         {
             _isFactoryState = false;
+        }
+        
+        private void HandleCleanMode(bool cleanMode)
+        {
+            _cleanMode = cleanMode;
+            
+            // Hide the preview
+            if (_currentMachinePreview)
+            {
+                _currentMachinePreview.gameObject.SetActive(!cleanMode);
+            }
         }
     }
 
