@@ -16,20 +16,10 @@ namespace Components.Grid.Obstacle
 		{
 			_randomBonusProbability = 0.0f;
 
-			//Dictionary<Side, Cell> neighboursCells = grid.GetNeighboursByPosition(chosenCell);
-			//foreach (Cell cell in neighboursCells.Values)
-			//{
-			//	if (cell.Obstacle != null)
-			//	{
-			//		_randomBonusProbability += 0.4f;
-			//	}
-			//}
-
 			if (!(Random.value <= _obstacleGenerationProbability + _randomBonusProbability))
 			{
 				return null;
 			}
-
 
 			var obstacle = Instantiate(_obstacleList[UnityEngine.Random.Range(0, _obstacleList.Count)], obstacleHolder);
 			obstacle.transform.position = grid.GetWorldPosition(chosenCell.X, chosenCell.Y) + new Vector3(cellSize / 2, 0, cellSize / 2);
@@ -64,7 +54,7 @@ namespace Components.Grid.Obstacle
 
 					obstacle.SetObstacleType(obstacleType);
 					chosenCell.AddObstacleToCell(obstacle);
-					return obstacleController;
+					return obstacle;
 				}
 			}
 

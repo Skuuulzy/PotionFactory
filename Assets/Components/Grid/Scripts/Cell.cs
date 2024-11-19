@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Components.Grid.Decorations;
 using Components.Grid.Obstacle;
 using Components.Grid.Tile;
 using Components.Ingredients;
@@ -23,7 +24,9 @@ namespace Components.Grid
 		[SerializeField] private TileController _tileController; 
 		[SerializeField] private Node _node; 
 		[SerializeField] private IngredientTemplate _ingredient;
-        [SerializeField] private List<RelicEffect> _relicEffects; 
+
+		[SerializeField] private List<RelicEffect> _relicEffects; 
+        [SerializeField] private List<DecorationController> _decorations;
        
         public ObstacleController ObstacleController => _obstacleController;  
         public TileController TileController => _tileController;  
@@ -101,6 +104,11 @@ namespace Components.Grid
 			{
                 effect.ApplyEffect(_node.Machine.Behavior);
 			}
+        }
+
+        public void AddDecorationToCell(DecorationController decoration)
+        {
+            _decorations.Add(decoration);
         }
 
         public Vector3 GetCenterPosition(Vector3 originPosition)

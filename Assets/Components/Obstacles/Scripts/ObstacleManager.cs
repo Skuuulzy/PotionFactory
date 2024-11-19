@@ -32,14 +32,15 @@ namespace Components.Grid.Obstacle
 			{
 				ObstacleSelectorView selectorView = Instantiate(_obstacleSelectorView, _obstacleSelectorViewHolder);
 				selectorView.Init(tile);
-				selectorView.OnSelected += HandleTileSelected;
+				selectorView.OnSelected += HandleObstacleSelected;
 			}
 
 			// Init selected machine has the first 
 			SelectedObstacle = _obstacleTemplateList[0];
 		}
 
-		private void HandleTileSelected(ObstacleTemplate obstacle)
+
+		private void HandleObstacleSelected(ObstacleTemplate obstacle)
 		{
 			SelectedObstacle = obstacle;
 			OnChangeSelectedObstacle?.Invoke(obstacle);
