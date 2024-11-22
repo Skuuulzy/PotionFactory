@@ -47,6 +47,11 @@ namespace Components.Inventory
 			GrimoireController.OnRelicRemoved -= RemoveRelicFromInventory;
 		}
 		
+		public void OpenInventory()
+		{
+            _machineSelectorViewParent.gameObject.SetActive(!_machineSelectorViewParent.gameObject.activeSelf);
+        }
+
 		private void HandleBaseInventoryCreated()
 		{
 			foreach (var machine in GrimoireController.Instance.PlayerMachinesDictionary)

@@ -8,7 +8,7 @@ namespace Components.Machines
 {
     public class MachineSelectorView : MonoBehaviour
     {
-        [SerializeField] private TMP_Text _name;
+        //[SerializeField] private TMP_Text _name;
         [SerializeField] private Image _background;
         [SerializeField] private TextMeshProUGUI _numberOfAvailableMAchineText;
 
@@ -22,13 +22,13 @@ namespace Components.Machines
         {
             _machine = machine;
 
-            _name.text = machine.Name;
+            //_name.text = machine.Name;
             _background.sprite = machine.UIView;
             UpdateNumberOfAvailableMachine(value);
         }
 
         
-
+        //Call by machine in player inventory
         public void Select()
         {
             if(GrimoireController.Instance.PlayerMachinesDictionary[_machine] > 0)
