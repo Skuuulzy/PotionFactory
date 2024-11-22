@@ -8,7 +8,7 @@ using VComponent.Tools.Singletons;
 
 namespace Components.Inventory
 {
-    public class InventoryController : Singleton<InventoryController>
+    public class GrimoireController : Singleton<GrimoireController>
     {
 		[SerializeField] private InventoryTemplate _defaultPlayerInventory;
 

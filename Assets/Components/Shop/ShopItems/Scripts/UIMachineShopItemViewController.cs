@@ -63,7 +63,7 @@ namespace Components.Shop.ShopItems
 				}
 			}
 
-			InventoryController.Instance.AddMachineToPlayerInventory(_shopItem.MachineTemplate, 1);
+			GrimoireController.Instance.AddMachineToPlayerInventory(_shopItem.MachineTemplate, 1);
 
 		}
 	}

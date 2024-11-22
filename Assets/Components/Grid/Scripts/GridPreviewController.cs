@@ -47,7 +47,7 @@ namespace Components.Grid
             MachineManager.OnChangeSelectedMachine += InstantiatePreview;
             PlanningFactoryState.OnPlanningFactoryStateStarted += HandlePlanningFactoryState;
             ShopState.OnShopStateStarted += HandleShopState;
-            UIInventoryController.OnEnableCleanMode += HandleCleanMode;
+            UIGrimoireController.OnEnableCleanMode += HandleCleanMode;
         }
 
         private void Update()
@@ -89,7 +89,7 @@ namespace Components.Grid
             MachineManager.OnChangeSelectedMachine -= InstantiatePreview;
             PlanningFactoryState.OnPlanningFactoryStateStarted -= HandlePlanningFactoryState;
             ShopState.OnShopStateStarted -= HandleShopState;
-            UIInventoryController.OnEnableCleanMode -= HandleCleanMode;
+            UIGrimoireController.OnEnableCleanMode -= HandleCleanMode;
         }
 
         private MachineController InstantiateMachine(MachineTemplate template, int rotation)
@@ -282,7 +282,7 @@ namespace Components.Grid
             _gridController.AddMachineToGrid(machineToAdd, chosenCell, true);
             
             //Instantiate the same machine type if we have enough in the inventory.
-            if (InventoryController.Instance.CountMachineOfType(Preview.Machine.Template) > 0)
+            if (GrimoireController.Instance.CountMachineOfType(Preview.Machine.Template) > 0)
             {
                 //InstantiatePreview(Preview.Machine.Template);
             }

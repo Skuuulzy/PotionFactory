@@ -230,7 +230,7 @@ namespace Components.Grid
 
 
 			//Remove one machine from the inventory 
-			InventoryController.Instance.RemoveRelicFromPlayerInventory(template);
+			GrimoireController.Instance.RemoveRelicFromPlayerInventory(template);
 			DeletePreview();
 
 		}
@@ -283,7 +283,7 @@ namespace Components.Grid
 			if (fetchFromInventory)
 			{
 				//Remove one machine from the inventory 
-				InventoryController.Instance.DecreaseMachineToPlayerInventory(machineController.Machine.Template, 1);
+				GrimoireController.Instance.DecreaseMachineToPlayerInventory(machineController.Machine.Template, 1);
 			}
 		}
 
@@ -392,7 +392,7 @@ namespace Components.Grid
 			_currentConsumablePreview.ConfirmPlacement(chosenCell);
 
 			//Remove one machine from the inventory 
-			InventoryController.Instance.RemoveConsumableFromPlayerInventory(template);
+			GrimoireController.Instance.RemoveConsumableFromPlayerInventory(template);
 			DeletePreview();
 		}
 
@@ -511,7 +511,7 @@ namespace Components.Grid
 			_instancedObjects.Remove(machineToSell.Controller);
 			Destroy(machineToSell.Controller.gameObject);
 
-			InventoryController.Instance.AddMachineToPlayerInventory(machineToSell.Template, 1);
+			GrimoireController.Instance.AddMachineToPlayerInventory(machineToSell.Template, 1);
 			
 			// For destroying the class instance, not sure if this a good way.
 			machineToSell = null;

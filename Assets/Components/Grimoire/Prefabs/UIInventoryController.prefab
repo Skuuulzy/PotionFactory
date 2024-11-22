@@ -678,18 +678,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 3388396359383161611}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a8c935e9a9fe35c488b4b2555356651f, type: 3}
+  m_Script: {fileID: 11500000, guid: 363d99ba78c11af47a4e261d8bc009a1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _machineSelectorViewPrefab: {fileID: 4789450057896576343, guid: d01f5d2668de1a246ab8b9b7504e53f6,
-    type: 3}
-  _consumableSelectorViewPrefab: {fileID: 8888690622200023719, guid: 4e76f1b3cc658d7448bc51c764453d65,
-    type: 3}
-  _relicSelectorViewPrefab: {fileID: 7913925984338699187, guid: 32619e6fb2f89854cbb1a17a44cff17e,
-    type: 3}
-  _machineSelectorViewParent: {fileID: 7922920105278793621}
-  _consumableSelectorViewParent: {fileID: 1925909772337961406}
-  _relicSelectorViewParent: {fileID: 6451627086883829643}
+  _machineSelectorViewPrefab: {fileID: 0}
+  _consumableSelectorViewPrefab: {fileID: 0}
+  _relicSelectorViewPrefab: {fileID: 0}
+  _machineSelectorViewParent: {fileID: 0}
+  _consumableSelectorViewParent: {fileID: 0}
+  _relicSelectorViewParent: {fileID: 0}
 --- !u!1 &3660073633246797156
 GameObject:
   m_ObjectHideFlags: 0

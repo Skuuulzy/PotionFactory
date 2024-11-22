@@ -31,7 +31,7 @@ namespace Components.Machines
 
         public void Select()
         {
-            if(InventoryController.Instance.PlayerMachinesDictionary[_machine] > 0)
+            if(GrimoireController.Instance.PlayerMachinesDictionary[_machine] > 0)
 			{
                 OnSelected?.Invoke(_machine);
             }
