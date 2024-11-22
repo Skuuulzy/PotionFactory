@@ -6,19 +6,19 @@ using UnityEngine;
 
 namespace Components.Recipes.Grimoire
 {
-    public class UIGrimoireController : MonoBehaviour
+    public class UIRecipeController : MonoBehaviour
     {
         [SerializeField] private Transform _entriesHolder;
-        [SerializeField] private GrimoireEntryView _entryViewPrefab;
+        [SerializeField] private RecipeEntryView _entryViewPrefab;
         
-        private List<GrimoireEntryView> _entryViews;
+        private List<RecipeEntryView> _entryViews;
         
         private void Awake()
         {
             var allRecipe = ScriptableObjectDatabase.GetAllScriptableObjectOfType<RecipeTemplate>();
             allRecipe = allRecipe.OrderBy(template => template.Ingredients.Count).ThenBy(template => template.OutIngredient.Name).ToList();
             
-            _entryViews = new List<GrimoireEntryView>();
+            _entryViews = new List<RecipeEntryView>();
             
             foreach (var recipeTemplate in allRecipe)
             {

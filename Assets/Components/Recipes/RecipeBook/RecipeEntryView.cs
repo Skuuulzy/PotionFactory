@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 namespace Components.Recipes.Grimoire
 {
-    public class GrimoireEntryView : MonoBehaviour
+    public class RecipeEntryView : MonoBehaviour
     {
         [SerializeField] private TMP_Text _recipeNameTxt;
         [SerializeField] private TMP_Text _machineNameTxt;
