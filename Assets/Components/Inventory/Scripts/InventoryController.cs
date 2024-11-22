@@ -1,11 +1,8 @@
 using Components.Bundle;
 using Components.Machines;
 using Components.Map;
-using Components.Shop.ShopItems;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using VComponent.Tools.Singletons;
 
@@ -29,6 +26,7 @@ namespace Components.Inventory
 		public static Action<ConsumableTemplate> OnConsumableRemoved;
 		public static Action<RelicTemplate> OnRelicAdded;
 		public static Action<RelicTemplate> OnRelicRemoved;
+		public static Action OnBaseInventoryGenerated;
 
 
 		//-------------------------------------------------------------------------------- MONO -------------------------------------------------------------------------------------
@@ -38,11 +36,7 @@ namespace Components.Inventory
 			_consumableTemplatesList = new List<ConsumableTemplate>();
 			_relicTemplatesList = new List<RelicTemplate>();
 			
-			//Creating the player inventory with a basic template
-			foreach(var kvp in _defaultPlayerInventory.MachineDictionary.ToDictionary())
-			{
-				AddMachineToPlayerInventory(kvp.Key, kvp.Value);
-			}
+
 
 			MapGenerator.OnMapChoiceConfirm += HandleMapChoiceConfirm;
 		}
@@ -51,19 +45,20 @@ namespace Components.Inventory
 		{
 			MapGenerator.OnMapChoiceConfirm -= HandleMapChoiceConfirm;
 		}
-
-
-
+		
 		//--------------------------------------------------------- ADDING AND REMOVING MACHINES CONSUMABLE AND RELICS --------------------------------------------------------------
 
-		public void AddMachineToPlayerInventory(MachineTemplate machineTemplate, int numberOfMachine)
+		public void AddMachineToPlayerInventory(MachineTemplate machineTemplate, int numberOfMachine, bool inform = true)
 		{
 			if (!_playerMachinesDictionary.TryAdd(machineTemplate, numberOfMachine))
 			{
                 _playerMachinesDictionary[machineTemplate] += numberOfMachine;
 			}
 
-			OnMachineAddedOrRemoved?.Invoke(machineTemplate, _playerMachinesDictionary[machineTemplate]);
+			if (inform)
+			{
+				OnMachineAddedOrRemoved?.Invoke(machineTemplate, _playerMachinesDictionary[machineTemplate]);
+			}
 		}
 
 		public void DecreaseMachineToPlayerInventory(MachineTemplate machineTemplate, int numberOfMachine)
@@ -125,6 +120,14 @@ namespace Components.Inventory
 			{
 				return;
 			}
+			
+			//Creating the player inventory with a basic template
+			foreach(var kvp in _defaultPlayerInventory.MachineDictionary.ToDictionary())
+			{
+				AddMachineToPlayerInventory(kvp.Key, kvp.Value, false);
+			}
+			
+			OnBaseInventoryGenerated?.Invoke();
 
 			foreach(MachineTemplate machineTemplate in bundle.MachinesTemplateList)
 			{
