@@ -1,8 +1,8 @@
-using Components.Machines;
 using System;
-using System.Collections;
+using Components.Machines;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 
 namespace Components.Inventory
@@ -16,10 +16,12 @@ namespace Components.Inventory
 		[SerializeField] private Transform _machineSelectorViewParent;
 		[SerializeField] private Transform _consumableSelectorViewParent;
 		[SerializeField] private Transform _relicSelectorViewParent;
-
+		
 		private List<MachineSelectorView> _inventoryMachinesList;
 		private List<ConsumableSelectorView> _inventoryConsumableList;
 		private List<RelicSelectorView> _inventoryRelicList;
+
+		public static Action<bool> OnEnableCleanMode;
 
 		private void Awake()
 		{
@@ -41,9 +43,6 @@ namespace Components.Inventory
 			InventoryController.OnConsumableRemoved -= RemoveConsumableFromInventory;
 			InventoryController.OnRelicAdded -= AddRelicToInventory;
 			InventoryController.OnRelicRemoved -= RemoveRelicFromInventory;
-
-
-
 		}
 
 		private void UpdateMachineUIView(MachineTemplate machineTemplate, int value)
@@ -109,6 +108,11 @@ namespace Components.Inventory
 			}
 
 			Debug.LogError("Can't find the relic template : " + relic);
+		}
+
+		public void EnableCleanMode(bool enable)
+		{
+			OnEnableCleanMode?.Invoke(enable);
 		}
 	}
 }
