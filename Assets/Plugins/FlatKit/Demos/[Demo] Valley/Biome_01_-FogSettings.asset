@@ -50,7 +50,7 @@ Material:
     m_Floats:
     - _DistanceFogIntensity: 0.7
     - _DistanceHeightBlend: 0.2
-    - _Far: 100
+    - _Far: 70
     - _HeightFogIntensity: 0.5
     - _HighWorldY: 9
     - _LowWorldY: 0
@@ -101,7 +101,7 @@ MonoBehaviour:
     m_NumColorKeys: 2
     m_NumAlphaKeys: 3
   near: 25
-  far: 100
+  far: 70
   distanceFogIntensity: 0.7
   useHeight: 1
   heightGradient:
@@ -140,5 +140,5 @@ MonoBehaviour:
   cameraRelativePosition: 0
   distanceHeightBlend: 0.2
   renderEvent: 550
-  applyInSceneView: 1
+  applyInSceneView: 0
   effectMaterial: {fileID: -5893212418065708504}
