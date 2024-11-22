@@ -92,6 +92,7 @@ namespace Components.Grid
 			ConsumableManager.OnChangeSelectedConsumable += UpdateSelection;
 			RelicManager.OnChangeSelectedRelic += UpdateSelection;
 			MapGenerator.OnMapChoiceConfirm += HandleMapChoiceConfirm;
+			UIOptionsController.OnClearGrid += ClearGrid;
 		}
 
 		private void OnDestroy()
@@ -102,6 +103,7 @@ namespace Components.Grid
 			ConsumableManager.OnChangeSelectedConsumable -= UpdateSelection;
 			RelicManager.OnChangeSelectedRelic -= UpdateSelection;
 			MapGenerator.OnMapChoiceConfirm-= HandleMapChoiceConfirm;
+			UIOptionsController.OnClearGrid += ClearGrid;
 		}
 
 		private void Update()
@@ -405,8 +407,6 @@ namespace Components.Grid
 
 			Grid = new Grid(_gridXValue, _gridYValue, _cellSize, _originPosition, _groundHolder, _showDebug);
 			_tileController.SelectATileType();
-
-			
 		}
 
 		private void ClearGrid()
