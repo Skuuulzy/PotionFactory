@@ -46,6 +46,7 @@ public class GrimoireInventoryButton : MonoBehaviour
         _animator.SetBool("isHover", false);
     }
 
+    //When click on a selected button, we deselect it 
     private void HandleOnSelected()
     {
         if (_isSelected == true)
@@ -54,6 +55,7 @@ public class GrimoireInventoryButton : MonoBehaviour
         }
     }
 
+    // When player right click with a machine preview
     private void HandleOnDeselected(bool asPreview)
     {
         if (_isSelected == true && asPreview == true)

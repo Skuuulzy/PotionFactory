@@ -57,14 +57,6 @@ namespace Components.Inventory
             {
                 _animator.SetTrigger("Apparition");
             }
-
-            /*
-            switch (state)
-            {
-                case PlanningFactoryState planningFactoryState:
-                    _animator.SetTrigger("Apparition");
-                    break;
-            }*/
         }
 
         public void OpenInventory()

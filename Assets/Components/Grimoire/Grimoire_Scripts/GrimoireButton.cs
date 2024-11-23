@@ -15,13 +15,13 @@ public class GrimoireButton : MonoBehaviour
 
     private void Start()
     {
-        OnSelected += HandleOnSelect;
+        OnSelected += HandleOnSelected;
         GridPreviewController.OnPreviewUnselected += HandleOnDeselected;
     }
 
     private void OnDestroy()
     {
-        OnSelected -= HandleOnSelect;
+        OnSelected -= HandleOnSelected;
         GridPreviewController.OnPreviewUnselected -= HandleOnDeselected;
     }
 
@@ -43,7 +43,8 @@ public class GrimoireButton : MonoBehaviour
         _animator.SetBool("isHover", false);
     }
 
-    private void HandleOnSelect()
+    //When click on a selected button, we deselect it 
+    private void HandleOnSelected()
     {
         if (_isSelected == true)
         {
@@ -51,6 +52,7 @@ public class GrimoireButton : MonoBehaviour
         }
     }
 
+    // When player right click with a machine preview
     private void HandleOnDeselected(bool asPreview)
     {
         if (_isSelected == true && asPreview == false)
