@@ -34,38 +34,40 @@ public static class ExtensionMethods
 
     #region QUATERNION
 
-    public static Quaternion ClampAxis(this Quaternion quaternion, Axis axis,float minAngle, float maxAngle)
+    public static Quaternion ClampAxis(this Quaternion quaternion, Axis axis, float minAngle, float maxAngle)
     {
-        Quaternion clampedQuaternion;
-        
+        Vector3 euler = quaternion.eulerAngles;
+
         switch (axis)
         {
             case Axis.X:
-                float x = Mathf.Clamp(quaternion.eulerAngles.x, minAngle, maxAngle);
-                clampedQuaternion = Quaternion.Euler(x,quaternion.eulerAngles.y,quaternion.eulerAngles.z);
+                euler.x = ClampAngle(euler.x, minAngle, maxAngle);
                 break;
             case Axis.Y:
-                float y = Mathf.Clamp(quaternion.y, minAngle, maxAngle);
-                clampedQuaternion = new Quaternion(quaternion.x, y, quaternion.z, quaternion.w).normalized;
+                euler.y = ClampAngle(euler.y, minAngle, maxAngle);
                 break;
             case Axis.Z:
-                float z = Mathf.Clamp(quaternion.z, minAngle, maxAngle);
-                clampedQuaternion = new Quaternion(quaternion.x, quaternion.y, z, quaternion.w).normalized;
-                break;
-            case Axis.W:
-                float w = Mathf.Clamp(quaternion.w, minAngle, maxAngle);
-                clampedQuaternion = new Quaternion(quaternion.x, quaternion.y, quaternion.z, w).normalized;
+                euler.z = ClampAngle(euler.z, minAngle, maxAngle);
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(axis), axis, null);
         }
-        
-        return clampedQuaternion;
+
+        return Quaternion.Euler(euler);
+    }
+
+    // Helper function to handle angle wrapping
+    private static float ClampAngle(float angle, float min, float max)
+    {
+        // Normalize angle to the range [-180, 180]
+        angle = (angle > 180) ? angle - 360 : angle;
+
+        return Mathf.Clamp(angle, min, max);
     }
     
     public enum Axis
     {
-        X,Y,Z,W
+        X,Y,Z
     }
 
     #endregion

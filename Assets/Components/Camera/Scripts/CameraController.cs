@@ -31,9 +31,12 @@ namespace VComponent.CameraSystem
         private void Awake()
         {
             _mainCam = Camera.main;
+
+            transform.localPosition = new Vector3(_parameters.StartPosition.x, 0, _parameters.StartPosition.z);
+            transform.rotation = Quaternion.Euler(0, _parameters.StartRotation.y, 0);
             
-            _cameraTransform.localPosition = _parameters.StartPosition;
-            _cameraTransform.localRotation = Quaternion.Euler(_parameters.StartRotation);
+            _cameraTransform.localPosition = new Vector3(0, _parameters.StartPosition.y, 0);
+            _cameraTransform.localRotation = Quaternion.Euler(_parameters.StartRotation.x, 0, 0);
             
             _newPosition = transform.position;
             _newYRotation = transform.rotation;
@@ -117,7 +120,8 @@ namespace VComponent.CameraSystem
                 
                     if (differenceX != 0)
                     {
-                        _newYRotation *= Quaternion.Euler(Vector3.up * (-differenceX * _parameters.RotationSensitivity));
+                        _newYRotation *= Quaternion.Euler(Vector3.up * (-Mathf.Sign(differenceX) * _parameters.RotationSensitivity));
+                        _newYRotation = _newYRotation.ClampAxis(ExtensionMethods.Axis.Y, _parameters.RotationClamp.x, _parameters.RotationClamp.y);
                     }
                 }
             }
@@ -136,17 +140,25 @@ namespace VComponent.CameraSystem
             var movementDirection = Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0) * new Vector3(InputsManager.Instance.MoveCamera.x, 0, InputsManager.Instance.MoveCamera.y);
             _newPosition += movementDirection.normalized * movementSpeed;
 
+            // Clamp the position to the allowed range in _parameters
+            _newPosition.z = Mathf.Clamp(_newPosition.z, _parameters.PositionRange.zMin, _parameters.PositionRange.zMax);
+            _newPosition.x = Mathf.Clamp(_newPosition.x, _parameters.PositionRange.xMin, _parameters.PositionRange.xMax);
+            
             transform.position = Vector3.Lerp(transform.position, _newPosition, _parameters.MovementResponsiveness * Time.deltaTime);
 
             // ROTATION KEYBOARD
             if (!_parameters.LockYaw && InputsManager.Instance.ClockwiseRotationCamera)
             {
-                _newYRotation *= Quaternion.Euler(Vector3.up * -_parameters.RotationSensitivity);
+                _newYRotation *= Quaternion.Euler(Vector3.up * _parameters.RotationSensitivity);
+                _newYRotation = _newYRotation.ClampAxis(ExtensionMethods.Axis.Y, _parameters.RotationClamp.x, _parameters.RotationClamp.y);
+                
                 transform.rotation = Quaternion.Lerp(transform.rotation, _newYRotation, _parameters.RotationResponsiveness * Time.deltaTime);
             }
             if (!_parameters.LockYaw && InputsManager.Instance.AntiClockwiseRotationCamera)
             {
-                _newYRotation *= Quaternion.Euler(Vector3.up * _parameters.RotationSensitivity);
+                _newYRotation *= Quaternion.Euler(Vector3.up * -_parameters.RotationSensitivity);
+                _newYRotation = _newYRotation.ClampAxis(ExtensionMethods.Axis.Y, _parameters.RotationClamp.x, _parameters.RotationClamp.y);
+                
                 transform.rotation = Quaternion.Lerp(transform.rotation, _newYRotation, _parameters.RotationResponsiveness * Time.deltaTime);
             }
 
@@ -169,10 +181,12 @@ namespace VComponent.CameraSystem
             // Zoom
             if (InputsManager.Instance.ZoomCamera != 0)
             {
-                float zoomDeltaY = InputsManager.Instance.ZoomCamera * _parameters.ZoomSpeed;
-                _newZoom = _cameraTransform.position + new Vector3(0, zoomDeltaY, 0);
+                var zoomDelta = new Vector3(0, InputsManager.Instance.ZoomCamera * _parameters.ZoomSpeed, 0);
 
-                _cameraTransform.position = Vector3.Lerp(_cameraTransform.position, _newZoom, _parameters.MovementResponsiveness * Time.deltaTime);
+                _newZoom = _parameters.InvertZoom ? _cameraTransform.position + zoomDelta : _cameraTransform.position - zoomDelta;
+                _newZoom.y = Mathf.Clamp(_newZoom.y, _parameters.ZoomClamp.x, _parameters.ZoomClamp.y);
+                
+                _cameraTransform.position = Vector3.Lerp(_cameraTransform.position, _newZoom, _parameters.ZoomResponsiveness * Time.deltaTime);
             }
         }
 
