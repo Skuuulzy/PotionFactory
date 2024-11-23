@@ -2,11 +2,16 @@ using Components.Grid;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GrimoireInventoryButton : MonoBehaviour
 {
+    [SerializeField] private Image _background;
+    [SerializeField] private TextMeshProUGUI _numberOfAvailableText;
     [SerializeField] private Animator _animator;
+
     private bool _isSelected = false;
 
     public static Action OnSelected;
@@ -22,6 +27,7 @@ public class GrimoireInventoryButton : MonoBehaviour
         OnSelected -= HandleOnSelected;
         GridPreviewController.OnPreviewUnselected -= HandleOnDeselected;
     }
+
     public void OnHover()
     {
         if (_isSelected == false)
@@ -47,6 +53,7 @@ public class GrimoireInventoryButton : MonoBehaviour
             OnDeselect();
         }
     }
+
     private void HandleOnDeselected(bool asPreview)
     {
         if (_isSelected == true && asPreview == true)
