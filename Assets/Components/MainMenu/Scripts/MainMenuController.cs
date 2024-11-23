@@ -1,34 +1,20 @@
-using System;
 using UnityEngine;
-using UnityEngine.SceneManagement;
+using VComponent.Tools.SceneLoader;
 
 public class MainMenuController : MonoBehaviour
 {
-	[SerializeField] private GameObject _loadingSplashScreen;
-
-	private void Start()
-	{
-		_loadingSplashScreen.SetActive(false);
-	}
-
 	public void LaunchSandBox()
 	{
-		SceneManager.LoadScene("Grid_Sandbox", LoadSceneMode.Single);
+		SceneLoader.Instance.LoadSandbox();
 	}
 
 	public void LaunchLevel()
 	{
-		_loadingSplashScreen.SetActive(true);
-		
-		SceneManager.LoadSceneAsync("Level")!.completed
-			+= _ =>
-			{
-				SceneManager.LoadSceneAsync("LevelUI", LoadSceneMode.Additive);
-			};
+		SceneLoader.Instance.LoadLevel();
 	}
 
 	public void LaunchGridGenerator()
 	{
-		SceneManager.LoadScene("Grid_Generator", LoadSceneMode.Single);
+		SceneLoader.Instance.LoadGridGenerator();
 	}
 }
