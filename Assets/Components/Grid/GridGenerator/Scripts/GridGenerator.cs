@@ -40,7 +40,7 @@ namespace Components.Grid.Generator
 		private TileController _currentTileController;
 		private ObstacleController _currentObstacleController;
 
-		private UnityEngine.Camera _camera;
+		private Camera _camera;
 
 		private string _jsonString;
 		private string _fileName;
@@ -48,7 +48,7 @@ namespace Components.Grid.Generator
 		// ------------------------------------------------------------------------- MONO -------------------------------------------------------------------------
 		private void Start()
 		{
-			_camera = UnityEngine.Camera.main;
+			_camera = Camera.main;
 			GenerateGrid();
 			InstantiateNewPreview();
 		}
