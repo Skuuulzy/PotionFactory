@@ -1,4 +1,5 @@
 using CodeMonkey.Utils;
+using Components.Grid.Decorations;
 using Components.Grid.Obstacle;
 using Components.Grid.Tile;
 using Newtonsoft.Json;
@@ -20,16 +21,22 @@ namespace Components.Grid.Generator
 		[Header("Prefabs")]
 		[SerializeField] private TileController _tilePrefab;
 		[SerializeField] private ObstacleController _obstaclePrefab;
+		[SerializeField] private DecorationController _decorationPrefab;
 
 		[Header("Holders")]
 		[SerializeField] private Transform _groundHolder;
 		[SerializeField] private Transform _obstacleHolder;
+		[SerializeField] private Transform _decorationHolder;
 
 		[Header("Tiles")]
 		[SerializeField] private AllTilesController _allTilesController;
 
 		[Header("Obstacles")]
 		[SerializeField] private AllObstaclesController _allObstacleController;
+
+		[Header("Decorations")]
+		[SerializeField] private AllDecorationsController _allDecorationController;
+
 
 		[Header("TilesGenerated")]
 		private List<Cell> _cellList;
@@ -39,6 +46,7 @@ namespace Components.Grid.Generator
 		// Preview
 		private TileController _currentTileController;
 		private ObstacleController _currentObstacleController;
+		private DecorationController _currentDecorationController;
 
 		private UnityEngine.Camera _camera;
 
@@ -62,9 +70,9 @@ namespace Components.Grid.Generator
 				RemoveObstacleFromGrid();
 			}
 
-			if (Input.GetMouseButton(0))
+			if (Input.GetMouseButtonDown(0))
 			{
-				AddSelectedTileOrObstacleToGrid();
+				AddSelectedObjectToGrid();
 			}
 
 		}
@@ -79,6 +87,7 @@ namespace Components.Grid.Generator
 
 			TileManager.OnChangeSelectedTile += UpdateTileSelection;
 			ObstacleManager.OnChangeSelectedObstacle += UpdateObstacleSelection;
+			DecorationManager.OnChangeSelectedDecoration += UpdateDecorationSelection;
 
 		}
 
@@ -92,6 +101,11 @@ namespace Components.Grid.Generator
 			if( _currentObstacleController != null )
 			{
 				Destroy(_currentObstacleController.gameObject);
+			}
+
+			if (_currentDecorationController != null)
+			{
+				Destroy(_currentDecorationController.gameObject);
 			}
 
 			_currentTileController = Instantiate(_tilePrefab);
@@ -111,10 +125,38 @@ namespace Components.Grid.Generator
 				Destroy(_currentObstacleController.gameObject);
 			}
 
+			if (_currentDecorationController != null)
+			{
+				Destroy(_currentDecorationController.gameObject);
+			}
+
 			_currentObstacleController = Instantiate(_obstaclePrefab);
 
 			_currentObstacleController.SetObstacleType(obstacleTemplate.ObstacleType);
 			_currentObstacleController.InstantiatePreview(obstacleTemplate, _cellSize);
+		}
+
+		private void UpdateDecorationSelection(DecorationTemplate decorationTemplate)
+		{
+			if (_currentTileController != null)
+			{
+				Destroy(_currentTileController.gameObject);
+			}
+
+			if (_currentObstacleController != null)
+			{
+				Destroy(_currentObstacleController.gameObject);
+			}
+
+			if (_currentDecorationController != null)
+			{
+				Destroy(_currentDecorationController.gameObject);
+			}
+
+			_currentDecorationController = Instantiate(_decorationPrefab);
+
+			_currentDecorationController.SetDecorationType(decorationTemplate.DecorationType);
+			_currentDecorationController.InstantiatePreview(decorationTemplate, _cellSize);
 		}
 
 		private void MoveSelection()
@@ -133,10 +175,14 @@ namespace Components.Grid.Generator
 			{
 				_currentObstacleController.transform.position = worldMousePosition;
 			}
+			else if (_currentDecorationController != null)
+			{
+				_currentDecorationController.transform.position = worldMousePosition;
+			}
 		}
 
 		// ------------------------------------------------------------------------- INPUT HANDLERS -------------------------------------------------------------------------
-		private void AddSelectedTileOrObstacleToGrid()
+		private void AddSelectedObjectToGrid()
 		{
 			// Try to get the position on the grid.
 			if (!UtilsClass.ScreenToWorldPositionIgnoringUI(Input.mousePosition, _camera, out Vector3 worldMousePosition))
@@ -173,16 +219,19 @@ namespace Components.Grid.Generator
 				return;
 			}
 
+			else if (_currentDecorationController != null)
+			{
+
+				DecorationController decorationController = _allDecorationController.GenerateDecorationFromPrefab(_grid, chosenCell, _decorationHolder, _cellSize, _currentDecorationController);
+				chosenCell.AddDecorationToCell(decorationController);
+				return;
+			}
+
 		}
 
 		private void RemoveObstacleFromGrid()
 		{
-			if(_currentTileController != null)
-			{
-				Destroy(_currentTileController.gameObject);
-				_currentTileController = null;	
-			}
-			else if (_currentObstacleController != null)
+			if (_currentObstacleController != null)
 			{
 				Destroy(_currentObstacleController.gameObject);
 				_currentObstacleController = null;
@@ -280,6 +329,11 @@ namespace Components.Grid.Generator
 			{
 				Destroy(obstacleTile.gameObject);
 			}
+			foreach (Transform decorationTile in _decorationHolder)
+			{
+				Destroy(decorationTile.gameObject);
+			}
+
 
 			_grid.ClearCellsData();
 		}

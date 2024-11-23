@@ -108,6 +108,11 @@ namespace Components.Grid
 
         public void AddDecorationToCell(DecorationController decoration)
         {
+            if(_decorations == null)
+            {
+                _decorations = new List<DecorationController>();
+            }
+
             _decorations.Add(decoration);
         }
 
