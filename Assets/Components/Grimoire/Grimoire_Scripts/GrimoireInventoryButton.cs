@@ -3,33 +3,28 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
-using UnityEngine.Rendering;
 
-public class GrimoireButton : MonoBehaviour
+public class GrimoireInventoryButton : MonoBehaviour
 {
     [SerializeField] private Animator _animator;
     private bool _isSelected = false;
-    private bool _isHover = false;
 
-    private static Action OnSelected;
+    public static Action OnSelected;
 
     private void Start()
     {
-        OnSelected += HandleOnSelect;
+        OnSelected += HandleOnSelected;
         GridPreviewController.OnPreviewUnselected += HandleOnDeselected;
     }
 
     private void OnDestroy()
     {
-        OnSelected -= HandleOnSelect;
+        OnSelected -= HandleOnSelected;
         GridPreviewController.OnPreviewUnselected -= HandleOnDeselected;
     }
-
     public void OnHover()
     {
         _animator.SetTrigger("Hover");
-        _isHover = true;
     }
 
     public void OnUnhover()
@@ -38,20 +33,18 @@ public class GrimoireButton : MonoBehaviour
         {
             _animator.SetTrigger("Unhover");
         }
-        _isHover = false;
     }
 
-    private void HandleOnSelect()
+    private void HandleOnSelected()
     {
         if (_isSelected == true)
         {
             OnDeselect();
         }
     }
-
     private void HandleOnDeselected(bool asPreview)
     {
-        if (_isSelected == true && asPreview == false)
+        if (_isSelected == true && asPreview == true)
         {
             OnDeselect();
         }

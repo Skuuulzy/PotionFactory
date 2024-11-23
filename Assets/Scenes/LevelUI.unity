@@ -1882,7 +1882,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 363d99ba78c11af47a4e261d8bc009a1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _machineSelectorViewPrefab: {fileID: 4954068736674798131, guid: 2af8de2ed9ca7a446a9b4ecf0993a58b,
+  _machineSelectorViewPrefab: {fileID: 8004550218260356378, guid: a1ebecacbd2e9c24d909fa7cd4e434fb,
     type: 3}
   _consumableSelectorViewPrefab: {fileID: 8888690622200023719, guid: 4e76f1b3cc658d7448bc51c764453d65,
     type: 3}
@@ -2044,6 +2044,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Grimoire_Button_Spell
+      objectReference: {fileID: 0}
+    - target: {fileID: 6735077236204718302, guid: f11587cd3ea8abe4487229fe34a486f7,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8392422901052409990, guid: f11587cd3ea8abe4487229fe34a486f7,
         type: 3}

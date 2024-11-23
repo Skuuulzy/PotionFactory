@@ -34,7 +34,9 @@ namespace Components.Grid
         private Vector3 _lastCellPosition = new(-1, -1, -1);
 
         private bool _cleanMode;
-        
+
+        public static Action<bool> OnPreviewUnselected; //True if their is a preview, false if not.
+
         private Grid Grid => _gridController.Grid;
 
         private MachineController Preview => _currentMachinePreview.gameObject.activeSelf ? _currentMachinePreview : _currentSubMachinePreview;
@@ -66,6 +68,7 @@ namespace Components.Grid
             if (Input.GetMouseButtonDown(1))
             {
                 DestroyPreview();
+                OnPreviewUnselected?.Invoke(_currentMachinePreview);
             }
             if (Input.GetMouseButton(0))
             {
@@ -194,7 +197,7 @@ namespace Components.Grid
                 Destroy(_currentMachinePreview.gameObject);
             }
         }
-        
+
         // ------------------------------------------------------------------------- SUB PREVIEW BEHAVIOUR -------------------------------------------------------------------------------- 
         private void InstantiateSubPreview(MachineTemplate template, int rotation)
         {
