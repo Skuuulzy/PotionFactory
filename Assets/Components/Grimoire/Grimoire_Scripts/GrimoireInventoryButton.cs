@@ -24,7 +24,11 @@ public class GrimoireInventoryButton : MonoBehaviour
     }
     public void OnHover()
     {
-        _animator.SetTrigger("Hover");
+        if (_isSelected == false)
+        {
+            _animator.SetTrigger("Hover");
+        }
+        _animator.SetBool("isHover", true);
     }
 
     public void OnUnhover()
@@ -33,6 +37,7 @@ public class GrimoireInventoryButton : MonoBehaviour
         {
             _animator.SetTrigger("Unhover");
         }
+        _animator.SetBool("isHover", false);
     }
 
     private void HandleOnSelected()
@@ -61,7 +66,6 @@ public class GrimoireInventoryButton : MonoBehaviour
         else
         {
             OnDeselect();
-            OnHover();
         }
     }
 

@@ -10,7 +10,6 @@ public class GrimoireButton : MonoBehaviour
 {
     [SerializeField] private Animator _animator;
     private bool _isSelected = false;
-    private bool _isHover = false;
 
     private static Action OnSelected;
 
@@ -28,8 +27,11 @@ public class GrimoireButton : MonoBehaviour
 
     public void OnHover()
     {
-        _animator.SetTrigger("Hover");
-        _isHover = true;
+        if (_isSelected == false)
+        {
+            _animator.SetTrigger("Hover");
+        }
+        _animator.SetBool("isHover", true);
     }
 
     public void OnUnhover()
@@ -38,7 +40,7 @@ public class GrimoireButton : MonoBehaviour
         {
             _animator.SetTrigger("Unhover");
         }
-        _isHover = false;
+        _animator.SetBool("isHover", false);
     }
 
     private void HandleOnSelect()
@@ -68,7 +70,6 @@ public class GrimoireButton : MonoBehaviour
         else
         {
             OnDeselect();
-            OnHover();
         }
     }
 
