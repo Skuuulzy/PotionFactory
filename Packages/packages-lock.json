@@ -7,6 +7,12 @@
       "dependencies": {},
       "url": "https://package.openupm.com"
     },
+    "com.distantlands.cozy.core": {
+      "version": "file:com.distantlands.cozy.core",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
+    },
     "com.eflatun.scenereference": {
       "version": "4.1.1",
       "depth": 0,
@@ -176,9 +182,9 @@
       "depth": 0,
       "source": "registry",
       "dependencies": {
+        "com.unity.modules.audio": "1.0.0",
         "com.unity.modules.director": "1.0.0",
         "com.unity.modules.animation": "1.0.0",
-        "com.unity.modules.audio": "1.0.0",
         "com.unity.modules.particlesystem": "1.0.0"
       },
       "url": "https://packages.unity.com"

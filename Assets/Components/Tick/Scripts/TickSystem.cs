@@ -34,6 +34,7 @@ namespace Components.Tick
             PlanningFactoryState.OnPlanningFactoryStateStarted += HandlePlanningFactoryState;
             ResolutionFactoryState.OnResolutionFactoryStateStarted += HandleResolutionFactoryState;
             ShopState.OnShopStateStarted += HandleShopState;
+            UIOptionsController.OnTickSpeedUpdated += ChangeTimeSpeed;
         }
 
 		private void OnDestroy()

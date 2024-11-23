@@ -1,22 +1,23 @@
+using System;
 using Components.Map;
 using Cysharp.Threading.Tasks;
-using System;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using VComponent.Tools.Timer;
 
 public class StateController : MonoBehaviour
 {
 	[SerializeField] private bool _disable;
-	[SerializeField] private UIStateController _uiStateController;
 	[SerializeField] private int _planningFactoryStateTime = 180;
 	[SerializeField] private int _resolutionFactoryStateTime = 120;
 
+	[SerializeField] private string _currentDebugStateName;
+	
 	private CountdownTimer _countdownTimer;
-
-	// StateMachine 
 	private StateMachine _stateMachine;
 
+	public static Action<float, float> OnCountdown;
+	public static Action<BaseState> OnStateStarted;
+	
 	//------------------------------------------------------------------------ MONO -------------------------------------------------------------------------------------------- 
 	private void Start()
 	{
@@ -48,10 +49,8 @@ public class StateController : MonoBehaviour
 
 		StartStateMachine(mapState);
 	}
-
-
-
-	private async void StartStateMachine(BaseState stateToStart)
+	
+	private async void StartStateMachine(IState stateToStart)
 	{
 		//Wait 1sec to let everyone subscribe to event 
 		await UniTask.WaitForSeconds(1);
@@ -77,48 +76,50 @@ public class StateController : MonoBehaviour
 		if (_countdownTimer != null)
 		{
 			_countdownTimer.Tick(Time.deltaTime);
-			_uiStateController.SetCountdownTime(_countdownTimer.Time, _countdownTimer.InitialTime);
+			OnCountdown?.Invoke(_countdownTimer.Time, _countdownTimer.InitialTime);
 		}
 	}
 
 	//------------------------------------------------------------------------ STATE STARTED -------------------------------------------------------------------------------------------- 
 	private void HandleMapState(MapState state)
 	{
+		_currentDebugStateName = "MAP";
+		
 		MapGenerator.OnMapChoiceConfirm += state.MapChoiceConfirmed;
 	}
 
 	private void HandleShopState(ShopState state)
 	{
-		_uiStateController.DisplayFinishStateButton(state);
+		_currentDebugStateName = "SHOP";
+
 		_countdownTimer = null;
+		OnStateStarted?.Invoke(state);
 	}
 
 	private void HandlePlanningFactoryState(PlanningFactoryState state)
 	{
+		_currentDebugStateName = "PLANNING";
+		
 		_countdownTimer = new CountdownTimer(_planningFactoryStateTime);
 		BaseState.OnStateEnded += _countdownTimer.Stop;
 		_countdownTimer.OnTimerStop += state.SetStateFinished;
-		_countdownTimer.OnTimerStop += _uiStateController.HideCountdown;
 		_countdownTimer.Start();
-		_uiStateController.DisplayFinishStateButton(state);
 
+		OnStateStarted.Invoke(state);
 	}
 
 	private void HandleResolutionFactoryState(ResolutionFactoryState state)
 	{
+		_currentDebugStateName = "RESOLUTION";
+		
 		_countdownTimer = new CountdownTimer(_resolutionFactoryStateTime);
 		BaseState.OnStateEnded += _countdownTimer.Stop;
 		_countdownTimer.OnTimerStop += state.SetStateFinished;
-		_countdownTimer.OnTimerStop += _uiStateController.HideCountdown;
 		_countdownTimer.Start();
-		_uiStateController.DisplayFinishStateButton(state);
+		
+		OnStateStarted.Invoke(state);
 	}
 
 	void At(IState from, IState to, IPredicate condition) => _stateMachine.AddTransition(from, to, condition);
 	void Any(IState to, IPredicate condition) => _stateMachine.AddAnyTransition(to, condition);
-
-	public void LaunchMainMenu()
-	{
-		SceneManager.LoadScene("Main_Menu", LoadSceneMode.Single);
-	}
 }

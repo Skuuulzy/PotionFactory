@@ -23,12 +23,13 @@ namespace Components.Inventory
 
 		public static Action<bool> OnEnableCleanMode;
 
-		private void Awake()
+		private void Start()
 		{
 			_inventoryMachinesList = new List<MachineSelectorView>();
 			_inventoryConsumableList = new List<ConsumableSelectorView>();
 			_inventoryRelicList = new List<RelicSelectorView>();
 
+			InventoryController.OnBaseInventoryGenerated += HandleBaseInventoryCreated;
 			InventoryController.OnMachineAddedOrRemoved += UpdateMachineUIView;
 			InventoryController.OnConsumableAdded += AddConsumableToInventory;
 			InventoryController.OnConsumableRemoved += RemoveConsumableFromInventory;
@@ -38,16 +39,24 @@ namespace Components.Inventory
 
 		private void OnDestroy()
 		{
+			InventoryController.OnBaseInventoryGenerated -= HandleBaseInventoryCreated;
 			InventoryController.OnMachineAddedOrRemoved -= UpdateMachineUIView;
 			InventoryController.OnConsumableAdded -= AddConsumableToInventory;
 			InventoryController.OnConsumableRemoved -= RemoveConsumableFromInventory;
 			InventoryController.OnRelicAdded -= AddRelicToInventory;
 			InventoryController.OnRelicRemoved -= RemoveRelicFromInventory;
 		}
+		
+		private void HandleBaseInventoryCreated()
+		{
+			foreach (var machine in InventoryController.Instance.PlayerMachinesDictionary)
+			{
+				UpdateMachineUIView(machine.Key, machine.Value);
+			}
+		}
 
 		private void UpdateMachineUIView(MachineTemplate machineTemplate, int value)
 		{
-
 			//Search for an existing machine selector view to update the value
 			foreach(MachineSelectorView machineSelectorView in _inventoryMachinesList)
 			{
