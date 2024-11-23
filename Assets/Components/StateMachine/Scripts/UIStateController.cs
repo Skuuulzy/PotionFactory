@@ -3,6 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using VComponent.Tools.SceneLoader;
 
 public class UIStateController : MonoBehaviour
 {
@@ -82,9 +83,9 @@ public class UIStateController : MonoBehaviour
 		_gameOverGO.SetActive(true);
 	}
 
-	// TODO: MOVE ELSEWHERE
+	// TODO: Is it supposed to be here ? 
 	public void ReturnToMainMenu()
 	{
-		SceneManager.LoadScene("Main_Menu", LoadSceneMode.Single);
+		SceneLoader.Instance.LoadMainMenu();
 	}
 }
