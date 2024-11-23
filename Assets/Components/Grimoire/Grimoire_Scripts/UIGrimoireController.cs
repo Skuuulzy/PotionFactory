@@ -59,9 +59,23 @@ namespace Components.Inventory
             }
         }
 
-        public void OpenInventory()
+        //Call by Grimoire button
+        public void ToggleInventory(int type)
         {
-            _machineSelectorViewParent.gameObject.SetActive(!_machineSelectorViewParent.gameObject.activeSelf);
+            switch ((ShopItemType)type)
+            {
+                case ShopItemType.MACHINE:
+                    _machineSelectorViewParent.gameObject.SetActive(!_machineSelectorViewParent.gameObject.activeSelf);
+                    break;
+
+                case ShopItemType.CONSUMABLE:
+                    _consumableSelectorViewParent.gameObject.SetActive(!_consumableSelectorViewParent.gameObject.activeSelf);
+                    break;
+
+                case ShopItemType.RELIC:
+                    _relicSelectorViewParent.gameObject.SetActive(!_relicSelectorViewParent.gameObject.activeSelf);
+                    break;
+            }
         }
 
         private void HandleBaseInventoryCreated()

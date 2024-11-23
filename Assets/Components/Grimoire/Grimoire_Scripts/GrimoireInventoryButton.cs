@@ -46,7 +46,7 @@ public class GrimoireInventoryButton : MonoBehaviour
         _animator.SetBool("isHover", false);
     }
 
-    //When click on a selected button, we deselect it 
+    //When click on a selected button or another button, we deselect the selected
     private void HandleOnSelected()
     {
         if (_isSelected == true)

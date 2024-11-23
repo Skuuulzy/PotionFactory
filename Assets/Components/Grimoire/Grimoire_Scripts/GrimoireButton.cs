@@ -1,4 +1,5 @@
 using Components.Grid;
+using Components.Inventory;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,6 +9,8 @@ using UnityEngine.Rendering;
 
 public class GrimoireButton : MonoBehaviour
 {
+    [SerializeField] private ShopItemType _type;
+    [SerializeField] private UIGrimoireController _uiGrimoireController;
     [SerializeField] private Animator _animator;
     private bool _isSelected = false;
 
@@ -43,12 +46,13 @@ public class GrimoireButton : MonoBehaviour
         _animator.SetBool("isHover", false);
     }
 
-    //When click on a selected button, we deselect it 
+    //When click on a selected button or another button, we deselect the selected
     private void HandleOnSelected()
     {
         if (_isSelected == true)
         {
             OnDeselect();
+            _uiGrimoireController.ToggleInventory((int)_type);
         }
     }
 
