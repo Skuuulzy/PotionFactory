@@ -166,10 +166,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1219121423225340229}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 6, y: 6}
-  m_SizeDelta: {x: 5, y: 5}
+  m_AnchorMin: {x: 0.036841944, y: 0.03684193}
+  m_AnchorMax: {x: 0.10263142, y: 0.10263139}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5157043121778354262
 CanvasRenderer:
@@ -350,18 +350,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a7019dfc99921843b9f6f76d46bc2b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _ButotnImage: {fileID: 2294928646905023033}
+  _buttonImage: {fileID: 2294928646905023033}
   _buttonBackground: {fileID: 2278907961017062511}
   _typeColor:
   - {fileID: 2100000, guid: 2c1e5a018f526c046bb4f59735289f29, type: 2}
   - {fileID: 2100000, guid: b58b3581ab2ef11479729212ede39321, type: 2}
   - {fileID: 2100000, guid: a81f7643c0253fa4db2b7bc926db87a6, type: 2}
-  _ButtonForm: {fileID: 8392422901052409990}
+  _buttonForm: {fileID: 8392422901052409990}
   _typeForm:
   - {fileID: 21300000, guid: be07c34264c05f547a59417456c05762, type: 3}
   - {fileID: 21300000, guid: 1077578249d7a644ab316952c308d138, type: 3}
   - {fileID: 21300000, guid: 72f65c7b01f51c946a298c9b1693e5ca, type: 3}
   _numberOfAvailableText: {fileID: 2928967803930130869}
+  _border: {fileID: 1279731480376401978}
+  _normalBackground: {fileID: 21300000, guid: be07c34264c05f547a59417456c05762, type: 3}
+  _zeroBackground: {fileID: 21300000, guid: 2ca9aa0afc7bcaa478876d35878883cf, type: 3}
   _animator: {fileID: 7031188854335074049}
 --- !u!114 &8004550218260356378
 MonoBehaviour:

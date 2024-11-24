@@ -10,12 +10,18 @@ using static UnityEngine.Rendering.DebugUI;
 public class GrimoireInventoryButton : MonoBehaviour
 {
     [Header ("Info button")]
-    [SerializeField] private Image _ButotnImage;
+    [SerializeField] private Image _buttonImage;
     [SerializeField] private Image _buttonBackground;
     [SerializeField] private Material[] _typeColor;
-    [SerializeField] private Image _ButtonForm;
+    [SerializeField] private Image _buttonForm;
     [SerializeField] private Sprite[] _typeForm;
     [SerializeField] private TextMeshProUGUI _numberOfAvailableText;
+
+    [Header ("Zero state")]
+    [SerializeField] private Image _border;
+    [SerializeField] private Sprite _normalBackground;
+    [SerializeField] private Sprite _zeroBackground;
+    private bool _zeroState = false;
 
     [Header ("Button comportment")]
     [SerializeField] private Animator _animator;
@@ -44,9 +50,9 @@ public class GrimoireInventoryButton : MonoBehaviour
     {
         _type = ShopItemType.MACHINE;
 
-        _ButotnImage.sprite = machine.UIView;
+        _buttonImage.sprite = machine.UIView;
         _buttonBackground.material = _typeColor[(int)_type];
-        _ButtonForm.sprite = _typeForm[(int)_type];
+        _buttonForm.sprite = _typeForm[(int)_type];
 
         UpdateNumberOfAvailableMachine(value);
     }
@@ -54,6 +60,27 @@ public class GrimoireInventoryButton : MonoBehaviour
     public void UpdateNumberOfAvailableMachine(int number)
     {
         _numberOfAvailableText.text = number.ToString();
+
+        if(number <= 0) 
+        {
+            _zeroState = true;
+            _buttonBackground.sprite = _zeroBackground;
+
+            Color alpha75 = _border.color;
+            alpha75.a = 0.75f;
+            _border.color = _buttonForm.color = _buttonImage.color = alpha75;
+
+            OnDeselect();
+        }
+        else if(_zeroState == true)
+        {
+            _zeroState = false;
+            _buttonBackground.sprite = _normalBackground;
+
+            Color alpha100 = _border.color;
+            alpha100.a = 1f;
+            _border.color = _buttonForm.color = _buttonImage.color = alpha100;
+        }
     }
     #endregion
 
@@ -61,6 +88,9 @@ public class GrimoireInventoryButton : MonoBehaviour
     #region Button comportment
     public void OnHover()
     {
+        if (_zeroState == true)
+            return;
+
         if (_isSelected == false)
         {
             _animator.SetTrigger("Hover");
@@ -70,6 +100,9 @@ public class GrimoireInventoryButton : MonoBehaviour
 
     public void OnUnhover()
     {
+        if (_zeroState == true)
+            return;
+
         if (_isSelected == false)
         {
             _animator.SetTrigger("Unhover");
@@ -97,6 +130,9 @@ public class GrimoireInventoryButton : MonoBehaviour
 
     public void OnSelect()
     {
+        if (_zeroState == true)
+            return;
+
         if (_isSelected == false)
         {
             _animator.SetBool("Selected", true);
