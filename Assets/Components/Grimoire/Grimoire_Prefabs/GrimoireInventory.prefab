@@ -350,8 +350,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a7019dfc99921843b9f6f76d46bc2b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _background: {fileID: 0}
-  _numberOfAvailableText: {fileID: 0}
+  _ButotnImage: {fileID: 2294928646905023033}
+  _buttonBackground: {fileID: 2278907961017062511}
+  _typeColor:
+  - {fileID: 2100000, guid: 2c1e5a018f526c046bb4f59735289f29, type: 2}
+  - {fileID: 2100000, guid: b58b3581ab2ef11479729212ede39321, type: 2}
+  - {fileID: 2100000, guid: a81f7643c0253fa4db2b7bc926db87a6, type: 2}
+  _ButtonForm: {fileID: 8392422901052409990}
+  _typeForm:
+  - {fileID: 21300000, guid: be07c34264c05f547a59417456c05762, type: 3}
+  - {fileID: 21300000, guid: 1077578249d7a644ab316952c308d138, type: 3}
+  - {fileID: 21300000, guid: 72f65c7b01f51c946a298c9b1693e5ca, type: 3}
+  _numberOfAvailableText: {fileID: 2928967803930130869}
   _animator: {fileID: 7031188854335074049}
 --- !u!114 &8004550218260356378
 MonoBehaviour:
@@ -365,8 +375,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b7fa180759247747903f75c1c91a421, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _background: {fileID: 2294928646905023033}
-  _numberOfAvailableMAchineText: {fileID: 2928967803930130869}
+  _grimoireInventoryButton: {fileID: 5276421524049371043}
 --- !u!114 &2278907961017062511
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -568,8 +577,8 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1219121423225340229}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.20400001, y: 0.20500001}
-  m_AnchorMax: {x: 0.79600006, y: 0.7948409}
+  m_AnchorMin: {x: 0.078947365, y: 0.078947365}
+  m_AnchorMax: {x: 0.92105263, y: 0.92105263}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -601,7 +610,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: 0b3b933b9932dde4eadfce2854c03d1e, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

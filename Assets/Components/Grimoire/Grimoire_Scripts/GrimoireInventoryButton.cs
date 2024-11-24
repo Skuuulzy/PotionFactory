@@ -5,15 +5,24 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEngine.Rendering.DebugUI;
 
 public class GrimoireInventoryButton : MonoBehaviour
 {
-    [SerializeField] private Image _background;
+    [Header ("Info button")]
+    [SerializeField] private Image _ButotnImage;
+    [SerializeField] private Image _buttonBackground;
+    [SerializeField] private Material[] _typeColor;
+    [SerializeField] private Image _ButtonForm;
+    [SerializeField] private Sprite[] _typeForm;
     [SerializeField] private TextMeshProUGUI _numberOfAvailableText;
+
+    [Header ("Button comportment")]
     [SerializeField] private Animator _animator;
 
-    private bool _isSelected = false;
+    private ShopItemType _type;
 
+    private bool _isSelected = false;
     public static Action OnSelected;
 
     private void Start()
@@ -28,6 +37,28 @@ public class GrimoireInventoryButton : MonoBehaviour
         GridPreviewController.OnPreviewUnselected -= HandleOnDeselected;
     }
 
+    //-------------- INFO BUTTON --------------//
+    #region Info button
+
+    public void InitMachine(Components.Machines.MachineTemplate machine, int value = 1)
+    {
+        _type = ShopItemType.MACHINE;
+
+        _ButotnImage.sprite = machine.UIView;
+        _buttonBackground.material = _typeColor[(int)_type];
+        _ButtonForm.sprite = _typeForm[(int)_type];
+
+        UpdateNumberOfAvailableMachine(value);
+    }
+
+    public void UpdateNumberOfAvailableMachine(int number)
+    {
+        _numberOfAvailableText.text = number.ToString();
+    }
+    #endregion
+
+    //-------------- BUTTON COMPORTMENT --------------//
+    #region Button comportment
     public void OnHover()
     {
         if (_isSelected == false)
@@ -83,4 +114,5 @@ public class GrimoireInventoryButton : MonoBehaviour
         _animator.SetBool("Selected", false);
         _isSelected = false;
     }
+    #endregion
 }

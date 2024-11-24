@@ -8,9 +8,7 @@ namespace Components.Machines
 {
     public class MachineSelectorView : MonoBehaviour
     {
-        //[SerializeField] private TMP_Text _name;
-        [SerializeField] private Image _background;
-        [SerializeField] private TextMeshProUGUI _numberOfAvailableMAchineText;
+        [SerializeField] private GrimoireInventoryButton _grimoireInventoryButton;
 
         public static Action<MachineTemplate> OnSelected;
         
@@ -22,9 +20,7 @@ namespace Components.Machines
         {
             _machine = machine;
 
-            //_name.text = machine.Name;
-            _background.sprite = machine.UIView;
-            UpdateNumberOfAvailableMachine(value);
+            _grimoireInventoryButton.InitMachine(machine, value);
         }
 
         
@@ -39,7 +35,7 @@ namespace Components.Machines
 
 		public void UpdateNumberOfAvailableMachine(int number)
 		{
-            _numberOfAvailableMAchineText.text = number.ToString();
+            _grimoireInventoryButton.UpdateNumberOfAvailableMachine(number);
 		}
 	}
 }
