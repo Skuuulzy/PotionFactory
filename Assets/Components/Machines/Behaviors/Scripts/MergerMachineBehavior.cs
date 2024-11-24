@@ -18,7 +18,11 @@ namespace Components.Machines.Behaviors
             // There is only one connected machine no need for specific behavior.
             if (connectedMachines.Count == 1 || _lastMachineTakenFrom == null)
             {
-                return base.CanTakeItem(machine, fromMachine);
+                if (!base.CanTakeItem(machine, fromMachine)) 
+                    return false;
+                
+                _lastMachineTakenFrom = fromMachine;
+                return true;
             }
 
             if (_lastMachineTakenFrom == null)
