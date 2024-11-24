@@ -52,6 +52,7 @@ namespace Components.Grid.Generator
 
 		private string _jsonString;
 		private string _fileName;
+		private bool _freePlacement;
 
 		// ------------------------------------------------------------------------- MONO -------------------------------------------------------------------------
 		private void Start()
@@ -72,8 +73,23 @@ namespace Components.Grid.Generator
 
 			if (Input.GetMouseButtonDown(0))
 			{
-				AddSelectedObjectToGrid();
+				if (_currentDecorationController != null && _freePlacement)
+				{
+					AddSelectedObjectToGrid();
+				}
 			}
+
+			if ( Input.GetMouseButton(0))
+			{
+				if(_currentDecorationController != null && _freePlacement)
+				{
+					return;
+				}
+
+				AddSelectedObjectToGrid();	
+			}
+			
+			
 
 		}
 
@@ -82,9 +98,6 @@ namespace Components.Grid.Generator
 		// ------------------------------------------------------------------------- SELECTION -------------------------------------------------------------------------
 		private void InstantiateNewPreview()
 		{
-			_currentTileController = Instantiate(_tilePrefab);
-			_currentObstacleController = Instantiate(_obstaclePrefab);
-
 			TileManager.OnChangeSelectedTile += UpdateTileSelection;
 			ObstacleManager.OnChangeSelectedObstacle += UpdateObstacleSelection;
 			DecorationManager.OnChangeSelectedDecoration += UpdateDecorationSelection;
@@ -221,8 +234,12 @@ namespace Components.Grid.Generator
 
 			else if (_currentDecorationController != null)
 			{
+				if (chosenCell.DecorationControllers != null && !_freePlacement && chosenCell.DetectDecorationOnCell(_currentDecorationController))
+				{
+					return;
+				}
 
-				DecorationController decorationController = _allDecorationController.GenerateDecorationFromPrefab(_grid, chosenCell, _decorationHolder, _cellSize, _currentDecorationController);
+				DecorationController decorationController = _allDecorationController.GenerateDecorationFromPrefab(_grid, chosenCell, _decorationHolder, _cellSize, _currentDecorationController, _freePlacement, worldMousePosition);
 				chosenCell.AddDecorationToCell(decorationController);
 				return;
 			}
@@ -255,6 +272,11 @@ namespace Components.Grid.Generator
 				chosenCell.RemoveObstacleFromCell();
 
 			}
+		}
+
+		public void ChangeFreePlacementMode(bool value)
+		{
+			_freePlacement = value;
 		}
 
 		// ------------------------------------------------------------------------- GENERATE GRID -------------------------------------------------------------------------

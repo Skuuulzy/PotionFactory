@@ -26,13 +26,14 @@ namespace Components.Grid
 		[SerializeField] private IngredientTemplate _ingredient;
 
 		[SerializeField] private List<RelicEffect> _relicEffects; 
-        [SerializeField] private List<DecorationController> _decorations;
+        [SerializeField] private List<DecorationController> _decorationControllers;
        
         public ObstacleController ObstacleController => _obstacleController;  
         public TileController TileController => _tileController;  
         public Node Node => _node;
         public IngredientTemplate Ingredient => _ingredient;
         public List<RelicEffect> RelicEffects => _relicEffects;
+        public List<DecorationController> DecorationControllers => _decorationControllers;
 
         public Cell(int x, int y, float size, bool containsObject)
         {
@@ -108,13 +109,28 @@ namespace Components.Grid
 
         public void AddDecorationToCell(DecorationController decoration)
         {
-            if(_decorations == null)
+            if(_decorationControllers == null)
             {
-                _decorations = new List<DecorationController>();
+                _decorationControllers = new List<DecorationController>();
             }
 
-            _decorations.Add(decoration);
+            _decorationControllers.Add(decoration);
         }
+
+        public bool DetectDecorationOnCell(DecorationController decoration)
+		{
+            if(_decorationControllers != null)
+			{
+                foreach(DecorationController controller in _decorationControllers)
+				{
+                    if(controller.DecorationType == decoration.DecorationType)
+					{
+                        return true;
+					}
+				}
+			}
+            return false;
+		}
 
         public Vector3 GetCenterPosition(Vector3 originPosition)
         {

@@ -8,10 +8,18 @@ namespace Components.Grid.Decorations
     {
         [SerializeField] private List<DecorationController> _decorationsList;
 
-		public DecorationController GenerateDecorationFromPrefab(Grid grid, Cell chosenCell, Transform decorationHolder, float cellSize, DecorationController decorationController)
+		public DecorationController GenerateDecorationFromPrefab(Grid grid, Cell chosenCell, Transform decorationHolder, float cellSize, DecorationController decorationController, bool freePlacement, Vector3 worldMousePosition)
 		{
 			DecorationController decoration = Instantiate(decorationController, decorationHolder);
-			decoration.transform.position = grid.GetWorldPosition(chosenCell.X, chosenCell.Y) + new Vector3(cellSize / 2, 0, cellSize / 2);
+			if (freePlacement)
+			{
+				decoration.transform.position = worldMousePosition; 
+			}
+			else
+			{
+				decoration.transform.position = grid.GetWorldPosition(chosenCell.X, chosenCell.Y) + new Vector3(cellSize / 2, 0, cellSize / 2);
+
+			}
 			decoration.transform.localScale = new Vector3(cellSize, cellSize, cellSize);
 
 
