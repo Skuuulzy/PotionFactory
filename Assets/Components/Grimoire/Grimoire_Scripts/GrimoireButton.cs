@@ -68,6 +68,7 @@ public class GrimoireButton : MonoBehaviour
     {
         if (_isSelected == false)
         {
+            _uiGrimoireController.ToggleInventory((int)_type);
             _animator.SetBool("Selected", true);
             OnSelected?.Invoke();
             _isSelected = true;
