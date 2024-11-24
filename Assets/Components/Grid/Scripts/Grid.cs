@@ -136,11 +136,19 @@ namespace Components.Grid
 
 
 
-		public void ClearCellsData()
+		public void ClearNodes()
         {
             foreach (var cell in _cells)
             {
                 cell.RemoveNodeFromCell();
+                cell.RemoveObstacleFromCell();
+            }
+        }
+
+        public void ClearObstacles()
+        {
+            foreach (var cell in _cells)
+            {
                 cell.RemoveObstacleFromCell();
             }
         }

@@ -135,20 +135,16 @@ namespace Components.Machines
             OnItemAdded?.Invoke(true);
         }
         
-        public bool TryGiveItemItem(IngredientTemplate ingredient)
+        public bool TryGiveItemItem(IngredientTemplate ingredient, Machine fromMachine)
         {
-            if (Template.MaxItemCount != -1 && Ingredients.Count >= Template.MaxItemCount)
-            {
-                return false;
-            }
-            
-            if (Behavior.ProcessingRecipe)
+            if (!Behavior.CanTakeItem(this, fromMachine))
             {
                 return false;
             }
             
             Ingredients.Add(ingredient);
             OnItemAdded?.Invoke(true);
+            
             return true;
         }
 

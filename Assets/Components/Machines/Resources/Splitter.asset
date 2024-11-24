@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 581ab5ce2c92484d9bd63e4e972996c1, type: 3}
-  m_Name: Merger
+  m_Name: Splitter
   m_EditorClassIdentifier: 
-  _name: Merger
-  _type: 8
-  _gridView: {fileID: 4377708450514837446, guid: 81af9bfd3795ec247ab8824cb76ecf73,
+  _name: Splitter
+  _type: 9
+  _gridView: {fileID: 4377708450514837446, guid: a28a45fa4642bb04fb4e721059560c15,
     type: 3}
   _uiView: {fileID: 21300000, guid: 9b2db208432e74069a526b81826489b9, type: 3}
-  _behavior: {fileID: 11400000, guid: 4bd481d361fd4ef48bd01de8db970275, type: 2}
+  _behavior: {fileID: 11400000, guid: 6c81c11a340a5c74eab122fe500d84a1, type: 2}
   _nodes:
   - _localPosition: {x: 0, y: 0}
     _gridPosition: {x: 0, y: 0}
@@ -25,9 +25,9 @@ MonoBehaviour:
     - _side: 3
       _way: 0
     - _side: 1
-      _way: 0
+      _way: 1
     - _side: 0
-      _way: 0
+      _way: 1
     - _side: 2
       _way: 1
   _maxItemCount: 1
