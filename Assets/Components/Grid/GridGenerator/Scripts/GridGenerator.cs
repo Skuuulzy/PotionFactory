@@ -88,8 +88,6 @@ namespace Components.Grid.Generator
 
 				AddSelectedObjectToGrid();	
 			}
-			
-			
 
 		}
 
@@ -324,19 +322,32 @@ namespace Components.Grid.Generator
 				for (int z = 0; z < _grid.GetHeight(); z++)
 				{
 					_grid.TryGetCellByCoordinates(x, z, out var chosenCell);
-					SerializedCell serializeCell = serializedCellList.Find(cell => cell.X == x && cell.Y == z);
+					SerializedCell serializedCell = serializedCellList.Find(cell => cell.X == x && cell.Y == z);
 
-					if(serializeCell.TileType != TileType.NONE)
+					if (serializedCell.TileType != TileType.NONE)
 					{
-						TileController tile = _allTilesController.GenerateTileFromType(chosenCell, _grid, _groundHolder, _cellSize, serializeCell.TileType);
+						TileController tile = _allTilesController.GenerateTileFromType(chosenCell, _grid, _groundHolder, _cellSize, serializedCell.TileType);
 					}
 
-					if(serializeCell.ObstacleType != ObstacleType.NONE)
+					if (serializedCell.ObstacleType != ObstacleType.NONE)
 					{
-						ObstacleController obstacle = _allObstacleController.GenerateObstacleFromType(chosenCell, _grid, _obstacleHolder, _cellSize, serializeCell.ObstacleType);
+						ObstacleController obstacle = _allObstacleController.GenerateObstacleFromType(chosenCell, _grid, _obstacleHolder, _cellSize, serializedCell.ObstacleType);
 					}
 
-					_cellList.Add(chosenCell);
+					if (serializedCell.DecorationPositions != null && serializedCell.DecorationPositions.Count > 0)
+					{
+						for (int i = 0; i < serializedCell.DecorationPositions.Count; i++)
+						{
+							// Lire les coordonnées de la décoration
+							float[] positionArray = serializedCell.DecorationPositions[i];
+							Vector3 decorationPosition = new Vector3(positionArray[0], positionArray[1], positionArray[2]);
+
+							// Générer la décoration à la position récupérée
+							_allDecorationController.GenerateDecorationFromType(chosenCell, _grid, _decorationHolder, _cellSize, serializedCell.DecorationTypes[i], decorationPosition);
+						}
+
+						_cellList.Add(chosenCell);
+					}
 				}
 			}
 		}
@@ -368,6 +379,7 @@ namespace Components.Grid.Generator
 		}
 		public void SaveMap()
 		{
+
 			SerializedCell[] serializeCellArray = new SerializedCell[_cellList.Count];
 			for (int i = 0; i < serializeCellArray.Length; i++)
 			{
@@ -375,15 +387,41 @@ namespace Components.Grid.Generator
 				serializeCellArray[i] = cell;
 			}
 
-			_jsonString = JsonHelper.ToJson(serializeCellArray, true);
+			_jsonString = JsonConvert.SerializeObject(serializeCellArray, Formatting.Indented);
 			Debug.Log(Application.persistentDataPath);
 			System.IO.File.WriteAllText(Application.persistentDataPath + $"/{_fileName}", _jsonString);
 		}
 
 		public void LoadMap()
 		{
-			SerializedCell[] serializedCellArray = JsonHelper.FromJson<SerializedCell>(System.IO.File.ReadAllText(Application.persistentDataPath + $"/{_fileName}"));
-			GenerateGridFromTemplate(serializedCellArray.ToList());
+			string jsonContent = System.IO.File.ReadAllText(Application.persistentDataPath + $"/{_fileName}");
+
+			Debug.Log("JSON Loaded: " + jsonContent);
+
+			// Désérialisation avec Newtonsoft.Json
+			SerializedCell[] serializedCellArray = JsonConvert.DeserializeObject<SerializedCell[]>(jsonContent);
+
+			if (serializedCellArray == null || serializedCellArray.Length == 0)
+			{
+				Debug.LogError("No cells were loaded. Check the JSON format.");
+				return;
+			}
+
+			Debug.Log($"Loaded {serializedCellArray.Length} cells.");
+
+			foreach (var cell in serializedCellArray)
+			{
+				if (cell == null)
+				{
+					Debug.LogError("A null cell was found during loading.");
+				}
+				else
+				{
+					Debug.Log($"Loaded cell at position ({cell.X}, {cell.Y}) with TileType {cell.TileType}");
+				}
+			}
+
+			GenerateGridFromTemplate(serializedCellArray.ToList());	
 		}
 	}
 

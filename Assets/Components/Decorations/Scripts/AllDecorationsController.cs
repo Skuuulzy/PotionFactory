@@ -28,14 +28,14 @@ namespace Components.Grid.Decorations
 			return decoration;
 		}
 
-		public DecorationController GenerateDecorationFromType(Cell chosenCell, Grid grid, Transform decorationHolder, float cellSize, DecorationType decorationType)
+		public DecorationController GenerateDecorationFromType(Cell chosenCell, Grid grid, Transform decorationHolder, float cellSize, DecorationType decorationType, Vector3 localPositon)
 		{
 			foreach (DecorationController decorationController in _decorationsList)
 			{
 				if (decorationController.DecorationType == decorationType)
 				{
 					DecorationController decoration = Instantiate(decorationController, decorationHolder);
-					decoration.transform.position = grid.GetWorldPosition(chosenCell.X, chosenCell.Y) + new Vector3(cellSize / 2, 0, cellSize / 2);
+					decoration.transform.position = localPositon;
 					decoration.transform.localScale = new Vector3(cellSize, cellSize, cellSize);
 
 

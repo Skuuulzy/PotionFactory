@@ -5,6 +5,7 @@ using Components.Grid.Obstacle;
 using Components.Grid.Tile;
 using Components.Ingredients;
 using Components.Machines;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace Components.Grid
@@ -144,28 +145,62 @@ namespace Components.Grid
     [Serializable]
     public class SerializedCell
 	{
-        [SerializeField] public int X;
-        [SerializeField] public int Y;
-        [SerializeField] public float Size;
-        [SerializeField] public bool ContainsObject;
-        [SerializeField] public bool ContainsObstacle;
-        [SerializeField] public bool ContainsTile;
-        [SerializeField] public TileType TileType;
-        [SerializeField] public ObstacleType ObstacleType;
+        [JsonProperty("X")]
+        public int X { get; set; }
 
+        [JsonProperty("Y")]
+        public int Y { get; set; }
+
+        [JsonProperty("Size")]
+        public float Size { get; set; }
+
+        [JsonProperty("ContainsObject")]
+        public bool ContainsObject { get; set; }
+
+        [JsonProperty("ContainsObstacle")]
+        public bool ContainsObstacle { get; set; }
+
+        [JsonProperty("ContainsTile")]
+        public bool ContainsTile { get; set; }
+
+        [JsonProperty("TileType")]
+        public TileType TileType { get; set; }
+
+        [JsonProperty("ObstacleType")]
+        public ObstacleType ObstacleType { get; set; }
+
+        [JsonProperty("DecorationTypes")]
+        public DecorationType[] DecorationTypes { get; set; }
+
+        [JsonProperty("DecorationPositions")]
+        public List<float[]> DecorationPositions { get; set; }
+
+        public SerializedCell() { }
 
         public SerializedCell(Cell cell)
-		{
+        {
             X = cell.X;
             Y = cell.Y;
             Size = cell.Size;
             ContainsObject = cell.ContainsObject;
             ContainsObstacle = cell.ContainsObstacle;
             ContainsTile = cell.ContainsTile;
+            TileType = cell.TileController == null ? TileType.NONE : cell.TileController.TileType;
+            ObstacleType = cell.ObstacleController == null ? ObstacleType.NONE : cell.ObstacleController.ObstacleType;
 
-            
-            TileType = cell.TileController == null ? TileType.NONE : cell.TileController.TileType ;
-            ObstacleType = cell.ObstacleController == null ? ObstacleType.NONE : cell.ObstacleController.ObstacleType ;
-		}
+            if (cell.DecorationControllers != null)
+            {
+                DecorationTypes = new DecorationType[cell.DecorationControllers.Count];
+                DecorationPositions = new List<float[]>();
+
+                for (int i = 0; i < cell.DecorationControllers.Count; i++)
+                {
+                    DecorationTypes[i] = cell.DecorationControllers[i].DecorationType;
+
+                    Vector3 position = cell.DecorationControllers[i].transform.localPosition;
+                    DecorationPositions.Add(new float[] { position.x, position.y, position.z });
+                }
+            }
+        }
     }
 }
