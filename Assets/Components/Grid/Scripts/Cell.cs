@@ -133,13 +133,35 @@ namespace Components.Grid
             return false;
 		}
 
+        public void RemoveDecorationFromCell(DecorationController decoration)
+        {
+            _decorationControllers.Remove(decoration);
+        }
+
+        public DecorationController GetDecorationController(Vector3 worldMousePosition, float offset)
+        {
+            foreach (var decoration in _decorationControllers)
+            {
+                if (decoration == null) continue;
+
+                if (Vector3.Distance(decoration.transform.position, worldMousePosition) <= offset)
+                {
+                    return decoration;
+                }
+            }
+
+            return null;
+        }
+
         public Vector3 GetCenterPosition(Vector3 originPosition)
         {
 	        return new Vector3(X + Size / 2, 0, Y + Size / 2) * Size + originPosition;
         }
 
         public Vector2Int Position => new(X, Y);
-    }
+
+		
+	}
 
 
     [Serializable]

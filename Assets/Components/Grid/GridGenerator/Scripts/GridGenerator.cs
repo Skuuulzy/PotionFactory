@@ -53,6 +53,8 @@ namespace Components.Grid.Generator
 		private string _jsonString;
 		private string _fileName;
 		private bool _freePlacement;
+		private bool _cleanDecorationMode;
+		private bool _cleanObstacleMode;
 
 		// ------------------------------------------------------------------------- MONO -------------------------------------------------------------------------
 		private void Start()
@@ -66,14 +68,11 @@ namespace Components.Grid.Generator
 		{
 			MoveSelection();
 
-			if (Input.GetMouseButton(1))
-			{
-				RemoveObstacleFromGrid();
-			}
+
 
 			if (Input.GetMouseButtonDown(0))
 			{
-				if (_currentDecorationController != null && _freePlacement)
+				if (_currentDecorationController != null && _freePlacement && (!_cleanDecorationMode || !_cleanObstacleMode))
 				{
 					AddSelectedObjectToGrid();
 				}
@@ -81,7 +80,13 @@ namespace Components.Grid.Generator
 
 			if ( Input.GetMouseButton(0))
 			{
-				if(_currentDecorationController != null && _freePlacement)
+				if (_cleanDecorationMode || _cleanObstacleMode)
+				{
+					RemoveObjectFromGrid();
+					return;
+				}
+
+				else if(_currentDecorationController != null && _freePlacement)
 				{
 					return;
 				}
@@ -244,14 +249,8 @@ namespace Components.Grid.Generator
 
 		}
 
-		private void RemoveObstacleFromGrid()
+		private void RemoveObjectFromGrid()
 		{
-			if (_currentObstacleController != null)
-			{
-				Destroy(_currentObstacleController.gameObject);
-				_currentObstacleController = null;
-			}
-
 			// Try to get the position on the grid.
 			if (!UtilsClass.ScreenToWorldPositionIgnoringUI(Input.mousePosition, _camera, out Vector3 worldMousePosition))
 			{
@@ -264,17 +263,74 @@ namespace Components.Grid.Generator
 				return;
 			}
 
-			if (chosenCell.ContainsObstacle == true)
+			if (_cleanObstacleMode)
 			{
-				Destroy(chosenCell.ObstacleController.gameObject);
-				chosenCell.RemoveObstacleFromCell();
-
+				if (chosenCell.ContainsObstacle == true)
+				{
+					Destroy(chosenCell.ObstacleController.gameObject);
+					chosenCell.RemoveObstacleFromCell();
+				}
 			}
+
+			else if (_cleanDecorationMode)
+			{
+				if (chosenCell.DecorationControllers != null && chosenCell.DecorationControllers.Count != 0)
+				{
+					DecorationController decoration = chosenCell.GetDecorationController(worldMousePosition, 0.2f);
+					if(decoration != null)
+					{
+						Destroy(decoration.gameObject);
+						chosenCell.RemoveDecorationFromCell(decoration);
+					}
+				}
+			}
+
 		}
 
 		public void ChangeFreePlacementMode(bool value)
 		{
 			_freePlacement = value;
+		}
+
+		public void ChangeCleanDecorationMode(bool value)
+		{
+			_cleanDecorationMode = value;
+
+			if (_cleanDecorationMode)
+			{
+				DestroyCurrentController();
+			}
+		}
+
+		public void ChangeCleanObstacleMode(bool value)
+		{
+			_cleanObstacleMode = value;
+
+			if (_cleanObstacleMode)
+			{
+				DestroyCurrentController();
+			}
+		}
+
+		private void DestroyCurrentController()
+		{
+			if (_currentTileController != null)
+			{
+				Destroy(_currentTileController.gameObject);
+				_currentTileController = null;
+			}
+
+			else if (_currentObstacleController != null)
+			{
+				Destroy(_currentObstacleController.gameObject);
+				_currentObstacleController = null;
+			}
+
+			else if (_currentDecorationController != null)
+			{
+				Destroy(_currentDecorationController.gameObject);
+				_currentDecorationController = null;
+			}
 		}
 
 		// ------------------------------------------------------------------------- GENERATE GRID -------------------------------------------------------------------------
@@ -346,8 +402,8 @@ namespace Components.Grid.Generator
 							_allDecorationController.GenerateDecorationFromType(chosenCell, _grid, _decorationHolder, _cellSize, serializedCell.DecorationTypes[i], decorationPosition);
 						}
 
-						_cellList.Add(chosenCell);
 					}
+					_cellList.Add(chosenCell);
 				}
 			}
 		}
