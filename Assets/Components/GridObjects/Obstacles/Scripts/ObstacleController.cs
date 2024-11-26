@@ -5,24 +5,13 @@ using UnityEngine;
 
 namespace Components.Grid.Obstacle
 {
-	public class ObstacleController : MonoBehaviour
+	public class ObstacleController : GridObjectController
 	{
-		[SerializeField] private Transform _3dViewHolder;
+
 		[SerializeField] private ObstacleType _obstacleType;
-
-		private GameObject _view;
-
-		public Transform View => _3dViewHolder;
 		public ObstacleType ObstacleType => _obstacleType;
 
 		// ------------------------------------------------------------------------- INIT -------------------------------------------------------------------------
-		public void InstantiatePreview(ObstacleTemplate obstacleTemplate, float scale)
-		{
-			_view = Instantiate(obstacleTemplate.GridView, _3dViewHolder);
-
-			transform.localScale = new Vector3(scale, scale, scale);
-		}
-
 
 		public void SetObstacleType(ObstacleType obstacleType)
 		{
