@@ -1,15 +1,13 @@
 using Components.Grid;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using static UnityEngine.Rendering.DebugUI;
 
-public class GrimoireInventoryButton : MonoBehaviour
+public class GrimoireInventoryButton : MonoBehaviour, IPointerClickHandler
 {
-    [Header ("Info button")]
+    [Header("Info button")]
     [SerializeField] private Image _buttonImage;
     [SerializeField] private Image _buttonBackground;
     [SerializeField] private Material[] _typeColor;
@@ -17,13 +15,13 @@ public class GrimoireInventoryButton : MonoBehaviour
     [SerializeField] private Sprite[] _typeForm;
     [SerializeField] private TextMeshProUGUI _numberOfAvailableText;
 
-    [Header ("Zero state")]
+    [Header("Zero state")]
     [SerializeField] private Image _border;
     [SerializeField] private Sprite _normalBackground;
     [SerializeField] private Sprite _zeroBackground;
     private bool _zeroState = false;
 
-    [Header ("Button comportment")]
+    [Header("Button comportment")]
     [SerializeField] private Animator _animator;
 
     private ShopItemType _type;
@@ -61,7 +59,7 @@ public class GrimoireInventoryButton : MonoBehaviour
     {
         _numberOfAvailableText.text = number.ToString();
 
-        if(number <= 0) 
+        if (number <= 0)
         {
             _zeroState = true;
             _buttonBackground.sprite = _zeroBackground;
@@ -72,7 +70,7 @@ public class GrimoireInventoryButton : MonoBehaviour
 
             OnDeselect();
         }
-        else if(_zeroState == true)
+        else if (_zeroState == true)
         {
             _zeroState = false;
             _buttonBackground.sprite = _normalBackground;
@@ -125,6 +123,14 @@ public class GrimoireInventoryButton : MonoBehaviour
         if (_isSelected == true && asPreview == true)
         {
             OnDeselect();
+        }
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (eventData.button == PointerEventData.InputButton.Left)
+        {
+            OnSelect();
         }
     }
 
