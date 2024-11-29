@@ -3,6 +3,7 @@ using Components.Machines;
 using Components.Map;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using VComponent.Tools.Singletons;
 
@@ -63,21 +64,24 @@ namespace Components.Inventory
 
 		public void DecreaseMachineToPlayerInventory(MachineTemplate machineTemplate, int numberOfMachine)
 		{
-			if (_playerMachinesDictionary.ContainsKey(machineTemplate))
+			var matchingKey = _playerMachinesDictionary.Keys.FirstOrDefault(key => key.Type == machineTemplate.Type);
+
+			if (matchingKey != null)
 			{
-				_playerMachinesDictionary[machineTemplate] -= numberOfMachine;
-				OnMachineAddedOrRemoved?.Invoke(machineTemplate, _playerMachinesDictionary[machineTemplate]);
+				_playerMachinesDictionary[matchingKey] -= numberOfMachine;
+				OnMachineAddedOrRemoved?.Invoke(matchingKey, _playerMachinesDictionary[matchingKey]);
 			}
 			else
 			{
-				Debug.LogError($"Can't remove this machine :{machineTemplate} because player doesn't has it in inventory");
+				Debug.LogError($"Can't remove this machine type: {machineTemplate.Type} because player doesn't have it in inventory");
 			}
 		}
 
-		public int CountMachineOfType(MachineTemplate machineTemplate)
+		public int CountMachineOfType(MachineType machineType)
 		{
-			return _playerMachinesDictionary.GetValueOrDefault(machineTemplate, 0);
+			return _playerMachinesDictionary.Where(entry => entry.Key.Type == machineType).Sum(entry => entry.Value);
 		}
+	
 
 		public void AddConsumableToPlayerInventory(ConsumableTemplate consumableTemplate, int v)
 		{
