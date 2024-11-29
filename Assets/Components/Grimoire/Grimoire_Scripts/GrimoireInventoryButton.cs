@@ -14,6 +14,7 @@ public class GrimoireInventoryButton : MonoBehaviour, IPointerClickHandler
     [SerializeField] private Image _buttonForm;
     [SerializeField] private Sprite[] _typeForm;
     [SerializeField] private TextMeshProUGUI _numberOfAvailableText;
+    [SerializeField] private TextMeshProUGUI _numberOfAvailableSelectedText;
 
     [Header("Zero state")]
     [SerializeField] private Image _border;
@@ -33,6 +34,7 @@ public class GrimoireInventoryButton : MonoBehaviour, IPointerClickHandler
     {
         OnSelected += HandleOnSelected;
         GridPreviewController.OnPreviewUnselected += HandleOnDeselected;
+        
     }
 
     private void OnDestroy()
@@ -58,6 +60,7 @@ public class GrimoireInventoryButton : MonoBehaviour, IPointerClickHandler
     public void UpdateNumberOfAvailableMachine(int number)
     {
         _numberOfAvailableText.text = number.ToString();
+		_numberOfAvailableSelectedText.text = number.ToString();
 
         if (number <= 0)
         {

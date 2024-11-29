@@ -286,10 +286,11 @@ namespace Components.Grid
             _gridController.AddMachineToGrid(machineToAdd, chosenCell, true);
 
             //Instantiate the same machine type if we have enough in the inventory.
-            if (GrimoireController.Instance.CountMachineOfType(Preview.Machine.Template) > 0)
+            if (GrimoireController.Instance.CountMachineOfType(Preview.Machine.Template) <= 0)
             {
-                //InstantiatePreview(Preview.Machine.Template);
-            }
+				DestroyPreview();
+
+			}
         }
 
         private void TryDestroyHoveredMachine()
