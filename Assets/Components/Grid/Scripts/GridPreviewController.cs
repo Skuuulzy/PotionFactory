@@ -22,7 +22,7 @@ namespace Components.Grid
         [SerializeField] private bool _useSubMachine;
         [SerializeField] private SerializableDictionary<MachineTemplate, List<RotationSubMachine>> _subMachineRotation;
         
-        private UnityEngine.Camera _camera;
+        private Camera _camera;
         
         private MachineController _currentMachinePreview;
         private MachineController _currentSubMachinePreview;

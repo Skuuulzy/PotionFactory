@@ -32,6 +32,7 @@ namespace Components.Machines
         public Action OnTick;
         public Action OnPropagateTick;
         public Action<bool> OnItemAdded;
+        public static Action<Machine> OnSelected;
         
         // --------------------------------------------------------------------- INITIALISATION -------------------------------------------------------------------------
         public Machine(MachineTemplate template, MachineController controller)
@@ -196,6 +197,12 @@ namespace Components.Machines
             }
 
             _nodes = Template.Nodes.RotateNodes(angle);
+        }
+        
+        // ------------------------------------------------------------------------- SELECT BEHAVIOUR -------------------------------------------------------------------------
+        public void Select()
+        {
+            OnSelected?.Invoke(this);
         }
     }
 }
