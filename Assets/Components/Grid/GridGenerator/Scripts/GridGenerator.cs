@@ -38,7 +38,9 @@ namespace Components.Grid.Generator
 		[SerializeField] private AllDecorationsController _allDecorationController;
 
 
-		[Header("TilesGenerated")]
+		[Header("Options")]
+		[SerializeField] private float _rotationSpeed = 300f;
+
 		private List<Cell> _cellList;
 
 		// Grid
@@ -66,9 +68,22 @@ namespace Components.Grid.Generator
 
 		private void Update()
 		{
-			MoveSelection();
-
-
+			if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.R))
+			{
+				RotateSelectionBy90Degrees();
+			}
+			else if (Input.GetKey(KeyCode.R))
+			{
+				RotateSelection();
+			}
+			else if(Input.GetKey(KeyCode.T))
+			{
+				ScaleSelection();
+			}
+			else
+			{
+				MoveSelection();
+			}
 
 			if (Input.GetMouseButtonDown(0))
 			{
@@ -196,6 +211,91 @@ namespace Components.Grid.Generator
 				_currentDecorationController.transform.position = worldMousePosition;
 			}
 		}
+
+		/// <summary>
+		/// Rotates the currently selected object (decoration or obstacle) based on mouse movement while holding the R key.
+		/// </summary>
+		private void RotateSelection()
+		{
+			if (_currentObstacleController == null && _currentDecorationController == null)
+			{
+				return;
+			}
+
+			// Capture horizontal mouse delta
+			float mouseDeltaX = Input.GetAxis("Mouse X");
+
+
+			float rotationAngle = mouseDeltaX * _rotationSpeed * Time.deltaTime;
+
+			// Apply rotation
+			if (_currentObstacleController != null)
+			{
+				_currentObstacleController.transform.Rotate(Vector3.up, rotationAngle);
+			}
+			else if (_currentDecorationController != null)
+			{
+				_currentDecorationController.transform.Rotate(Vector3.up, rotationAngle);
+			}
+		}
+
+		/// <summary>
+		/// Rotates the currently selected object (decoration or obstacle) by 90 degrees when Shift + R is pressed.
+		/// </summary>
+		private void RotateSelectionBy90Degrees()
+		{
+			if (_currentObstacleController == null && _currentDecorationController == null)
+			{
+				return;
+			}
+
+			// Determine the rotation step (90 degrees around the Y axis)
+			float rotationAngle = 90f;
+
+			// Apply rotation
+			if (_currentObstacleController != null)
+			{
+				_currentObstacleController.transform.Rotate(Vector3.up, rotationAngle);
+			}
+			else if (_currentDecorationController != null)
+			{
+				_currentDecorationController.transform.Rotate(Vector3.up, rotationAngle);
+			}
+		}
+
+
+		/// <summary>
+		/// Modifies the local scale of the currently selected object (decoration or obstacle) based on vertical mouse movement while holding the T key.
+		/// </summary>
+		private void ScaleSelection()
+		{
+			if (_currentObstacleController == null && _currentDecorationController == null)
+			{
+				return;
+			}
+
+			// Capture vertical mouse delta
+			float mouseDeltaY = Input.GetAxis("Mouse Y");
+
+			// Determine scaling factor (adjust sensitivity as needed)
+			float scaleSpeed = 0.1f; // Scale speed factor
+			float scaleFactor = 1 + mouseDeltaY * scaleSpeed;
+
+			// Clamp scale factor to avoid negative or zero scale
+			scaleFactor = Mathf.Clamp(scaleFactor, 0.1f, 3f);
+
+			// Apply scaling
+			if (_currentObstacleController != null)
+			{
+				_currentObstacleController.transform.localScale *= scaleFactor;
+			}
+			else if (_currentDecorationController != null)
+			{
+				_currentDecorationController.transform.localScale *= scaleFactor;
+			}
+		}
+
+
 
 		// ------------------------------------------------------------------------- INPUT HANDLERS -------------------------------------------------------------------------
 		private void AddSelectedObjectToGrid()

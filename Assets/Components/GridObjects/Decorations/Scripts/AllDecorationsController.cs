@@ -20,8 +20,8 @@ namespace Components.Grid.Decorations
 				decoration.transform.position = grid.GetWorldPosition(chosenCell.X, chosenCell.Y) + new Vector3(cellSize / 2, 0, cellSize / 2);
 
 			}
-			decoration.transform.localScale = new Vector3(cellSize, cellSize, cellSize);
-
+			decoration.transform.localScale = decorationController.transform.localScale;
+			decoration.transform.rotation = decorationController.transform.rotation;
 
 			decoration.SetDecorationType(decorationController.DecorationType);
 			chosenCell.AddDecorationToCell(decoration);

@@ -33,7 +33,8 @@ namespace Components.Grid.Obstacle
 		{
 			ObstacleController obstacle = Instantiate(obstacleController, obstacleHolder);
 			obstacle.transform.position = grid.GetWorldPosition(chosenCell.X, chosenCell.Y) + new Vector3(cellSize / 2, 0, cellSize / 2);
-			obstacle.transform.localScale = new Vector3(cellSize, cellSize, cellSize);
+			obstacle.transform.localScale = obstacleController.transform.localScale;
+			obstacle.transform.rotation = obstacleController.transform.rotation;
 
 
 			obstacle.SetObstacleType(obstacleController.ObstacleType);
