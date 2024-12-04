@@ -487,7 +487,16 @@ namespace Components.Grid.Generator
 
 					if (serializedCell.ObstacleType != ObstacleType.NONE)
 					{
-						ObstacleController obstacle = _allObstacleController.GenerateObstacleFromType(chosenCell, _grid, _obstacleHolder, _cellSize, serializedCell.ObstacleType);
+						// Lire la rotation de l'obstacle
+						float[] rotationArray = serializedCell.ObstacleRotation;
+						Quaternion obstacleRotation = new Quaternion(rotationArray[0], rotationArray[1], rotationArray[2], rotationArray[3]);
+
+						// Lire l'échelle locale de l'obstacle
+						float[] scaleArray = serializedCell.ObstacleScale;
+						Vector3 obstacleScale = new Vector3(scaleArray[0], scaleArray[1], scaleArray[2]);
+
+						// Générer l'obstacle avec la rotation et l'échelle récupérées
+						ObstacleController obstacle = _allObstacleController.GenerateObstacleFromType(chosenCell, _grid, _obstacleHolder, _cellSize, serializedCell.ObstacleType, obstacleRotation,	obstacleScale);
 					}
 
 					if (serializedCell.DecorationPositions != null && serializedCell.DecorationPositions.Count > 0)
@@ -498,11 +507,19 @@ namespace Components.Grid.Generator
 							float[] positionArray = serializedCell.DecorationPositions[i];
 							Vector3 decorationPosition = new Vector3(positionArray[0], positionArray[1], positionArray[2]);
 
-							// Générer la décoration à la position récupérée
-							_allDecorationController.GenerateDecorationFromType(chosenCell, _grid, _decorationHolder, _cellSize, serializedCell.DecorationTypes[i], decorationPosition);
-						}
+							// Lire la rotation de la décoration
+							float[] rotationArray = serializedCell.DecorationRotations[i];
+							Quaternion decorationRotation = new Quaternion(rotationArray[0], rotationArray[1], rotationArray[2], rotationArray[3]);
 
+							// Lire l'échelle locale de la décoration
+							float[] scaleArray = serializedCell.DecorationScales[i];
+							Vector3 decorationScale = new Vector3(scaleArray[0], scaleArray[1], scaleArray[2]);
+
+							// Générer la décoration avec la position, la rotation, et l'échelle récupérées
+							_allDecorationController.GenerateDecorationFromType(chosenCell,	_decorationHolder, serializedCell.DecorationTypes[i], decorationPosition, decorationRotation, decorationScale);
+						}
 					}
+
 					_cellList.Add(chosenCell);
 				}
 			}

@@ -28,26 +28,35 @@ namespace Components.Grid.Decorations
 			return decoration;
 		}
 
-		public DecorationController GenerateDecorationFromType(Cell chosenCell, Grid grid, Transform decorationHolder, float cellSize, DecorationType decorationType, Vector3 localPositon)
-		{
-			foreach (DecorationController decorationController in _decorationsList)
-			{
-				if (decorationController.DecorationType == decorationType)
-				{
-					DecorationController decoration = Instantiate(decorationController, decorationHolder);
-					decoration.transform.position = localPositon;
-					decoration.transform.localScale = new Vector3(cellSize, cellSize, cellSize);
+        /// <summary>
+        /// Generates a decoration from a given type, position, rotation, and scale, and assigns it to the cell.
+        /// </summary>
+        public DecorationController GenerateDecorationFromType(Cell chosenCell, Transform decorationHolder, DecorationType decorationType, Vector3 localPosition, Quaternion localRotation, Vector3 localScale)
+        {
+            foreach (DecorationController decorationController in _decorationsList)
+            {
+                if (decorationController.DecorationType == decorationType)
+                {
+                    // Instantiate the decoration
+                    DecorationController decoration = Instantiate(decorationController, decorationHolder);
 
+                    // Apply position, rotation, and scale
+                    decoration.transform.localPosition = localPosition;
+                    decoration.transform.localRotation = localRotation;
+                    decoration.transform.localScale = localScale;
 
-					decoration.SetDecorationType(decorationType);
-					chosenCell.AddDecorationToCell(decoration);
-					return decoration;
-				}
-			}
+                    // Set decoration type and assign to cell
+                    decoration.SetDecorationType(decorationType);
+                    chosenCell.AddDecorationToCell(decoration);
 
-			Debug.LogError("Can't find obstacle associated ObstacleType : " + decorationType);
-			return null;
-		}
-	}
+                    return decoration;
+                }
+            }
+
+            Debug.LogError("Can't find decoration associated with DecorationType: " + decorationType);
+            return null;
+        }
+
+    }
 }
 
