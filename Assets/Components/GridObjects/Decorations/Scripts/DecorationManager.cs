@@ -1,5 +1,8 @@
+using Components.Grid.Obstacle;
+using Database;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Components.Grid.Decorations
@@ -21,6 +24,8 @@ namespace Components.Grid.Decorations
 
 		void Start()
 		{
+			_decorationsTemplateList = ScriptableObjectDatabase.GetAllScriptableObjectOfType<DecorationTemplate>().ToList();
+
 			if (_decorationsTemplateList.Count <= 0)
 			{
 				Debug.LogWarning("[Obstacle] No templates found.");

@@ -55,8 +55,11 @@ namespace Components.Grid.Generator
 		private string _jsonString;
 		private string _fileName;
 		private bool _freePlacement;
-		private bool _cleanDecorationMode;
-		private bool _cleanObstacleMode;
+		private bool _cleanMode;
+		private float _cleanRadius = 1f;
+
+		public bool CleanMode => _cleanMode;
+		public float CleanRadius => _cleanRadius;
 
 		// ------------------------------------------------------------------------- MONO -------------------------------------------------------------------------
 		private void Start()
@@ -87,7 +90,7 @@ namespace Components.Grid.Generator
 
 			if (Input.GetMouseButtonDown(0))
 			{
-				if (_currentDecorationController != null && _freePlacement && (!_cleanDecorationMode || !_cleanObstacleMode))
+				if (_currentDecorationController != null && _freePlacement && !_cleanMode)
 				{
 					AddSelectedObjectToGrid();
 				}
@@ -95,7 +98,7 @@ namespace Components.Grid.Generator
 
 			if ( Input.GetMouseButton(0))
 			{
-				if (_cleanDecorationMode || _cleanObstacleMode)
+				if (_cleanMode)
 				{
 					RemoveObjectFromGrid();
 					return;
@@ -349,42 +352,45 @@ namespace Components.Grid.Generator
 
 		}
 
+		private void RemoveObjectsInCircle(Vector3 center, float radius)
+		{
+			// Get all the cells within the circle.
+			List<Cell> cellsInCircle = _grid.GetCellsInCircle(center, radius);
+
+			foreach (var cell in cellsInCircle)
+			{
+				if (_cleanMode)
+				{
+					// Remove the obstacle if it exists.
+					if (cell.ContainsObstacle)
+					{
+						Destroy(cell.ObstacleController.gameObject);
+						cell.RemoveObstacleFromCell();
+					}
+
+					// Remove all decorations in the cell.
+					if (cell.DecorationControllers != null && cell.DecorationControllers.Count > 0)
+					{
+						foreach (var decoration in cell.DecorationControllers.ToArray()) // Use ToArray to avoid issues while modifying the collection.
+						{
+							Destroy(decoration.gameObject);
+							cell.RemoveDecorationFromCell(decoration);
+						}
+					}
+				}
+			}
+		}
+
 		private void RemoveObjectFromGrid()
 		{
-			// Try to get the position on the grid.
+			// Try to get the world position ignoring UI.
 			if (!UtilsClass.ScreenToWorldPositionIgnoringUI(Input.mousePosition, _camera, out Vector3 worldMousePosition))
 			{
 				return;
 			}
 
-			// Try getting the cell
-			if (!_grid.TryGetCellByPosition(worldMousePosition, out Cell chosenCell))
-			{
-				return;
-			}
-
-			if (_cleanObstacleMode)
-			{
-				if (chosenCell.ContainsObstacle == true)
-				{
-					Destroy(chosenCell.ObstacleController.gameObject);
-					chosenCell.RemoveObstacleFromCell();
-				}
-			}
-
-			else if (_cleanDecorationMode)
-			{
-				if (chosenCell.DecorationControllers != null && chosenCell.DecorationControllers.Count != 0)
-				{
-					DecorationController decoration = chosenCell.GetDecorationController(worldMousePosition, 0.2f);
-					if(decoration != null)
-					{
-						Destroy(decoration.gameObject);
-						chosenCell.RemoveDecorationFromCell(decoration);
-					}
-				}
-			}
-
+			// Remove objects in the circle.
+			RemoveObjectsInCircle(worldMousePosition, _cleanRadius);
 		}
 
 		public void ChangeFreePlacementMode(bool value)
@@ -392,25 +398,17 @@ namespace Components.Grid.Generator
 			_freePlacement = value;
 		}
 
-		public void ChangeCleanDecorationMode(bool value)
+		public void ChangeCleanMode(bool value)
 		{
-			_cleanDecorationMode = value;
+			_cleanMode = value;
 
-			if (_cleanDecorationMode)
+			if (_cleanMode)
 			{
 				DestroyCurrentController();
 			}
 		}
 
-		public void ChangeCleanObstacleMode(bool value)
-		{
-			_cleanObstacleMode = value;
 
-			if (_cleanObstacleMode)
-			{
-				DestroyCurrentController();
-			}
-		}
 
 		private void DestroyCurrentController()
 		{
@@ -542,6 +540,11 @@ namespace Components.Grid.Generator
 
 
 			_grid.ClearCellsData();
+		}
+
+		public void ChangeRadiusValue(float radiusValue)
+		{
+			_cleanRadius = radiusValue / 10f;
 		}
 
 		// ------------------------------------------------------------------------ SAVE AND LOAD MAP -------------------------------------------------------------

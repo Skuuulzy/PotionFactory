@@ -21,6 +21,7 @@ namespace Components.Grid.Decorations
 	public enum DecorationType
 	{
 		NONE,
-		BLUE_FLOWER
+		BLUE_FLOWER,
+		YELLOW_FLOWER
 	}
 }

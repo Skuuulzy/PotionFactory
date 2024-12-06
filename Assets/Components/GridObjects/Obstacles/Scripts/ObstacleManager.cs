@@ -1,7 +1,9 @@
 using Components.Grid.Tile;
+using Database;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Components.Grid.Obstacle
@@ -22,6 +24,7 @@ namespace Components.Grid.Obstacle
 		// Start is called before the first frame update
 		void Start()
 		{
+			_obstacleTemplateList = ScriptableObjectDatabase.GetAllScriptableObjectOfType<ObstacleTemplate>().ToList();
 			if (_obstacleTemplateList.Count <= 0)
 			{
 				Debug.LogWarning("[Obstacle] No templates found.");

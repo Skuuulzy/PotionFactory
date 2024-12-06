@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace Components.Grid.Decorations
 {
-	[CreateAssetMenu(fileName = "New All Decoration Template", menuName = "Grid/All Decoration Template")]
 	public class AllDecorationsController : ScriptableObject
     {
         [SerializeField] private List<DecorationController> _decorationsList;

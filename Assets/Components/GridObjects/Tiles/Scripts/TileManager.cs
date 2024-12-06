@@ -1,6 +1,9 @@
+using Components.Recipes;
+using Database;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Components.Grid.Tile
@@ -20,7 +23,9 @@ namespace Components.Grid.Tile
         // Start is called before the first frame update
         void Start()
         {
-            if (_tileTemplateList.Count <= 0)
+			_tileTemplateList = ScriptableObjectDatabase.GetAllScriptableObjectOfType<TileTemplate>().ToList();
+
+			if (_tileTemplateList.Count <= 0)
             {
                 Debug.LogWarning("[Tile] No templates found.");
                 return;
