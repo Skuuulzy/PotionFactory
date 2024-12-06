@@ -43,6 +43,9 @@ namespace Components.Map
 			//Set up ingredients bundles list
 			_startingGameIngredientsBundles = ScriptableObjectDatabase.GetAllScriptableObjectOfType<IngredientsBundle>().Where(bundle => bundle.IsStartingGameBundle).ToList();
 			_startingRoundIngredientsBundles = ScriptableObjectDatabase.GetAllScriptableObjectOfType<IngredientsBundle>().Where(bundle => !bundle.IsStartingGameBundle).ToList();
+			
+			_mapGameObject.SetActive(true);
+			_confirmButton.interactable = false;
 		}
 		private void OnDestroy()
 		{

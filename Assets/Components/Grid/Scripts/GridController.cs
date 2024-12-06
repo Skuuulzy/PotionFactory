@@ -92,6 +92,7 @@ namespace Components.Grid
 			ConsumableManager.OnChangeSelectedConsumable += UpdateSelection;
 			RelicManager.OnChangeSelectedRelic += UpdateSelection;
 			MapGenerator.OnMapChoiceConfirm += HandleMapChoiceConfirm;
+			UIOptionsController.OnClearGrid += ClearGrid;
 		}
 
 		private void OnDestroy()
@@ -102,6 +103,7 @@ namespace Components.Grid
 			ConsumableManager.OnChangeSelectedConsumable -= UpdateSelection;
 			RelicManager.OnChangeSelectedRelic -= UpdateSelection;
 			MapGenerator.OnMapChoiceConfirm-= HandleMapChoiceConfirm;
+			UIOptionsController.OnClearGrid += ClearGrid;
 		}
 
 		private void Update()
@@ -405,8 +407,6 @@ namespace Components.Grid
 
 			Grid = new Grid(_gridXValue, _gridYValue, _cellSize, _originPosition, _groundHolder, _showDebug);
 			_tileController.SelectATileType();
-
-			
 		}
 
 		private void ClearGrid()
@@ -675,8 +675,12 @@ namespace Components.Grid
 			//var randomExtractorCoordinates = ListExtensionsMethods.GetRandomIndexes(_sellersCoordinates.Count, _sellersOnGridCount);
 			for (int i = 0; i < _sellersCoordinates.Count; i++)
 			{
-				var ingredient = selectedIngredients.Dequeue();
-				Grid.TryGetCellByCoordinates(_sellersCoordinates[i].x, _sellersCoordinates[i].y, out var chosenCell);
+				if (!Grid.TryGetCellByCoordinates(_sellersCoordinates[i].x, _sellersCoordinates[i].y, out var chosenCell))
+				{
+					Debug.LogError($"Unable to place seller at ({_sellersCoordinates[i].x}, {_sellersCoordinates[i].y}), there is no cell at this position");
+					continue;
+				}
+				
 				var destructorTemplate = ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("Destructor");
 
 				var machine = Instantiate(_machineControllerPrefab);

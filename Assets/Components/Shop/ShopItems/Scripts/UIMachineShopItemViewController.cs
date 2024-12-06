@@ -42,7 +42,10 @@ namespace Components.Shop.ShopItems
 		public override void BuyItem()
 		{
 			if (EconomyController.Instance.PlayerMoney < Price)
+			{
+				Debug.LogError("Not enough money you bum.");
 				return;
+			}
 
 			EconomyController.Instance.DecreaseMoney(Price);
 			if (_shopItem.NumberOfItemToSell != -1)

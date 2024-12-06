@@ -1,7 +1,9 @@
 using Components.Economy;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using VComponent.Tools.SceneLoader;
 
 public class UIStateController : MonoBehaviour
 {
@@ -13,25 +15,48 @@ public class UIStateController : MonoBehaviour
 	[Header("GameOver")]
 	[SerializeField] private GameObject _gameOverGO;
 
+	private static readonly int DISPLAY_STATE = Animator.StringToHash("DisplayState");
+
 	private void Awake()
 	{
 		BaseState.OnStateStarted += DisplayNewState;
 		EconomyController.OnGameOver += HandleGameOver;
+		StateController.OnCountdown += SetCountdownTime;
+		StateController.OnStateStarted += HandleStateStarted;
 	}
 
 	private void OnDestroy()
 	{
 		BaseState.OnStateStarted -= DisplayNewState;
 		EconomyController.OnGameOver -= HandleGameOver;
+		StateController.OnCountdown -= SetCountdownTime;
+		StateController.OnStateStarted -= HandleStateStarted;
+	}
+	
+	private void HandleStateStarted(BaseState state)
+	{
+		switch (state)
+		{
+			case ShopState shopState:
+				HideCountdown();
+				DisplayFinishStateButton(shopState);
+				break;
+			case PlanningFactoryState planningFactoryState:
+				DisplayFinishStateButton(planningFactoryState);
+				break;
+			case ResolutionFactoryState resolutionFactoryState:
+				DisplayFinishStateButton(resolutionFactoryState);
+				break;
+		}
 	}
 
 	private void DisplayNewState(BaseState state)
 	{
 		_stateNameText.text = $"{state.StateName} : {state.StateIndex}";
-		_stateUITitleAnimator.SetTrigger("DisplayState");
+		_stateUITitleAnimator.SetTrigger(DISPLAY_STATE);
 	}
 
-	public void SetCountdownTime(float currentTime, float duration)
+	private void SetCountdownTime(float currentTime, float duration)
 	{
 		//Check if the timer is display 
 		if (_stateCountdownImage.gameObject.activeSelf == false)
@@ -42,12 +67,12 @@ public class UIStateController : MonoBehaviour
 		_stateCountdownImage.fillAmount = currentTime / duration;
 	}
 
-	public void HideCountdown()
+	private void HideCountdown()
 	{
 		_stateCountdownImage.gameObject.SetActive(false);
 	}
 
-	public void DisplayFinishStateButton(BaseState state)
+	private void DisplayFinishStateButton(BaseState state)
 	{
 		_finishStateButton.gameObject.SetActive(true);
 		_finishStateButton.onClick.AddListener(state.SetStateFinished);
@@ -56,5 +81,11 @@ public class UIStateController : MonoBehaviour
 	private void HandleGameOver()
 	{
 		_gameOverGO.SetActive(true);
+	}
+
+	// TODO: Is it supposed to be here ? 
+	public void ReturnToMainMenu()
+	{
+		SceneLoader.Instance.LoadMainMenu();
 	}
 }

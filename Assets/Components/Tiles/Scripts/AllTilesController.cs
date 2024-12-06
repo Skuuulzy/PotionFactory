@@ -18,9 +18,12 @@ namespace Components.Grid.Tile
                 TileController tile = Instantiate(_groundTile, groundHolder);
                 tile.transform.position = grid.GetWorldPosition(cell.X, cell.Y) + new Vector3(cellSize / 2, 0, cellSize / 2);
                 tile.transform.localScale = new Vector3(cellSize, cellSize, cellSize);
+                tile.gameObject.isStatic = true;
                 tile.SetTileType(_groundTile.TileType);
+                tile.name = $"Tile: ({tile.TileType.ToString().ToLowerInvariant()} ({cell.X}, {cell.Y})";
+                
                 cell.AddTileToCell(tile);
-                tile.name = $"Tile ({tile.TileType})";
+                
                 return tile;
             }
             else
@@ -28,9 +31,12 @@ namespace Components.Grid.Tile
                 TileController tile = Instantiate(_waterTile, groundHolder);
                 tile.transform.position = grid.GetWorldPosition(cell.X, cell.Y) + new Vector3(cellSize / 2, 0, cellSize / 2);
                 tile.transform.localScale = new Vector3(cellSize, cellSize, cellSize);
+                tile.gameObject.isStatic = true;
                 tile.SetTileType(TileType.WATER);
+                tile.name = $"Tile: ({tile.TileType.ToString().ToLowerInvariant()} ({cell.X}, {cell.Y})";
+                
 				cell.AddTileToCell(tile);
-                tile.name = $"Tile ({tile.TileType})";
+                
                 return tile;
             }
 
@@ -41,7 +47,7 @@ namespace Components.Grid.Tile
             TileController tile = Instantiate(tileController, groundHolder);
             tile.transform.position = grid.GetWorldPosition(cell.X, cell.Y) + new Vector3(cellSize / 2, 0, cellSize / 2);
             tile.transform.localScale = new Vector3(cellSize, cellSize, cellSize);
-            tile.name = $"Tile ({tile})";
+            tile.name = $"Tile: ({tile.TileType.ToString().ToLowerInvariant()} ({cell.X}, {cell.Y})";
             tile.SetTileType(tileController.TileType);
 			return tile;
         }
@@ -53,7 +59,7 @@ namespace Components.Grid.Tile
                 TileController tile = Instantiate(_waterTile, groundHolder);
                 tile.transform.position = grid.GetWorldPosition(cell.X, cell.Y) + new Vector3(cellSize / 2, 0, cellSize / 2);
                 tile.transform.localScale = new Vector3(cellSize, cellSize, cellSize);
-                tile.name = $"Tile ({tile})";
+                tile.name = $"Tile: ({tile.TileType.ToString().ToLowerInvariant()} ({cell.X}, {cell.Y})";
                 tile.SetTileType(TileType.WATER);
                 cell.AddTileToCell(tile);
                 return tile;
@@ -66,7 +72,7 @@ namespace Components.Grid.Tile
                     TileController tile = Instantiate(tileController, groundHolder);
                     tile.transform.position = grid.GetWorldPosition(cell.X, cell.Y) + new Vector3(cellSize / 2, 0, cellSize / 2);
                     tile.transform.localScale = new Vector3(cellSize, cellSize, cellSize);
-                    tile.name = $"Tile ({tile})";
+                    tile.name = $"Tile: ({tile.TileType.ToString().ToLowerInvariant()} ({cell.X}, {cell.Y})";
                     tile.SetTileType(tileType);
                     cell.AddTileToCell(tile);
                     return tile;

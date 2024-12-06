@@ -1,18 +1,20 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
+using VComponent.Tools.SceneLoader;
 
 public class MainMenuController : MonoBehaviour
 {
-   
-	public void LaunchGame()
+	public void LaunchSandBox()
 	{
-		SceneManager.LoadScene("Grid_Sandbox", LoadSceneMode.Single);
+		SceneLoader.Instance.LoadSandbox();
+	}
+
+	public void LaunchLevel()
+	{
+		SceneLoader.Instance.LoadLevel();
 	}
 
 	public void LaunchGridGenerator()
 	{
-		SceneManager.LoadScene("Grid_Generator", LoadSceneMode.Single);
+		SceneLoader.Instance.LoadGridGenerator();
 	}
 }
