@@ -199,7 +199,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
-  m_VertexColorAlwaysGammaSpace: 1
+  m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
@@ -233,6 +233,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1926692623}
     m_Modifications:
+    - target: {fileID: 212188757996940299, guid: f11587cd3ea8abe4487229fe34a486f7,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 553646490779576108, guid: f11587cd3ea8abe4487229fe34a486f7,
         type: 3}
       propertyPath: _type
@@ -1166,6 +1171,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1926692623}
     m_Modifications:
+    - target: {fileID: 212188757996940299, guid: f11587cd3ea8abe4487229fe34a486f7,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 553646490779576108, guid: f11587cd3ea8abe4487229fe34a486f7,
         type: 3}
       propertyPath: _uiGrimoireController
