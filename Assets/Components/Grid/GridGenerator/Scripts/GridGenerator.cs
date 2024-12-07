@@ -1,12 +1,14 @@
+using System;
 using CodeMonkey.Utils;
 using Components.Grid.Decorations;
 using Components.Grid.Obstacle;
 using Components.Grid.Tile;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Components.Grid.Generator
 {
@@ -37,7 +39,6 @@ namespace Components.Grid.Generator
 		[Header("Decorations")]
 		[SerializeField] private AllDecorationsController _allDecorationController;
 
-
 		[Header("Options")]
 		[SerializeField] private float _rotationSpeed = 300f;
 
@@ -60,6 +61,8 @@ namespace Components.Grid.Generator
 
 		public bool CleanMode => _cleanMode;
 		public float CleanRadius => _cleanRadius;
+
+		public static string MapsPath => Path.Combine(Application.dataPath, "JsonData/Maps/");
 
 		// ------------------------------------------------------------------------- MONO -------------------------------------------------------------------------
 		private void Start()
@@ -113,8 +116,6 @@ namespace Components.Grid.Generator
 			}
 
 		}
-
-
 
 		// ------------------------------------------------------------------------- SELECTION -------------------------------------------------------------------------
 		private void InstantiateNewPreview()
@@ -265,8 +266,7 @@ namespace Components.Grid.Generator
 				_currentDecorationController.transform.Rotate(Vector3.up, rotationAngle);
 			}
 		}
-
-
+		
 		/// <summary>
 		/// Modifies the local scale of the currently selected object (decoration or obstacle) based on vertical mouse movement while holding the T key.
 		/// </summary>
@@ -297,9 +297,7 @@ namespace Components.Grid.Generator
 				_currentDecorationController.transform.localScale *= scaleFactor;
 			}
 		}
-
-
-
+		
 		// ------------------------------------------------------------------------- INPUT HANDLERS -------------------------------------------------------------------------
 		private void AddSelectedObjectToGrid()
 		{
@@ -327,7 +325,7 @@ namespace Components.Grid.Generator
 				return;
 			}
 
-			else if( _currentObstacleController != null)
+			if( _currentObstacleController != null)
 			{
 				if(chosenCell.ObstacleController != null)
 				{
@@ -335,9 +333,7 @@ namespace Components.Grid.Generator
 				}
 				ObstacleController obstacleController = _allObstacleController.GenerateObstacleFromPrefab(_grid, chosenCell, _obstacleHolder, _cellSize, _currentObstacleController);
 				chosenCell.AddObstacleToCell(obstacleController);
-				return;
 			}
-
 			else if (_currentDecorationController != null)
 			{
 				if (chosenCell.DecorationControllers != null && !_freePlacement && chosenCell.DetectDecorationOnCell(_currentDecorationController))
@@ -347,9 +343,7 @@ namespace Components.Grid.Generator
 
 				DecorationController decorationController = _allDecorationController.GenerateDecorationFromPrefab(_grid, chosenCell, _decorationHolder, _cellSize, _currentDecorationController, _freePlacement, worldMousePosition);
 				chosenCell.AddDecorationToCell(decorationController);
-				return;
 			}
-
 		}
 
 		private void RemoveObjectsInCircle(Vector3 center, float radius)
@@ -408,8 +402,6 @@ namespace Components.Grid.Generator
 			}
 		}
 
-
-
 		private void DestroyCurrentController()
 		{
 			if (_currentTileController != null)
@@ -454,7 +446,7 @@ namespace Components.Grid.Generator
 					{
 						if (x != 1 && x != _grid.GetWidth() - 2 && z != 1 && z != _grid.GetHeight() - 2)
 						{
-							ObstacleController obstacleController = _allObstacleController.GenerateObstacle(_grid, chosenCell, _obstacleHolder, _cellSize);
+							_allObstacleController.GenerateObstacle(_grid, chosenCell, _obstacleHolder, _cellSize);
 						}
 					}
 					_cellList.Add(chosenCell);
@@ -468,7 +460,7 @@ namespace Components.Grid.Generator
 			{
 				ClearGrid();
 			}
-			_grid = new Grid(_gridXValue, _gridYValue, _cellSize, _startPosition, _groundHolder, false, serializedCellList);
+			_grid = new Grid(_gridXValue, _gridYValue, _cellSize, _startPosition, _groundHolder, false, serializedCellList.ToArray());
 			_cellList = new List<Cell>();
 			// Instantiate ground blocks
 			for (int x = 0; x < _grid.GetWidth(); x++)
@@ -480,7 +472,7 @@ namespace Components.Grid.Generator
 
 					if (serializedCell.TileType != TileType.NONE)
 					{
-						TileController tile = _allTilesController.GenerateTileFromType(chosenCell, _grid, _groundHolder, _cellSize, serializedCell.TileType);
+						_allTilesController.GenerateTileFromType(chosenCell, _grid, _groundHolder, _cellSize, serializedCell.TileType);
 					}
 
 					if (serializedCell.ObstacleType != ObstacleType.NONE)
@@ -494,7 +486,7 @@ namespace Components.Grid.Generator
 						Vector3 obstacleScale = new Vector3(scaleArray[0], scaleArray[1], scaleArray[2]);
 
 						// Générer l'obstacle avec la rotation et l'échelle récupérées
-						ObstacleController obstacle = _allObstacleController.GenerateObstacleFromType(chosenCell, _grid, _obstacleHolder, _cellSize, serializedCell.ObstacleType, obstacleRotation,	obstacleScale);
+						_allObstacleController.GenerateObstacleFromType(chosenCell, _grid, _obstacleHolder, _cellSize, serializedCell.ObstacleType, obstacleRotation,	obstacleScale);
 					}
 
 					if (serializedCell.DecorationPositions != null && serializedCell.DecorationPositions.Count > 0)
@@ -548,14 +540,13 @@ namespace Components.Grid.Generator
 		}
 
 		// ------------------------------------------------------------------------ SAVE AND LOAD MAP -------------------------------------------------------------
-
 		public void SetFileName(string fileName)
 		{
 			_fileName = fileName;
 		}
+		
 		public void SaveMap()
 		{
-
 			SerializedCell[] serializeCellArray = new SerializedCell[_cellList.Count];
 			for (int i = 0; i < serializeCellArray.Length; i++)
 			{
@@ -564,13 +555,15 @@ namespace Components.Grid.Generator
 			}
 
 			_jsonString = JsonConvert.SerializeObject(serializeCellArray, Formatting.Indented);
-			Debug.Log(Application.persistentDataPath);
-			System.IO.File.WriteAllText(Application.persistentDataPath + $"/{_fileName}", _jsonString);
+
+			File.WriteAllText(Path.Combine(MapsPath, _fileName), _jsonString);
+			
+			Debug.Log($"Map saved to: {Path.Combine(MapsPath, _fileName)}");
 		}
 
 		public void LoadMap()
 		{
-			string jsonContent = System.IO.File.ReadAllText(Application.persistentDataPath + $"/{_fileName}");
+			string jsonContent = File.ReadAllText(Path.Combine(MapsPath, _fileName));
 
 			Debug.Log("JSON Loaded: " + jsonContent);
 
@@ -591,14 +584,73 @@ namespace Components.Grid.Generator
 				{
 					Debug.LogError("A null cell was found during loading.");
 				}
-				else
-				{
-					Debug.Log($"Loaded cell at position ({cell.X}, {cell.Y}) with TileType {cell.TileType}");
-				}
 			}
 
 			GenerateGridFromTemplate(serializedCellArray.ToList());	
 		}
-	}
+		
+		public static bool TryLoadRandomMap(out SerializedCell[] serializedCells)
+		{
+			// Get all potential maps.
+			var mapFileNames = GetAllMapFileNames();
 
+			if (mapFileNames.Count == 0)
+			{
+				Debug.LogError("No map files were found.");
+				serializedCells = null;
+				return false;
+			}
+
+			// Select a random file
+			int randomIndex = Random.Range(0, mapFileNames.Count);
+			string jsonContent = File.ReadAllText(Path.Combine(MapsPath, mapFileNames[randomIndex]));
+			serializedCells = JsonConvert.DeserializeObject<SerializedCell[]>(jsonContent);
+
+			if (serializedCells == null || serializedCells.Length == 0)
+			{
+				Debug.LogError("No cells were loaded. Check the JSON format.");
+				return false;
+			}
+
+			for (var i = 0; i < serializedCells.Length; i++)
+			{
+				var cell = serializedCells[i];
+
+				if (cell != null) 
+					continue;
+				
+				Debug.LogError("A null cell was found during loading.");
+				return false;
+			}
+
+			return true;
+		}
+
+		public static List<string> GetAllMapFileNames()
+		{
+			List<string> mapFileNames = new List<string>();
+
+			if (!Directory.Exists(MapsPath))
+			{
+				Debug.LogError($"The directory '{MapsPath}' does not exist.");
+				return mapFileNames;
+			}
+			
+			DirectoryInfo info = new DirectoryInfo(MapsPath);
+			FileInfo[] fileInfo = info.GetFiles();
+
+			for (var i = 0; i < fileInfo.Length; i++)
+			{
+				var file = fileInfo[i];
+				
+				// Ignore .meta files
+				if (file.Extension.Equals(".meta", StringComparison.OrdinalIgnoreCase))
+					continue;
+
+				mapFileNames.Add(file.Name);
+			}
+
+			return mapFileNames;
+		}
+	}
 }
