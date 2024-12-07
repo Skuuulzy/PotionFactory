@@ -22,6 +22,8 @@ public class GrimoireInventoryButton : MonoBehaviour, IPointerClickHandler
     [SerializeField] private Sprite _zeroBackground;
     private bool _zeroState = false;
 
+    [SerializeField] private GameObject _selectedParent;
+
     [Header("Button comportment")]
     [SerializeField] private Animator _animator;
 
@@ -34,7 +36,7 @@ public class GrimoireInventoryButton : MonoBehaviour, IPointerClickHandler
     {
         OnSelected += HandleOnSelected;
         GridPreviewController.OnPreviewUnselected += HandleOnDeselected;
-        
+
     }
 
     private void OnDestroy()
@@ -60,7 +62,7 @@ public class GrimoireInventoryButton : MonoBehaviour, IPointerClickHandler
     public void UpdateNumberOfAvailableMachine(int number)
     {
         _numberOfAvailableText.text = number.ToString();
-		_numberOfAvailableSelectedText.text = number.ToString();
+        _numberOfAvailableSelectedText.text = number.ToString();
 
         if (number <= 0)
         {
@@ -158,6 +160,15 @@ public class GrimoireInventoryButton : MonoBehaviour, IPointerClickHandler
     {
         _animator.SetBool("Selected", false);
         _isSelected = false;
+    }
+
+    private void OnDisable()
+    {
+        if (_isSelected)
+        {
+            OnDeselect();
+            _selectedParent.SetActive(false);
+        }
     }
     #endregion
 }
