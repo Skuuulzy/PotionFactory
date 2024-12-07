@@ -10,13 +10,27 @@ namespace Components.Machines.Behaviors
 
         public float RelicEffectBonusProcessTime = 0;
         public List<RelicEffect> RelicEffects;
-
-
+        
         protected int InitialProcessTime => _initialProcessTime;
 
         public bool ProcessingRecipe { get; protected set; }
 
         public abstract void Process(Machine machine);
+
+        public virtual bool CanTakeItem(Machine machine, Machine fromMachine)
+        {
+            if (machine.Template.MaxItemCount != -1 && machine.Ingredients.Count >= machine.Template.MaxItemCount)
+            {
+                return false;
+            }
+            
+            if (ProcessingRecipe)
+            {
+                return false;
+            }
+
+            return true;
+        }
 
         public void SetInitialProcessTime(int processTime)
         {

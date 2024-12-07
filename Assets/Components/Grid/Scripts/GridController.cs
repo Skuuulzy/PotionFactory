@@ -92,7 +92,7 @@ namespace Components.Grid
 			ConsumableManager.OnChangeSelectedConsumable += UpdateSelection;
 			RelicManager.OnChangeSelectedRelic += UpdateSelection;
 			MapGenerator.OnMapChoiceConfirm += HandleMapChoiceConfirm;
-			UIOptionsController.OnClearGrid += ClearGrid;
+			UIOptionsController.OnClearGrid += ClearMachines;
 		}
 
 		private void OnDestroy()
@@ -103,7 +103,7 @@ namespace Components.Grid
 			ConsumableManager.OnChangeSelectedConsumable -= UpdateSelection;
 			RelicManager.OnChangeSelectedRelic -= UpdateSelection;
 			MapGenerator.OnMapChoiceConfirm-= HandleMapChoiceConfirm;
-			UIOptionsController.OnClearGrid += ClearGrid;
+			UIOptionsController.OnClearGrid -= ClearMachines;
 		}
 
 		private void Update()
@@ -431,7 +431,19 @@ namespace Components.Grid
 				Destroy(objectTile.gameObject);
 			}
 
-			Grid.ClearCellsData();
+			Grid.ClearNodes();
+			Grid.ClearObstacles();
+			_instancedObjects.Clear();
+		}
+
+		private void ClearMachines()
+		{
+			foreach (var machineController in _instancedObjects)
+			{
+				Destroy(machineController.gameObject);
+			}
+			
+			Grid.ClearNodes();
 			_instancedObjects.Clear();
 		}
 

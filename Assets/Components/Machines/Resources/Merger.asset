@@ -24,26 +24,13 @@ MonoBehaviour:
     _ports:
     - _side: 3
       _way: 0
-  - _localPosition: {x: 0, y: -1}
-    _gridPosition: {x: 0, y: 0}
-    _ports: []
-  - _localPosition: {x: 0, y: -2}
-    _gridPosition: {x: 0, y: 0}
-    _ports:
-    - _side: 3
+    - _side: 1
       _way: 0
-  - _localPosition: {x: 1, y: 0}
-    _gridPosition: {x: 0, y: 0}
-    _ports: []
-  - _localPosition: {x: 1, y: -1}
-    _gridPosition: {x: 0, y: 0}
-    _ports:
+    - _side: 0
+      _way: 0
     - _side: 2
       _way: 1
-  - _localPosition: {x: 1, y: -2}
-    _gridPosition: {x: 0, y: 0}
-    _ports: []
-  _maxItemCount: -1
+  _maxItemCount: 1
   _processTime: 1
   _shopSpawnProbability: 0
   _shopPrice: 200
