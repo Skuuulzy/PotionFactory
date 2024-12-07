@@ -21,11 +21,14 @@ namespace Components.Grid.Obstacle
 				return null;
 			}
 
-			var obstacle = Instantiate(_obstacleList[UnityEngine.Random.Range(0, _obstacleList.Count)], obstacleHolder);
+			var obstacle = Instantiate(_obstacleList[Random.Range(0, _obstacleList.Count)], obstacleHolder);
 			obstacle.transform.position = grid.GetWorldPosition(chosenCell.X, chosenCell.Y) + new Vector3(cellSize / 2, 0, cellSize / 2);
 			obstacle.transform.localScale = new Vector3(cellSize, cellSize, cellSize);
 
 			chosenCell.AddObstacleToCell(obstacle);
+			
+			Debug.Log($"Instantiating obstacle on ({chosenCell.X}, {chosenCell.Y})");
+			
 			return obstacle;
 		}
 

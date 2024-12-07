@@ -539,7 +539,7 @@ namespace Components.Grid.Generator
 			}
 
 
-			_grid.ClearCellsData();
+			_grid.ClearNodes();
 		}
 
 		public void ChangeRadiusValue(float radiusValue)
