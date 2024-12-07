@@ -26,6 +26,7 @@
         EXTRACTOR,
         MIXER,
         PRESS,
-        MERGER
+        MERGER,
+        SPLITTER
     }
 }

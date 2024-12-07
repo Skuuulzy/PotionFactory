@@ -281,7 +281,7 @@ namespace Components.Grid.Generator
 				Destroy(obstacleTile.gameObject);
 			}
 
-			_grid.ClearCellsData();
+			_grid.ClearNodes();
 		}
 
 		// ------------------------------------------------------------------------ SAVE AND LOAD MAP -------------------------------------------------------------

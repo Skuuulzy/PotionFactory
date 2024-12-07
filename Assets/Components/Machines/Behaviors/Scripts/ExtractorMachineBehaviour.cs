@@ -37,7 +37,7 @@ namespace Components.Machines.Behaviors
                 var outMachine = outMachines[0];
                 
                 _outMachineName = outMachine.Controller.name;
-                outMachine.TryGiveItemItem(_ingredientTemplate);
+                outMachine.TryGiveItemItem(_ingredientTemplate, machine);
             }
             else
             {

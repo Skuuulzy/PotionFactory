@@ -17,7 +17,7 @@ namespace Components.Machines.Behaviors
             {
                 var outMachine = outMachines[0];
                 
-                if (outMachine.TryGiveItemItem(machine.Ingredients[0]))
+                if (outMachine.TryGiveItemItem(machine.Ingredients[0], machine))
                 {
                     machine.RemoveItem(0);
                 }
