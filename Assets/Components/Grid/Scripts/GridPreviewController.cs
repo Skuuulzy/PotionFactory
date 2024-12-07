@@ -50,6 +50,7 @@ namespace Components.Grid
             PlanningFactoryState.OnPlanningFactoryStateStarted += HandlePlanningFactoryState;
             ShopState.OnShopStateStarted += HandleShopState;
             UIGrimoireController.OnEnableCleanMode += HandleCleanMode;
+            GrimoireButton.OnGrimoireButtonDeselect += HandleGrimoireDeselect;
         }
 
         private void Update()
@@ -69,7 +70,6 @@ namespace Components.Grid
             {
                 DestroyPreview();
                 OnPreviewUnselected?.Invoke(_currentMachinePreview);
-
             }
             if (Input.GetMouseButton(0))
             {
@@ -94,6 +94,7 @@ namespace Components.Grid
             PlanningFactoryState.OnPlanningFactoryStateStarted -= HandlePlanningFactoryState;
             ShopState.OnShopStateStarted -= HandleShopState;
             UIGrimoireController.OnEnableCleanMode -= HandleCleanMode;
+            GrimoireButton.OnGrimoireButtonDeselect -= HandleGrimoireDeselect;
         }
 
         private MachineController InstantiateMachine(MachineTemplate template, int rotation)
@@ -335,6 +336,11 @@ namespace Components.Grid
             {
                 _currentMachinePreview.gameObject.SetActive(!cleanMode);
             }
+        }
+
+        private void HandleGrimoireDeselect()
+        {
+            DestroyPreview();
         }
     }
 

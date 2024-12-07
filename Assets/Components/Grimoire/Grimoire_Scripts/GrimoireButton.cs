@@ -15,6 +15,7 @@ public class GrimoireButton : MonoBehaviour
     private bool _isSelected = false;
 
     private static Action OnSelected;
+    public static Action OnGrimoireButtonDeselect;
 
     private void Start()
     {
@@ -77,6 +78,8 @@ public class GrimoireButton : MonoBehaviour
         {
             OnDeselect();
         }
+
+        OnGrimoireButtonDeselect?.Invoke(); //Remove 3D preview when select or deselect another main button.
     }
 
     public void OnDeselect()
