@@ -40,7 +40,7 @@ namespace Components.Grid
             }
         }
 
-        public Grid(int width, int height, float cellSize, Vector3 originPosition, Transform parentTransform, bool showDebug, List<SerializedCell> serializedCellList)
+        public Grid(int width, int height, float cellSize, Vector3 originPosition, Transform parentTransform, bool showDebug, SerializedCell[] serializedCellList)
 		{
             _width = width;
             _height = height;
@@ -50,9 +50,10 @@ namespace Components.Grid
             _gridArray = new int[width, height];
             _cells = new List<Cell>();
 
-            for (int i = 0; i < serializedCellList.Count; i++)
+            for (int i = 0; i < serializedCellList.Length; i++)
 			{
                 SerializedCell serializedCell = serializedCellList[i];
+                
                 //Create a new cell and add it to cell list
                 Cell cell = new Cell(serializedCell.X, serializedCell.Y, cellSize, serializedCell.ContainsObject);
                 _cells.Add(cell);
@@ -134,6 +135,33 @@ namespace Components.Grid
             return false;
         }
 
+		/// <summary>
+		/// Retrieves all cells within a circle defined by a center position and radius.
+		/// </summary>
+		/// <param name="center">Center position in world coordinates.</param>
+		/// <param name="radius">Radius of the circle.</param>
+		/// <returns>List of cells within the circle.</returns>
+		public List<Cell> GetCellsInCircle(Vector3 center, float radius)
+		{
+			List<Cell> cellsInCircle = new List<Cell>();
+
+			foreach (Cell cell in _cells)
+			{
+				// Calculate the world position of the center of the cell.
+				Vector3 cellWorldPosition = GetWorldPosition(cell.X, cell.Y) + new Vector3(_cellSize / 2, 0, _cellSize / 2);
+
+				// Calculate the distance between the circle center and the cell center.
+				float distance = Vector3.Distance(center, cellWorldPosition);
+
+				// Add the cell to the list if it is within the radius.
+				if (distance <= radius)
+				{
+					cellsInCircle.Add(cell);
+				}
+			}
+
+			return cellsInCircle;
+		}
 
 
 		public void ClearNodes()

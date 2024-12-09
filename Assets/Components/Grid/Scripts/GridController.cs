@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Components.Machines;
 using Sirenix.OdinInspector;
 using System;
+using System.IO;
 using System.Linq;
 using Components.Grid.Tile;
 using Components.Grid.Obstacle;
@@ -18,6 +19,9 @@ using Components.Consumable;
 using Database;
 using Components.Map;
 using Components.Bundle;
+using Components.Grid.Decorations;
+using Components.Grid.Generator;
+using Newtonsoft.Json;
 
 namespace Components.Grid
 {
@@ -40,12 +44,16 @@ namespace Components.Grid
 		[SerializeField] private Transform _groundHolder;
 		[SerializeField] private Transform _objectsHolder;
 		[SerializeField] private Transform _obstacleHolder;
+		[SerializeField] private Transform _decorationHolder;
 
 		[Header("Tiles")]
 		[SerializeField] private AllTilesController _tileController;
 
 		[Header("Obstacles")]
 		[SerializeField] private AllObstaclesController _obstacleController;
+		
+		[Header("Decorations")]
+		[SerializeField] private AllDecorationsController _decorationController;
 
 		[Header("Ingredients")]
 		[SerializeField] private int _extractorsOnGridCount = 4;
@@ -405,8 +413,14 @@ namespace Components.Grid
 				ClearGrid();
 			}
 
-			Grid = new Grid(_gridXValue, _gridYValue, _cellSize, _originPosition, _groundHolder, _showDebug);
-			_tileController.SelectATileType();
+			if (GridGenerator.TryLoadRandomMap(out var serializedCells))
+			{
+				GenerateGridFromTemplate(serializedCells);
+			}
+			else
+			{
+				GenerateEmptyGrid();
+			}
 		}
 
 		private void ClearGrid()
@@ -468,6 +482,89 @@ namespace Components.Grid
 			return false;
 		}
 
+		private void GenerateEmptyGrid()
+		{
+			Grid = new Grid(_gridXValue, _gridYValue, _cellSize, _originPosition, _groundHolder, _showDebug);
+			_tileController.SelectATileType();
+			
+			// Instantiate ground blocks 
+			for (int x = 0; x < Grid.GetWidth() - 4; x++)
+			{
+				for (int z = 1; z < Grid.GetHeight(); z++)
+				{
+					Grid.TryGetCellByCoordinates(x, z, out var chosenCell);
+
+					TileController tile = _tileController.GenerateTile(chosenCell, Grid, _groundHolder, _cellSize);
+
+					// Get the zone where the extractors can be placed 
+					if ((x == 0 && z <= Grid.GetWidth() / 2) || z == Grid.GetHeight() - 1 || z == 0)
+					{
+						_extractorPotentialCoordinates.Add(new(x, z));
+					}
+				}
+			}
+		}
+		
+		private void GenerateGridFromTemplate(SerializedCell[] serializedCells)
+		{
+			Grid = new Grid(_gridXValue, _gridYValue, _cellSize, _originPosition, _groundHolder, false, serializedCells);
+
+			// Instantiate ground blocks
+			for (int x = 0; x < Grid.GetWidth(); x++)
+			{
+				for (int z = 0; z < Grid.GetHeight(); z++)
+				{
+					Grid.TryGetCellByCoordinates(x, z, out var chosenCell);
+					
+					// TODO: find a cleaner way to do this operation.
+					SerializedCell serializedCell = serializedCells.ToList().Find(cell => cell.X == x && cell.Y == z);
+
+					// TILES
+					if (serializedCell.TileType != TileType.NONE)
+					{
+						_tileController.GenerateTileFromType(chosenCell, Grid, _groundHolder, _cellSize, serializedCell.TileType);
+					}
+
+					// OBSTACLES
+					if (serializedCell.ObstacleType != ObstacleType.NONE)
+					{
+						// Read obstacle rotation
+						float[] rotationArray = serializedCell.ObstacleRotation;
+						Quaternion obstacleRotation = new Quaternion(rotationArray[0], rotationArray[1], rotationArray[2], rotationArray[3]);
+
+						// Read obstacle scale
+						float[] scaleArray = serializedCell.ObstacleScale;
+						Vector3 obstacleScale = new Vector3(scaleArray[0], scaleArray[1], scaleArray[2]);
+
+						// Generate obstacle
+						_obstacleController.GenerateObstacleFromType(chosenCell, Grid, _obstacleHolder, _cellSize, serializedCell.ObstacleType, obstacleRotation, obstacleScale);
+					}
+
+					// DECORATIONS
+					if (serializedCell.DecorationPositions != null && serializedCell.DecorationPositions.Count > 0)
+					{
+						for (int i = 0; i < serializedCell.DecorationPositions.Count; i++)
+						{
+							// Decoration coordinates.
+							float[] positionArray = serializedCell.DecorationPositions[i];
+							Vector3 decorationPosition = new Vector3(positionArray[0], positionArray[1], positionArray[2]);
+
+							// Decoration rotation.
+							float[] rotationArray = serializedCell.DecorationRotations[i];
+							Quaternion decorationRotation = new Quaternion(rotationArray[0], rotationArray[1], rotationArray[2], rotationArray[3]);
+
+							// Decoration local scale.
+							float[] scaleArray = serializedCell.DecorationScales[i];
+							Vector3 decorationScale = new Vector3(scaleArray[0], scaleArray[1], scaleArray[2]);
+
+							// Generate decoration.
+							_decorationController.GenerateDecorationFromType(chosenCell, _decorationHolder, serializedCell.DecorationTypes[i], decorationPosition, decorationRotation, decorationScale);
+						}
+					}
+				}
+			}
+		}
+		
 		// ------------------------------------------------------------------------- STATES METHODS ---------------------------------------------------------------------- 
 		private void HandleShopState(ShopState obj)
 		{
@@ -533,9 +630,8 @@ namespace Components.Grid
 		private void PlaceExtractors(List<IngredientTemplate> ingredientsToInstantiate)
 		{			
 			_extractorBehaviours = new List<ExtractorMachineBehaviour>();
-
 			_extractorPotentialCoordinates = new List<(int, int)>();
-
+			
 			// Instantiate ground blocks 
 			for (int x = 0; x < Grid.GetWidth() - 4; x++)
 			{
@@ -543,24 +639,10 @@ namespace Components.Grid
 				{
 					Grid.TryGetCellByCoordinates(x, z, out var chosenCell);
 
-					TileController tile = _tileController.GenerateTile(chosenCell, Grid, _groundHolder, _cellSize);
-
 					// Get the zone where the extractors can be placed 
 					if ((x == 0 && z <= Grid.GetWidth() / 2) || z == Grid.GetHeight() - 1 || z == 0)
 					{
-						_extractorPotentialCoordinates.Add(new(x, z));
-						continue;
-					}
-
-					if (tile.TileType == TileType.WATER)
-					{
-						//No need to place anything else on this cell because it is water 
-						continue;
-					}
-
-					if (x != 1 && x != Grid.GetWidth() - 2 && z != 1 && z != Grid.GetHeight() - 2)
-					{
-						_obstacleController.GenerateObstacle(Grid, chosenCell, _obstacleHolder, _cellSize);
+						_extractorPotentialCoordinates.Add(new ValueTuple<int, int>(x, z));
 					}
 				}
 			}
@@ -607,7 +689,6 @@ namespace Components.Grid
 			{
 				_extractorPotentialCoordinates.RemoveAt(coordinate);
 			}
-			
 		}
 
 		private void AddExtractors(List<IngredientTemplate> ingredientsToInstantiate)
@@ -713,6 +794,7 @@ namespace Components.Grid
 			if (isFirstGameChoice)
 			{
 				GenerateGrid();
+				GenerateEmptyGrid();
 				PlaceExtractors(bundle.IngredientsTemplatesList);
 				PlaceSellers();
 			}
