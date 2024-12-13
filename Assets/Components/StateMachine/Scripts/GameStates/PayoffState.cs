@@ -34,7 +34,7 @@ public class PayoffState : BaseState
 
 	public void PayoffConfirm()
 	{
-		PayoffController.OnPayoffConfirm -= PayoffConfirm;
+		UIPayoffController.OnPayoffConfirm -= PayoffConfirm;
 		base.SetStateFinished();
 	}
 }

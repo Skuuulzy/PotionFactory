@@ -127,7 +127,7 @@ public class StateController : MonoBehaviour
 	{
 		_currentDebugStateName = "PAYOFF";
 
-		PayoffController.OnPayoffConfirm += state.PayoffConfirm;
+		UIPayoffController.OnPayoffConfirm += state.PayoffConfirm;
 		_countdownTimer = null;
 		OnStateStarted?.Invoke(state);
 	}

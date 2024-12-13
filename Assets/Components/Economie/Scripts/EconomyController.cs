@@ -17,11 +17,14 @@ namespace Components.Economy
 		public static Action<int> OnStatePlayerScoreUpdated;
 		public static Action<int> OnScoreStateObjectiveUpdated;
 		public static Action OnGameOver;
+		public static Action<int, int, int> OnEndRoundGoldValuesCalculated;
 
+		private int _totalGoldAmountPerRound;
 		private void Start()
 		{
 			PlanningFactoryState.OnPlanningFactoryStateStarted += HandlePlanningFactoryState;
-			ShopState.OnShopStateStarted += HandleShopState;
+			PayoffState.OnPayoffStateStarted += HandleStartPayoffState;
+			PayoffState.OnPayoffStateEnded += HandleEndPayoffState;
 			ResolutionFactoryState.OnResolutionFactoryStateEnded += HandleResolutionFactoryStateEnded;
 		}
 
@@ -29,7 +32,8 @@ namespace Components.Economy
 		private void OnDestroy()
 		{
 			PlanningFactoryState.OnPlanningFactoryStateStarted -= HandlePlanningFactoryState;
-			ShopState.OnShopStateStarted -= HandleShopState;
+			PayoffState.OnPayoffStateStarted -= HandleStartPayoffState;
+			PayoffState.OnPayoffStateEnded -= HandleEndPayoffState;
 			ResolutionFactoryState.OnResolutionFactoryStateEnded -= HandleResolutionFactoryStateEnded;
 
 		}
@@ -69,11 +73,24 @@ namespace Components.Economy
 			}
 		}
 
-		private void HandleShopState(ShopState state)
+		/// <summary>
+		/// Calcultate the gold amount to give to the player at the start of the payoff State
+		/// </summary>
+		private void HandleStartPayoffState(PayoffState payoffState)
 		{
-			int amount = 5 + (_playerMoney / 5);
-			AddMoney(amount);
+			int interest = (_playerMoney / _runConfiguration.GoldInterestValue) * _runConfiguration.GoldInterestAmountPerRound;
+			_totalGoldAmountPerRound = _runConfiguration.GoldAmountPerRound + interest;
+			OnEndRoundGoldValuesCalculated?.Invoke(_totalGoldAmountPerRound, _runConfiguration.GoldAmountPerRound, interest);
 		}
+
+		/// <summary>
+		/// Give the gold amount previously calculated to player
+		/// </summary>
+		private void HandleEndPayoffState(PayoffState payoffState)
+		{
+			AddMoney(_totalGoldAmountPerRound);
+		}
+
 
 	}
 }

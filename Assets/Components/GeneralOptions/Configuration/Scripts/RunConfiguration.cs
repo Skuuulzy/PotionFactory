@@ -10,7 +10,15 @@ using UnityEngine;
 public class RunConfiguration : ScriptableObject
 {
 	[SerializeField] private List<RunStateConfiguration> _runStateList;
+	[SerializeField] private int _goldAmountPerRound = 5;
+
+	[Tooltip("For every gold interest value give the GoldInterestAmountPerRound as bonus gold")]
+	[SerializeField] private int _goldInterestValue = 5;
+	[SerializeField] private int _goldInterestAmountPerRound = 1;
 	public List<RunStateConfiguration> RunStateList => _runStateList;
+	public int GoldAmountPerRound => _goldAmountPerRound;
+	public int GoldInterestValue => _goldInterestValue;
+	public int GoldInterestAmountPerRound => _goldInterestAmountPerRound;
 
 	//-------------------------------------------------------------------------------------------------- METHODS -------------------------------------------------------------------------------------------------------------------
 	public List<IngredientTemplate> GetPossibleIngredients(int stateNumber, List<IngredientTemplate> baseIngredients)
