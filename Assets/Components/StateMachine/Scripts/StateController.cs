@@ -29,6 +29,7 @@ public class StateController : MonoBehaviour
 		MapState.OnMapStateStarted += HandleMapState;
 		PlanningFactoryState.OnPlanningFactoryStateStarted += HandlePlanningFactoryState;
 		ResolutionFactoryState.OnResolutionFactoryStateStarted += HandleResolutionFactoryState;
+		PayoffState.OnPayoffStateStarted += HandlePayoffState;
 		ShopState.OnShopStateStarted += HandleShopState;
 
 		//State Machine 
@@ -38,12 +39,14 @@ public class StateController : MonoBehaviour
 		MapState mapState = new MapState();
 		PlanningFactoryState planningFactoryState = new PlanningFactoryState();
 		ResolutionFactoryState resolutionFactoryState = new ResolutionFactoryState();
+		PayoffState payoffState = new PayoffState();
 		ShopState shopState = new ShopState();
 
 		//Define transitions  
 		At(mapState, planningFactoryState, new FuncPredicate(() => mapState.IsFinished));
 		At(planningFactoryState, resolutionFactoryState, new FuncPredicate(() => planningFactoryState.IsFinished));
-		At(resolutionFactoryState, shopState, new FuncPredicate(() => resolutionFactoryState.IsFinished));
+		At(resolutionFactoryState, payoffState, new FuncPredicate(() => resolutionFactoryState.IsFinished));
+		At(payoffState, shopState, new FuncPredicate(() => payoffState.IsFinished));
 		At(shopState, planningFactoryState, new FuncPredicate(() => shopState.IsFinished && shopState.StateIndex % 4 != 0));
 		At(shopState, mapState, new FuncPredicate(() => shopState.IsFinished && shopState.StateIndex % 4 == 0));
 
@@ -118,6 +121,15 @@ public class StateController : MonoBehaviour
 		_countdownTimer.Start();
 		
 		OnStateStarted.Invoke(state);
+	}
+
+	private void HandlePayoffState(PayoffState state)
+	{
+		_currentDebugStateName = "PAYOFF";
+
+		UIPayoffController.OnPayoffConfirm += state.PayoffConfirm;
+		_countdownTimer = null;
+		OnStateStarted?.Invoke(state);
 	}
 
 	void At(IState from, IState to, IPredicate condition) => _stateMachine.AddTransition(from, to, condition);
