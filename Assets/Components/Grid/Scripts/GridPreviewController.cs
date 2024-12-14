@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using CodeMonkey.Utils;
+using Components.Grid.Tile;
 using Components.Inventory;
 using Components.Machines;
 using Database;
@@ -276,7 +277,7 @@ namespace Components.Grid
                 }
 
                 // One node of the machine overlap a cell that already contain an object. 
-                if (overlapCell.ContainsObject)
+                if (overlapCell.ContainsObject || overlapCell.TileController.TileType == TileType.WATER)
                 {
                     return;
                 }
