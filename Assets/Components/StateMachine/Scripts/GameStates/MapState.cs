@@ -1,4 +1,5 @@
 using Components.Bundle;
+using Components.Map;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -29,6 +30,7 @@ public class MapState : BaseState
 
 	public void MapChoiceConfirmed(IngredientsBundle bundle, bool isFirstChoice)
 	{
+		MapGenerator.OnMapChoiceConfirm -= MapChoiceConfirmed;
 		base.SetStateFinished();
 	}
 }
