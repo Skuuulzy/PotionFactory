@@ -215,7 +215,7 @@ namespace Components.Machines
         {
             if (show)
             {
-                _ingredientController.CreateRepresentationFromTemplate(_machine.Ingredients);
+                _ingredientController.CreateRepresentationFromTemplate(_machine.InIngredients);
             }
             else
             {

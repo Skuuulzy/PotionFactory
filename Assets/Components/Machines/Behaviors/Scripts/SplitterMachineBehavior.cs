@@ -10,7 +10,7 @@ namespace Components.Machines.Behaviors
 
         public override void Process(Machine machine)
         {
-            if (machine.Ingredients.Count == 0)
+            if (machine.InIngredients.Count == 0)
             {
                 return;
             }
@@ -20,7 +20,7 @@ namespace Components.Machines.Behaviors
 
             if (outMachines.Count == 1)
             {
-                if (outMachines[0].TryGiveItemItem(machine.Ingredients[0], machine))
+                if (outMachines[0].TryGiveItemItem(machine.InIngredients[0], machine))
                 {
                     machine.RemoveItem(0);
                 }
@@ -34,7 +34,7 @@ namespace Components.Machines.Behaviors
                 {
                     var outMachine = outMachines[i];
                 
-                    if (outMachine.TryGiveItemItem(machine.Ingredients[0], machine))
+                    if (outMachine.TryGiveItemItem(machine.InIngredients[0], machine))
                     {
                         _lastMachineGivenTo = outMachine;
                         machine.RemoveItem(0);
@@ -52,7 +52,7 @@ namespace Components.Machines.Behaviors
                 if (outMachine == _lastMachineGivenTo)
                     continue;
 
-                if (outMachine.TryGiveItemItem(machine.Ingredients[0], machine))
+                if (outMachine.TryGiveItemItem(machine.InIngredients[0], machine))
                 {
                     _lastMachineGivenTo = outMachine;
                     machine.RemoveItem(0);

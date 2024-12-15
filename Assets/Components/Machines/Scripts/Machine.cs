@@ -12,7 +12,7 @@ namespace Components.Machines
     public class Machine : ITickable
     {
         // ----------------------------------------------------------------------- PRIVATE FIELDS -------------------------------------------------------------------------
-        [SerializeField] private List<IngredientTemplate> _ingredients;
+        [SerializeField] private List<IngredientTemplate> _inIngredients;
         [SerializeField] private List<Node> _nodes;
         [SerializeField, ReadOnly] private MachineController _controller;
         [SerializeField] private MachineBehavior _behavior;
@@ -25,7 +25,7 @@ namespace Components.Machines
         public MachineTemplate Template => _template;
         public MachineController Controller => _controller;
         public MachineBehavior Behavior => _behavior;
-        public List<IngredientTemplate> Ingredients => _ingredients;
+        public List<IngredientTemplate> InIngredients => _inIngredients;
         public virtual List<Node> Nodes => _nodes;
         
         // ------------------------------------------------------------------------- ACTIONS -------------------------------------------------------------------------
@@ -33,6 +33,7 @@ namespace Components.Machines
         public Action OnPropagateTick;
         public Action<bool> OnItemAdded;
         public static Action<Machine> OnSelected;
+        public static Action<Machine, bool> OnHovered;
         
         // --------------------------------------------------------------------- INITIALISATION -------------------------------------------------------------------------
         public Machine(MachineTemplate template, MachineController controller)
@@ -43,7 +44,7 @@ namespace Components.Machines
 
             UpdateNodesRotation(0);
             
-            _ingredients = new List<IngredientTemplate>();
+            _inIngredients = new List<IngredientTemplate>();
         }
 
         public void UpdateNodesRotation(int rotation)
@@ -143,7 +144,7 @@ namespace Components.Machines
                 return false;
             }
             
-            Ingredients.Add(ingredient);
+            InIngredients.Add(ingredient);
             OnItemAdded?.Invoke(true);
             
             return true;
@@ -151,19 +152,19 @@ namespace Components.Machines
 
         public void RemoveAllItems()
         {
-            Ingredients.Clear();
+            InIngredients.Clear();
             OnItemAdded?.Invoke(false);
         }
 
         public void RemoveItem(int index)
         {
-            Ingredients.RemoveAt(index);
+            InIngredients.RemoveAt(index);
             OnItemAdded?.Invoke(false);
         }
         
         public void ClearItems()
         {
-            Ingredients.Clear();
+            InIngredients.Clear();
             OnItemAdded?.Invoke(false);
         }
 
@@ -203,6 +204,11 @@ namespace Components.Machines
         public void Select()
         {
             OnSelected?.Invoke(this);
+        }
+
+        public void Hover(bool hovered)
+        {
+            OnHovered?.Invoke(this, hovered);
         }
     }
 }

@@ -1,4 +1,6 @@
+using System;
 using CodeMonkey.Utils;
+using Components.Machines;
 using UnityEngine;
 
 namespace Components.Grid
@@ -9,33 +11,87 @@ namespace Components.Grid
         [SerializeField] private GridController _gridController;
 
         private Grid Grid => _gridController.Grid;
-
         private Camera _camera;
+
+        private Machine _hoveredMachine;
+        private bool _initialized;
 
         private void Start()
         {
             _camera = Camera.main;
+            GridController.OnGridGenerated += HandleGridGenerated;
         }
 
         private void Update()
         {
+            if (!_initialized)
+            {
+                return;
+            }
+            
+            TryHoverMachine();
+            
             if (Input.GetMouseButtonDown(0))
             {
                 TrySelectMachine();
             }
         }
 
-        private void TrySelectMachine()
+        private void OnDestroy()
+        {
+            GridController.OnGridGenerated -= HandleGridGenerated;
+        }
+
+        private void HandleGridGenerated()
+        {
+            _initialized = true;
+        }
+        
+        private void TryHoverMachine()
         {
             // TODO: This click workflow really need to be centralized (maybe in the input sys)
             // Try to get the position on the grid. 
-            if (!UtilsClass.ScreenToWorldPositionIgnoringUI(Input.mousePosition, _camera, out Vector3 worldMousePosition))
+            if (!UtilsClass.ScreenToWorldPositionIgnoringUI(Input.mousePosition, _camera, out var worldMousePosition))
             {
                 return;
             }
             
             // Try getting the cell 
-            if (!Grid.TryGetCellByPosition(worldMousePosition, out Cell chosenCell))
+            if (!Grid.TryGetCellByPosition(worldMousePosition, out var chosenCell))
+            {
+                return;
+            }
+
+            if (!chosenCell.ContainsNode)
+            {
+                // Un hover previous machine if it exists
+                _hoveredMachine?.Hover(false);
+                _hoveredMachine = null;
+                
+                return;
+            }
+
+            if (_hoveredMachine == chosenCell.Node.Machine)
+            {
+                return;
+            }
+
+            // Hover current machine
+            _hoveredMachine = chosenCell.Node.Machine;
+            _hoveredMachine.Hover(true);
+        }
+
+        private void TrySelectMachine()
+        {
+            // TODO: This click workflow really need to be centralized (maybe in the input sys)
+            // Try to get the position on the grid. 
+            if (!UtilsClass.ScreenToWorldPositionIgnoringUI(Input.mousePosition, _camera, out var worldMousePosition))
+            {
+                return;
+            }
+            
+            // Try getting the cell 
+            if (!Grid.TryGetCellByPosition(worldMousePosition, out var chosenCell))
             {
                 return;
             }

@@ -19,7 +19,7 @@ namespace Components.Machines.Behaviors
 
         public virtual bool CanTakeItem(Machine machine, Machine fromMachine)
         {
-            if (machine.Template.MaxItemCount != -1 && machine.Ingredients.Count >= machine.Template.MaxItemCount)
+            if (machine.Template.MaxItemCount != -1 && machine.InIngredients.Count >= machine.Template.MaxItemCount)
             {
                 return false;
             }
