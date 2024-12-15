@@ -74,7 +74,7 @@ namespace Components.Machines
             
             _machine.OnTick += Tick;
             _machine.OnPropagateTick += PropagateTick;
-            _machine.OnInItemAdded += ShowItem;
+            _machine.OnItemAdded += ShowItem;
             _machine.Behavior.SetInitialProcessTime(_machine.Template.ProcessTime);
             _machine.LinkNodeData();
 
@@ -99,7 +99,7 @@ namespace Components.Machines
             
             _machine.OnTick -= Tick;
             _machine.OnPropagateTick -= PropagateTick;
-            _machine.OnInItemAdded -= ShowItem;
+            _machine.OnItemAdded -= ShowItem;
         }
 
         // ------------------------------------------------------------------------- TICK -------------------------------------------------------------------------

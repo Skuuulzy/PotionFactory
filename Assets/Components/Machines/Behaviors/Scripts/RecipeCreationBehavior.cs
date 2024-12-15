@@ -46,11 +46,20 @@ namespace Components.Machines.Behaviors
                 return;
             }
 
-            // Is there any space left in the out slot
+            // Is there any space left in the out slot.
             if (machine.CanAddIngredientOfTypeInSlot(_currentRecipe.OutIngredient, Way.OUT))
             {
-                // Add the ingredient to the machine out slot
+                // Add the ingredient to the machine out slot.
                 machine.AddIngredient(_currentRecipe.OutIngredient, Way.OUT);
+                
+                ProcessingRecipe = false;
+                
+                // Remove items used for the recipe.
+                machine.RemoveInItems(_currentRecipe.Ingredients.Keys.ToList());
+                
+                // Reset the recipe.
+                _currentRecipe = null;
+                _currentProcessTime = 0;
             }
         }
 
@@ -72,11 +81,6 @@ namespace Components.Machines.Behaviors
                     outMachine.AddIngredient(ingredientToGive, Way.IN);
                     
                     Debug.Log($"Machine: {machine.Controller.name} outputting: {ingredientToGive.name} to: {outMachine.Controller.name}.");
-
-                    ProcessingRecipe = false;
-                    _currentRecipe = null;
-                    _currentProcessTime = 0;
-                    machine.ClearItems();
                 }
                 else
                 {
@@ -85,7 +89,7 @@ namespace Components.Machines.Behaviors
             }
             else
             {
-                Debug.Log($"Machine: {machine.Controller.name} cannot output because no out machine is connected.");
+                //Debug.Log($"Machine: {machine.Controller.name} cannot output because no out machine is connected.");
             }
         }
     }

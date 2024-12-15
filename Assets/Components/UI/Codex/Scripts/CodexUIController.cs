@@ -35,6 +35,11 @@ public class CodexUIController : MonoBehaviour
     {
         if (!hovered)
         {
+            // Reset listener of previous hovered machine
+            if (_hoveredMachine != null)
+            {
+                _hoveredMachine.OnItemAdded -= HandleIngredientInMachineUpdated;
+            }
             _hoveredMachine = null;
             _contextMachineWindow.SetActive(false);
             
@@ -46,11 +51,29 @@ public class CodexUIController : MonoBehaviour
             return;
         }
 
+        // Reset listener of previous hovered machine
+        if (_hoveredMachine != null)
+        {
+            _hoveredMachine.OnItemAdded -= HandleIngredientInMachineUpdated;
+        }
+        
         _hoveredMachine = machine;
         _machineImage.sprite = machine.Template.UIView;
         _machineTitle.text = machine.Template.Name;
-
         
+        UpdateIngredientInSlots(machine);
+        _hoveredMachine.OnItemAdded += HandleIngredientInMachineUpdated;
+        
+        _contextMachineWindow.SetActive(true);
+    }
+
+    private void HandleIngredientInMachineUpdated(bool _)
+    {
+        UpdateIngredientInSlots(_hoveredMachine);
+    }
+
+    private void UpdateIngredientInSlots(Machine machine)
+    {
         // Setup in ingredients slots
         var inIngredientCountByType = machine.GroupedInIngredients;
         
@@ -86,7 +109,5 @@ public class CodexUIController : MonoBehaviour
         {
             _outIngredientSlot.SetEmpty(machine.Template.IngredientsPerSlotCount);
         }
-
-        _contextMachineWindow.SetActive(true);
     }
 }

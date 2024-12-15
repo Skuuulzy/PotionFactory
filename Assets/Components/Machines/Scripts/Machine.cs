@@ -38,7 +38,7 @@ namespace Components.Machines
         // ------------------------------------------------------------------------- ACTIONS -------------------------------------------------------------------------
         public Action OnTick;
         public Action OnPropagateTick;
-        public Action<bool> OnInItemAdded;
+        public Action<bool> OnItemAdded;
         public static Action<Machine> OnSelected;
         public static Action<Machine, bool> OnHovered;
         
@@ -146,10 +146,11 @@ namespace Components.Machines
             {
                 case Way.IN:
                     _inIngredients.Add(ingredient);
-                    OnInItemAdded?.Invoke(true);
+                    OnItemAdded?.Invoke(true);
                     break;
                 case Way.OUT:
                     _outIngredients.Add(ingredient);
+                    OnItemAdded?.Invoke(true);
                     break;
                 case Way.NONE:
                     Debug.LogError("Way of adding item not handle.");
@@ -185,19 +186,19 @@ namespace Components.Machines
         public void RemoveAllItems()
         {
             InIngredients.Clear();
-            OnInItemAdded?.Invoke(false);
+            OnItemAdded?.Invoke(false);
         }
 
         public void RemoveItem(int index)
         {
             InIngredients.RemoveAt(index);
-            OnInItemAdded?.Invoke(false);
+            OnItemAdded?.Invoke(false);
         }
         
-        public void ClearItems()
+        public void RemoveInItems(List<IngredientTemplate> ingredientToRemove)
         {
-            InIngredients.Clear();
-            OnInItemAdded?.Invoke(false);
+            _inIngredients.RemoveAll(item => ingredientToRemove.Any(b => b.Name == item.Name));            
+            OnItemAdded?.Invoke(false);
         }
 
         /// Return a dictionary with ingredients grouped by type and count.
