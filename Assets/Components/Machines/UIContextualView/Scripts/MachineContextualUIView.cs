@@ -41,12 +41,12 @@ namespace Components.Machines.UIView
             }
 
             HandleItemAdded(false);
-            _associatedMachine.OnItemAdded += HandleItemAdded;
+            _associatedMachine.OnInItemAdded += HandleItemAdded;
         }
 
         private void OnDestroy()
         {
-            _associatedMachine.OnItemAdded -= HandleItemAdded;
+            _associatedMachine.OnInItemAdded -= HandleItemAdded;
         }
 
         public void AddComponents(List<UIContextualComponent> contextualComponents)

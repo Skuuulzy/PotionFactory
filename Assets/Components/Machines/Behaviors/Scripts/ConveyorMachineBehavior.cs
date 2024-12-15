@@ -8,6 +8,11 @@ namespace Components.Machines.Behaviors
     {
         public override void Process(Machine machine)
         {
+            
+        }
+
+        public override void TryGiveOutIngredient(Machine machine)
+        {
             if (machine.InIngredients.Count != 1)
             {
                 return;
@@ -17,7 +22,7 @@ namespace Components.Machines.Behaviors
             {
                 var outMachine = outMachines[0];
                 
-                if (outMachine.TryGiveItemItem(machine.InIngredients[0], machine))
+                if (outMachine.TryGiveIngredient(machine.InIngredients[0], machine))
                 {
                     machine.RemoveItem(0);
                 }

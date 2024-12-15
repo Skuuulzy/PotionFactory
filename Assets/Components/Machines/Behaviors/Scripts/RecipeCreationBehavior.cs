@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Components.Recipes;
 using Database;
 using UnityEngine;
@@ -44,15 +45,33 @@ namespace Components.Machines.Behaviors
                 _currentProcessTime++;
                 return;
             }
-            
+
+            // Is there any space left in the out slot
+            if (machine.CanAddIngredientOfTypeInSlot(_currentRecipe.OutIngredient, Way.OUT))
+            {
+                // Add the ingredient to the machine out slot
+                machine.AddIngredient(_currentRecipe.OutIngredient, Way.OUT);
+            }
+        }
+
+        public override void TryGiveOutIngredient(Machine machine)
+        {
             // Try to give the item to the next machine.
+            if (machine.OutIngredients.Count <= 0)
+            {
+                return;
+            }
+            
             if (machine.TryGetOutMachines(out List<Machine> outMachines))
             {
                 var outMachine = outMachines[0];
                 
-                if (outMachine.TryGiveItemItem(_currentRecipe.OutIngredient, machine))
+                if (outMachine.CanAddIngredientOfTypeInSlot(machine.OutIngredients.First(), Way.IN))
                 {
-                    Debug.Log($"Machine: {machine.Controller.name} outputting: {_currentRecipe.OutIngredient.name} to: {outMachine.Controller.name}.");
+                    var ingredientToGive = machine.TakeOlderIngredient();
+                    outMachine.AddIngredient(ingredientToGive, Way.IN);
+                    
+                    Debug.Log($"Machine: {machine.Controller.name} outputting: {ingredientToGive.name} to: {outMachine.Controller.name}.");
 
                     ProcessingRecipe = false;
                     _currentRecipe = null;
@@ -61,12 +80,12 @@ namespace Components.Machines.Behaviors
                 }
                 else
                 {
-                    Debug.Log($"Machine: {machine.Controller.name} cannot output: {_currentRecipe.OutIngredient.name} to: {outMachine.Controller.name}. Because {outMachine.Controller.name} is either full or processing a recipe");
+                    Debug.Log($"Machine: {machine.Controller.name} cannot output to: {outMachine.Controller.name}. Because {outMachine.Controller.name} is full.");
                 }
             }
             else
             {
-                Debug.Log($"Machine: {machine.Controller.name} cannot output: {_currentRecipe.OutIngredient.name} because no out machine is connected.");
+                Debug.Log($"Machine: {machine.Controller.name} cannot output because no out machine is connected.");
             }
         }
     }

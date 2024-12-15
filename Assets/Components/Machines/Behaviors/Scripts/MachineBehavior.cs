@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Components.Ingredients;
 using UnityEngine;
 
 namespace Components.Machines.Behaviors
@@ -16,20 +17,16 @@ namespace Components.Machines.Behaviors
         public bool ProcessingRecipe { get; protected set; }
 
         public abstract void Process(Machine machine);
+        public abstract void TryGiveOutIngredient(Machine machine);
 
-        public virtual bool CanTakeItem(Machine machine, Machine fromMachine)
+        public virtual bool CanTakeItem(Machine machine, Machine fromMachine, IngredientTemplate ingredient)
         {
-            if (machine.Template.MaxItemCount != -1 && machine.InIngredients.Count >= machine.Template.MaxItemCount)
+            if (machine.Template.CanTakeInfiniteIngredients)
             {
-                return false;
-            }
-            
-            if (ProcessingRecipe)
-            {
-                return false;
+                return true;
             }
 
-            return true;
+            return machine.CanAddIngredientOfTypeInSlot(ingredient, Way.IN);
         }
 
         public void SetInitialProcessTime(int processTime)

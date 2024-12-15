@@ -35,6 +35,11 @@ namespace Components.Machines.Behaviors
             machine.RemoveAllItems();
         }
 
+        public override void TryGiveOutIngredient(Machine machine)
+        {
+            
+        }
+
         public void SetSpecialIngredientTemplate(IngredientTemplate specialIngredient)
         {
             _specialIngredientTemplate = specialIngredient;

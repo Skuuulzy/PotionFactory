@@ -26,7 +26,10 @@ namespace Components.Machines.Behaviors
             }
             
             CurrentTick++;
+        }
 
+        public override void TryGiveOutIngredient(Machine machine)
+        {
             if (!CanProcess(CurrentTick))
             {
                 return;
@@ -37,7 +40,7 @@ namespace Components.Machines.Behaviors
                 var outMachine = outMachines[0];
                 
                 _outMachineName = outMachine.Controller.name;
-                outMachine.TryGiveItemItem(_ingredientTemplate, machine);
+                outMachine.TryGiveIngredient(_ingredientTemplate, machine);
             }
             else
             {

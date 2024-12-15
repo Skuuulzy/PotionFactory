@@ -74,7 +74,7 @@ namespace Components.Machines
             
             _machine.OnTick += Tick;
             _machine.OnPropagateTick += PropagateTick;
-            _machine.OnItemAdded += ShowItem;
+            _machine.OnInItemAdded += ShowItem;
             _machine.Behavior.SetInitialProcessTime(_machine.Template.ProcessTime);
             _machine.LinkNodeData();
 
@@ -99,7 +99,7 @@ namespace Components.Machines
             
             _machine.OnTick -= Tick;
             _machine.OnPropagateTick -= PropagateTick;
-            _machine.OnItemAdded -= ShowItem;
+            _machine.OnInItemAdded -= ShowItem;
         }
 
         // ------------------------------------------------------------------------- TICK -------------------------------------------------------------------------
@@ -107,6 +107,7 @@ namespace Components.Machines
         private void Tick()
         {
             _machine.Behavior.Process(_machine);
+            _machine.Behavior.TryGiveOutIngredient(_machine);
             
             // Propagate tick
             if (_machine.TryGetInMachine(out List<Machine> previousMachines))
@@ -135,6 +136,7 @@ namespace Components.Machines
             }
             
             _machine.Behavior.Process(_machine);
+            _machine.Behavior.TryGiveOutIngredient(_machine);
 
             // Propagate tick
             if (!_machine.TryGetInMachine(out List<Machine> previousMachines))

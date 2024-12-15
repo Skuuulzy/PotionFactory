@@ -34,10 +34,5 @@ namespace Components.Ingredients
 			_isLiquid = isLiquid;
 			_executionTimeModifier = executionTimeModifier;
 		}
-
-		internal string GetName()
-		{
-			throw new NotImplementedException();
-		}
 	}
 }

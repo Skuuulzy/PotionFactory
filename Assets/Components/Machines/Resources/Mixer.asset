@@ -54,7 +54,10 @@ MonoBehaviour:
   - _localPosition: {x: 2, y: -2}
     _gridPosition: {x: 0, y: 0}
     _ports: []
-  _maxItemCount: -1
+  _canTakeInfiniteIngredients: 0
+  _inSlotIngredientCount: 3
+  _outSlotIngredientCount: 1
+  _ingredientsPerSlotCount: 5
   _processTime: 6
   _shopSpawnProbability: 0.6
   _shopPrice: 500
