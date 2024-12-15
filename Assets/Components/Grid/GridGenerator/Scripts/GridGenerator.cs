@@ -7,7 +7,9 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
 
 namespace Components.Grid.Generator
@@ -24,6 +26,7 @@ namespace Components.Grid.Generator
 		[SerializeField] private TileController _tilePrefab;
 		[SerializeField] private ObstacleController _obstaclePrefab;
 		[SerializeField] private DecorationController _decorationPrefab;
+		[SerializeField] private GameObject _waterPlanePrefab;
 
 		[Header("Holders")]
 		[SerializeField] private Transform _groundHolder;
@@ -452,6 +455,18 @@ namespace Components.Grid.Generator
 					_cellList.Add(chosenCell);
 				}
 			}
+			
+			// Instantiate water plane
+			if (_waterPlanePrefab)
+			{
+				var waterPlane = Instantiate(_waterPlanePrefab, transform);
+				waterPlane.transform.position = _startPosition + new Vector3(_grid.GetWidth() / 2f, 0, _grid.GetHeight() / 2f);
+				waterPlane.transform.localScale = new Vector3(_grid.GetWidth() / 10f, 1, _grid.GetHeight() / 10f);
+			}
+			else
+			{
+				Debug.LogError("No water prefab found.");
+			}
 		}
 
 		private void GenerateGridFromTemplate(List<SerializedCell> serializedCellList)
@@ -557,7 +572,7 @@ namespace Components.Grid.Generator
 			_jsonString = JsonConvert.SerializeObject(serializeCellArray, Formatting.Indented);
 
 			File.WriteAllText(Path.Combine(MapsPath, _fileName), _jsonString);
-			
+			AssetDatabase.Refresh();
 			Debug.Log($"Map saved to: {Path.Combine(MapsPath, _fileName)}");
 		}
 
@@ -593,17 +608,33 @@ namespace Components.Grid.Generator
 		{
 			// Get all potential maps.
 			var mapFileNames = GetAllMapFileNames();
+			
+			// Select a random file
+			int randomIndex = Random.Range(0, mapFileNames.Count);
 
-			if (mapFileNames.Count == 0)
+			if (TryLoadMapAt(randomIndex, out var cells))
 			{
-				Debug.LogError("No map files were found.");
+				serializedCells = cells;
+				return true;
+			}
+
+			serializedCells = null;
+			return false;
+		}
+
+		public static bool TryLoadMapAt(int index, out SerializedCell[] serializedCells)
+		{
+			// Get all potential maps.
+			var mapFileNames = GetAllMapFileNames();
+			
+			if (mapFileNames.Count == 0 || index > mapFileNames.Count - 1)
+			{
+				Debug.LogError($"No map files were found at index: {index}.");
 				serializedCells = null;
 				return false;
 			}
-
-			// Select a random file
-			int randomIndex = Random.Range(0, mapFileNames.Count);
-			string jsonContent = File.ReadAllText(Path.Combine(MapsPath, mapFileNames[randomIndex]));
+			
+			string jsonContent = File.ReadAllText(Path.Combine(MapsPath, mapFileNames[index]));
 			serializedCells = JsonConvert.DeserializeObject<SerializedCell[]>(jsonContent);
 
 			if (serializedCells == null || serializedCells.Length == 0)
@@ -623,6 +654,7 @@ namespace Components.Grid.Generator
 				return false;
 			}
 
+			Debug.Log($"Map : {mapFileNames[index]} successfully loaded");
 			return true;
 		}
 

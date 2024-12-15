@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using Components.Machines;
 using Sirenix.OdinInspector;
 using System;
-using System.IO;
 using System.Linq;
 using Components.Grid.Tile;
 using Components.Grid.Obstacle;
@@ -21,7 +20,6 @@ using Components.Map;
 using Components.Bundle;
 using Components.Grid.Decorations;
 using Components.Grid.Generator;
-using Newtonsoft.Json;
 
 namespace Components.Grid
 {
@@ -33,12 +31,15 @@ namespace Components.Grid
 		[SerializeField] private float _cellSize = 10;
 		[SerializeField] private Vector3 _originPosition = new(0, 0);
 		[SerializeField] private bool _showDebug;
+		[SerializeField] private bool _loadRandomMap;
+		[SerializeField] private int _mapToLoadIndex;
 
 		[Header("Prefabs")]
 		[SerializeField] private GameObject _groundTile;
 		[SerializeField] private MachineController _machineControllerPrefab;
 		[SerializeField] private RelicController _relicControllerPrefab;
 		[SerializeField] private ConsumableController _consumableControllerPrefab;
+		[SerializeField] private GameObject _waterPlanePrefab;
 
 		[Header("Holders")]
 		[SerializeField] private Transform _groundHolder;
@@ -413,9 +414,25 @@ namespace Components.Grid
 				ClearGrid();
 			}
 
+			if (!_loadRandomMap)
+			{
+				if (GridGenerator.TryLoadMapAt(_mapToLoadIndex, out var cells))
+				{
+					GenerateGridFromTemplate(cells);
+					AddWaterPlane();
+				}
+				else
+				{
+					GenerateEmptyGrid();
+				}
+				
+				return;
+			}
+			
 			if (GridGenerator.TryLoadRandomMap(out var serializedCells))
 			{
 				GenerateGridFromTemplate(serializedCells);
+				AddWaterPlane();
 			}
 			else
 			{
@@ -488,19 +505,12 @@ namespace Components.Grid
 			_tileController.SelectATileType();
 			
 			// Instantiate ground blocks 
-			for (int x = 0; x < Grid.GetWidth() - 4; x++)
+			for (int x = 0; x < Grid.GetWidth(); x++)
 			{
-				for (int z = 1; z < Grid.GetHeight(); z++)
+				for (int z = 0; z < Grid.GetHeight(); z++)
 				{
 					Grid.TryGetCellByCoordinates(x, z, out var chosenCell);
-
-					TileController tile = _tileController.GenerateTile(chosenCell, Grid, _groundHolder, _cellSize);
-
-					// Get the zone where the extractors can be placed 
-					if ((x == 0 && z <= Grid.GetWidth() / 2) || z == Grid.GetHeight() - 1 || z == 0)
-					{
-						_extractorPotentialCoordinates.Add(new(x, z));
-					}
+					_tileController.GenerateTile(chosenCell, Grid, _groundHolder, _cellSize);
 				}
 			}
 		}
@@ -562,6 +572,20 @@ namespace Components.Grid
 						}
 					}
 				}
+			}
+		}
+		
+		private void AddWaterPlane()
+		{
+			if (_waterPlanePrefab)
+			{
+				var waterPlane = Instantiate(_waterPlanePrefab, transform);
+				waterPlane.transform.position = OriginPosition + new Vector3(Grid.GetWidth() / 2f, 0, Grid.GetHeight() / 2f);
+				waterPlane.transform.localScale = new Vector3(Grid.GetWidth() / 10f, 1, Grid.GetHeight() / 10f);
+			}
+			else
+			{
+				Debug.LogError("No water prefab found.");
 			}
 		}
 		
@@ -747,24 +771,6 @@ namespace Components.Grid
 				}
 			}
 
-			// Instantiate ground blocks 
-			for (int x = 0; x < Grid.GetWidth(); x++)
-			{
-				for (int z = 0; z < Grid.GetHeight(); z++)
-				{
-					Grid.TryGetCellByCoordinates(x, z, out var chosenCell);
-
-					TileController tile = _tileController.GenerateTile(chosenCell, Grid, _groundHolder, _cellSize);
-
-					//// Get the zone where the extractors can be placed 
-					//if ((x == Grid.GetWidth() - 1))
-					//{
-					//	sellersPotentialCoordinates.Add(new(x, z));
-					//	continue;
-					//}
-				}
-			}
-
 			//var randomExtractorCoordinates = ListExtensionsMethods.GetRandomIndexes(_sellersCoordinates.Count, _sellersOnGridCount);
 			for (int i = 0; i < _sellersCoordinates.Count; i++)
 			{
@@ -794,7 +800,6 @@ namespace Components.Grid
 			if (isFirstGameChoice)
 			{
 				GenerateGrid();
-				GenerateEmptyGrid();
 				PlaceExtractors(bundle.IngredientsTemplatesList);
 				PlaceSellers();
 			}
@@ -803,6 +808,5 @@ namespace Components.Grid
 				AddExtractors(bundle.IngredientsTemplatesList);
 			}
 		}
-
 	}
 }
