@@ -40,7 +40,7 @@ namespace Components.Grid
             }
         }
 
-        public Grid(int width, int height, float cellSize, Vector3 originPosition, Transform parentTransform, bool showDebug, List<SerializedCell> serializedCellList)
+        public Grid(int width, int height, float cellSize, Vector3 originPosition, Transform parentTransform, bool showDebug, SerializedCell[] serializedCellList)
 		{
             _width = width;
             _height = height;
@@ -50,9 +50,10 @@ namespace Components.Grid
             _gridArray = new int[width, height];
             _cells = new List<Cell>();
 
-            for (int i = 0; i < serializedCellList.Count; i++)
+            for (int i = 0; i < serializedCellList.Length; i++)
 			{
                 SerializedCell serializedCell = serializedCellList[i];
+                
                 //Create a new cell and add it to cell list
                 Cell cell = new Cell(serializedCell.X, serializedCell.Y, cellSize, serializedCell.ContainsObject);
                 _cells.Add(cell);
@@ -163,11 +164,19 @@ namespace Components.Grid
 		}
 
 
-		public void ClearCellsData()
+		public void ClearNodes()
         {
             foreach (var cell in _cells)
             {
                 cell.RemoveNodeFromCell();
+                cell.RemoveObstacleFromCell();
+            }
+        }
+
+        public void ClearObstacles()
+        {
+            foreach (var cell in _cells)
+            {
                 cell.RemoveObstacleFromCell();
             }
         }

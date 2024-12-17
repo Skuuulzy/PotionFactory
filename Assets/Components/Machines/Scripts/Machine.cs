@@ -32,6 +32,7 @@ namespace Components.Machines
         public Action OnTick;
         public Action OnPropagateTick;
         public Action<bool> OnItemAdded;
+        public static Action<Machine> OnSelected;
         
         // --------------------------------------------------------------------- INITIALISATION -------------------------------------------------------------------------
         public Machine(MachineTemplate template, MachineController controller)
@@ -135,20 +136,16 @@ namespace Components.Machines
             OnItemAdded?.Invoke(true);
         }
         
-        public bool TryGiveItemItem(IngredientTemplate ingredient)
+        public bool TryGiveItemItem(IngredientTemplate ingredient, Machine fromMachine)
         {
-            if (Template.MaxItemCount != -1 && Ingredients.Count >= Template.MaxItemCount)
-            {
-                return false;
-            }
-            
-            if (Behavior.ProcessingRecipe)
+            if (!Behavior.CanTakeItem(this, fromMachine))
             {
                 return false;
             }
             
             Ingredients.Add(ingredient);
             OnItemAdded?.Invoke(true);
+            
             return true;
         }
 
@@ -200,6 +197,12 @@ namespace Components.Machines
             }
 
             _nodes = Template.Nodes.RotateNodes(angle);
+        }
+        
+        // ------------------------------------------------------------------------- SELECT BEHAVIOUR -------------------------------------------------------------------------
+        public void Select()
+        {
+            OnSelected?.Invoke(this);
         }
     }
 }

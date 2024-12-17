@@ -267,12 +267,6 @@ namespace Components.Map
 			// Trouver le nœud avec le plus de connexions
 			LevelNode startingNode = _nodes.OrderByDescending(node => node.ConnectedNodes.Count).FirstOrDefault();
 
-			// Afficher le nœud de départ sélectionné
-			if (startingNode != null)
-			{
-				Debug.Log($"Nœud de départ sélectionné : {startingNode.name} avec {startingNode.ConnectedNodes.Count} connexions.");
-			}
-
 			foreach (var node in _nodes) 
 			{
 				//Bind a starting game bundle to every connected nodes of starting node
