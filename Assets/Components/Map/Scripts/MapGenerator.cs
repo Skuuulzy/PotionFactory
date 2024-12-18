@@ -43,6 +43,9 @@ namespace Components.Map
 			//Set up ingredients bundles list
 			_startingGameIngredientsBundles = ScriptableObjectDatabase.GetAllScriptableObjectOfType<IngredientsBundle>().Where(bundle => bundle.IsStartingGameBundle).ToList();
 			_startingRoundIngredientsBundles = ScriptableObjectDatabase.GetAllScriptableObjectOfType<IngredientsBundle>().Where(bundle => !bundle.IsStartingGameBundle).ToList();
+			
+			_mapGameObject.SetActive(true);
+			_confirmButton.interactable = false;
 		}
 		private void OnDestroy()
 		{
@@ -263,12 +266,6 @@ namespace Components.Map
 
 			// Trouver le nœud avec le plus de connexions
 			LevelNode startingNode = _nodes.OrderByDescending(node => node.ConnectedNodes.Count).FirstOrDefault();
-
-			// Afficher le nœud de départ sélectionné
-			if (startingNode != null)
-			{
-				Debug.Log($"Nœud de départ sélectionné : {startingNode.name} avec {startingNode.ConnectedNodes.Count} connexions.");
-			}
 
 			foreach (var node in _nodes) 
 			{

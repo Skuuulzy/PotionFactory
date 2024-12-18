@@ -94,6 +94,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5707753484759384870}
   - component: {fileID: 8796190468462433388}
+  - component: {fileID: 4633680450218448697}
   m_Layer: 0
   m_Name: IngredientController
   m_TagString: Untagged
@@ -132,6 +133,28 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _spriteRenderer: {fileID: 3657800735614172135}
   _favoriteSellerSpriteRenderer: {fileID: 5555704428061359833}
+  _animator: {fileID: 4633680450218448697}
+--- !u!95 &4633680450218448697
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5153633125603899843}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 804cbbc1a33d5c74380c8259f73b037e, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &7742950602689073292
 GameObject:
   m_ObjectHideFlags: 0
@@ -184,7 +207,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

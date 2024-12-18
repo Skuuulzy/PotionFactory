@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using Components.Interactions.Clickable;
 using Components.Ingredients;
 using Components.Tick;
 using UnityEngine;
@@ -8,7 +6,7 @@ using Components.Machines.Behaviors;
 
 namespace Components.Machines
 {
-    public class MachineController : MonoBehaviour, IClickable
+    public class MachineController : MonoBehaviour
     {
         [SerializeField] private Transform _3dViewHolder;
         [SerializeField] private Machine _machine;
@@ -17,7 +15,6 @@ namespace Components.Machines
         [SerializeField] private GameObject _inPreview;
         [SerializeField] private GameObject _outPreview;
         
-        public static Action<Machine> OnMachineClicked;
         
         public Machine Machine => _machine;
 
@@ -35,7 +32,6 @@ namespace Components.Machines
             _machine = new Machine(machineTemplate, this);
             _view.transform.localScale = new Vector3(scale, scale, scale);
 
-            SetupSelectionCollider(machineTemplate);
             SetupDirectionalArrows(machineTemplate);
         }
 
@@ -50,7 +46,9 @@ namespace Components.Machines
                     var previewArrow = Instantiate(port.Way == Way.IN ? _inPreview : _outPreview, _view.transform);
                     
                     previewArrow.transform.localPosition = new Vector3(node.LocalPosition.x, previewArrow.transform.position.y, node.LocalPosition.y);
-                    previewArrow.transform.Rotate(Vector3.up, port.Side.AngleFromSide());
+                    
+                    // TODO: Find why we need to invert the angle when the machine is only 1x1 (especially with curved conveyor).
+                    previewArrow.transform.Rotate(Vector3.up, port.Side.AngleFromSide(machineTemplate.Nodes.Count == 1));
                     
                     _previewObjects.Add(previewArrow);
                 }
@@ -230,32 +228,5 @@ namespace Components.Machines
         {
 			_ingredientController.CreateFavoriteSellerItemRepresentationFromTemplate(ingredient);
 		}
-        
-        // ------------------------------------------------------------------------- CLICKABLE BEHAVIOUR -------------------------------------------------------------------------
-        private void SetupSelectionCollider(MachineTemplate machineTemplate)
-        {
-            if (TryGetComponent(out BoxCollider boxCollider))
-            {
-                var machineSize = machineTemplate.Size();
-                boxCollider.size = new Vector3(machineSize.width, 1, machineSize.length);
-
-                var machineCenter = machineTemplate.Center();
-                boxCollider.center = new Vector3(machineCenter.X, 0.5f, machineCenter.Z);
-            }
-            else
-            {
-                Debug.LogError($"No selection box collider found on {name}. This machine cannot be selected.");
-            }
-        }
-        
-        public void Clicked()
-        {
-            if (!_initialized)
-            {
-                return;
-            }
-            
-            OnMachineClicked?.Invoke(_machine);
-        }
     }
 }

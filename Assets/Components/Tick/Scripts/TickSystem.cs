@@ -34,6 +34,7 @@ namespace Components.Tick
             PlanningFactoryState.OnPlanningFactoryStateStarted += HandlePlanningFactoryState;
             ResolutionFactoryState.OnResolutionFactoryStateStarted += HandleResolutionFactoryState;
             ShopState.OnShopStateStarted += HandleShopState;
+            UIOptionsController.OnTickSpeedUpdated += ChangeTimeSpeed;
         }
 
 		private void OnDestroy()
@@ -73,14 +74,22 @@ namespace Components.Tick
         
         public static void AddTickable(ITickable tickable)
         {
+            if (TICKABLES.Contains(tickable))
+            {
+                Debug.LogError($"You try to add a tickable but it was already found in the tickable list.");
+                return;
+            }
+            
             TICKABLES.Add(tickable);
         }
         
         public static void ReplaceTickable(ITickable previousTickable, ITickable newTickable)
         {
+            // This happens when a machine has multiple outputs, it replaced when his first out is connected.
+            // But then his next outputs need to be also added has a new partial chain.
             if (!TICKABLES.Contains(previousTickable))
             {
-                Debug.LogError($"You try to replace a tickable but it was not found in the tickable list.");
+                AddTickable(newTickable);
                 return;
             }
 
