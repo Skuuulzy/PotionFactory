@@ -5,7 +5,6 @@ using Components.Machines;
 using Sirenix.OdinInspector;
 using System;
 using System.Linq;
-using Components.Economy;
 using Components.Grid.Tile;
 using Components.Grid.Obstacle;
 using Components.Ingredients;
@@ -19,6 +18,8 @@ using Components.Consumable;
 using Database;
 using Components.Map;
 using Components.Bundle;
+using Components.Grid.Decorations;
+using Components.Grid.Generator;
 
 namespace Components.Grid
 {
@@ -30,23 +31,30 @@ namespace Components.Grid
 		[SerializeField] private float _cellSize = 10;
 		[SerializeField] private Vector3 _originPosition = new(0, 0);
 		[SerializeField] private bool _showDebug;
+		[SerializeField] private bool _loadRandomMap;
+		[SerializeField] private int _mapToLoadIndex;
 
 		[Header("Prefabs")]
 		[SerializeField] private GameObject _groundTile;
 		[SerializeField] private MachineController _machineControllerPrefab;
 		[SerializeField] private RelicController _relicControllerPrefab;
 		[SerializeField] private ConsumableController _consumableControllerPrefab;
+		[SerializeField] private GameObject _waterPlanePrefab;
 
 		[Header("Holders")]
 		[SerializeField] private Transform _groundHolder;
 		[SerializeField] private Transform _objectsHolder;
 		[SerializeField] private Transform _obstacleHolder;
+		[SerializeField] private Transform _decorationHolder;
 
 		[Header("Tiles")]
 		[SerializeField] private AllTilesController _tileController;
 
 		[Header("Obstacles")]
 		[SerializeField] private AllObstaclesController _obstacleController;
+		
+		[Header("Decorations")]
+		[SerializeField] private AllDecorationsController _decorationController;
 
 		[Header("Ingredients")]
 		[SerializeField] private int _extractorsOnGridCount = 4;
@@ -57,6 +65,9 @@ namespace Components.Grid
 
 		[Header("Movement Parameters")] 
 		[SerializeField] private bool _snapping;
+
+		[Header("Sellers Parameters")]
+		[SerializeField] private List<Vector2Int> _sellersCoordinates;
 
 		// Grid 
 		private readonly List<MachineController> _instancedObjects = new();
@@ -86,20 +97,22 @@ namespace Components.Grid
 			_camera = UnityEngine.Camera.main;
 			PlanningFactoryState.OnPlanningFactoryStateStarted += HandlePlanningFactoryState;
 			ShopState.OnShopStateStarted += HandleShopState;
-			MachineContextualUIView.OnSellMachine += HandleMachineSold;
+			MachineContextualUIView.OnSellMachine += SellMachine;
 			ConsumableManager.OnChangeSelectedConsumable += UpdateSelection;
 			RelicManager.OnChangeSelectedRelic += UpdateSelection;
 			MapGenerator.OnMapChoiceConfirm += HandleMapChoiceConfirm;
+			UIOptionsController.OnClearGrid += ClearMachines;
 		}
 
 		private void OnDestroy()
 		{
 			PlanningFactoryState.OnPlanningFactoryStateStarted -= HandlePlanningFactoryState;
 			ShopState.OnShopStateStarted -= HandleShopState;
-			MachineContextualUIView.OnSellMachine -= HandleMachineSold;
+			MachineContextualUIView.OnSellMachine -= SellMachine;
 			ConsumableManager.OnChangeSelectedConsumable -= UpdateSelection;
 			RelicManager.OnChangeSelectedRelic -= UpdateSelection;
 			MapGenerator.OnMapChoiceConfirm-= HandleMapChoiceConfirm;
+			UIOptionsController.OnClearGrid -= ClearMachines;
 		}
 
 		private void Update()
@@ -226,7 +239,7 @@ namespace Components.Grid
 
 
 			//Remove one machine from the inventory 
-			InventoryController.Instance.RemoveRelicFromPlayerInventory(template);
+			GrimoireController.Instance.RemoveRelicFromPlayerInventory(template);
 			DeletePreview();
 
 		}
@@ -279,7 +292,7 @@ namespace Components.Grid
 			if (fetchFromInventory)
 			{
 				//Remove one machine from the inventory 
-				InventoryController.Instance.DecreaseMachineToPlayerInventory(machineController.Machine.Template, 1);
+				GrimoireController.Instance.DecreaseMachineToPlayerInventory(machineController.Machine.Template, 1);
 			}
 		}
 
@@ -388,7 +401,7 @@ namespace Components.Grid
 			_currentConsumablePreview.ConfirmPlacement(chosenCell);
 
 			//Remove one machine from the inventory 
-			InventoryController.Instance.RemoveConsumableFromPlayerInventory(template);
+			GrimoireController.Instance.RemoveConsumableFromPlayerInventory(template);
 			DeletePreview();
 		}
 
@@ -401,12 +414,31 @@ namespace Components.Grid
 				ClearGrid();
 			}
 
-			Grid = new Grid(_gridXValue, _gridYValue, _cellSize, _originPosition, _groundHolder, _showDebug);
-			_tileController.SelectATileType();
-
+			if (!_loadRandomMap)
+			{
+				if (GridGenerator.TryLoadMapAt(_mapToLoadIndex, out var cells))
+				{
+					GenerateGridFromTemplate(cells);
+					AddWaterPlane();
+				}
+				else
+				{
+					GenerateEmptyGrid();
+				}
+				
+				return;
+			}
 			
+			if (GridGenerator.TryLoadRandomMap(out var serializedCells))
+			{
+				GenerateGridFromTemplate(serializedCells);
+				AddWaterPlane();
+			}
+			else
+			{
+				GenerateEmptyGrid();
+			}
 		}
-
 
 		private void ClearGrid()
 		{
@@ -430,7 +462,19 @@ namespace Components.Grid
 				Destroy(objectTile.gameObject);
 			}
 
-			Grid.ClearCellsData();
+			Grid.ClearNodes();
+			Grid.ClearObstacles();
+			_instancedObjects.Clear();
+		}
+
+		private void ClearMachines()
+		{
+			foreach (var machineController in _instancedObjects)
+			{
+				Destroy(machineController.gameObject);
+			}
+			
+			Grid.ClearNodes();
 			_instancedObjects.Clear();
 		}
 
@@ -455,6 +499,96 @@ namespace Components.Grid
 			return false;
 		}
 
+		private void GenerateEmptyGrid()
+		{
+			Grid = new Grid(_gridXValue, _gridYValue, _cellSize, _originPosition, _groundHolder, _showDebug);
+			_tileController.SelectATileType();
+			
+			// Instantiate ground blocks 
+			for (int x = 0; x < Grid.GetWidth(); x++)
+			{
+				for (int z = 0; z < Grid.GetHeight(); z++)
+				{
+					Grid.TryGetCellByCoordinates(x, z, out var chosenCell);
+					_tileController.GenerateTile(chosenCell, Grid, _groundHolder, _cellSize);
+				}
+			}
+		}
+		
+		private void GenerateGridFromTemplate(SerializedCell[] serializedCells)
+		{
+			Grid = new Grid(_gridXValue, _gridYValue, _cellSize, _originPosition, _groundHolder, false, serializedCells);
+
+			// Instantiate ground blocks
+			for (int x = 0; x < Grid.GetWidth(); x++)
+			{
+				for (int z = 0; z < Grid.GetHeight(); z++)
+				{
+					Grid.TryGetCellByCoordinates(x, z, out var chosenCell);
+					
+					// TODO: find a cleaner way to do this operation.
+					SerializedCell serializedCell = serializedCells.ToList().Find(cell => cell.X == x && cell.Y == z);
+
+					// TILES
+					if (serializedCell.TileType != TileType.NONE)
+					{
+						_tileController.GenerateTileFromType(chosenCell, Grid, _groundHolder, _cellSize, serializedCell.TileType);
+					}
+
+					// OBSTACLES
+					if (serializedCell.ObstacleType != ObstacleType.NONE)
+					{
+						// Read obstacle rotation
+						float[] rotationArray = serializedCell.ObstacleRotation;
+						Quaternion obstacleRotation = new Quaternion(rotationArray[0], rotationArray[1], rotationArray[2], rotationArray[3]);
+
+						// Read obstacle scale
+						float[] scaleArray = serializedCell.ObstacleScale;
+						Vector3 obstacleScale = new Vector3(scaleArray[0], scaleArray[1], scaleArray[2]);
+
+						// Generate obstacle
+						_obstacleController.GenerateObstacleFromType(chosenCell, Grid, _obstacleHolder, _cellSize, serializedCell.ObstacleType, obstacleRotation, obstacleScale);
+					}
+
+					// DECORATIONS
+					if (serializedCell.DecorationPositions != null && serializedCell.DecorationPositions.Count > 0)
+					{
+						for (int i = 0; i < serializedCell.DecorationPositions.Count; i++)
+						{
+							// Decoration coordinates.
+							float[] positionArray = serializedCell.DecorationPositions[i];
+							Vector3 decorationPosition = new Vector3(positionArray[0], positionArray[1], positionArray[2]);
+
+							// Decoration rotation.
+							float[] rotationArray = serializedCell.DecorationRotations[i];
+							Quaternion decorationRotation = new Quaternion(rotationArray[0], rotationArray[1], rotationArray[2], rotationArray[3]);
+
+							// Decoration local scale.
+							float[] scaleArray = serializedCell.DecorationScales[i];
+							Vector3 decorationScale = new Vector3(scaleArray[0], scaleArray[1], scaleArray[2]);
+
+							// Generate decoration.
+							_decorationController.GenerateDecorationFromType(chosenCell, _decorationHolder, serializedCell.DecorationTypes[i], decorationPosition, decorationRotation, decorationScale);
+						}
+					}
+				}
+			}
+		}
+		
+		private void AddWaterPlane()
+		{
+			if (_waterPlanePrefab)
+			{
+				var waterPlane = Instantiate(_waterPlanePrefab, transform);
+				waterPlane.transform.position = OriginPosition + new Vector3(Grid.GetWidth() / 2f, 0, Grid.GetHeight() / 2f);
+				waterPlane.transform.localScale = new Vector3(Grid.GetWidth() / 10f, 1, Grid.GetHeight() / 10f);
+			}
+			else
+			{
+				Debug.LogError("No water prefab found.");
+			}
+		}
+		
 		// ------------------------------------------------------------------------- STATES METHODS ---------------------------------------------------------------------- 
 		private void HandleShopState(ShopState obj)
 		{
@@ -494,7 +628,7 @@ namespace Components.Grid
 		}
 
 		// ------------------------------------------------------------------------ MACHINE METHODS ---------------------------------------------------------------------- 
-		private void HandleMachineSold(Machine machineToSell, int sellPrice)
+		public void SellMachine(Machine machineToSell, int sellPrice)
 		{
 			//Reset all cell linked to the machine. 
 			foreach (var node in machineToSell.Nodes)
@@ -510,7 +644,9 @@ namespace Components.Grid
 			_instancedObjects.Remove(machineToSell.Controller);
 			Destroy(machineToSell.Controller.gameObject);
 
-			InventoryController.Instance.AddMachineToPlayerInventory(machineToSell.Template, 1);
+			GrimoireController.Instance.AddMachineToPlayerInventory(machineToSell.Template, 1);
+			
+			// For destroying the class instance, not sure if this a good way.
 			machineToSell = null;
 		}
 
@@ -518,34 +654,19 @@ namespace Components.Grid
 		private void PlaceExtractors(List<IngredientTemplate> ingredientsToInstantiate)
 		{			
 			_extractorBehaviours = new List<ExtractorMachineBehaviour>();
-
 			_extractorPotentialCoordinates = new List<(int, int)>();
-
+			
 			// Instantiate ground blocks 
-			for (int x = 0; x < Grid.GetWidth(); x++)
+			for (int x = 0; x < Grid.GetWidth() - 4; x++)
 			{
-				for (int z = 0; z < Grid.GetHeight(); z++)
+				for (int z = 1; z < Grid.GetHeight(); z++)
 				{
 					Grid.TryGetCellByCoordinates(x, z, out var chosenCell);
-
-					TileController tile = _tileController.GenerateTile(chosenCell, Grid, _groundHolder, _cellSize);
 
 					// Get the zone where the extractors can be placed 
 					if ((x == 0 && z <= Grid.GetWidth() / 2) || z == Grid.GetHeight() - 1 || z == 0)
 					{
-						_extractorPotentialCoordinates.Add(new(x, z));
-						continue;
-					}
-
-					if (tile.TileType == TileType.WATER)
-					{
-						//No need to place anything else on this cell because it is water 
-						continue;
-					}
-
-					if (x != 1 && x != Grid.GetWidth() - 2 && z != 1 && z != Grid.GetHeight() - 2)
-					{
-						_obstacleController.GenerateObstacle(Grid, chosenCell, _obstacleHolder, _cellSize);
+						_extractorPotentialCoordinates.Add(new ValueTuple<int, int>(x, z));
 					}
 				}
 			}
@@ -592,7 +713,6 @@ namespace Components.Grid
 			{
 				_extractorPotentialCoordinates.RemoveAt(coordinate);
 			}
-			
 		}
 
 		private void AddExtractors(List<IngredientTemplate> ingredientsToInstantiate)
@@ -637,7 +757,7 @@ namespace Components.Grid
 
 		private void PlaceSellers()
 		{
-			List<(int, int)> sellersPotentialCoordinates = new List<(int, int)>();
+			//List<(int, int)> sellersPotentialCoordinates = new List<(int, int)>();
 			var ingredientsFromRecipes = ScriptableObjectDatabase.GetAllScriptableObjectOfType<RecipeTemplate>().Select(template => template.OutIngredient).ToList();
 			var randomIngredientsIndexes = ListExtensionsMethods.GetRandomIndexes(ingredientsFromRecipes.Count, _sellersOnGridCount);
 			Queue<IngredientTemplate> selectedIngredients = new Queue<IngredientTemplate>();
@@ -651,42 +771,24 @@ namespace Components.Grid
 				}
 			}
 
-			// Instantiate ground blocks 
-			for (int x = 0; x < Grid.GetWidth(); x++)
+			//var randomExtractorCoordinates = ListExtensionsMethods.GetRandomIndexes(_sellersCoordinates.Count, _sellersOnGridCount);
+			for (int i = 0; i < _sellersCoordinates.Count; i++)
 			{
-				for (int z = 0; z < Grid.GetHeight(); z++)
+				if (!Grid.TryGetCellByCoordinates(_sellersCoordinates[i].x, _sellersCoordinates[i].y, out var chosenCell))
 				{
-					Grid.TryGetCellByCoordinates(x, z, out var chosenCell);
-
-					TileController tile = _tileController.GenerateTile(chosenCell, Grid, _groundHolder, _cellSize);
-
-					// Get the zone where the extractors can be placed 
-					if ((x == Grid.GetWidth() - 1))
-					{
-						sellersPotentialCoordinates.Add(new(x, z));
-						continue;
-					}
+					Debug.LogError($"Unable to place seller at ({_sellersCoordinates[i].x}, {_sellersCoordinates[i].y}), there is no cell at this position");
+					continue;
 				}
-			}
+				
+				var destructorTemplate = ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("Destructor");
 
-			var randomExtractorCoordinates = ListExtensionsMethods.GetRandomIndexes(sellersPotentialCoordinates.Count, _sellersOnGridCount);
-			for (int i = 0; i < sellersPotentialCoordinates.Count; i++)
-			{
-				// We want to place an extractor here. 
-				if (randomExtractorCoordinates.Contains(i))
+				var machine = Instantiate(_machineControllerPrefab);
+				machine.InstantiatePreview(destructorTemplate, _cellSize);
+				AddMachineToGrid(machine, chosenCell, false);
+
+				if (chosenCell.Node.Machine.Behavior is DestructorMachineBehaviour destructorMachineBehaviour)
 				{
-					var ingredient = selectedIngredients.Dequeue();
-					Grid.TryGetCellByCoordinates(sellersPotentialCoordinates[i].Item1, sellersPotentialCoordinates[i].Item2, out var chosenCell);
-					var destructorTemplate = ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("Destructor");
-					
-					var machine = Instantiate(_machineControllerPrefab);
-					machine.InstantiatePreview(destructorTemplate, _cellSize);
-					AddMachineToGrid(machine, chosenCell, false);
-
-					if (chosenCell.Node.Machine.Behavior is DestructorMachineBehaviour destructorMachineBehaviour)
-					{
-						_sellersBehaviours.Add(destructorMachineBehaviour);
-					}
+					_sellersBehaviours.Add(destructorMachineBehaviour);
 				}
 			}
 		}
@@ -706,6 +808,5 @@ namespace Components.Grid
 				AddExtractors(bundle.IngredientsTemplatesList);
 			}
 		}
-
 	}
 }

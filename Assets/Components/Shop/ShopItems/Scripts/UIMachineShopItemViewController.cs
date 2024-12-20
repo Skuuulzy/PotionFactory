@@ -42,7 +42,10 @@ namespace Components.Shop.ShopItems
 		public override void BuyItem()
 		{
 			if (EconomyController.Instance.PlayerMoney < Price)
+			{
+				Debug.LogError("Not enough money you bum.");
 				return;
+			}
 
 			EconomyController.Instance.DecreaseMoney(Price);
 			if (_shopItem.NumberOfItemToSell != -1)
@@ -60,7 +63,7 @@ namespace Components.Shop.ShopItems
 				}
 			}
 
-			InventoryController.Instance.AddMachineToPlayerInventory(_shopItem.MachineTemplate, 1);
+			GrimoireController.Instance.AddMachineToPlayerInventory(_shopItem.MachineTemplate, 1);
 
 		}
 	}

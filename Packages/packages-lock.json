@@ -7,6 +7,12 @@
       "dependencies": {},
       "url": "https://package.openupm.com"
     },
+    "com.distantlands.cozy.core": {
+      "version": "file:com.distantlands.cozy.core",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
+    },
     "com.eflatun.scenereference": {
       "version": "4.1.1",
       "depth": 0,
@@ -17,12 +23,28 @@
       },
       "url": "https://package.openupm.com"
     },
-    "com.mygamedevtools.scene-loader": {
-      "version": "3.0.0",
+    "com.marijnzwemmer.unity-toolbar-extender": {
+      "version": "1.4.2",
       "depth": 0,
       "source": "registry",
       "dependencies": {},
       "url": "https://package.openupm.com"
+    },
+    "com.mygamedevtools.scene-loader": {
+      "version": "3.1.0",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://package.openupm.com"
+    },
+    "com.singularitygroup.hotreload": {
+      "version": "file:com.singularitygroup.hotreload",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {
+        "com.unity.ugui": "1.0.0",
+        "com.unity.modules.unitywebrequest": "1.0.0"
+      }
     },
     "com.unity.burst": {
       "version": "1.8.8",
@@ -50,7 +72,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.ide.rider": {
-      "version": "3.0.31",
+      "version": "3.0.34",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -176,9 +198,9 @@
       "depth": 0,
       "source": "registry",
       "dependencies": {
+        "com.unity.modules.audio": "1.0.0",
         "com.unity.modules.director": "1.0.0",
         "com.unity.modules.animation": "1.0.0",
-        "com.unity.modules.audio": "1.0.0",
         "com.unity.modules.particlesystem": "1.0.0"
       },
       "url": "https://packages.unity.com"

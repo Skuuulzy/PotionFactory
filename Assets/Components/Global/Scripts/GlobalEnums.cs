@@ -12,7 +12,7 @@ public enum Season
 
 public enum ShopItemType
 {
-	MACHINE,
+	MACHINE = 0,
 	CONSUMABLE,
 	RELIC
 }

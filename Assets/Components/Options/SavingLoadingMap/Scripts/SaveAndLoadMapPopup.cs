@@ -1,7 +1,4 @@
 using Components.Grid.Generator;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
 
 public class SaveAndLoadMapPopup : MonoBehaviour
@@ -17,13 +14,13 @@ public class SaveAndLoadMapPopup : MonoBehaviour
 			Destroy(child.gameObject);
 		}
 
-		DirectoryInfo info = new DirectoryInfo(Application.persistentDataPath );
-		FileInfo[] fileInfo = info.GetFiles();
-		foreach(FileInfo file in fileInfo)
+		var fileNames = GridGenerator.GetAllMapFileNames();
+
+		for (var i = 0; i < fileNames.Count; i++)
 		{
+			var fileName = fileNames[i];
 			SavingAndLoadingMapPreview loadingMapPreview = Instantiate(_savingAndLoadingMapPreviewPrefab, _existingFilesTransform);
-			loadingMapPreview.Init(file.Name, _gridGenerator);
+			loadingMapPreview.Init(fileName, _gridGenerator);
 		}
 	}
-
 }
