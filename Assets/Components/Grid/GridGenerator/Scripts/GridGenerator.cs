@@ -117,8 +117,35 @@ namespace Components.Grid.Generator
 
 				AddSelectedObjectToGrid();	
 			}
+			if (Input.GetMouseButton(1))
+			{
+				DeletePreview();
+			}
 
 		}
+
+		private void DeletePreview()
+		{
+			if (_currentTileController != null)
+			{
+				Destroy(_currentTileController.gameObject);
+				_currentTileController = null;
+			}
+
+			if (_currentObstacleController != null)
+			{
+				Destroy(_currentObstacleController.gameObject);
+				_currentObstacleController = null;
+			}
+
+			if (_currentDecorationController != null)
+			{
+				Destroy(_currentDecorationController.gameObject);
+				_currentDecorationController = null;
+			}
+		}
+
+
 
 		// ------------------------------------------------------------------------- SELECTION -------------------------------------------------------------------------
 		private void InstantiateNewPreview()
