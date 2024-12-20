@@ -21,7 +21,10 @@ namespace Components.Machines
         [SerializeField] private List<Node> _nodes;
         
         [Header("Process")]
-        [SerializeField] private int _maxItemCount = -1;
+        [SerializeField] private bool _canTakeInfiniteIngredients;
+        [SerializeField] private int _inSlotIngredientCount = 1;
+        [SerializeField] private int _outSlotIngredientCount = 1;
+        [SerializeField] private int _ingredientsPerSlotCount = 1;
         [SerializeField] private int _processTime;
         
         [Header("Shop")]
@@ -32,7 +35,8 @@ namespace Components.Machines
 
         [Header("Contextual View")] 
         [SerializeField] private List<UIContextualComponent> _contextualComponents;
-        
+
+
         public string Name => _name;
         public MachineType Type => _type;
 
@@ -69,7 +73,11 @@ namespace Components.Machines
             return (centerX, centerZ);
         }
 
-        public int MaxItemCount => _maxItemCount;
+        public bool CanTakeInfiniteIngredients => _canTakeInfiniteIngredients;
+        public int InSlotIngredientCount => _inSlotIngredientCount;
+        public int OutSlotIngredientCount => _outSlotIngredientCount;
+        public int IngredientsPerSlotCount => _ingredientsPerSlotCount;
+
         public int ProcessTime => _processTime;
 
         public float ShopSpawnProbability => _shopSpawnProbability;

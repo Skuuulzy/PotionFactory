@@ -30,7 +30,9 @@ MonoBehaviour:
       _way: 1
     - _side: 2
       _way: 1
-  _maxItemCount: 1
+  _canTakeInfiniteIngredients: 0
+  _slotIngredientCount: 1
+  _ingredientsPerSlotCount: 5
   _processTime: 1
   _shopSpawnProbability: 0
   _shopPrice: 200

@@ -24,7 +24,9 @@ MonoBehaviour:
     _ports:
     - _side: 3
       _way: 0
-  _maxItemCount: -1
+  _canTakeInfiniteIngredients: 1
+  _slotIngredientCount: 1
+  _ingredientsPerSlotCount: 1
   _processTime: 0
   _shopSpawnProbability: 0.1
   _shopPrice: 15000

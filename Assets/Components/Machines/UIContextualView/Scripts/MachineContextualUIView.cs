@@ -84,13 +84,13 @@ namespace Components.Machines.UIView
         {
             _heldIngredients.text = "Empty";
 
-            if (_associatedMachine.Ingredients.Count == 0)
+            if (_associatedMachine.InIngredients.Count == 0)
             {
                 return;
             }
             
             var ingredientsNames = new List<string>();
-            foreach (var ingredient in _associatedMachine.Ingredients)
+            foreach (var ingredient in _associatedMachine.InIngredients)
             {
                 ingredientsNames.Add(ingredient.Name);
             }

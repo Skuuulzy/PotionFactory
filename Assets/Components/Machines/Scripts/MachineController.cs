@@ -107,6 +107,7 @@ namespace Components.Machines
         private void Tick()
         {
             _machine.Behavior.Process(_machine);
+            _machine.Behavior.TryGiveOutIngredient(_machine);
             
             // Propagate tick
             if (_machine.TryGetInMachine(out List<Machine> previousMachines))
@@ -135,6 +136,7 @@ namespace Components.Machines
             }
             
             _machine.Behavior.Process(_machine);
+            _machine.Behavior.TryGiveOutIngredient(_machine);
 
             // Propagate tick
             if (!_machine.TryGetInMachine(out List<Machine> previousMachines))
@@ -215,7 +217,7 @@ namespace Components.Machines
         {
             if (show)
             {
-                _ingredientController.CreateRepresentationFromTemplate(_machine.Ingredients);
+                _ingredientController.CreateRepresentationFromTemplate(_machine.InIngredients);
             }
             else
             {

@@ -89,6 +89,7 @@ namespace Components.Grid
 
 		public Grid Grid { get; private set; }
 		public Vector3 OriginPosition => _originPosition;
+		public static Action OnGridGenerated;
 
 		// ------------------------------------------------------------------------- MONO -------------------------------------------------------------------------------- 
 
@@ -513,6 +514,8 @@ namespace Components.Grid
 					_tileController.GenerateTile(chosenCell, Grid, _groundHolder, _cellSize);
 				}
 			}
+			
+			OnGridGenerated?.Invoke();
 		}
 		
 		private void GenerateGridFromTemplate(SerializedCell[] serializedCells)
@@ -573,6 +576,8 @@ namespace Components.Grid
 					}
 				}
 			}
+			
+			OnGridGenerated?.Invoke();
 		}
 		
 		private void AddWaterPlane()
