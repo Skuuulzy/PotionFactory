@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Security.Cryptography;
 using Components.Ingredients;
 using Components.Machines.Behaviors;
 using Components.Tick;
@@ -12,7 +14,9 @@ namespace Components.Machines
     public class Machine : ITickable
     {
         // ----------------------------------------------------------------------- PRIVATE FIELDS -------------------------------------------------------------------------
-        [SerializeField] private List<IngredientTemplate> _ingredients;
+        // TODO: Should be a dictionary ?
+        [SerializeField] private List<IngredientTemplate> _inIngredients;
+        [SerializeField] private List<IngredientTemplate> _outIngredients;
         [SerializeField] private List<Node> _nodes;
         [SerializeField, ReadOnly] private MachineController _controller;
         [SerializeField] private MachineBehavior _behavior;
@@ -25,14 +29,18 @@ namespace Components.Machines
         public MachineTemplate Template => _template;
         public MachineController Controller => _controller;
         public MachineBehavior Behavior => _behavior;
-        public List<IngredientTemplate> Ingredients => _ingredients;
+        public List<IngredientTemplate> InIngredients => _inIngredients;
+        public List<IngredientTemplate> OutIngredients => _outIngredients;
+        public Dictionary<IngredientTemplate, int> GroupedInIngredients => GroupIngredientByTypeAndCount(_inIngredients);
+        public Dictionary<IngredientTemplate, int> GroupedOutIngredients => GroupIngredientByTypeAndCount(_outIngredients);
         public virtual List<Node> Nodes => _nodes;
-        
+
         // ------------------------------------------------------------------------- ACTIONS -------------------------------------------------------------------------
         public Action OnTick;
         public Action OnPropagateTick;
         public Action<bool> OnItemAdded;
         public static Action<Machine> OnSelected;
+        public static Action<Machine, bool> OnHovered;
         
         // --------------------------------------------------------------------- INITIALISATION -------------------------------------------------------------------------
         public Machine(MachineTemplate template, MachineController controller)
@@ -43,7 +51,8 @@ namespace Components.Machines
 
             UpdateNodesRotation(0);
             
-            _ingredients = new List<IngredientTemplate>();
+            _inIngredients = new List<IngredientTemplate>();
+            _outIngredients = new List<IngredientTemplate>();
         }
 
         public void UpdateNodesRotation(int rotation)
@@ -131,40 +140,112 @@ namespace Components.Machines
         }
 
         // ------------------------------------------------------------------------- ITEMS -------------------------------------------------------------------------
-        public void AddItem()
+        public void AddIngredient(IngredientTemplate ingredient , Way way)
         {
-            OnItemAdded?.Invoke(true);
+            switch (way)
+            {
+                case Way.IN:
+                    _inIngredients.Add(ingredient);
+                    OnItemAdded?.Invoke(true);
+                    break;
+                case Way.OUT:
+                    _outIngredients.Add(ingredient);
+                    OnItemAdded?.Invoke(true);
+                    break;
+                case Way.NONE:
+                    Debug.LogError("Way of adding item not handle.");
+                    return;
+            }
         }
         
-        public bool TryGiveItemItem(IngredientTemplate ingredient, Machine fromMachine)
+        public bool TryGiveIngredient(IngredientTemplate ingredient, Machine fromMachine)
         {
-            if (!Behavior.CanTakeItem(this, fromMachine))
+            if (!Behavior.CanTakeItem(this, fromMachine, ingredient))
             {
                 return false;
             }
             
-            Ingredients.Add(ingredient);
-            OnItemAdded?.Invoke(true);
+            AddIngredient(ingredient, Way.IN);
             
             return true;
         }
 
+        public IngredientTemplate TakeOlderIngredient()
+        {
+            if (_outIngredients.Count == 0)
+            {
+                return null;
+            }
+
+            var ingredient = _outIngredients.First();
+            _outIngredients.Remove(ingredient);
+
+            return ingredient;
+        }
+        
         public void RemoveAllItems()
         {
-            Ingredients.Clear();
+            InIngredients.Clear();
             OnItemAdded?.Invoke(false);
         }
 
         public void RemoveItem(int index)
         {
-            Ingredients.RemoveAt(index);
+            InIngredients.RemoveAt(index);
             OnItemAdded?.Invoke(false);
         }
         
-        public void ClearItems()
+        public void RemoveInItems(List<IngredientTemplate> ingredientToRemove)
         {
-            Ingredients.Clear();
+            _inIngredients.RemoveAll(item => ingredientToRemove.Any(b => b.Name == item.Name));            
             OnItemAdded?.Invoke(false);
+        }
+
+        /// Return a dictionary with ingredients grouped by type and count.
+        /// <param name="ingredientsToLook"></param>
+        private Dictionary<IngredientTemplate, int> GroupIngredientByTypeAndCount(List<IngredientTemplate> ingredientsToLook)
+        {
+            var counts = new Dictionary<IngredientTemplate, int>();
+            
+            foreach (var ingredient in ingredientsToLook)
+            {
+                if (!counts.TryAdd(ingredient, 1))
+                {
+                    counts[ingredient]++;
+                }
+            }
+            
+            return counts;
+        }
+        
+        public int EmptyInSlotCount()
+        {
+            int remainingSlot = Template.InSlotIngredientCount - GroupIngredientByTypeAndCount(_inIngredients).Count;
+
+            return remainingSlot < 0 ? 0 : remainingSlot;
+        }
+        
+        public bool CanAddIngredientOfTypeInSlot(IngredientTemplate ingredient, Way way)
+        {
+            if (ingredient == null)
+            {
+                return false;
+            }
+            
+            var ingredientsToLook = way == Way.IN ? _inIngredients : _outIngredients;
+            var groupedIngredients = GroupIngredientByTypeAndCount(ingredientsToLook);
+            
+            if (groupedIngredients.ContainsKey(ingredient))
+            {
+                if (groupedIngredients[ingredient] < Template.IngredientsPerSlotCount)
+                {
+                    return true;
+                }
+
+                return false;
+            }
+            
+            return EmptyInSlotCount() > 0;
         }
 
         // ------------------------------------------------------------------------- TICK -------------------------------------------------------------------------
@@ -203,6 +284,11 @@ namespace Components.Machines
         public void Select()
         {
             OnSelected?.Invoke(this);
+        }
+
+        public void Hover(bool hovered)
+        {
+            OnHovered?.Invoke(this, hovered);
         }
     }
 }

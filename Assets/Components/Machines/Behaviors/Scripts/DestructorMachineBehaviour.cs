@@ -17,7 +17,7 @@ namespace Components.Machines.Behaviors
         {
             // Sell items
             int sellPrice = 0;
-            foreach(IngredientTemplate ingredientTemplate in machine.Ingredients)
+            foreach(IngredientTemplate ingredientTemplate in machine.InIngredients)
             {
                 if(ingredientTemplate != null && ingredientTemplate.Name == _specialIngredientTemplate.Name)
                 {
@@ -33,6 +33,11 @@ namespace Components.Machines.Behaviors
             
             // Clear the machine items
             machine.RemoveAllItems();
+        }
+
+        public override void TryGiveOutIngredient(Machine machine)
+        {
+            
         }
 
         public void SetSpecialIngredientTemplate(IngredientTemplate specialIngredient)
