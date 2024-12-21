@@ -1,19 +1,33 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Bilboarding : MonoBehaviour
 {
-    Vector3 cameraDir;
-
-  
-
-    // Update is called once per frame
-    void Update()
+    private Transform _cameraTransform;
+    private Vector3 _cameraDirection;
+    private bool _initialized;
+    
+    private void Awake()
     {
-        cameraDir = Camera.main.transform.forward;
-        cameraDir.y = 0;
+        if (Camera.main == null)
+        {
+            Debug.LogError($"Unable to find the main camera. Billboard: {gameObject.name} will not behave as intended.");
+            return;
+        }
 
-        transform.rotation = Quaternion.LookRotation(cameraDir);
+        _cameraTransform = Camera.main.transform;
+        _initialized = true;
+    }
+
+    private void LateUpdate()
+    {
+        if (!_initialized)
+        {
+            return;
+        }
+        
+        _cameraDirection = _cameraTransform.forward;
+        _cameraDirection.y = 0;
+
+        transform.rotation = Quaternion.LookRotation(_cameraDirection);
     }
 }

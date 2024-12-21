@@ -41,8 +41,7 @@ namespace Components.Map
 			MapState.OnMapStateStarted += Init;
 
 			//Set up ingredients bundles list
-			_startingGameIngredientsBundles = ScriptableObjectDatabase.GetAllScriptableObjectOfType<IngredientsBundle>().Where(bundle => bundle.IsStartingGameBundle).ToList();
-			_startingRoundIngredientsBundles = ScriptableObjectDatabase.GetAllScriptableObjectOfType<IngredientsBundle>().Where(bundle => !bundle.IsStartingGameBundle).ToList();
+
 			
 			_mapGameObject.SetActive(true);
 			_confirmButton.interactable = false;
@@ -61,11 +60,7 @@ namespace Components.Map
 			//First map generation
 			if (state.StateIndex == 1)
 			{
-				_isFirstGameChoice = true;
-				GenerateNodes();
-				EnsureConnectivity();
-				DrawConnections();
-				SelectStartingGameNode();
+				RegenerateMap();
 			}
 			else
 			{
@@ -73,9 +68,41 @@ namespace Components.Map
 				SelectStartingRoundNode(_selectedNode);
 			}
 		}
+
+		[ContextMenu("Regenerate Map")]
+		public void RegenerateMap()
+		{
+			ClearMap();
+			_isFirstGameChoice = true;
+			GenerateNodes();
+			EnsureConnectivity();
+			DrawConnections();
+			SelectStartingGameNode();
+		}
+
+		private void ClearMap()
+		{
+			foreach (Transform child in _nodeParent)
+			{
+				Destroy(child.gameObject);
+			}
+
+			foreach (Transform child in _nodeLineParent)
+			{
+				Destroy(child.gameObject);
+			}
+			
+			_nodes = null;
+			_selectedNode = null;
+			_startingSelectedNode = null;
+
+			_startingGameIngredientsBundles = ScriptableObjectDatabase.GetAllScriptableObjectOfType<IngredientsBundle>().Where(bundle => bundle.IsStartingGameBundle).ToList();
+			_startingRoundIngredientsBundles = ScriptableObjectDatabase.GetAllScriptableObjectOfType<IngredientsBundle>().Where(bundle => !bundle.IsStartingGameBundle).ToList();
+		}
 		//------------------------------------------------------------------------------------------- MAP GENERATION -------------------------------------------------------------------------------------------
 		private void GenerateNodes()
 		{
+			_nodes = new List<LevelNode>();
 			// Génération des nœuds avec positionnement aléatoire
 			for (int i = 0; i < _nodeCount; i++)
 			{
@@ -89,8 +116,8 @@ namespace Components.Map
 				do
 				{
 					position = new Vector2(
-                        UnityEngine.Random.Range(-(_nodeParent.rect.width - 100) / 2, (_nodeParent.rect.width - 100) / 2),
-                        UnityEngine.Random.Range(-(_nodeParent.rect.height - 100) / 2, (_nodeParent.rect.height - 100) / 2)
+                        UnityEngine.Random.Range(-_nodeParent.rect.width / 2, _nodeParent.rect.width / 2),
+                        UnityEngine.Random.Range(-_nodeParent.rect.height / 2, _nodeParent.rect.height / 2)
 					);
 					positionValid = IsPositionValid(position);
 					attempt++;
