@@ -26,7 +26,6 @@ namespace VComponent.Tools.SceneLoader
 
             _sceneManager = new AdvancedSceneManager();
             _sceneLoader = new SceneLoaderUniTask(_sceneManager);
-            var sceneLoader = new SceneLoaderCoroutine(_sceneManager);
 
             _loadingSceneInfo = new LoadSceneInfoName(_loadingScene.Name);
 

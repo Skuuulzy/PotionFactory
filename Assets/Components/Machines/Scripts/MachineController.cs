@@ -15,7 +15,6 @@ namespace Components.Machines
         [SerializeField] private GameObject _inPreview;
         [SerializeField] private GameObject _outPreview;
         
-        
         public Machine Machine => _machine;
 
         private List<GameObject> _previewObjects;

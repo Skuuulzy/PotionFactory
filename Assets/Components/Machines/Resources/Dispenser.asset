@@ -25,7 +25,8 @@ MonoBehaviour:
     - _side: 2
       _way: 1
   _canTakeInfiniteIngredients: 0
-  _slotIngredientCount: 1
+  _inSlotIngredientCount: 1
+  _outSlotIngredientCount: 1
   _ingredientsPerSlotCount: 5
   _processTime: 1
   _shopSpawnProbability: 0
@@ -34,3 +35,6 @@ MonoBehaviour:
   _sellPrice: 0
   _contextualComponents:
   - {fileID: 7706745679750095, guid: ad1416cb9a463d54eab6523dcdc6b95f, type: 3}
+  _uiGameplayDescription: Extract base ingredient for further process.
+  _uiLoreDescription: Were does it come from ? We do not know yet, but it works why
+    bother ?
