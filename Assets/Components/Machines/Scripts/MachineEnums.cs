@@ -20,7 +20,7 @@
     {
         CAULDRON,
         CONVEYOR,
-        DESTRUCTOR,
+        MARCHAND,
         DISPENSER,
         DISTILLER,
         EXTRACTOR,

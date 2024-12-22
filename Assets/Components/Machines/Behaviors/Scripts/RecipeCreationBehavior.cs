@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Components.Recipes;
 using Database;
 using UnityEngine;
@@ -23,7 +24,7 @@ namespace Components.Machines.Behaviors
             // Try to find a recipe based on the machine and the items inside the machine.
             if (!ProcessingRecipe)
             {
-                if (ScriptableObjectDatabase.TryFindRecipe(machine.Template, machine.Ingredients, out RecipeTemplate recipe))
+                if (ScriptableObjectDatabase.TryFindRecipe(machine.Template, machine.InIngredients, out RecipeTemplate recipe))
                 {
                     _currentRecipe = recipe;
                     _additionalRecipeProcessTime = Mathf.RoundToInt(machine.Template.ProcessTime * recipe.ProcessTimeModifier);
@@ -44,29 +45,51 @@ namespace Components.Machines.Behaviors
                 _currentProcessTime++;
                 return;
             }
-            
+
+            // Is there any space left in the out slot.
+            if (machine.CanAddIngredientOfTypeInSlot(_currentRecipe.OutIngredient, Way.OUT))
+            {
+                // Add the ingredient to the machine out slot.
+                machine.AddIngredient(_currentRecipe.OutIngredient, Way.OUT);
+                
+                ProcessingRecipe = false;
+                
+                // Remove items used for the recipe.
+                machine.RemoveInItems(_currentRecipe.Ingredients.Keys.ToList());
+                
+                // Reset the recipe.
+                _currentRecipe = null;
+                _currentProcessTime = 0;
+            }
+        }
+
+        public override void TryGiveOutIngredient(Machine machine)
+        {
             // Try to give the item to the next machine.
+            if (machine.OutIngredients.Count <= 0)
+            {
+                return;
+            }
+            
             if (machine.TryGetOutMachines(out List<Machine> outMachines))
             {
                 var outMachine = outMachines[0];
                 
-                if (outMachine.TryGiveItemItem(_currentRecipe.OutIngredient, machine))
+                if (outMachine.CanAddIngredientOfTypeInSlot(machine.OutIngredients.First(), Way.IN))
                 {
-                    Debug.Log($"Machine: {machine.Controller.name} outputting: {_currentRecipe.OutIngredient.name} to: {outMachine.Controller.name}.");
-
-                    ProcessingRecipe = false;
-                    _currentRecipe = null;
-                    _currentProcessTime = 0;
-                    machine.ClearItems();
+                    var ingredientToGive = machine.TakeOlderIngredient();
+                    outMachine.AddIngredient(ingredientToGive, Way.IN);
+                    
+                    Debug.Log($"Machine: {machine.Controller.name} outputting: {ingredientToGive.name} to: {outMachine.Controller.name}.");
                 }
                 else
                 {
-                    Debug.Log($"Machine: {machine.Controller.name} cannot output: {_currentRecipe.OutIngredient.name} to: {outMachine.Controller.name}. Because {outMachine.Controller.name} is either full or processing a recipe");
+                    Debug.Log($"Machine: {machine.Controller.name} cannot output to: {outMachine.Controller.name}. Because {outMachine.Controller.name} is full.");
                 }
             }
             else
             {
-                Debug.Log($"Machine: {machine.Controller.name} cannot output: {_currentRecipe.OutIngredient.name} because no out machine is connected.");
+                //Debug.Log($"Machine: {machine.Controller.name} cannot output because no out machine is connected.");
             }
         }
     }

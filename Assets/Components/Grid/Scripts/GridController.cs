@@ -89,6 +89,7 @@ namespace Components.Grid
 
 		public Grid Grid { get; private set; }
 		public Vector3 OriginPosition => _originPosition;
+		public static Action OnGridGenerated;
 
 		// ------------------------------------------------------------------------- MONO -------------------------------------------------------------------------------- 
 
@@ -513,6 +514,8 @@ namespace Components.Grid
 					_tileController.GenerateTile(chosenCell, Grid, _groundHolder, _cellSize);
 				}
 			}
+			
+			OnGridGenerated?.Invoke();
 		}
 		
 		private void GenerateGridFromTemplate(SerializedCell[] serializedCells)
@@ -573,6 +576,8 @@ namespace Components.Grid
 					}
 				}
 			}
+			
+			OnGridGenerated?.Invoke();
 		}
 		
 		private void AddWaterPlane()
@@ -708,7 +713,10 @@ namespace Components.Grid
 				}
 			}
 
-			//Clear the _extractorPotentialCoordinates from selected coordinate to use it after
+			// Sort the randomExtractorCoordinates in descending order, ensuring that removes elements from the list starting with the highest index, preserving the validity of the lower indices.
+			randomExtractorCoordinates.Sort((a, b) => b.CompareTo(a));
+
+			// Clear the _extractorPotentialCoordinates from selected coordinate
 			foreach (var coordinate in randomExtractorCoordinates)
 			{
 				_extractorPotentialCoordinates.RemoveAt(coordinate);
@@ -780,7 +788,7 @@ namespace Components.Grid
 					continue;
 				}
 				
-				var destructorTemplate = ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("Destructor");
+				var destructorTemplate = ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("Marchand");
 
 				var machine = Instantiate(_machineControllerPrefab);
 				machine.InstantiatePreview(destructorTemplate, _cellSize);

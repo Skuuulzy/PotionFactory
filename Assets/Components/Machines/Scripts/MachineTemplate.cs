@@ -21,7 +21,10 @@ namespace Components.Machines
         [SerializeField] private List<Node> _nodes;
         
         [Header("Process")]
-        [SerializeField] private int _maxItemCount = -1;
+        [SerializeField] private bool _canTakeInfiniteIngredients;
+        [SerializeField] private int _inSlotIngredientCount = 1;
+        [SerializeField] private int _outSlotIngredientCount = 1;
+        [SerializeField] private int _ingredientsPerSlotCount = 1;
         [SerializeField] private int _processTime;
         
         [Header("Shop")]
@@ -32,6 +35,8 @@ namespace Components.Machines
 
         [Header("Contextual View")] 
         [SerializeField] private List<UIContextualComponent> _contextualComponents;
+        [SerializeField] private string _uiGameplayDescription;
+        [SerializeField] private string _uiLoreDescription;
         
         public string Name => _name;
         public MachineType Type => _type;
@@ -40,6 +45,40 @@ namespace Components.Machines
         public Sprite UIView => _uiView;
 
         public List<Node> Nodes => GetNodeInstance();
+
+        public bool CanTakeInfiniteIngredients => _canTakeInfiniteIngredients;
+        public int InSlotIngredientCount => _inSlotIngredientCount;
+        public int OutSlotIngredientCount => _outSlotIngredientCount;
+        public int IngredientsPerSlotCount => _ingredientsPerSlotCount;
+
+        public int ProcessTime => _processTime;
+
+        public float ShopSpawnProbability => _shopSpawnProbability;
+        public int ShopPrice => _shopPrice;
+        public int SellPrice => _sellPrice;
+        public bool CannotBeSell => _cannotBeSell;
+
+        public List<UIContextualComponent> ContextualComponents => _contextualComponents;
+        public string UIGameplayDescription => _uiGameplayDescription;
+        public string UILoreDescription => _uiLoreDescription;
+        
+        private List<Node> GetNodeInstance()
+        {
+            List<Node> result = new List<Node>();
+            
+            foreach (var node in _nodes)
+            {
+                Node newNode = new Node(node);
+                result.Add(newNode);
+            }
+
+            return result;
+        }
+        
+        public MachineBehavior GetBehaviorClone()
+        {
+            return _behavior.Clone();
+        }
         
         /// Return the size of the machine based on his nodes.
         public (int width, int length) Size()
@@ -68,35 +107,5 @@ namespace Components.Machines
 
             return (centerX, centerZ);
         }
-
-        public int MaxItemCount => _maxItemCount;
-        public int ProcessTime => _processTime;
-
-        public float ShopSpawnProbability => _shopSpawnProbability;
-        public int ShopPrice => _shopPrice;
-        public int SellPrice => _sellPrice;
-        public bool CannotBeSell => _cannotBeSell;
-
-        public List<UIContextualComponent> ContextualComponents => _contextualComponents;
-
-        private List<Node> GetNodeInstance()
-        {
-            List<Node> result = new List<Node>();
-            
-            foreach (var node in _nodes)
-            {
-                Node newNode = new Node(node);
-                result.Add(newNode);
-            }
-
-            return result;
-        }
-        
-        public MachineBehavior GetBehaviorClone()
-        {
-            return _behavior.Clone();
-        }
-        
-
     }
 }
