@@ -21,7 +21,34 @@ namespace Components.Grid.Decorations
 	public enum DecorationType
 	{
 		NONE,
-		BLUE_FLOWER,
-		YELLOW_FLOWER
+		Book_01,
+		Book_02,
+		Bottle_Clay_01,
+		Bottle_Clay_02,
+		Bottle_Clay_03,
+		Bottle_Clay_04,
+		BottlePotion_01,
+		BottlePotion_02,
+		BottlePotion_03,
+		Candle,
+		Carpet_Large,
+		Carpet_Small,
+		Carpet_Table,
+		Etandar_01,
+		Etandar_02,
+		Etandar_03,
+		Etandar_04,
+		Etandar_Shop,
+		Parchemin,
+		Planks_01,
+		Planks_02,
+		Planks_03,
+		Musroom_Brown,
+		Musroom_Brown_Group,
+		Musroom_Red,
+		Musroom_Red_Group,
+		Musroom_Yellow,
+		Musroom_Yellow_Group,
+
 	}
 }
