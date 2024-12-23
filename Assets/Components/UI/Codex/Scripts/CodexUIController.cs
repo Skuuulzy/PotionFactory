@@ -1,15 +1,15 @@
+using System;
 using Components.Machines;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using System.Linq;
+using Components.Machines.Behaviors;
 
 public class CodexUIController : MonoBehaviour
 {
-    [Header("Codex base")]
-    [SerializeField] private GameObject _gradient;
-
+    [SerializeField] private GameObject _window;
     [Header("Machine")]
     [SerializeField] private GameObject _contextMachineWindow;
     [SerializeField] private Image _machineImage;
@@ -18,12 +18,19 @@ public class CodexUIController : MonoBehaviour
     [SerializeField] private List<UIIngredientSlotController> _inIngredientSlots;
     [SerializeField] private UIIngredientSlotController _outIngredientSlot;
 
+    [Header("Generic")]
+    [SerializeField] private GameObject _contextGenericWindow;
+    [SerializeField] private Image _genericMachineImage;
+    [SerializeField] private TextMeshProUGUI _genericMachineTitle;
+    [SerializeField] private TextMeshProUGUI _genericMachineState;
+    [SerializeField] private TextMeshProUGUI _genericMachineLore;
+    
     private Machine _hoveredMachine;
     
     private void Start()
     {
         Machine.OnHovered += HandleMachineHovered;
-        _contextMachineWindow.SetActive(false);
+        _window.SetActive(false);
     }
 
     private void OnDestroy()
@@ -33,6 +40,34 @@ public class CodexUIController : MonoBehaviour
 
     private void HandleMachineHovered(Machine machine, bool hovered)
     {
+        _window.SetActive(hovered);
+        
+        // Special case for other machine. TODO: Handle it directly in the template to have generic method here.
+        if (machine.Template.Type == MachineType.DISPENSER || machine.Template.Type == MachineType.MARCHAND)
+        {
+            _contextGenericWindow.SetActive(hovered);
+            _contextMachineWindow.SetActive(!hovered);
+            
+            _genericMachineTitle.text = machine.Template.Name;
+            _genericMachineState.text = machine.Template.UIGameplayDescription;
+            _genericMachineLore.text = machine.Template.UILoreDescription;
+
+            switch (machine.Behavior)
+            {
+                case DestructorMachineBehaviour destructorMachineBehaviour:
+                    _genericMachineImage.sprite = destructorMachineBehaviour.SpecialIngredientTemplate.Icon;
+                    break;
+                case ExtractorMachineBehaviour extractorMachineBehaviour:
+                    _genericMachineImage.sprite = extractorMachineBehaviour.IngredientTemplate.Icon;
+                    break;
+            }
+
+            return;
+        }
+        
+        _contextMachineWindow.SetActive(hovered);
+        _contextGenericWindow.SetActive(!hovered);
+        
         if (!hovered)
         {
             // Reset listener of previous hovered machine
@@ -41,7 +76,6 @@ public class CodexUIController : MonoBehaviour
                 _hoveredMachine.OnItemAdded -= HandleIngredientInMachineUpdated;
             }
             _hoveredMachine = null;
-            _contextMachineWindow.SetActive(false);
             
             return;
         }
@@ -63,8 +97,6 @@ public class CodexUIController : MonoBehaviour
         
         UpdateIngredientInSlots(machine);
         _hoveredMachine.OnItemAdded += HandleIngredientInMachineUpdated;
-        
-        _contextMachineWindow.SetActive(true);
     }
 
     private void HandleIngredientInMachineUpdated(bool _)

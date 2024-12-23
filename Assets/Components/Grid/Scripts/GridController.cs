@@ -713,7 +713,10 @@ namespace Components.Grid
 				}
 			}
 
-			//Clear the _extractorPotentialCoordinates from selected coordinate to use it after
+			// Sort the randomExtractorCoordinates in descending order, ensuring that removes elements from the list starting with the highest index, preserving the validity of the lower indices.
+			randomExtractorCoordinates.Sort((a, b) => b.CompareTo(a));
+
+			// Clear the _extractorPotentialCoordinates from selected coordinate
 			foreach (var coordinate in randomExtractorCoordinates)
 			{
 				_extractorPotentialCoordinates.RemoveAt(coordinate);
@@ -785,7 +788,7 @@ namespace Components.Grid
 					continue;
 				}
 				
-				var destructorTemplate = ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("Destructor");
+				var destructorTemplate = ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("Marchand");
 
 				var machine = Instantiate(_machineControllerPrefab);
 				machine.InstantiatePreview(destructorTemplate, _cellSize);
