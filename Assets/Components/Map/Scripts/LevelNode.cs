@@ -13,13 +13,16 @@ namespace Components.Map
         [SerializeField] private List<LevelNode> _connectedNodes;
         [SerializeField] private IngredientsBundle _ingredientsBundle;
         [SerializeField] private LevelNodeView _view;
+        [SerializeField] private NodeSide _nodeSide;
 
-
+        private List<LevelNode> _externalConnectedNode = new List<LevelNode>();
         public List<LevelNode> ConnectedNodes => _connectedNodes;
+        public List<LevelNode> ExternalConnectedNode => _externalConnectedNode;
         public IngredientsBundle IngredientsBundle => _ingredientsBundle;
 
 		public static Action OnResetNode;
         public static Action<LevelNode> OnNodeSelected;
+        public NodeSide NodeSizde => _nodeSide;
 
         /// <summary>
         /// Initializes the node, setting up its locked or unlocked state.
@@ -27,8 +30,8 @@ namespace Components.Map
         public void Initialize(IngredientsBundle ingredientsBundle)
         {
             _ingredientsBundle = ingredientsBundle;
-			_view.Init(ingredientsBundle);
-		}
+			_view.Init(ingredientsBundle);		
+        }
 
         /// <summary>
         /// Unlocks the connected nodes when this node is selected.
@@ -71,6 +74,15 @@ namespace Components.Map
             _ingredientsBundle = null;
             _view.HandleResetLevelNode();
 		}
+	}
+
+    public enum NodeSide
+	{
+        DEFAULT,
+        EAST,
+        WEST,
+        NORTH,
+        SOUTH
 	}
 
 }

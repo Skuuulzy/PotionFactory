@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "New Consumable Template", menuName = "Consumable/Consumable Template")]
+[CreateAssetMenu(fileName = "New Consumable Template", menuName = "Component/Consumable/Consumable Template")]
 
 public class ConsumableTemplate : ScriptableObject
 {

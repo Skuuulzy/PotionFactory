@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Components.Grid.Decorations
 {
-    [CreateAssetMenu(fileName = "New Decoration Template", menuName = "Grid/Decoration Template")]
+    [CreateAssetMenu(fileName = "New Decoration Template", menuName = "Component/Grid/Decoration Template")]
     public class DecorationTemplate : GridObjectTemplate
     {
 		[SerializeField] private DecorationType _decorationType;
