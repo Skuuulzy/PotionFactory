@@ -14,7 +14,7 @@ namespace Components.Grid.Decorations
 		[SerializeField] private List<DecorationTemplate> _decorationsTemplateList;
 		[Header("Selector View")]
 		[SerializeField] private DecorationSelectorView _decorationSelectorView;
-		[SerializeField] private Transform _decorationSelectorViewHolder;
+		[SerializeField] private SerializableDictionary<DecorationCategory, Transform>  _decorationSelectorViewHolder;
 
 
 		public DecorationTemplate SelectedDecoration { get; private set; }
@@ -32,10 +32,10 @@ namespace Components.Grid.Decorations
 				return;
 			}
 
-			foreach (var tile in _decorationsTemplateList)
+			foreach (var decoration in _decorationsTemplateList)
 			{
-				DecorationSelectorView selectorView = Instantiate(_decorationSelectorView, _decorationSelectorViewHolder);
-				selectorView.Init(tile);
+				DecorationSelectorView selectorView = Instantiate(_decorationSelectorView, _decorationSelectorViewHolder[decoration	.DecorationCategory]);
+				selectorView.Init(decoration);
 				selectorView.OnSelected += HandleObstacleSelected;
 			}
 

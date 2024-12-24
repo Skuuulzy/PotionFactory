@@ -15,7 +15,7 @@ namespace Components.Grid.Obstacle
 		[SerializeField] private List<ObstacleTemplate> _obstacleTemplateList;
 		[Header("Selector View")]
 		[SerializeField] private ObstacleSelectorView _obstacleSelectorView;
-		[SerializeField] private Transform _obstacleSelectorViewHolder;
+		[SerializeField] private SerializableDictionary<ObstacleCategory, Transform> _obstacleSelectorViewHolder;
 
 
 		public ObstacleTemplate SelectedObstacle { get; private set; }
@@ -31,10 +31,10 @@ namespace Components.Grid.Obstacle
 				return;
 			}
 
-			foreach (var tile in _obstacleTemplateList)
+			foreach (var obstacle in _obstacleTemplateList)
 			{
-				ObstacleSelectorView selectorView = Instantiate(_obstacleSelectorView, _obstacleSelectorViewHolder);
-				selectorView.Init(tile);
+				ObstacleSelectorView selectorView = Instantiate(_obstacleSelectorView, _obstacleSelectorViewHolder[obstacle.Category]);
+				selectorView.Init(obstacle);
 				selectorView.OnSelected += HandleObstacleSelected;
 			}
 

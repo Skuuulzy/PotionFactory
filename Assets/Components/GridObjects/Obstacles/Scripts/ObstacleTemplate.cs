@@ -6,7 +6,18 @@ namespace Components.Grid.Obstacle
 	public class ObstacleTemplate : GridObjectTemplate
     {
 		[SerializeField] private ObstacleType _obstacleType;
+		[SerializeField] private ObstacleCategory _category;
 
 		public ObstacleType ObstacleType => _obstacleType;
+		public ObstacleCategory Category => _category;
+	}
+
+	public enum ObstacleCategory
+	{
+		Trees,
+		Bushs,
+		Rocks,
+		Walls,
+		Props
 	}
 }

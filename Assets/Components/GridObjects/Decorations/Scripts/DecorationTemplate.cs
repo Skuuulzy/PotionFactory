@@ -8,7 +8,18 @@ namespace Components.Grid.Decorations
     public class DecorationTemplate : GridObjectTemplate
     {
 		[SerializeField] private DecorationType _decorationType;
+		[SerializeField] private DecorationCategory _decorationCategory;
 
 		public DecorationType DecorationType => _decorationType;
+		public DecorationCategory DecorationCategory => _decorationCategory;
+	}
+
+	public enum DecorationCategory
+	{
+
+		Water,
+		Plants,
+		Bushs,
+		Paths
 	}
 }
