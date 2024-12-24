@@ -45,6 +45,7 @@ namespace Components.Grid.Generator
 		[Header("Options")]
 		[SerializeField] private float _rotationSpeed = 300f;
 
+		private Vector3 _lastCellPosition = new(-1, -1, -1);
 		private List<Cell> _cellList;
 
 		// Grid
@@ -230,20 +231,41 @@ namespace Components.Grid.Generator
 			{
 				return;
 			}
+			
+			if (_grid.TryGetCellByPosition(worldMousePosition, out Cell cell))
+			{
+				Vector3 position = worldMousePosition;
 
-			// Update the object's position
-			if(_currentTileController != null)
-			{
-				_currentTileController.transform.position = worldMousePosition;
+				if (!_freePlacement)
+				{
+					position = cell.GetCenterPosition(_startPosition);
+					// Preventing the computation when staying on the same cell.
+					if (position == _lastCellPosition)
+					{
+						return;
+					}
+
+					_lastCellPosition = position;
+				}
+				
+
+				// Update the object's position
+				if (_currentTileController != null)
+				{
+					_currentTileController.transform.position = position;
+				}
+				else if (_currentObstacleController != null)
+				{
+					_currentObstacleController.transform.position = position;
+				}
+				else if (_currentDecorationController != null)
+				{
+					_currentDecorationController.transform.position = position;
+				}
 			}
-			else if (_currentObstacleController != null)
-			{
-				_currentObstacleController.transform.position = worldMousePosition;
-			}
-			else if (_currentDecorationController != null)
-			{
-				_currentDecorationController.transform.position = worldMousePosition;
-			}
+			
+
+
 		}
 
 		/// <summary>
