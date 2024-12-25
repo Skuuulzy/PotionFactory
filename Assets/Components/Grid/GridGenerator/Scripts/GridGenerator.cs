@@ -11,6 +11,7 @@ using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
+using VComponent.Tools.EventSystem;
 
 namespace Components.Grid.Generator
 {
@@ -45,6 +46,10 @@ namespace Components.Grid.Generator
 		[Header("Options")]
 		[SerializeField] private float _rotationSpeed = 300f;
 
+		[Header("Modifying Events")]
+		[SerializeField] private FloatEventChannel _scalingEvent;
+		[SerializeField] private FloatEventChannel _yPositionEvent;
+
 		private Vector3 _lastCellPosition = new(-1, -1, -1);
 		private List<Cell> _cellList;
 
@@ -62,11 +67,13 @@ namespace Components.Grid.Generator
 		private bool _freePlacement;
 		private bool _cleanMode;
 		private float _cleanRadius = 1f;
+		private float _objectYPosition;
 
 		public bool CleanMode => _cleanMode;
 		public float CleanRadius => _cleanRadius;
 
 		public static string MapsPath => Path.Combine(Application.dataPath, "JsonData/Maps/");
+
 
 		// ------------------------------------------------------------------------- MONO -------------------------------------------------------------------------
 		private void Start()
@@ -74,6 +81,7 @@ namespace Components.Grid.Generator
 			_camera = Camera.main;
 			GenerateGrid();
 			InstantiateNewPreview();
+
 		}
 
 		private void Update()
@@ -89,6 +97,10 @@ namespace Components.Grid.Generator
 			else if(Input.GetKey(KeyCode.T))
 			{
 				ScaleSelection();
+			}
+			else if (Input.GetKey(KeyCode.LeftControl))
+			{
+				UpAndDownSelection();
 			}
 			else
 			{
@@ -124,6 +136,7 @@ namespace Components.Grid.Generator
 			}
 
 		}
+
 
 		private void DeletePreview()
 		{
@@ -176,7 +189,10 @@ namespace Components.Grid.Generator
 
 			_currentTileController = Instantiate(_tilePrefab);
 			_currentTileController.SetTileType(tileTemplate.TileType);
-			_currentTileController.InstantiatePreview(tileTemplate, _cellSize);
+			_currentTileController.InstantiatePreview(tileTemplate, _cellSize); 
+
+			_scalingEvent?.Invoke(1);
+			_yPositionEvent?.Invoke(0);
 		}
 
 		private void UpdateObstacleSelection(ObstacleTemplate obstacleTemplate)
@@ -200,6 +216,9 @@ namespace Components.Grid.Generator
 
 			_currentObstacleController.SetObstacleType(obstacleTemplate.ObstacleType);
 			_currentObstacleController.InstantiatePreview(obstacleTemplate, _cellSize);
+
+			_scalingEvent?.Invoke(1);
+			_yPositionEvent?.Invoke(0);
 		}
 
 		private void UpdateDecorationSelection(DecorationTemplate decorationTemplate)
@@ -223,6 +242,9 @@ namespace Components.Grid.Generator
 
 			_currentDecorationController.SetDecorationType(decorationTemplate.DecorationType);
 			_currentDecorationController.InstantiatePreview(decorationTemplate, _cellSize);
+
+			_scalingEvent?.Invoke(1);
+			_yPositionEvent?.Invoke(0);
 		}
 
 		private void MoveSelection()
@@ -256,11 +278,11 @@ namespace Components.Grid.Generator
 				}
 				else if (_currentObstacleController != null)
 				{
-					_currentObstacleController.transform.position = position;
+					_currentObstacleController.transform.position = position + new Vector3(0, _currentObstacleController.transform.position.y);
 				}
 				else if (_currentDecorationController != null)
 				{
-					_currentDecorationController.transform.position = position;
+					_currentDecorationController.transform.position = position + new Vector3(0, _currentDecorationController.transform.position.y);
 				}
 			}
 			
@@ -338,18 +360,51 @@ namespace Components.Grid.Generator
 
 			// Clamp scale factor to avoid negative or zero scale
 			scaleFactor = Mathf.Clamp(scaleFactor, 0.1f, 3f);
+			
 
 			// Apply scaling
 			if (_currentObstacleController != null)
 			{
 				_currentObstacleController.transform.localScale *= scaleFactor;
+				_scalingEvent?.Invoke(_currentObstacleController.transform.localScale.x);
 			}
 			else if (_currentDecorationController != null)
 			{
 				_currentDecorationController.transform.localScale *= scaleFactor;
+				_scalingEvent?.Invoke(_currentDecorationController.transform.localScale.x);
+
 			}
 		}
-		
+
+		public void UpAndDownSelection()
+		{
+			if (_currentObstacleController == null && _currentDecorationController == null)
+			{
+				return;
+			}
+
+			float mouseDeltaY = Input.GetAxis("Mouse Y");
+
+			float moveSpeed = 0.1f; 
+			_objectYPosition = mouseDeltaY * moveSpeed;
+			Vector3 newPosition = new Vector3();
+			if (_currentObstacleController != null)
+			{
+				newPosition = _currentObstacleController.transform.position;
+				newPosition.y += _objectYPosition;
+				_currentObstacleController.transform.position = newPosition;
+			}
+			else if (_currentDecorationController != null)
+			{
+				newPosition = _currentDecorationController.transform.position;
+				newPosition.y += _objectYPosition;
+				_currentDecorationController.transform.position = newPosition;
+			}
+
+			_yPositionEvent?.Invoke(newPosition.y);
+		}
+
+
 		// ------------------------------------------------------------------------- INPUT HANDLERS -------------------------------------------------------------------------
 		private void AddSelectedObjectToGrid()
 		{
@@ -383,7 +438,7 @@ namespace Components.Grid.Generator
 				{
 					Destroy(chosenCell.ObstacleController.gameObject);
 				}
-				ObstacleController obstacleController = _allObstacleController.GenerateObstacleFromPrefab(_grid, chosenCell, _obstacleHolder, _cellSize, _currentObstacleController);
+				ObstacleController obstacleController = _allObstacleController.GenerateObstacleFromPrefab(_grid, chosenCell, _obstacleHolder, _cellSize, _currentObstacleController, _freePlacement);
 				chosenCell.AddObstacleToCell(obstacleController);
 			}
 			else if (_currentDecorationController != null)
@@ -393,7 +448,7 @@ namespace Components.Grid.Generator
 					return;
 				}
 
-				DecorationController decorationController = _allDecorationController.GenerateDecorationFromPrefab(_grid, chosenCell, _decorationHolder, _cellSize, _currentDecorationController, _freePlacement, worldMousePosition);
+				DecorationController decorationController = _allDecorationController.GenerateDecorationFromPrefab(_grid, chosenCell, _decorationHolder, _cellSize, _currentDecorationController, _freePlacement);
 				chosenCell.AddDecorationToCell(decorationController);
 			}
 		}
@@ -541,6 +596,10 @@ namespace Components.Grid.Generator
 
 					if (serializedCell.ObstacleType != ObstacleType.NONE)
 					{
+						// Lire les coordonnées de la décoration
+						float[] positionArray = serializedCell.ObstaclePositions;
+						Vector3 obstaclePositions = new Vector3(positionArray[0], positionArray[1], positionArray[2]);
+
 						// Lire la rotation de l'obstacle
 						float[] rotationArray = serializedCell.ObstacleRotation;
 						Quaternion obstacleRotation = new Quaternion(rotationArray[0], rotationArray[1], rotationArray[2], rotationArray[3]);
@@ -550,7 +609,7 @@ namespace Components.Grid.Generator
 						Vector3 obstacleScale = new Vector3(scaleArray[0], scaleArray[1], scaleArray[2]);
 
 						// Générer l'obstacle avec la rotation et l'échelle récupérées
-						_allObstacleController.GenerateObstacleFromType(chosenCell, _grid, _obstacleHolder, _cellSize, serializedCell.ObstacleType, obstacleRotation,	obstacleScale);
+						_allObstacleController.GenerateObstacleFromType(chosenCell, _grid, _obstacleHolder, _cellSize, serializedCell.ObstacleType, obstaclePositions, obstacleRotation,	obstacleScale);
 					}
 
 					if (serializedCell.DecorationPositions != null && serializedCell.DecorationPositions.Count > 0)

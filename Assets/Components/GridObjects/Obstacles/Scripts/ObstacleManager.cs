@@ -15,7 +15,7 @@ namespace Components.Grid.Obstacle
 		[SerializeField] private List<ObstacleTemplate> _obstacleTemplateList;
 		[Header("Selector View")]
 		[SerializeField] private ObstacleSelectorView _obstacleSelectorView;
-		[SerializeField] private SerializableDictionary<ObstacleCategory, Transform> _obstacleSelectorViewHolder;
+		[SerializeField] private Transform _obstacleSelectorViewHolder;
 
 
 		public ObstacleTemplate SelectedObstacle { get; private set; }
@@ -31,12 +31,7 @@ namespace Components.Grid.Obstacle
 				return;
 			}
 
-			foreach (var obstacle in _obstacleTemplateList)
-			{
-				ObstacleSelectorView selectorView = Instantiate(_obstacleSelectorView, _obstacleSelectorViewHolder[obstacle.Category]);
-				selectorView.Init(obstacle);
-				selectorView.OnSelected += HandleObstacleSelected;
-			}
+			ChangeObstacleCategory(0);
 
 			// Init selected machine has the first 
 			SelectedObstacle = _obstacleTemplateList[0];
@@ -47,6 +42,24 @@ namespace Components.Grid.Obstacle
 		{
 			SelectedObstacle = obstacle;
 			OnChangeSelectedObstacle?.Invoke(obstacle);
+		}
+
+		public void ChangeObstacleCategory(int category)
+		{
+			int childCount = _obstacleSelectorViewHolder.childCount;
+
+			for (int i = childCount - 1; i >= 0; i--)
+			{
+				Destroy(_obstacleSelectorViewHolder.GetChild(i).gameObject);
+			}
+
+			List<ObstacleTemplate> filtredObstacleTemplate = _obstacleTemplateList.Where(obstacle => obstacle.Category == (ObstacleCategory)category).ToList();
+			foreach (var obstacle in filtredObstacleTemplate)
+			{
+				ObstacleSelectorView selectorView = Instantiate(_obstacleSelectorView, _obstacleSelectorViewHolder);
+				selectorView.Init(obstacle);
+				selectorView.OnSelected += HandleObstacleSelected;
+			}
 		}
 
 	}

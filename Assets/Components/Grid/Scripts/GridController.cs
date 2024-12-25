@@ -541,6 +541,10 @@ namespace Components.Grid
 					// OBSTACLES
 					if (serializedCell.ObstacleType != ObstacleType.NONE)
 					{
+						// Lire les coordonnées de la décoration
+						float[] positionArray = serializedCell.ObstaclePositions;
+						Vector3 obstaclePositions = new Vector3(positionArray[0], positionArray[1], positionArray[2]);
+
 						// Read obstacle rotation
 						float[] rotationArray = serializedCell.ObstacleRotation;
 						Quaternion obstacleRotation = new Quaternion(rotationArray[0], rotationArray[1], rotationArray[2], rotationArray[3]);
@@ -550,7 +554,7 @@ namespace Components.Grid
 						Vector3 obstacleScale = new Vector3(scaleArray[0], scaleArray[1], scaleArray[2]);
 
 						// Generate obstacle
-						_obstacleController.GenerateObstacleFromType(chosenCell, Grid, _obstacleHolder, _cellSize, serializedCell.ObstacleType, obstacleRotation, obstacleScale);
+						_obstacleController.GenerateObstacleFromType(chosenCell, Grid, _obstacleHolder, _cellSize, serializedCell.ObstacleType, obstaclePositions, obstacleRotation, obstacleScale);
 					}
 
 					// DECORATIONS

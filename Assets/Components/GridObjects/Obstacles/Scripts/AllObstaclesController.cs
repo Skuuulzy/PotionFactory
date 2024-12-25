@@ -32,10 +32,18 @@ namespace Components.Grid.Obstacle
 			return obstacle;
 		}
 
-		public ObstacleController GenerateObstacleFromPrefab(Grid grid, Cell chosenCell, Transform obstacleHolder, float cellSize, ObstacleController obstacleController)
+		public ObstacleController GenerateObstacleFromPrefab(Grid grid, Cell chosenCell, Transform obstacleHolder, float cellSize, ObstacleController obstacleController, bool freePlacement)
 		{
 			ObstacleController obstacle = Instantiate(obstacleController, obstacleHolder);
-			obstacle.transform.position = grid.GetWorldPosition(chosenCell.X, chosenCell.Y) + new Vector3(cellSize / 2, 0, cellSize / 2);
+			if (freePlacement)
+			{
+				obstacle.transform.position = obstacleController.transform.position;
+			}
+			else
+			{
+
+				obstacle.transform.position = grid.GetWorldPosition(chosenCell.X, chosenCell.Y) + new Vector3(cellSize / 2, obstacleController.transform.position.y, cellSize / 2);
+			}
 			obstacle.transform.localScale = obstacleController.transform.localScale;
 			obstacle.transform.rotation = obstacleController.transform.rotation;
 
@@ -48,7 +56,7 @@ namespace Components.Grid.Obstacle
 		/// <summary>
 		/// Generates an obstacle from a given type, position, rotation, and scale, and assigns it to the cell.
 		/// </summary>
-		public ObstacleController GenerateObstacleFromType(Cell chosenCell, Grid grid, Transform obstacleHolder, float cellSize, ObstacleType obstacleType, Quaternion localRotation, Vector3 localScale)
+		public ObstacleController GenerateObstacleFromType(Cell chosenCell, Grid grid, Transform obstacleHolder, float cellSize, ObstacleType obstacleType, Vector3 localPosition, Quaternion localRotation, Vector3 localScale)
 		{
 			foreach (ObstacleController obstacleController in _obstacleList)
 			{
@@ -58,7 +66,7 @@ namespace Components.Grid.Obstacle
 					ObstacleController obstacle = Instantiate(obstacleController, obstacleHolder);
 
 					// Set position, rotation, and scale
-					obstacle.transform.position = grid.GetWorldPosition(chosenCell.X, chosenCell.Y) + new Vector3(cellSize / 2, 0, cellSize / 2);
+					obstacle.transform.position = localPosition;
 					obstacle.transform.localRotation = localRotation;
 					obstacle.transform.localScale = localScale;
 

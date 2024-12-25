@@ -16,8 +16,7 @@ namespace Components.Grid.Decorations
 
 	public enum DecorationCategory
 	{
-
-		Water,
+		Props,
 		Plants,
 		Bushs,
 		Paths

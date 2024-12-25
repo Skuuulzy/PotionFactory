@@ -191,6 +191,9 @@ namespace Components.Grid
         [JsonProperty("ObstacleType")]
         public ObstacleType ObstacleType { get; set; }
 
+        [JsonProperty("ObstaclePositions")]
+        public float[] ObstaclePositions { get; set; }
+
         [JsonProperty("ObstacleRotation")]
         public float[] ObstacleRotation { get; set; }
 
@@ -224,6 +227,10 @@ namespace Components.Grid
 
             if (cell.ObstacleController != null)
             {
+                // Serialize decoration position
+                Vector3 position = cell.ObstacleController.transform.localPosition;
+                ObstaclePositions = (new float[]{ position.x, position.y, position.z });
+
                 // Serialize obstacle rotation and scale
                 Quaternion rotation = cell.ObstacleController.transform.localRotation;
                 ObstacleRotation = new float[] { rotation.x, rotation.y, rotation.z, rotation.w };

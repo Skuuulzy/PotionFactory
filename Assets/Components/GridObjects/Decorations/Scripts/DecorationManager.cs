@@ -14,7 +14,7 @@ namespace Components.Grid.Decorations
 		[SerializeField] private List<DecorationTemplate> _decorationsTemplateList;
 		[Header("Selector View")]
 		[SerializeField] private DecorationSelectorView _decorationSelectorView;
-		[SerializeField] private SerializableDictionary<DecorationCategory, Transform>  _decorationSelectorViewHolder;
+		[SerializeField] private Transform  _decorationSelectorViewHolder;
 
 
 		public DecorationTemplate SelectedDecoration { get; private set; }
@@ -32,22 +32,34 @@ namespace Components.Grid.Decorations
 				return;
 			}
 
-			foreach (var decoration in _decorationsTemplateList)
-			{
-				DecorationSelectorView selectorView = Instantiate(_decorationSelectorView, _decorationSelectorViewHolder[decoration	.DecorationCategory]);
-				selectorView.Init(decoration);
-				selectorView.OnSelected += HandleObstacleSelected;
-			}
-
+			ChangeDecorationCategory(0);
 			// Init selected machine has the first 
 			SelectedDecoration = _decorationsTemplateList[0];
 		}
 
 
-		private void HandleObstacleSelected(DecorationTemplate decoration)
+		private void HandleDecorationSelected(DecorationTemplate decoration)
 		{
 			SelectedDecoration = decoration;
 			OnChangeSelectedDecoration?.Invoke(decoration);
+		}
+
+		public void ChangeDecorationCategory(int category)
+		{
+			int childCount = _decorationSelectorViewHolder.childCount;
+
+			for (int i = childCount - 1; i >= 0; i--)
+			{
+				Destroy(_decorationSelectorViewHolder.GetChild(i).gameObject);
+			}
+
+			List<DecorationTemplate> filtredDecorationTemplate = _decorationsTemplateList.Where(decoration => decoration.DecorationCategory == (DecorationCategory)category).ToList();
+			foreach (var decoration in filtredDecorationTemplate)
+			{
+				DecorationSelectorView selectorView = Instantiate(_decorationSelectorView, _decorationSelectorViewHolder);
+				selectorView.Init(decoration);
+				selectorView.OnSelected += HandleDecorationSelected;
+			}
 		}
 	}
 }
