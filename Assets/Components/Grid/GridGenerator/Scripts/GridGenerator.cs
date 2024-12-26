@@ -25,6 +25,7 @@ namespace Components.Grid.Generator
 
 		[Header("Prefabs")]
 		[SerializeField] private TileController _tilePrefab;
+		[SerializeField] private TacticaleViewController _tacticalViewPrefab;
 		[SerializeField] private ObstacleController _obstaclePrefab;
 		[SerializeField] private DecorationController _decorationPrefab;
 		[SerializeField] private GameObject _waterPlanePrefab;
@@ -33,6 +34,7 @@ namespace Components.Grid.Generator
 		[SerializeField] private Transform _groundHolder;
 		[SerializeField] private Transform _obstacleHolder;
 		[SerializeField] private Transform _decorationHolder;
+		[SerializeField] private Transform _TacticalViewHolder;
 
 		[Header("Tiles")]
 		[SerializeField] private AllTilesController _allTilesController;
@@ -86,6 +88,14 @@ namespace Components.Grid.Generator
 
 		private void Update()
 		{
+			if (Input.GetKeyDown(KeyCode.Tab))
+			{
+				DisplayTacticalView(true);
+			}
+			else if(Input.GetKeyUp(KeyCode.Tab))
+			{
+				DisplayTacticalView(false);
+			}
 			if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.R))
 			{
 				RotateSelectionBy90Degrees();
@@ -137,6 +147,12 @@ namespace Components.Grid.Generator
 
 		}
 
+		private void DisplayTacticalView(bool value)
+		{
+			_TacticalViewHolder.gameObject.SetActive(value);
+			_obstacleHolder.gameObject.SetActive(!value);
+			_decorationHolder.gameObject.SetActive(!value);
+		}
 
 		private void DeletePreview()
 		{
@@ -589,13 +605,22 @@ namespace Components.Grid.Generator
 					_grid.TryGetCellByCoordinates(x, z, out var chosenCell);
 					SerializedCell serializedCell = serializedCellList.Find(cell => cell.X == x && cell.Y == z);
 
+
 					if (serializedCell.TileType != TileType.NONE)
 					{
+						if(serializedCell.TileType == TileType.WATER)
+						{
+							TacticaleViewController tacticalView = Instantiate(_tacticalViewPrefab, _TacticalViewHolder);
+							tacticalView.transform.position = _grid.GetWorldPosition(chosenCell.X, chosenCell.Y) + new Vector3(_cellSize / 2, 0, _cellSize / 2);
+						}
 						_allTilesController.GenerateTileFromType(chosenCell, _grid, _groundHolder, _cellSize, serializedCell.TileType);
 					}
 
 					if (serializedCell.ObstacleType != ObstacleType.NONE)
 					{
+						TacticaleViewController tacticalView = Instantiate(_tacticalViewPrefab, _TacticalViewHolder);
+						tacticalView.transform.position = _grid.GetWorldPosition(chosenCell.X, chosenCell.Y) + new Vector3(_cellSize / 2, 0, _cellSize / 2);
+
 						// Lire les coordonnées de la décoration
 						float[] positionArray = serializedCell.ObstaclePositions;
 						Vector3 obstaclePositions = new Vector3(positionArray[0], positionArray[1], positionArray[2]);
