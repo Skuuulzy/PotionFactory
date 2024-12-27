@@ -5,5 +5,7 @@ namespace VComponent.Tools.EventSystem
     [CreateAssetMenu(menuName = "Events/FloatEventChannel")]
     public class FloatEventChannel : EventChannel<float>
     {
+        [SerializeField] public float MinValue;
+        [SerializeField] public float MaxValue;
     }
 }

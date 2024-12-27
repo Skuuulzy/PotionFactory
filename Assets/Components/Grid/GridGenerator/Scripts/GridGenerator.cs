@@ -51,6 +51,8 @@ namespace Components.Grid.Generator
 		[Header("Modifying Events")]
 		[SerializeField] private FloatEventChannel _scalingEvent;
 		[SerializeField] private FloatEventChannel _yPositionEvent;
+		private bool _lockScaling;
+		private bool _lockUpAndDown;
 
 		private Vector3 _lastCellPosition = new(-1, -1, -1);
 		private List<Cell> _cellList;
@@ -58,9 +60,7 @@ namespace Components.Grid.Generator
 		// Grid
 		private Grid _grid;
 		// Preview
-		private TileController _currentTileController;
-		private ObstacleController _currentObstacleController;
-		private DecorationController _currentDecorationController;
+		private GridObjectController _currentGridObjectController;
 
 		private Camera _camera;
 
@@ -104,9 +104,17 @@ namespace Components.Grid.Generator
 			{
 				RotateSelection();
 			}
+			else if(Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.T))
+			{
+				LockScaling(!_lockScaling);
+			}
 			else if(Input.GetKey(KeyCode.T))
 			{
 				ScaleSelection();
+			}
+			else if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.LeftControl))
+			{
+				LockUpAndDown(!_lockUpAndDown);
 			}
 			else if (Input.GetKey(KeyCode.LeftControl))
 			{
@@ -119,7 +127,7 @@ namespace Components.Grid.Generator
 
 			if (Input.GetMouseButtonDown(0))
 			{
-				if (_currentDecorationController != null && _freePlacement && !_cleanMode)
+				if (_currentGridObjectController != null && _freePlacement && !_cleanMode)
 				{
 					AddSelectedObjectToGrid();
 				}
@@ -133,7 +141,7 @@ namespace Components.Grid.Generator
 					return;
 				}
 
-				else if(_currentDecorationController != null && _freePlacement)
+				else if(_currentGridObjectController != null && _freePlacement)
 				{
 					return;
 				}
@@ -156,22 +164,10 @@ namespace Components.Grid.Generator
 
 		private void DeletePreview()
 		{
-			if (_currentTileController != null)
+			if (_currentGridObjectController != null)
 			{
-				Destroy(_currentTileController.gameObject);
-				_currentTileController = null;
-			}
-
-			if (_currentObstacleController != null)
-			{
-				Destroy(_currentObstacleController.gameObject);
-				_currentObstacleController = null;
-			}
-
-			if (_currentDecorationController != null)
-			{
-				Destroy(_currentDecorationController.gameObject);
-				_currentDecorationController = null;
+				Destroy(_currentGridObjectController.gameObject);
+				_currentGridObjectController = null;
 			}
 		}
 
@@ -188,79 +184,50 @@ namespace Components.Grid.Generator
 
 		private void UpdateTileSelection(TileTemplate tileTemplate)
 		{
-			if(_currentTileController != null)
+			if (_currentGridObjectController != null)
 			{
-				Destroy(_currentTileController.gameObject);
-			}
-			
-			if( _currentObstacleController != null )
-			{
-				Destroy(_currentObstacleController.gameObject);
+				Destroy(_currentGridObjectController.gameObject);
 			}
 
-			if (_currentDecorationController != null)
-			{
-				Destroy(_currentDecorationController.gameObject);
-			}
+			_currentGridObjectController = Instantiate(_tilePrefab) ;
+			var tileController = _currentGridObjectController as TileController;
+			tileController.SetTileType(tileTemplate.TileType);
+			_currentGridObjectController.InstantiatePreview(tileTemplate, _cellSize);
 
-			_currentTileController = Instantiate(_tilePrefab);
-			_currentTileController.SetTileType(tileTemplate.TileType);
-			_currentTileController.InstantiatePreview(tileTemplate, _cellSize); 
-
-			_scalingEvent?.Invoke(1);
-			_yPositionEvent?.Invoke(0);
+			OnScaleChange(1);
+			OnYPositionChange(0);
 		}
 
 		private void UpdateObstacleSelection(ObstacleTemplate obstacleTemplate)
 		{
-			if (_currentTileController != null)
+			if (_currentGridObjectController != null)
 			{
-				Destroy(_currentTileController.gameObject);
+				Destroy(_currentGridObjectController.gameObject);
 			}
 
-			if (_currentObstacleController != null)
-			{
-				Destroy(_currentObstacleController.gameObject);
-			}
+			_currentGridObjectController = Instantiate(_obstaclePrefab);
+			var currentObstacleController = _currentGridObjectController as ObstacleController;
+			currentObstacleController.SetObstacleType(obstacleTemplate.ObstacleType);
+			_currentGridObjectController.InstantiatePreview(obstacleTemplate, _cellSize);
 
-			if (_currentDecorationController != null)
-			{
-				Destroy(_currentDecorationController.gameObject);
-			}
-
-			_currentObstacleController = Instantiate(_obstaclePrefab);
-
-			_currentObstacleController.SetObstacleType(obstacleTemplate.ObstacleType);
-			_currentObstacleController.InstantiatePreview(obstacleTemplate, _cellSize);
-
-			_scalingEvent?.Invoke(1);
-			_yPositionEvent?.Invoke(0);
+			OnScaleChange(1);
+			OnYPositionChange(0);
 		}
 
 		private void UpdateDecorationSelection(DecorationTemplate decorationTemplate)
 		{
-			if (_currentTileController != null)
+			if (_currentGridObjectController != null)
 			{
-				Destroy(_currentTileController.gameObject);
+				Destroy(_currentGridObjectController.gameObject);
 			}
 
-			if (_currentObstacleController != null)
-			{
-				Destroy(_currentObstacleController.gameObject);
-			}
+			_currentGridObjectController = Instantiate(_decorationPrefab);
+			var currentDecorationController = _currentGridObjectController as DecorationController;
+			currentDecorationController.SetDecorationType(decorationTemplate.DecorationType);
+			_currentGridObjectController.InstantiatePreview(decorationTemplate, _cellSize);
 
-			if (_currentDecorationController != null)
-			{
-				Destroy(_currentDecorationController.gameObject);
-			}
-
-			_currentDecorationController = Instantiate(_decorationPrefab);
-
-			_currentDecorationController.SetDecorationType(decorationTemplate.DecorationType);
-			_currentDecorationController.InstantiatePreview(decorationTemplate, _cellSize);
-
-			_scalingEvent?.Invoke(1);
-			_yPositionEvent?.Invoke(0);
+			OnScaleChange(1);
+			OnYPositionChange(0);
 		}
 
 		private void MoveSelection()
@@ -288,17 +255,18 @@ namespace Components.Grid.Generator
 				
 
 				// Update the object's position
-				if (_currentTileController != null)
+				if (_currentGridObjectController == null)
 				{
-					_currentTileController.transform.position = position;
+					return;
 				}
-				else if (_currentObstacleController != null)
+				else if (_currentGridObjectController is TileController)
 				{
-					_currentObstacleController.transform.position = position + new Vector3(0, _currentObstacleController.transform.position.y);
+					_currentGridObjectController.transform.position = position;
 				}
-				else if (_currentDecorationController != null)
+				//All others grid object controller
+				else
 				{
-					_currentDecorationController.transform.position = position + new Vector3(0, _currentDecorationController.transform.position.y);
+					_currentGridObjectController.transform.position = position + new Vector3(0, _currentGridObjectController.transform.position.y);
 				}
 			}
 			
@@ -311,7 +279,7 @@ namespace Components.Grid.Generator
 		/// </summary>
 		private void RotateSelection()
 		{
-			if (_currentObstacleController == null && _currentDecorationController == null)
+			if (_currentGridObjectController == null || _currentGridObjectController is TileController)
 			{
 				return;
 			}
@@ -323,14 +291,8 @@ namespace Components.Grid.Generator
 			float rotationAngle = mouseDeltaX * _rotationSpeed * Time.deltaTime;
 
 			// Apply rotation
-			if (_currentObstacleController != null)
-			{
-				_currentObstacleController.transform.Rotate(Vector3.up, rotationAngle);
-			}
-			else if (_currentDecorationController != null)
-			{
-				_currentDecorationController.transform.Rotate(Vector3.up, rotationAngle);
-			}
+			_currentGridObjectController.transform.Rotate(Vector3.up, rotationAngle);
+			
 		}
 
 		/// <summary>
@@ -338,7 +300,7 @@ namespace Components.Grid.Generator
 		/// </summary>
 		private void RotateSelectionBy90Degrees()
 		{
-			if (_currentObstacleController == null && _currentDecorationController == null)
+			if (_currentGridObjectController == null || _currentGridObjectController is TileController)
 			{
 				return;
 			}
@@ -347,14 +309,7 @@ namespace Components.Grid.Generator
 			float rotationAngle = 90f;
 
 			// Apply rotation
-			if (_currentObstacleController != null)
-			{
-				_currentObstacleController.transform.Rotate(Vector3.up, rotationAngle);
-			}
-			else if (_currentDecorationController != null)
-			{
-				_currentDecorationController.transform.Rotate(Vector3.up, rotationAngle);
-			}
+			_currentGridObjectController.transform.Rotate(Vector3.up, rotationAngle);
 		}
 		
 		/// <summary>
@@ -362,7 +317,7 @@ namespace Components.Grid.Generator
 		/// </summary>
 		private void ScaleSelection()
 		{
-			if (_currentObstacleController == null && _currentDecorationController == null)
+			if (_currentGridObjectController == null || _currentGridObjectController is TileController)
 			{
 				return;
 			}
@@ -376,25 +331,31 @@ namespace Components.Grid.Generator
 
 			// Clamp scale factor to avoid negative or zero scale
 			scaleFactor = Mathf.Clamp(scaleFactor, 0.1f, 3f);
-			
+			OnScaleChange(_currentGridObjectController.transform.localScale.x * scaleFactor);
 
-			// Apply scaling
-			if (_currentObstacleController != null)
-			{
-				_currentObstacleController.transform.localScale *= scaleFactor;
-				_scalingEvent?.Invoke(_currentObstacleController.transform.localScale.x);
-			}
-			else if (_currentDecorationController != null)
-			{
-				_currentDecorationController.transform.localScale *= scaleFactor;
-				_scalingEvent?.Invoke(_currentDecorationController.transform.localScale.x);
+		}
+		public void ScaleSelection(float scaleFactor)
+		{
+			_currentGridObjectController.transform.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
+		}
 
+		private void OnScaleChange(float value)
+		{
+			if (_lockScaling)
+			{
+				return;
 			}
+			_scalingEvent?.Invoke(value);
+		}
+
+		public void LockScaling(bool value)
+		{
+			_lockScaling = value;
 		}
 
 		public void UpAndDownSelection()
 		{
-			if (_currentObstacleController == null && _currentDecorationController == null)
+			if (_currentGridObjectController == null || _currentGridObjectController is TileController)
 			{
 				return;
 			}
@@ -404,20 +365,30 @@ namespace Components.Grid.Generator
 			float moveSpeed = 0.1f; 
 			_objectYPosition = mouseDeltaY * moveSpeed;
 			Vector3 newPosition = new Vector3();
-			if (_currentObstacleController != null)
-			{
-				newPosition = _currentObstacleController.transform.position;
-				newPosition.y += _objectYPosition;
-				_currentObstacleController.transform.position = newPosition;
-			}
-			else if (_currentDecorationController != null)
-			{
-				newPosition = _currentDecorationController.transform.position;
-				newPosition.y += _objectYPosition;
-				_currentDecorationController.transform.position = newPosition;
-			}
 
-			_yPositionEvent?.Invoke(newPosition.y);
+			newPosition = _currentGridObjectController.transform.position;
+			newPosition.y += _objectYPosition;
+
+
+			OnYPositionChange(newPosition.y);
+		}
+		public void OnYPositionChange(float value)
+		{
+			if (_lockUpAndDown)
+			{
+				return;
+			}
+			_yPositionEvent?.Invoke(value);
+		}
+
+		public void UpAndDownSelection(float newPosition)
+		{
+			_currentGridObjectController.transform.position = new Vector3(_currentGridObjectController.transform.position.x,newPosition, _currentGridObjectController.transform.position.z);
+		}
+
+		public void LockUpAndDown(bool value)
+		{
+			_lockUpAndDown = value;
 		}
 
 
@@ -436,36 +407,41 @@ namespace Components.Grid.Generator
 				return;
 			}
 
-			if(_currentTileController != null)
+			if(_currentGridObjectController == null)
+			{
+				return;
+			}
+
+			if(_currentGridObjectController is TileController tileController)
 			{
 				if(chosenCell.TileController != null)
 				{
 					Destroy(chosenCell.TileController.gameObject);
 				}
-				TileController tileInstantiate = _allTilesController.GenerateTileFromPrefab(chosenCell, _grid, _groundHolder, _cellSize, _currentTileController);
+				TileController tileInstantiate = _allTilesController.GenerateTileFromPrefab(chosenCell, _grid, _groundHolder, _cellSize, tileController);
 				chosenCell.AddTileToCell(tileInstantiate);
 
 				return;
 			}
 
-			if( _currentObstacleController != null)
+			if (_currentGridObjectController is ObstacleController obstacleController)
 			{
 				if(chosenCell.ObstacleController != null)
 				{
 					Destroy(chosenCell.ObstacleController.gameObject);
 				}
-				ObstacleController obstacleController = _allObstacleController.GenerateObstacleFromPrefab(_grid, chosenCell, _obstacleHolder, _cellSize, _currentObstacleController, _freePlacement);
-				chosenCell.AddObstacleToCell(obstacleController);
+				ObstacleController obstacleInstantiate = _allObstacleController.GenerateObstacleFromPrefab(_grid, chosenCell, _obstacleHolder, _cellSize, obstacleController, _freePlacement);
+				chosenCell.AddObstacleToCell(obstacleInstantiate);
 			}
-			else if (_currentDecorationController != null)
+			else if (_currentGridObjectController is DecorationController decorationController)
 			{
-				if (chosenCell.DecorationControllers != null && !_freePlacement && chosenCell.DetectDecorationOnCell(_currentDecorationController))
+				if (chosenCell.DecorationControllers != null && !_freePlacement && chosenCell.DetectDecorationOnCell(decorationController))
 				{
 					return;
 				}
 
-				DecorationController decorationController = _allDecorationController.GenerateDecorationFromPrefab(_grid, chosenCell, _decorationHolder, _cellSize, _currentDecorationController, _freePlacement);
-				chosenCell.AddDecorationToCell(decorationController);
+				DecorationController decorationInstantiate = _allDecorationController.GenerateDecorationFromPrefab(_grid, chosenCell, _decorationHolder, _cellSize, decorationController, _freePlacement);
+				chosenCell.AddDecorationToCell(decorationInstantiate);
 			}
 		}
 
@@ -527,23 +503,12 @@ namespace Components.Grid.Generator
 
 		private void DestroyCurrentController()
 		{
-			if (_currentTileController != null)
+			if(_currentGridObjectController != null)
 			{
-				Destroy(_currentTileController.gameObject);
-				_currentTileController = null;
+				Destroy(_currentGridObjectController.gameObject);
+				_currentGridObjectController = null;
 			}
-
-			else if (_currentObstacleController != null)
-			{
-				Destroy(_currentObstacleController.gameObject);
-				_currentObstacleController = null;
-			}
-
-			else if (_currentDecorationController != null)
-			{
-				Destroy(_currentDecorationController.gameObject);
-				_currentDecorationController = null;
-			}
+			
 		}
 
 		// ------------------------------------------------------------------------- GENERATE GRID -------------------------------------------------------------------------
