@@ -36,7 +36,7 @@ namespace Components.Grid
 
         private bool _cleanMode;
 
-        public static Action<bool> OnPreviewUnselected; //True if their is a preview, false if not.
+        public static Action<bool> OnPreviewUnselected; //True if there is a preview, false if not.
 
         private Grid Grid => _gridController.Grid;
 

@@ -77,7 +77,6 @@ namespace Components.Machines
             _machine.Behavior.SetInitialProcessTime(_machine.Template.ProcessTime);
             _machine.LinkNodeData();
 
-
             if(_machine.Behavior is DestructorMachineBehaviour destructor)
             {
                 destructor.OnSpecialIngredientChanged += ShowItem;
