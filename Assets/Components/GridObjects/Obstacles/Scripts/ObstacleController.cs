@@ -88,6 +88,25 @@ namespace Components.Grid.Obstacle
 		Wall_02,
 		Well,
 		Dead_Trunk,
+		Cave_01,
+		Cave_02,
+		Cave_03,
+		Cross_Stone,
+		Cross_Wooden,
+		Crypt,
+		Gargoyle,
+		Small_FirePit,
+		Small_Fontain,
+		Small_Pilard,
+		Tomb_01,
+		Tomb_02,
+		Tomb_03,
+		Tomb_04,
+		Tomb_05,
+		Tomb_06,
+		Tomb_Soil,
+		Wall_Fence,
+
 
 	}
 }
