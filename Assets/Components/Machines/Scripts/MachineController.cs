@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Components.Ingredients;
 using Components.Tick;
@@ -23,6 +24,10 @@ namespace Components.Machines
         private GameObject _view;
 
         private int _outMachineTickCount;
+
+        public static Action<Machine, bool> OnRetrieve;
+        public static Action<Machine> OnMove;
+        public static Action<Machine> OnConfigure;
         
         // ------------------------------------------------------------------------- INIT -------------------------------------------------------------------------
         public void InstantiatePreview(MachineTemplate machineTemplate, float scale)
@@ -228,5 +233,21 @@ namespace Components.Machines
         {
 			_ingredientController.CreateFavoriteSellerItemRepresentationFromTemplate(ingredient);
 		}
+
+        // ------------------------------------------------------------------------- CONTEXTUAL ACTIONS -------------------------------------------------------------------------
+        public void Move()
+        {
+            OnMove?.Invoke(Machine);
+        }
+
+        public void Configure()
+        {
+            Debug.Log($"Configure: {name}");
+        }
+
+        public void Retrieve()
+        {
+            OnRetrieve?.Invoke(Machine, true);
+        }
     }
 }

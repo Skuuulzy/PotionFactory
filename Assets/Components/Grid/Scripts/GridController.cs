@@ -20,6 +20,7 @@ using Components.Map;
 using Components.Bundle;
 using Components.Grid.Decorations;
 using Components.Grid.Generator;
+using Components.Tick;
 
 namespace Components.Grid
 {
@@ -98,7 +99,8 @@ namespace Components.Grid
 			_camera = UnityEngine.Camera.main;
 			PlanningFactoryState.OnPlanningFactoryStateStarted += HandlePlanningFactoryState;
 			ShopState.OnShopStateStarted += HandleShopState;
-			MachineContextualUIView.OnSellMachine += SellMachine;
+			MachineController.OnRetrieve += RetrieveMachine;
+			MachineController.OnMove += ClearMachineGridData;
 			ConsumableManager.OnChangeSelectedConsumable += UpdateSelection;
 			RelicManager.OnChangeSelectedRelic += UpdateSelection;
 			MapGenerator.OnMapChoiceConfirm += HandleMapChoiceConfirm;
@@ -109,7 +111,8 @@ namespace Components.Grid
 		{
 			PlanningFactoryState.OnPlanningFactoryStateStarted -= HandlePlanningFactoryState;
 			ShopState.OnShopStateStarted -= HandleShopState;
-			MachineContextualUIView.OnSellMachine -= SellMachine;
+			MachineController.OnRetrieve += RetrieveMachine;
+			MachineController.OnMove -= ClearMachineGridData;
 			ConsumableManager.OnChangeSelectedConsumable -= UpdateSelection;
 			RelicManager.OnChangeSelectedRelic -= UpdateSelection;
 			MapGenerator.OnMapChoiceConfirm-= HandleMapChoiceConfirm;
@@ -633,10 +636,11 @@ namespace Components.Grid
 		}
 
 		// ------------------------------------------------------------------------ MACHINE METHODS ---------------------------------------------------------------------- 
-		public void SellMachine(Machine machineToSell, int sellPrice)
+
+		private void ClearMachineGridData(Machine machineToClear)
 		{
 			//Reset all cell linked to the machine. 
-			foreach (var node in machineToSell.Nodes)
+			foreach (var node in machineToClear.Nodes)
 			{
 				if (!Grid.TryGetCellByCoordinates(node.GridPosition.x, node.GridPosition.y, out Cell linkedCell))
 				{
@@ -645,11 +649,24 @@ namespace Components.Grid
 
 				linkedCell.RemoveNodeFromCell();
 			}
+			
+			// Potential remove from tickables
+			TickSystem.RemoveTickable(machineToClear);
+		}
 
+		private void RetrieveMachine(Machine machineToSell, bool giveBack)
+		{
+			ClearMachineGridData(machineToSell);
+			
+			// Remove 3D objects
 			_instancedObjects.Remove(machineToSell.Controller);
 			Destroy(machineToSell.Controller.gameObject);
 
-			GrimoireController.Instance.AddMachineToPlayerInventory(machineToSell.Template, 1);
+			// Give back to the player
+			if (giveBack)
+			{
+				GrimoireController.Instance.AddMachineToPlayerInventory(machineToSell.Template, 1);
+			}
 			
 			// For destroying the class instance, not sure if this a good way.
 			machineToSell = null;

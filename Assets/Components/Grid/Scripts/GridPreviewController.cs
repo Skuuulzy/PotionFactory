@@ -35,6 +35,7 @@ namespace Components.Grid
         private Vector3 _lastCellPosition = new(-1, -1, -1);
 
         private bool _cleanMode;
+        private bool _moveMode;
 
         public static Action<bool> OnPreviewUnselected; //True if there is a preview, false if not.
 
@@ -45,13 +46,14 @@ namespace Components.Grid
         // ------------------------------------------------------------------------- MONO -------------------------------------------------------------------------------- 
         private void Start()
         {
-            _camera = UnityEngine.Camera.main;
+            _camera = Camera.main;
 
             MachineManager.OnChangeSelectedMachine += InstantiatePreview;
             PlanningFactoryState.OnPlanningFactoryStateStarted += HandlePlanningFactoryState;
             ShopState.OnShopStateStarted += HandleShopState;
             UIGrimoireController.OnEnableCleanMode += HandleCleanMode;
             GrimoireButton.OnGrimoireButtonDeselect += HandleGrimoireDeselect;
+            MachineController.OnMove += HandleMovingMachine;
         }
 
         private void Update()
@@ -67,7 +69,7 @@ namespace Components.Grid
                 MovePreview();
             }
 
-            if (Input.GetMouseButtonDown(1))
+            if (Input.GetMouseButtonDown(1) && !_moveMode)
             {
                 DestroyPreview();
                 OnPreviewUnselected?.Invoke(_currentMachinePreview);
@@ -283,16 +285,23 @@ namespace Components.Grid
                 }
             }
 
-            var machineToAdd = InstantiateMachine(Preview.Machine.Template, _currentMachineRotation);
-
-            _gridController.AddMachineToGrid(machineToAdd, chosenCell, true);
-
-            //Instantiate the same machine type if we have enough in the inventory.
-            if (GrimoireController.Instance.CountMachineOfType(Preview.Machine.Template.Type) <= 0)
+            if (_moveMode)
             {
-				DestroyPreview();
-
-			}
+                _gridController.AddMachineToGrid(_currentMachinePreview, chosenCell, false);
+                _currentMachinePreview = null;
+                _moveMode = false;
+            }
+            else
+            {
+                var machineToAdd = InstantiateMachine(Preview.Machine.Template, _currentMachineRotation);
+                _gridController.AddMachineToGrid(machineToAdd, chosenCell, true);
+                
+                //Instantiate the same machine type if we have enough in the inventory.
+                if (GrimoireController.Instance.CountMachineOfType(Preview.Machine.Template.Type) <= 0)
+                {
+                    DestroyPreview();
+                }
+            }
         }
 
         private void TryDestroyHoveredMachine()
@@ -314,7 +323,7 @@ namespace Components.Grid
                 return;
             }
 
-            _gridController.SellMachine(chosenCell.Node.Machine, 0);
+            chosenCell.Node.Machine.Controller.Retrieve();
         }
 
         // ------------------------------------------------------------------------- EVENT HANDLERS -------------------------------------------------------------------------------- 
@@ -342,6 +351,18 @@ namespace Components.Grid
         private void HandleGrimoireDeselect()
         {
             DestroyPreview();
+        }
+        
+        // For now to move a machine we first destroy it and the reinstancing it.
+        private void HandleMovingMachine(Machine machine)
+        {
+            _currentMachinePreview = machine.Controller;
+            _currentMachineRotation = (int)machine.Controller.transform.rotation.eulerAngles.y;
+            
+            machine.Controller.transform.parent = _previewHolder;
+            machine.Controller.transform.localPosition = Vector3.zero;
+
+            _moveMode = true;
         }
     }
 

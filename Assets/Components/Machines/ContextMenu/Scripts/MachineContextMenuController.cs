@@ -36,7 +36,6 @@ namespace Components.Machines.ContextMenu
             }
 
             _cameraDirection = _cameraTransform.forward;
-            //_cameraDirection.y = 0;
 
             transform.rotation = Quaternion.LookRotation(_cameraDirection);
         }
@@ -59,17 +58,20 @@ namespace Components.Machines.ContextMenu
 
         public void MoveMachine()
         {
-            Debug.Log("Move Machine");
+            _controller.Move();
+            _canvas.gameObject.SetActive(false);
         }
 
         public void ConfigureMachine()
         {
-            Debug.Log("Destroy Machine");
+            _controller.Configure();
+            _canvas.gameObject.SetActive(false);
         }
 
         public void RetrieveMachine()
         {
-            Debug.Log("Destroy Machine");
+            _controller.Retrieve();
+            _canvas.gameObject.SetActive(false);
         }
     }
 }

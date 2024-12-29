@@ -47,7 +47,7 @@ namespace Components.Tick
 
 		private void Update()
         {
-            if(_isPause == true)
+            if(_isPause)
 			{
                 return;
 			}
@@ -101,7 +101,6 @@ namespace Components.Tick
         {
             if (!TICKABLES.Contains(tickableToRemove))
             {
-                Debug.LogError($"You try to remove a tickable but it was not found in the tickable list.");
                 return;
             }
 
@@ -119,7 +118,6 @@ namespace Components.Tick
             _currentTickDuration =  _initialTickDuration / value;
             _isPause = false;
         }
-
 
         // ------------------------------------------------------------------------- STATE METHODS -------------------------------------------------------------------------
 
