@@ -43,12 +43,12 @@ namespace Components.Grid.Decorations
 		Planks_01,
 		Planks_02,
 		Planks_03,
-		Musroom_Brown,
-		Musroom_Brown_Group,
-		Musroom_Red,
-		Musroom_Red_Group,
-		Musroom_Yellow,
-		Musroom_Yellow_Group,
+		Mushroom_Brown,
+		Mushroom_Brown_Group,
+		Mushroom_Red,
+		Mushroom_Red_Group,
+		Mushroom_Yellow,
+		Mushroom_Yellow_Group,
 
 	}
 }
