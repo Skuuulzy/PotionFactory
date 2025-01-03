@@ -43,13 +43,12 @@ namespace Components.Machines
         
         public void ConfirmPlacement()
         {
-            _initialized = true;
-            
             _machine.OnTick += Tick;
             _machine.OnPropagateTick += PropagateTick;
             _machine.OnItemAdded += ShowItem;
             Machine.OnSelected += HandleMachineSelected;
             
+            _initialized = true;
             _machine.Behavior.SetInitialProcessTime(_machine.Template.ProcessTime);
             _machine.LinkNodeData();
 
@@ -66,17 +65,17 @@ namespace Components.Machines
         // ------------------------------------------------------------------------- DESTROY -------------------------------------------------------------------------
         private void OnDestroy()
         {
+            _machine.OnTick -= Tick;
+            _machine.OnPropagateTick -= PropagateTick;
+            _machine.OnItemAdded -= ShowItem;
+            Machine.OnSelected -= HandleMachineSelected;
+            
             if (!_initialized)
             {
                 return;
             }
             
             RemoveMachineFromChain();
-            
-            _machine.OnTick -= Tick;
-            _machine.OnPropagateTick -= PropagateTick;
-            _machine.OnItemAdded -= ShowItem;
-            Machine.OnSelected -= HandleMachineSelected;
         }
 
         // ------------------------------------------------------------------------- TICK -------------------------------------------------------------------------
