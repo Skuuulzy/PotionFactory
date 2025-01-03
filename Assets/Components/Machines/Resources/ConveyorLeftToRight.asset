@@ -27,7 +27,8 @@ MonoBehaviour:
     - _side: 2
       _way: 1
   _canTakeInfiniteIngredients: 0
-  _slotIngredientCount: 1
+  _inSlotIngredientCount: 1
+  _outSlotIngredientCount: 1
   _ingredientsPerSlotCount: 1
   _processTime: 1
   _shopSpawnProbability: 0
@@ -35,3 +36,8 @@ MonoBehaviour:
   _cannotBeSell: 0
   _sellPrice: 1
   _contextualComponents: []
+  _uiGameplayDescription: 
+  _uiLoreDescription: 
+  _canSell: 1
+  _canMove: 1
+  _canConfigure: 1

@@ -58,7 +58,10 @@ public class CodexUIController : MonoBehaviour
                     _genericMachineImage.sprite = destructorMachineBehaviour.SpecialIngredientTemplate.Icon;
                     break;
                 case ExtractorMachineBehaviour extractorMachineBehaviour:
-                    _genericMachineImage.sprite = extractorMachineBehaviour.IngredientTemplate.Icon;
+                    if ( extractorMachineBehaviour.IngredientTemplate)
+                    {
+                        _genericMachineImage.sprite = extractorMachineBehaviour.IngredientTemplate.Icon;
+                    }
                     break;
             }
 

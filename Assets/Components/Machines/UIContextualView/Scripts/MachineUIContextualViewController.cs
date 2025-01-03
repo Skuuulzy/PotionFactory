@@ -11,12 +11,12 @@ namespace Components.Machines.UIView
         
         private void Awake()
         {
-            Machine.OnSelected += HandleMachineClicked;
+            Machine.OnConfigure += HandleMachineClicked;
         }
 
         private void OnDestroy()
         {
-            Machine.OnSelected -= HandleMachineClicked;
+            Machine.OnConfigure -= HandleMachineClicked;
         }
         
         private void HandleMachineClicked(Machine machine)

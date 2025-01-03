@@ -39,8 +39,11 @@ namespace Components.Machines
         public Action OnTick;
         public Action OnPropagateTick;
         public Action<bool> OnItemAdded;
-        public static Action<Machine> OnSelected;
+        public static Action<Machine, bool> OnSelected;
         public static Action<Machine, bool> OnHovered;
+        public static Action<Machine, bool> OnRetrieve;
+        public static Action<Machine> OnMove;
+        public static Action<Machine> OnConfigure;
         
         // --------------------------------------------------------------------- INITIALISATION -------------------------------------------------------------------------
         public Machine(MachineTemplate template, MachineController controller)
@@ -281,9 +284,9 @@ namespace Components.Machines
         }
         
         // ------------------------------------------------------------------------- SELECT BEHAVIOUR -------------------------------------------------------------------------
-        public void Select()
+        public void Select(bool select)
         {
-            OnSelected?.Invoke(this);
+            OnSelected?.Invoke(this, select);
         }
 
         public void Hover(bool hovered)

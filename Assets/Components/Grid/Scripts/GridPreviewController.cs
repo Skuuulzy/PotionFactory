@@ -37,7 +37,7 @@ namespace Components.Grid
         private bool _cleanMode;
         private bool _moveMode;
 
-        public static Action<bool> OnPreviewUnselected; //True if there is a preview, false if not.
+        public static Action<bool> OnPreview;
 
         private Grid Grid => _gridController.Grid;
 
@@ -53,7 +53,7 @@ namespace Components.Grid
             ShopState.OnShopStateStarted += HandleShopState;
             UIGrimoireController.OnEnableCleanMode += HandleCleanMode;
             GrimoireButton.OnGrimoireButtonDeselect += HandleGrimoireDeselect;
-            MachineController.OnMove += HandleMovingMachine;
+            Machine.OnMove += HandleMovingMachine;
         }
 
         private void Update()
@@ -72,7 +72,7 @@ namespace Components.Grid
             if (Input.GetMouseButtonDown(1) && !_moveMode)
             {
                 DestroyPreview();
-                OnPreviewUnselected?.Invoke(_currentMachinePreview);
+                OnPreview?.Invoke(false);
             }
             if (Input.GetMouseButton(0))
             {
@@ -112,6 +112,8 @@ namespace Components.Grid
         // ------------------------------------------------------------------------- PREVIEW BEHAVIOUR -------------------------------------------------------------------------------- 
         private void InstantiatePreview(MachineTemplate template)
         {
+            OnPreview?.Invoke(true);
+            
             DestroyPreview();
             _currentMachinePreview = InstantiateMachine(template, _currentInputRotation);
         }

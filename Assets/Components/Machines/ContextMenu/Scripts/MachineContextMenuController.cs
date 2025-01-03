@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Components.Machines.ContextMenu
 {
@@ -7,6 +8,10 @@ namespace Components.Machines.ContextMenu
         [SerializeField] private Canvas _canvas;
         [SerializeField] private MachineController _controller;
 
+        [SerializeField] private Button _configureBtn;
+        [SerializeField] private Button _moveBtn;
+        [SerializeField] private Button _retrieveBtn;
+        
         private Transform _cameraTransform;
         private Vector3 _cameraDirection;
         private bool _initialized;
@@ -45,15 +50,19 @@ namespace Components.Machines.ContextMenu
             Machine.OnSelected -= HandleMachineSelected;
         }
         
-        private void HandleMachineSelected(Machine machine)
+        private void HandleMachineSelected(Machine machine, bool selected)
         {
             if (machine != _controller.Machine)
             {
                 _canvas.gameObject.SetActive(false);
                 return;
             }
-            
-            _canvas.gameObject.SetActive(true);
+
+            transform.localPosition = new Vector3(0, machine.Template.ContextMenuHeight, 0);
+            _configureBtn.interactable = machine.Template.CanConfigure;
+            _moveBtn.interactable = machine.Template.CanMove;
+            _retrieveBtn.interactable = machine.Template.CanSell;
+            _canvas.gameObject.SetActive(selected);
         }
 
         public void MoveMachine()
@@ -65,7 +74,6 @@ namespace Components.Machines.ContextMenu
         public void ConfigureMachine()
         {
             _controller.Configure();
-            _canvas.gameObject.SetActive(false);
         }
 
         public void RetrieveMachine()

@@ -99,8 +99,8 @@ namespace Components.Grid
 			_camera = UnityEngine.Camera.main;
 			PlanningFactoryState.OnPlanningFactoryStateStarted += HandlePlanningFactoryState;
 			ShopState.OnShopStateStarted += HandleShopState;
-			MachineController.OnRetrieve += RetrieveMachine;
-			MachineController.OnMove += ClearMachineGridData;
+			Machine.OnRetrieve += RetrieveMachine;
+			Machine.OnMove += ClearMachineGridData;
 			ConsumableManager.OnChangeSelectedConsumable += UpdateSelection;
 			RelicManager.OnChangeSelectedRelic += UpdateSelection;
 			MapGenerator.OnMapChoiceConfirm += HandleMapChoiceConfirm;
@@ -111,8 +111,8 @@ namespace Components.Grid
 		{
 			PlanningFactoryState.OnPlanningFactoryStateStarted -= HandlePlanningFactoryState;
 			ShopState.OnShopStateStarted -= HandleShopState;
-			MachineController.OnRetrieve += RetrieveMachine;
-			MachineController.OnMove -= ClearMachineGridData;
+			Machine.OnRetrieve += RetrieveMachine;
+			Machine.OnMove -= ClearMachineGridData;
 			ConsumableManager.OnChangeSelectedConsumable -= UpdateSelection;
 			RelicManager.OnChangeSelectedRelic -= UpdateSelection;
 			MapGenerator.OnMapChoiceConfirm-= HandleMapChoiceConfirm;
