@@ -7,7 +7,7 @@ using VComponent.Tools.Singletons;
 
 namespace VComponent.InputSystem
 {
-    public class InputsManager : PersistentSingleton<InputsManager>
+    public class InputsManager : Singleton<InputsManager>
     {
         [ShowInInspector] public bool RequestShipMove { get; private set; }
         [ShowInInspector] public bool OnInteract { get; private set; }
