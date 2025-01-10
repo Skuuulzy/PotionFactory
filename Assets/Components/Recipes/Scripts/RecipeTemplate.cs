@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Components.Recipes
 {
-    [CreateAssetMenu(fileName = "New Recipe Template", menuName = "Recipes/Recipe Template")]
+    [CreateAssetMenu(fileName = "New Recipe Template", menuName = "Component/Recipes/Recipe Template")]
     public class RecipeTemplate : ScriptableObject
     {
         [SerializeField] private MachineTemplate _machine;

@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Components.Machines.Behaviors
 {
-    [CreateAssetMenu(fileName = "New Machine Behaviour", menuName = "Machines/Behavior/Test")]
+    [CreateAssetMenu(fileName = "New Machine Behaviour", menuName = "Component/Machines/Behavior/Test")]
     public class RecipeCreationBehavior : MachineBehavior
     {
         private RecipeTemplate _currentRecipe;

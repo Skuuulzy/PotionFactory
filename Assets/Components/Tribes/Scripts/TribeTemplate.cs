@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Components.Tribes
 {
-    [CreateAssetMenu(fileName = "New Tribe Template", menuName = "Tribes/Tribe Template")]
+    [CreateAssetMenu(fileName = "New Tribe Template", menuName = "Component/Tribes/Tribe Template")]
 
     public class TribeTemplate : ScriptableObject
     {

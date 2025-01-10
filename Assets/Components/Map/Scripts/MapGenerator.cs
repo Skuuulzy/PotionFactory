@@ -1,4 +1,5 @@
 using Components.Bundle;
+using Components.Island;
 using Components.Recipes;
 using Database;
 using System;
@@ -14,22 +15,18 @@ namespace Components.Map
 	public class MapGenerator : MonoBehaviour
 	{
 		[SerializeField] private GameObject _mapGameObject;
-		[SerializeField] private RectTransform _nodeParent;
+		[SerializeField] private List<RectTransform> _islandsParents;
 		[SerializeField] private RectTransform _nodeLineParent;
-		[SerializeField] private GameObject _nodePrefab;
 		[SerializeField] private GameObject _linePrefab;
-		[SerializeField] private int _nodeCount = 20;
-		[SerializeField] private float _minDistance = 50f;
-		[SerializeField] private float _maxDistance = 200f;
 		[SerializeField] private Button _confirmButton;
-
-		private List<LevelNode> _nodes = new List<LevelNode>();
+		private List<UIIslandController> _islandsControllers = new List<UIIslandController>();
 		private LevelNode _selectedNode;
 		private LevelNode _startingSelectedNode;
 		private bool _isFirstGameChoice;
 
 		private List<IngredientsBundle> _startingGameIngredientsBundles;
 		private List<IngredientsBundle> _startingRoundIngredientsBundles;
+		private List<IslandTemplate> _allIslandTemplate;
 
 		//Need to change this poor bool 
 		public static Action<IngredientsBundle, bool> OnMapChoiceConfirm;
@@ -42,7 +39,7 @@ namespace Components.Map
 
 			//Set up ingredients bundles list
 
-			
+
 			_mapGameObject.SetActive(true);
 			_confirmButton.interactable = false;
 		}
@@ -74,181 +71,140 @@ namespace Components.Map
 		{
 			ClearMap();
 			_isFirstGameChoice = true;
-			GenerateNodes();
-			EnsureConnectivity();
+			GenerateIslands();
+			ConnectIslands();
 			DrawConnections();
 			SelectStartingGameNode();
 		}
 
+
+
 		private void ClearMap()
 		{
-			foreach (Transform child in _nodeParent)
+			for(int i = 0; i < _islandsParents.Count; i++)
 			{
-				Destroy(child.gameObject);
+				foreach (Transform child in _islandsParents[i])
+				{
+					Destroy(child.gameObject);
+				}
 			}
 
 			foreach (Transform child in _nodeLineParent)
 			{
 				Destroy(child.gameObject);
 			}
-			
-			_nodes = null;
+
+			_islandsControllers = new List<UIIslandController>();
 			_selectedNode = null;
 			_startingSelectedNode = null;
 
 			_startingGameIngredientsBundles = ScriptableObjectDatabase.GetAllScriptableObjectOfType<IngredientsBundle>().Where(bundle => bundle.IsStartingGameBundle).ToList();
 			_startingRoundIngredientsBundles = ScriptableObjectDatabase.GetAllScriptableObjectOfType<IngredientsBundle>().Where(bundle => !bundle.IsStartingGameBundle).ToList();
+			_allIslandTemplate = ScriptableObjectDatabase.GetAllScriptableObjectOfType<IslandTemplate>().ToList();
 		}
 		//------------------------------------------------------------------------------------------- MAP GENERATION -------------------------------------------------------------------------------------------
-		private void GenerateNodes()
+		private void GenerateIslands()
 		{
-			_nodes = new List<LevelNode>();
-			// Génération des nœuds avec positionnement aléatoire
-			for (int i = 0; i < _nodeCount; i++)
+			_allIslandTemplate = _allIslandTemplate.OrderBy(_ => UnityEngine.Random.value).ToList();
+			for (int i = 0; i < _islandsParents.Count; i++)
 			{
-				GameObject nodeObj = Instantiate(_nodePrefab, _nodeParent);
-				RectTransform rectTransform = nodeObj.GetComponent<RectTransform>();
-				Vector2 position;
-
-				// Boucle de positionnement pour éviter le chevauchement et les distances aberrantes
-				bool positionValid;
-				int attempt = 0;
-				do
-				{
-					position = new Vector2(
-                        UnityEngine.Random.Range(-_nodeParent.rect.width / 2, _nodeParent.rect.width / 2),
-                        UnityEngine.Random.Range(-_nodeParent.rect.height / 2, _nodeParent.rect.height / 2)
-					);
-					positionValid = IsPositionValid(position);
-					attempt++;
-				} while (!positionValid && attempt < 100);
-
-				rectTransform.localPosition = position;
-				LevelNode node = nodeObj.GetComponent<LevelNode>();
-				_nodes.Add(node);
-
-
+				UIIslandController controller = Instantiate(_allIslandTemplate[i].Controller, _islandsParents[i]);
+				_islandsControllers.Add(controller);
+				controller.SetIslandName(_allIslandTemplate[i].Name);
 			}
 		}
 
-		private bool IsPositionValid(Vector2 position)
+		public void ConnectIslands()
 		{
-			foreach (var node in _nodes)
+			foreach (var island in _islandsControllers)
 			{
-				if (Vector2.Distance(node.transform.localPosition, position) < _minDistance)
+				foreach (var node in island.LevelNodeList)
 				{
-					return false;
-				}
-			}
-			return true;
-		}
+					var validConnections = FindValidConnections(island,node);
 
-
-		private void EnsureConnectivity()
-		{
-			// Étape 1: Créer un arbre de connexions
-			HashSet<LevelNode> visitedNodes = new HashSet<LevelNode>();
-			List<LevelNode> treeNodes = new List<LevelNode>();
-
-			// Commencer par un nœud aléatoire
-			LevelNode startingNode = _nodes[UnityEngine.Random.Range(0, _nodes.Count)];
-			CreateTree(startingNode, visitedNodes, treeNodes);
-
-			// Étape 2: Ajouter des connexions aléatoires, mais en vérifiant les conditions
-			foreach (var node in _nodes)
-			{
-				// Ne pas ajouter des connexions si le nœud a déjà 4 voisins
-				if (node.ConnectedNodes.Count < 4)
-				{
-					// Connexion aléatoire avec des nœuds proches
-					foreach (var potentialNeighbor in _nodes)
+					foreach (var connection in validConnections)
 					{
-						if (node == potentialNeighbor) continue;
-
-						float distance = Vector2.Distance(node.transform.localPosition, potentialNeighbor.transform.localPosition);
-
-						// Vérifiez si les nœuds sont à proximité et ajoutez une connexion basée sur la probabilité
-						if (distance <= _maxDistance && UnityEngine.Random.value < 0.3f && potentialNeighbor.ConnectedNodes.Count < 4) // 5% de chance
+						if (!node.ConnectedNodes.Contains(connection) && node.ExternalConnectedNode.Count < 1 && connection.ExternalConnectedNode.Count < 1)
 						{
-							// Vérifiez s'ils ne sont pas déjà connectés
-							if (!node.ConnectedNodes.Contains(potentialNeighbor))
-							{
-								node.ConnectedNodes.Add(potentialNeighbor);
-								potentialNeighbor.ConnectedNodes.Add(node);
-							}
+							node.ConnectedNodes.Add(connection);
+							node.ExternalConnectedNode.Add(connection);
+							connection.ConnectedNodes.Add(node);
+							connection.ExternalConnectedNode.Add(node);
 						}
 					}
 				}
 			}
 		}
 
-		private void CreateTree(LevelNode currentNode, HashSet<LevelNode> visitedNodes, List<LevelNode> treeNodes)
+		private List<LevelNode> FindValidConnections(UIIslandController island,LevelNode node)
 		{
-			visitedNodes.Add(currentNode);
-			treeNodes.Add(currentNode);
+			List<LevelNode> validConnections = new List<LevelNode>();
 
-			// Crée des connexions à partir de nœuds non visités
-			foreach (var potentialNeighbor in _nodes)
+			foreach (var otherIsland in _islandsControllers)
 			{
-				if (currentNode == potentialNeighbor || visitedNodes.Contains(potentialNeighbor)) continue;
-
-				float distance = Vector2.Distance(currentNode.transform.localPosition, potentialNeighbor.transform.localPosition);
-				if (distance <= _maxDistance)
+				if(island == otherIsland)
 				{
-					currentNode.ConnectedNodes.Add(potentialNeighbor);
-					potentialNeighbor.ConnectedNodes.Add(currentNode);
+					continue;
+				}
+				foreach (var otherNode in otherIsland.LevelNodeList)
+				{
+					if (node == otherNode) continue;
 
-					// Appel récursif
-					CreateTree(potentialNeighbor, visitedNodes, treeNodes);
+					if (AreNodesConnectable(node, otherNode))
+					{
+						float distance = Vector3.Distance(node.transform.position, otherNode.transform.position);
+
+						validConnections.Add(otherNode);
+					}
 				}
 			}
+
+			return validConnections.OrderBy(n => Vector3.Distance(node.transform.position, n.transform.position)).ToList();
 		}
 
-		private void DFS(LevelNode node, HashSet<LevelNode> visitedNodes, List<LevelNode> group)
+		private bool AreNodesConnectable(LevelNode nodeA, LevelNode nodeB)
 		{
-			visitedNodes.Add(node);
-			group.Add(node);
-
-			foreach (var connectedNode in node.ConnectedNodes)
-			{
-				if (!visitedNodes.Contains(connectedNode))
-				{
-					DFS(connectedNode, visitedNodes, group);
-				}
-			}
+			return (nodeA.NodeSizde == NodeSide.EAST && nodeB.NodeSizde != NodeSide.EAST && nodeB.NodeSizde != NodeSide.DEFAULT) ||
+				   (nodeA.NodeSizde == NodeSide.WEST && nodeB.NodeSizde != NodeSide.WEST && nodeB.NodeSizde != NodeSide.DEFAULT) ||
+				   (nodeA.NodeSizde == NodeSide.NORTH && nodeB.NodeSizde != NodeSide.NORTH && nodeB.NodeSizde != NodeSide.DEFAULT) ||
+				   (nodeA.NodeSizde == NodeSide.SOUTH && nodeB.NodeSizde != NodeSide.SOUTH && nodeB.NodeSizde != NodeSide.DEFAULT)
+				   ;
 		}
 
 		private void DrawConnections()
 		{
 			HashSet<(LevelNode, LevelNode)> drawnConnections = new HashSet<(LevelNode, LevelNode)>();
 
-			foreach (var node in _nodes)
+			foreach(var island in _islandsControllers)
 			{
-				foreach (var connectedNode in node.ConnectedNodes)
+				foreach (var node in island.LevelNodeList)
 				{
-					if (!drawnConnections.Contains((node, connectedNode)) && !drawnConnections.Contains((connectedNode, node)))
+					foreach (var connectedNode in node.ConnectedNodes)
 					{
-						GameObject lineObj = Instantiate(_linePrefab, _nodeLineParent);
-						RectTransform lineRect = lineObj.GetComponent<RectTransform>();
+						if (!drawnConnections.Contains((node, connectedNode)) && !drawnConnections.Contains((connectedNode, node)))
+						{
+							GameObject lineObj = Instantiate(_linePrefab, _nodeLineParent);
+							RectTransform lineRect = lineObj.GetComponent<RectTransform>();
 
-						Vector2 startPos = node.transform.localPosition;
-						Vector2 endPos = connectedNode.transform.localPosition;
-						Vector2 midPoint = (startPos + endPos) / 2;
+							Vector2 startPos = node.transform.position;
+							Vector2 endPos = connectedNode.transform.position;
+							Vector2 midPoint = (startPos + endPos) / 2;
 
-						lineRect.localPosition = midPoint;
+							lineRect.localPosition = midPoint;
 
-						float distance = Vector2.Distance(startPos, endPos);
-						lineRect.sizeDelta = new Vector2(distance, lineRect.sizeDelta.y);
+							float distance = Vector2.Distance(startPos, endPos);
+							lineRect.sizeDelta = new Vector2(distance, lineRect.sizeDelta.y);
 
-						float angle = Mathf.Atan2(endPos.y - startPos.y, endPos.x - startPos.x) * Mathf.Rad2Deg;
-						lineRect.rotation = Quaternion.Euler(0, 0, angle);
+							float angle = Mathf.Atan2(endPos.y - startPos.y, endPos.x - startPos.x) * Mathf.Rad2Deg;
+							lineRect.rotation = Quaternion.Euler(0, 0, angle);
 
-						drawnConnections.Add((node, connectedNode));
+							drawnConnections.Add((node, connectedNode));
+						}
 					}
 				}
 			}
+			
 		}
-
 
 		//------------------------------------------------------------------------------------------- NODE SELECTION -------------------------------------------------------------------------------------------
 		private void HandleNodeSelected(LevelNode nodeSelected)
@@ -261,21 +217,25 @@ namespace Components.Map
 
 			_selectedNode = nodeSelected;
 		}
-		
+
 		private void SelectNodeAsDefaultForRound(LevelNode nodeSelected)
 		{
 			_startingSelectedNode = nodeSelected;
 
-			foreach (var node in _nodes)
+			foreach (var island in _islandsControllers)
 			{
-				if (node == nodeSelected || nodeSelected.ConnectedNodes.Contains(node))
+				foreach(var node in island.LevelNodeList)
 				{
-					node.UnlockNode();
+					if (node == nodeSelected || nodeSelected.ConnectedNodes.Contains(node))
+					{
+						node.UnlockNode();
+					}
+					else
+					{
+						node.LockNode();
+					}
 				}
-				else
-				{
-					node.LockNode();
-				}
+
 			}
 			_selectedNode = _startingSelectedNode;
 			_startingSelectedNode.SelectNodeAsFirst();
@@ -285,38 +245,31 @@ namespace Components.Map
 		//Use for starting round only
 		private void SelectStartingGameNode()
 		{
-			if (_nodes == null || _nodes.Count == 0)
+			if (_islandsControllers == null || _islandsControllers.Count == 0)
 			{
 				Debug.LogWarning("La liste de nœuds est vide. Impossible de définir un nœud de départ.");
 				return;
 			}
 
-			// Trouver le nœud avec le plus de connexions
-			LevelNode startingNode = _nodes.OrderByDescending(node => node.ConnectedNodes.Count).FirstOrDefault();
+			//Select starting island
+			UIIslandController startingIslandController = _islandsControllers.OrderByDescending(island => island.NumberOfNodes).FirstOrDefault();
+			//Select starting node
+			LevelNode startingNode = startingIslandController.StartingLevelNode;
+			//Set starting game ingredient bundles to each node in this island
+			_startingGameIngredientsBundles = _startingGameIngredientsBundles.OrderBy(_ => UnityEngine.Random.value).ToList();
+			startingIslandController.Init(_startingGameIngredientsBundles.Take(startingIslandController.NumberOfNodes).ToArray());
+			//Reset starting node bundle
+			startingNode.ResetIngredientBundle();
 
-			foreach (var node in _nodes) 
+			//All island except the starting one
+			UIIslandController[] nonStartingIslandControllers = _islandsControllers.Where(island => island != startingIslandController).ToArray();
+			foreach(UIIslandController nonStartingIslandController in nonStartingIslandControllers)
 			{
-				//Bind a starting game bundle to every connected nodes of starting node
-				if (startingNode.ConnectedNodes.Contains(node))
-				{
-					int randomIndex = UnityEngine.Random.Range(0, _startingGameIngredientsBundles.Count);
-
-					node.Initialize(_startingGameIngredientsBundles[randomIndex]);
-					_startingGameIngredientsBundles.RemoveAt(randomIndex);
-				}
-
-				else if(node == startingNode)
-				{
-					node.ResetIngredientBundle();
-				}
-
-				//Bind a starting round bundle to every one else
-				else
-				{
-					int randomIndex = UnityEngine.Random.Range(0, _startingRoundIngredientsBundles.Count);
-					node.Initialize(_startingRoundIngredientsBundles[randomIndex]);
-				}
+				//Randomize ingredients bundle list
+				_startingRoundIngredientsBundles = _startingRoundIngredientsBundles.OrderBy(_ => UnityEngine.Random.value).ToList(); 
+				nonStartingIslandController.Init(_startingRoundIngredientsBundles.Take(nonStartingIslandController.NumberOfNodes).ToArray());
 			}
+
 
 			SelectNodeAsDefaultForRound(startingNode);
 		}
@@ -324,18 +277,15 @@ namespace Components.Map
 		//Use for every rounds except the first one of the game
 		private void SelectStartingRoundNode(LevelNode startingNode)
 		{
-			foreach(var node in _nodes)
+			foreach (var island in _islandsControllers)
 			{
-				if(node.IngredientsBundle == null)
+				foreach(var node in island.LevelNodeList)
 				{
-					int randomIndex = UnityEngine.Random.Range(0, _startingRoundIngredientsBundles.Count);
-					node.Initialize(_startingRoundIngredientsBundles[randomIndex]);
-				}
-				//Need to change the starting game bundle by starting round bundle
-				else if (node.IngredientsBundle.IsStartingGameBundle)
-				{
-					int randomIndex = UnityEngine.Random.Range(0, _startingRoundIngredientsBundles.Count);
-					node.Initialize(_startingRoundIngredientsBundles[randomIndex]);
+					if(node.IngredientsBundle == null || node.IngredientsBundle.IsStartingGameBundle)
+					{
+						int randomIndex = UnityEngine.Random.Range(0, _startingRoundIngredientsBundles.Count);
+						node.Initialize(_startingRoundIngredientsBundles[randomIndex]);
+					}
 				}
 			}
 
