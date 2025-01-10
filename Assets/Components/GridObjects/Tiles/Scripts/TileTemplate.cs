@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Components.Grid.Tile
 {
-	[CreateAssetMenu(fileName = "New Tile Template", menuName = "Grid/Tile Template")]
+	[CreateAssetMenu(fileName = "New Tile Template", menuName = "Component/Grid/Tile Template")]
 	public class TileTemplate : GridObjectTemplate
 	{
 		[SerializeField] private TileType _tileType;

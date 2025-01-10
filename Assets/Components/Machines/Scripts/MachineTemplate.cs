@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Components.Machines
 {
-    [CreateAssetMenu(fileName = "New Machine Template", menuName = "Machines/Machine Template")]
+    [CreateAssetMenu(fileName = "New Machine Template", menuName = "Component/Machines/Machine Template")]
     public class MachineTemplate : ScriptableObject
     {
         [Header("Definition")]

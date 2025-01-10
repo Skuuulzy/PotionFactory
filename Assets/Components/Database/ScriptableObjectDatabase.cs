@@ -5,6 +5,7 @@ using Components.Bundle;
 using Components.Grid.Decorations;
 using Components.Grid.Obstacle;
 using Components.Ingredients;
+using Components.Island;
 using Components.Machines;
 using Components.Recipes;
 using UnityEngine;
@@ -34,6 +35,7 @@ namespace Database
             LoadAllScriptableObjects<ObstacleTemplate>();
             LoadAllScriptableObjects<DecorationTemplate>();
             LoadAllScriptableObjects<Components.Grid.Tile.TileTemplate>();
+            LoadAllScriptableObjects<IslandTemplate>();
         }
 
         private static void LoadAllScriptableObjects<T>() where T : ScriptableObject
