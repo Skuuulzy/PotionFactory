@@ -19,8 +19,9 @@ namespace Components.Machines
 
         [Header("Structure")] 
         [SerializeField] private List<Node> _nodes;
-        
-        [Header("Process")]
+
+        [Header("Process")] 
+        [SerializeField, Tooltip("Show the item in the machine on the map 3D view")] private bool _showItem;
         [SerializeField] private bool _canTakeInfiniteIngredients;
         [SerializeField] private int _inSlotIngredientCount = 1;
         [SerializeField] private int _outSlotIngredientCount = 1;
@@ -51,6 +52,7 @@ namespace Components.Machines
 
         public List<Node> Nodes => GetNodeInstance();
 
+        public bool ShowItem => _showItem;
         public bool CanTakeInfiniteIngredients => _canTakeInfiniteIngredients;
         public int InSlotIngredientCount => _inSlotIngredientCount;
         public int OutSlotIngredientCount => _outSlotIngredientCount;

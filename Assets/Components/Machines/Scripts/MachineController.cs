@@ -191,6 +191,11 @@ namespace Components.Machines
         // TODO: The ingredient should not be controlled by the machine but need to be independent and linked to a machine.
         private void ShowItem(bool show)
         {
+            if (!Machine.Template.ShowItem)
+            {
+                return;
+            }
+            
             if (show)
             {
                 _ingredientController.CreateRepresentationFromTemplate(_machine.InIngredients);
@@ -204,6 +209,11 @@ namespace Components.Machines
         //TO Change : special for destructor behavior
         private void ShowItem(IngredientTemplate ingredient)
         {
+            if (!Machine.Template.ShowItem)
+            {
+                return;
+            }
+            
 			_ingredientController.CreateFavoriteSellerItemRepresentationFromTemplate(ingredient);
 		}
 
