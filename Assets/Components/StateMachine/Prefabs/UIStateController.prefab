@@ -441,6 +441,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3001606254507775943}
   - component: {fileID: 8891006847143582540}
+  - component: {fileID: 2447632742528556565}
   m_Layer: 5
   m_Name: UIStateController
   m_TagString: Untagged
@@ -488,6 +489,34 @@ MonoBehaviour:
   _stateCountdownImage: {fileID: 7655490926784015139}
   _finishStateButton: {fileID: 7430885785059387855}
   _gameOverGO: {fileID: 403632442281821040}
+--- !u!114 &2447632742528556565
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4723299006608011712}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d63feae5414a48cb974831d7e3e5734f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _eventChannel: {fileID: 11400000, guid: f2d2cfd574e284447ba6cd62ef47026d, type: 2}
+  _unityEvent:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8891006847143582540}
+        m_TargetAssemblyTypeName: UIStateController, Assembly-CSharp
+        m_MethodName: OnEndCurrentState
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &5454147868756840211
 GameObject:
   m_ObjectHideFlags: 0

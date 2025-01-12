@@ -16,6 +16,7 @@ public class UIStateController : MonoBehaviour
 	[SerializeField] private GameObject _gameOverGO;
 
 	private static readonly int DISPLAY_STATE = Animator.StringToHash("DisplayState");
+	private BaseState _currentState;
 
 	private void Awake()
 	{
@@ -35,6 +36,8 @@ public class UIStateController : MonoBehaviour
 	
 	private void HandleStateStarted(BaseState state)
 	{
+		_currentState = state;
+
 		switch (state)
 		{
 			case ShopState shopState:
@@ -81,6 +84,11 @@ public class UIStateController : MonoBehaviour
 	private void HandleGameOver()
 	{
 		_gameOverGO.SetActive(true);
+	}
+
+	public void OnEndCurrentState()
+	{
+		_currentState.SetStateFinished();
 	}
 
 	// TODO: Is it supposed to be here ? 
