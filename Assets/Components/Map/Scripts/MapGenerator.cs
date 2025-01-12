@@ -22,6 +22,7 @@ namespace Components.Map
 		private List<UIIslandController> _islandsControllers = new List<UIIslandController>();
 		private LevelNode _selectedNode;
 		private LevelNode _startingSelectedNode;
+		private List<LevelNode> _alreadyConnectedLevelNodes;
 		private bool _isFirstGameChoice;
 
 		private List<IngredientsBundle> _startingGameIngredientsBundles;
@@ -62,7 +63,7 @@ namespace Components.Map
 			else
 			{
 				_isFirstGameChoice = false;
-				SelectStartingRoundNode(_selectedNode);
+				SelectStartingRoundNode(_startingSelectedNode);
 			}
 		}
 
@@ -97,6 +98,7 @@ namespace Components.Map
 			_islandsControllers = new List<UIIslandController>();
 			_selectedNode = null;
 			_startingSelectedNode = null;
+			_alreadyConnectedLevelNodes = new List<LevelNode>();
 
 			_startingGameIngredientsBundles = ScriptableObjectDatabase.GetAllScriptableObjectOfType<IngredientsBundle>().Where(bundle => bundle.IsStartingGameBundle).ToList();
 			_startingRoundIngredientsBundles = ScriptableObjectDatabase.GetAllScriptableObjectOfType<IngredientsBundle>().Where(bundle => !bundle.IsStartingGameBundle).ToList();
@@ -224,25 +226,23 @@ namespace Components.Map
 			_selectedNode = nodeSelected;
 		}
 
-		private void SetNodesState(LevelNode nodeSelected)
+		private void SetNodesState()
 		{
-			_startingSelectedNode = nodeSelected;
-
-			foreach (var island in _islandsControllers)
+			foreach(LevelNode node in _startingSelectedNode.ConnectedNodes)
 			{
-				foreach(var node in island.LevelNodeList)
-				{
-					if (node == nodeSelected || nodeSelected.ConnectedNodes.Contains(node))
-					{
-						node.UnlockNode();
-					}
-					else
-					{
-						node.LockNode();
-					}
-				}
-
+				node.UnlockNode();
 			}
+
+			foreach(LevelNode alreadyConnectedNode in _alreadyConnectedLevelNodes)
+			{
+				alreadyConnectedNode.SetNodeAsConnected();
+
+				foreach (LevelNode node in alreadyConnectedNode.ConnectedNodes)
+				{
+					node.UnlockNode();
+				}
+			}
+
 			_selectedNode = _startingSelectedNode;
 			_startingSelectedNode.SelectNodeAsFirst();
 			_confirmButton.interactable = false;
@@ -308,13 +308,18 @@ namespace Components.Map
 			}
 
 			startingNode.ResetIngredientBundle();
-			SetNodesState(startingNode);
+			SetNodesState();
 		}
 
 		//------------------------------------------------------------------------------------------- CONFIRM -------------------------------------------------------------------------------------------
 
 		public void Confirm()
 		{
+			if(_selectedNode != _startingSelectedNode)
+			{
+				_alreadyConnectedLevelNodes.Add(_selectedNode);
+			}
+
 			OnMapChoiceConfirm?.Invoke(_selectedNode.IngredientsBundle, _isFirstGameChoice);
 			_mapGameObject.SetActive(false);
 		}
