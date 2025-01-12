@@ -17,11 +17,14 @@ namespace Components.Island
 		public LevelNode StartingLevelNode => _levelNodeList[0];
 		public int NumberOfNodes => _levelNodeList.Length;
 
+		public void InitStartingBundle(IngredientsBundle ingredientsBundle)
+		{
+			StartingLevelNode.Initialize(ingredientsBundle);
+		}
 
 		public void Init(IngredientsBundle[] ingredientBundle)
 		{
-
-			for (int i = 0; i < ingredientBundle.Length; i++)
+			for (int i = 1; i < ingredientBundle.Length; i++)
 			{
 				_levelNodeList[i].Initialize(ingredientBundle[i]);
 			}

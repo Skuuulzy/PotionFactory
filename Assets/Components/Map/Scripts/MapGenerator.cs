@@ -74,7 +74,7 @@ namespace Components.Map
 			GenerateIslands();
 			ConnectIslands();
 			DrawConnections();
-			SelectStartingGameNode();
+			SetStartingGameNodes();
 		}
 
 
@@ -102,6 +102,7 @@ namespace Components.Map
 			_startingRoundIngredientsBundles = ScriptableObjectDatabase.GetAllScriptableObjectOfType<IngredientsBundle>().Where(bundle => !bundle.IsStartingGameBundle).ToList();
 			_allIslandTemplate = ScriptableObjectDatabase.GetAllScriptableObjectOfType<IslandTemplate>().ToList();
 		}
+
 		//------------------------------------------------------------------------------------------- MAP GENERATION -------------------------------------------------------------------------------------------
 		private void GenerateIslands()
 		{
@@ -153,7 +154,6 @@ namespace Components.Map
 					if (AreNodesConnectable(node, otherNode))
 					{
 						float distance = Vector3.Distance(node.transform.position, otherNode.transform.position);
-
 						validConnections.Add(otherNode);
 					}
 				}
@@ -203,14 +203,20 @@ namespace Components.Map
 					}
 				}
 			}
-			
 		}
 
 		//------------------------------------------------------------------------------------------- NODE SELECTION -------------------------------------------------------------------------------------------
 		private void HandleNodeSelected(LevelNode nodeSelected)
 		{
 			_confirmButton.interactable = true;
-			if (_selectedNode != _startingSelectedNode && _selectedNode != nodeSelected)
+
+			//First choice of the game
+			if(_startingSelectedNode == null)
+			{
+				_startingSelectedNode = nodeSelected;
+			}
+
+			if (_selectedNode != null && _selectedNode != nodeSelected)
 			{
 				_selectedNode.UnselectNode();
 			}
@@ -218,7 +224,7 @@ namespace Components.Map
 			_selectedNode = nodeSelected;
 		}
 
-		private void SelectNodeAsDefaultForRound(LevelNode nodeSelected)
+		private void SetNodesState(LevelNode nodeSelected)
 		{
 			_startingSelectedNode = nodeSelected;
 
@@ -243,7 +249,7 @@ namespace Components.Map
 		}
 
 		//Use for starting round only
-		private void SelectStartingGameNode()
+		private void SetStartingGameNodes()
 		{
 			if (_islandsControllers == null || _islandsControllers.Count == 0)
 			{
@@ -251,27 +257,39 @@ namespace Components.Map
 				return;
 			}
 
-			//Select starting island
-			UIIslandController startingIslandController = _islandsControllers.OrderByDescending(island => island.NumberOfNodes).FirstOrDefault();
-			//Select starting node
-			LevelNode startingNode = startingIslandController.StartingLevelNode;
-			//Set starting game ingredient bundles to each node in this island
 			_startingGameIngredientsBundles = _startingGameIngredientsBundles.OrderBy(_ => UnityEngine.Random.value).ToList();
-			startingIslandController.Init(_startingGameIngredientsBundles.Take(startingIslandController.NumberOfNodes).ToArray());
-			//Reset starting node bundle
-			startingNode.ResetIngredientBundle();
+			List<LevelNode> potentialStartingLevelNodes = new List<LevelNode>();
 
-			//All island except the starting one
-			UIIslandController[] nonStartingIslandControllers = _islandsControllers.Where(island => island != startingIslandController).ToArray();
-			foreach(UIIslandController nonStartingIslandController in nonStartingIslandControllers)
+			for( int i = 0; i < _islandsControllers.Count; i++)
 			{
-				//Randomize ingredients bundle list
-				_startingRoundIngredientsBundles = _startingRoundIngredientsBundles.OrderBy(_ => UnityEngine.Random.value).ToList(); 
-				nonStartingIslandController.Init(_startingRoundIngredientsBundles.Take(nonStartingIslandController.NumberOfNodes).ToArray());
+				//Set starting bundle for Starting node of each island
+				_islandsControllers[i].InitStartingBundle(_startingGameIngredientsBundles[i]);
+				potentialStartingLevelNodes.Add(_islandsControllers[i].StartingLevelNode);
+				//Set ingredient bundle for every node except the starting node
+				_startingRoundIngredientsBundles = _startingRoundIngredientsBundles.OrderBy(_ => UnityEngine.Random.value).ToList();
+				_islandsControllers[i].Init(_startingRoundIngredientsBundles.Take(_islandsControllers[i].NumberOfNodes).ToArray());
 			}
 
 
-			SelectNodeAsDefaultForRound(startingNode);
+			SetStartingGameNodesState(potentialStartingLevelNodes);
+		}
+
+		private void SetStartingGameNodesState(List<LevelNode> potentialStartingLevelNodes)
+		{
+			foreach(UIIslandController islandController in _islandsControllers)
+			{
+				foreach(LevelNode levelNode in islandController.LevelNodeList)
+				{
+					if (potentialStartingLevelNodes.Contains(levelNode))
+					{
+						levelNode.UnlockNode();
+					}
+					else
+					{
+						levelNode.LockNode();
+					}
+				}
+			}
 		}
 
 		//Use for every rounds except the first one of the game
@@ -290,7 +308,7 @@ namespace Components.Map
 			}
 
 			startingNode.ResetIngredientBundle();
-			SelectNodeAsDefaultForRound(startingNode);
+			SetNodesState(startingNode);
 		}
 
 		//------------------------------------------------------------------------------------------- CONFIRM -------------------------------------------------------------------------------------------
