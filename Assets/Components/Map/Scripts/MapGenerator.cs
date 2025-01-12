@@ -119,26 +119,65 @@ namespace Components.Map
 
 		public void ConnectIslands()
 		{
+			Dictionary<LevelNode, LevelNode> confirmedConnections = new Dictionary<LevelNode, LevelNode>();
+
 			foreach (var island in _islandsControllers)
 			{
+				Dictionary<LevelNode, List<LevelNode>> validConnectionByLevelNode = new Dictionary<LevelNode, List<LevelNode>>();
+
+				// Get all valid connection for each node
 				foreach (var node in island.LevelNodeList)
 				{
-					var validConnections = FindValidConnections(island,node);
+					var validConnections = FindValidConnections(island, node);
+					validConnectionByLevelNode.Add(node, validConnections);
+				}
 
-					foreach (var connection in validConnections)
+				
+				foreach (var node in validConnectionByLevelNode.Keys)
+				{
+					foreach (var targetNode in validConnectionByLevelNode[node])
 					{
-						if (!node.ConnectedNodes.Contains(connection) && node.ExternalConnectedNode.Count < 1 && connection.ExternalConnectedNode.Count < 1)
+						// Check if the targetNode is already connected
+						if (confirmedConnections.TryGetValue(targetNode, out var existingNode))
 						{
-							node.ConnectedNodes.Add(connection);
-							node.ExternalConnectedNode.Add(connection);
-							connection.ConnectedNodes.Add(node);
-							connection.ExternalConnectedNode.Add(node);
+							// If new node is closer then we change the old one by it
+							if (GetDistance(targetNode, node) < GetDistance(targetNode, existingNode))
+							{
+								confirmedConnections[targetNode] = node;
+							}
+						}
+						else
+						{
+							// Not connected so we create it
+							confirmedConnections[targetNode] = node;
 						}
 					}
 				}
 			}
+
+			//Create connections
+			foreach (var kvp in confirmedConnections)
+			{
+				if(kvp.Key.ExternalConnectedNode.Count < 1 && kvp.Value.ExternalConnectedNode.Count < 1)
+				{
+					kvp.Key.ConnectedNodes.Add(kvp.Value);
+					kvp.Key.ExternalConnectedNode.Add(kvp.Value);
+					kvp.Value.ConnectedNodes.Add(kvp.Key);
+					kvp.Value.ExternalConnectedNode.Add(kvp.Key);
+				}
+			}
 		}
 
+		private float GetDistance(LevelNode a, LevelNode b)
+		{
+			
+			return Vector3.Distance(a.transform.position, b.transform.position);
+		}
+
+
+		/// <summary>
+		/// Get a list of level node which can be connected to a node
+		/// </summary>
 		private List<LevelNode> FindValidConnections(UIIslandController island,LevelNode node)
 		{
 			List<LevelNode> validConnections = new List<LevelNode>();
@@ -151,19 +190,22 @@ namespace Components.Map
 				}
 				foreach (var otherNode in otherIsland.LevelNodeList)
 				{
+					//Security check but can't happen normally with the previous check
 					if (node == otherNode) continue;
 
 					if (AreNodesConnectable(node, otherNode))
 					{
-						float distance = Vector3.Distance(node.transform.position, otherNode.transform.position);
 						validConnections.Add(otherNode);
 					}
 				}
 			}
 
-			return validConnections.OrderBy(n => Vector3.Distance(node.transform.position, n.transform.position)).ToList();
+			return validConnections.OrderBy(n => GetDistance(node, n)).ToList();
 		}
 
+		/// <summary>
+		/// Check if a node can connect to another one
+		/// </summary>
 		private bool AreNodesConnectable(LevelNode nodeA, LevelNode nodeB)
 		{
 			return (nodeA.NodeSizde == NodeSide.EAST && nodeB.NodeSizde != NodeSide.EAST && nodeB.NodeSizde != NodeSide.DEFAULT) ||
@@ -315,6 +357,21 @@ namespace Components.Map
 
 		public void Confirm()
 		{
+			if(_selectedNode == _startingSelectedNode)
+			{
+				foreach(UIIslandController island in _islandsControllers)
+				{
+					foreach(LevelNode node in island.LevelNodeList)
+					{
+						if(node == _startingSelectedNode)
+						{
+							continue;
+						}
+
+						node.LockNode();
+					}
+				}
+			}
 			if(_selectedNode != _startingSelectedNode)
 			{
 				_alreadyConnectedLevelNodes.Add(_selectedNode);

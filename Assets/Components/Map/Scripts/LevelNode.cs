@@ -24,6 +24,7 @@ namespace Components.Map
         public static Action<LevelNode> OnNodeSelected;
         public NodeSide NodeSizde => _nodeSide;
         private bool _isAlreadyConnected = false;
+        private bool _isFirstNode = false;
         /// <summary>
         /// Initializes the node, setting up its locked or unlocked state.
         /// </summary>
@@ -46,10 +47,16 @@ namespace Components.Map
 		{
             _button.interactable = false;
             _button.image.color = Color.magenta;
+            _isFirstNode = true;
         }
 
         public void UnselectNode()
 		{
+            if(_isAlreadyConnected || _isFirstNode)
+			{
+                return;
+			}
+            _button.interactable = true;
             _button.image.color = Color.white;
         }
 
@@ -59,12 +66,6 @@ namespace Components.Map
         /// </summary>
         public void UnlockNode()
         {
-            if (_isAlreadyConnected)
-            {
-                return;
-            }
-
-            _button.interactable = true;
             UnselectNode();
 		}
 
