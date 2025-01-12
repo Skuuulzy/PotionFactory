@@ -16,13 +16,13 @@ public class UIPayoffController : MonoBehaviour
 
     void Start()
     {
-        EconomyController.OnEndRoundGoldValuesCalculated += Init;
+        //EconomyController.OnEndRoundGoldValuesCalculated += Init;
     }
 
 
 	private void OnDestroy()
 	{
-        EconomyController.OnEndRoundGoldValuesCalculated -= Init;
+        //EconomyController.OnEndRoundGoldValuesCalculated -= Init;
     }
 
 
