@@ -17,7 +17,7 @@ namespace Components.Map
 		[SerializeField] private GameObject _mapGameObject;
 		[SerializeField] private List<RectTransform> _islandsParents;
 		[SerializeField] private RectTransform _nodeLineParent;
-		[SerializeField] private GameObject _linePrefab;
+		[SerializeField] private NodeLineController _linePrefab;
 		[SerializeField] private Button _confirmButton;
 		private List<UIIslandController> _islandsControllers = new List<UIIslandController>();
 		private LevelNode _selectedNode;
@@ -227,7 +227,7 @@ namespace Components.Map
 					{
 						if (!drawnConnections.Contains((node, connectedNode)) && !drawnConnections.Contains((connectedNode, node)))
 						{
-							GameObject lineObj = Instantiate(_linePrefab, _nodeLineParent);
+							NodeLineController lineObj = Instantiate(_linePrefab, _nodeLineParent);
 							RectTransform lineRect = lineObj.GetComponent<RectTransform>();
 
 							Vector2 startPos = node.transform.position;
@@ -243,6 +243,7 @@ namespace Components.Map
 							lineRect.rotation = Quaternion.Euler(0, 0, angle);
 
 							drawnConnections.Add((node, connectedNode));
+							node.Lines.Add(lineObj);
 						}
 					}
 				}
@@ -254,11 +255,7 @@ namespace Components.Map
 		{
 			_confirmButton.interactable = true;
 
-			//First choice of the game
-			if(_startingSelectedNode == null)
-			{
-				_startingSelectedNode = nodeSelected;
-			}
+
 
 			if (_selectedNode != null && _selectedNode != nodeSelected)
 			{
@@ -272,7 +269,7 @@ namespace Components.Map
 		{
 			foreach(LevelNode node in _startingSelectedNode.ConnectedNodes)
 			{
-				node.UnlockNode();
+				node.UnlockNode(false);
 			}
 
 			foreach(LevelNode alreadyConnectedNode in _alreadyConnectedLevelNodes)
@@ -281,7 +278,7 @@ namespace Components.Map
 
 				foreach (LevelNode node in alreadyConnectedNode.ConnectedNodes)
 				{
-					node.UnlockNode();
+					node.UnlockNode(false);
 				}
 			}
 
@@ -324,7 +321,7 @@ namespace Components.Map
 				{
 					if (potentialStartingLevelNodes.Contains(levelNode))
 					{
-						levelNode.UnlockNode();
+						levelNode.UnlockNode(true);
 					}
 					else
 					{
@@ -357,8 +354,12 @@ namespace Components.Map
 
 		public void Confirm()
 		{
-			if(_selectedNode == _startingSelectedNode)
+			
+			if(_startingSelectedNode == null)
 			{
+				_startingSelectedNode = _selectedNode;
+				_startingSelectedNode.SetConnectedNodesConstructedLineColor(true);
+
 				foreach(UIIslandController island in _islandsControllers)
 				{
 					foreach(LevelNode node in island.LevelNodeList)
@@ -372,6 +373,7 @@ namespace Components.Map
 					}
 				}
 			}
+
 			if(_selectedNode != _startingSelectedNode)
 			{
 				_alreadyConnectedLevelNodes.Add(_selectedNode);

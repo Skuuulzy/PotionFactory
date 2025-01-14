@@ -14,15 +14,17 @@ namespace Components.Map
         [SerializeField] private IngredientsBundle _ingredientsBundle;
         [SerializeField] private LevelNodeView _view;
         [SerializeField] private NodeSide _nodeSide;
+        [SerializeField] private List<NodeLineController> _lines = new List<NodeLineController>();
 
         private List<LevelNode> _externalConnectedNode = new List<LevelNode>();
         public List<LevelNode> ConnectedNodes => _connectedNodes;
         public List<LevelNode> ExternalConnectedNode => _externalConnectedNode;
         public IngredientsBundle IngredientsBundle => _ingredientsBundle;
+        public NodeSide NodeSizde => _nodeSide;
+        public List<NodeLineController> Lines => _lines;
 
 		public static Action OnResetNode;
         public static Action<LevelNode> OnNodeSelected;
-        public NodeSide NodeSizde => _nodeSide;
         private bool _isAlreadyConnected = false;
         private bool _isFirstNode = false;
         /// <summary>
@@ -64,8 +66,12 @@ namespace Components.Map
         /// <summary>
         /// Unlocks this node, making it selectable.
         /// </summary>
-        public void UnlockNode()
+        public void UnlockNode(bool isFirstChoice)
         {
+			if (!isFirstChoice)
+			{
+                SetConnectedNodesConstructedLineColor(true);
+			}
             UnselectNode();
 		}
 
@@ -83,9 +89,19 @@ namespace Components.Map
 				return;
 			}
 
-			_button.interactable = false;
+            SetConnectedNodesConstructedLineColor(false);
+
+            _button.interactable = false;
             _button.image.color = Color.black;
 		}
+
+        public void SetConnectedNodesConstructedLineColor(bool value)
+		{
+            foreach (NodeLineController nodeLine in Lines)
+            {
+                nodeLine.SetConstructedLineColor(value);
+            }
+        }
 
 		public void ResetIngredientBundle()
 		{
