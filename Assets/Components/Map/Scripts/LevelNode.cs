@@ -68,10 +68,6 @@ namespace Components.Map
         /// </summary>
         public void UnlockNode(bool isFirstChoice)
         {
-			if (!isFirstChoice)
-			{
-                SetConnectedNodesConstructedLineColor(true);
-			}
             UnselectNode();
 		}
 

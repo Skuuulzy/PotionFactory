@@ -354,12 +354,11 @@ namespace Components.Map
 
 		public void Confirm()
 		{
-			
-			if(_startingSelectedNode == null)
+			_selectedNode.SetConnectedNodesConstructedLineColor(true);
+
+			if (_startingSelectedNode == null)
 			{
 				_startingSelectedNode = _selectedNode;
-				_startingSelectedNode.SetConnectedNodesConstructedLineColor(true);
-
 				foreach(UIIslandController island in _islandsControllers)
 				{
 					foreach(LevelNode node in island.LevelNodeList)
