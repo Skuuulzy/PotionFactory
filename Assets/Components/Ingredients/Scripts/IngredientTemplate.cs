@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Components.Ingredients
 {
-	[CreateAssetMenu(fileName = "New Ingredient Template", menuName = "Ingredients/Template")]
+	[CreateAssetMenu(fileName = "New Ingredient Template", menuName = "Component/Ingredients/Template")]
 	public class IngredientTemplate : ScriptableObject
 	{
 		[SerializeField] private string _name;

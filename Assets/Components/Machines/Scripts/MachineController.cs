@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Components.Ingredients;
 using Components.Tick;
@@ -17,7 +18,7 @@ namespace Components.Machines
         
         public Machine Machine => _machine;
 
-        private List<GameObject> _previewObjects;
+        private List<GameObject> _directionalArrows;
         
         private bool _initialized;
         private GameObject _view;
@@ -33,26 +34,6 @@ namespace Components.Machines
 
             SetupDirectionalArrows(machineTemplate);
         }
-
-        private void SetupDirectionalArrows(MachineTemplate machineTemplate)
-        {
-            _previewObjects = new List<GameObject>();
-            
-            foreach (var node in machineTemplate.Nodes)
-            {
-                foreach (var port in node.Ports)
-                {
-                    var previewArrow = Instantiate(port.Way == Way.IN ? _inPreview : _outPreview, _view.transform);
-                    
-                    previewArrow.transform.localPosition = new Vector3(node.LocalPosition.x, previewArrow.transform.position.y, node.LocalPosition.y);
-                    
-                    // TODO: Find why we need to invert the angle when the machine is only 1x1 (especially with curved conveyor).
-                    previewArrow.transform.Rotate(Vector3.up, port.Side.AngleFromSide(machineTemplate.Nodes.Count == 1));
-                    
-                    _previewObjects.Add(previewArrow);
-                }
-            }
-        }
         
         public void RotatePreview(int angle)
         {
@@ -62,21 +43,14 @@ namespace Components.Machines
         
         public void ConfirmPlacement()
         {
-            foreach (var previewObject in _previewObjects)
-            {
-                Destroy(previewObject);
-            }
-            
-            _previewObjects.Clear();
-            
-            _initialized = true;
-            
             _machine.OnTick += Tick;
             _machine.OnPropagateTick += PropagateTick;
             _machine.OnItemAdded += ShowItem;
+            Machine.OnSelected += HandleMachineSelected;
+            
+            _initialized = true;
             _machine.Behavior.SetInitialProcessTime(_machine.Template.ProcessTime);
             _machine.LinkNodeData();
-
 
             if(_machine.Behavior is DestructorMachineBehaviour destructor)
             {
@@ -84,21 +58,24 @@ namespace Components.Machines
 			}
 
             AddMachineToChain();
+            
+            ToggleDirectionalArrows(false);
         }
 
         // ------------------------------------------------------------------------- DESTROY -------------------------------------------------------------------------
         private void OnDestroy()
         {
+            _machine.OnTick -= Tick;
+            _machine.OnPropagateTick -= PropagateTick;
+            _machine.OnItemAdded -= ShowItem;
+            Machine.OnSelected -= HandleMachineSelected;
+            
             if (!_initialized)
             {
                 return;
             }
             
             RemoveMachineFromChain();
-            
-            _machine.OnTick -= Tick;
-            _machine.OnPropagateTick -= PropagateTick;
-            _machine.OnItemAdded -= ShowItem;
         }
 
         // ------------------------------------------------------------------------- TICK -------------------------------------------------------------------------
@@ -214,6 +191,11 @@ namespace Components.Machines
         // TODO: The ingredient should not be controlled by the machine but need to be independent and linked to a machine.
         private void ShowItem(bool show)
         {
+            if (!Machine.Template.ShowItem)
+            {
+                return;
+            }
+            
             if (show)
             {
                 _ingredientController.CreateRepresentationFromTemplate(_machine.InIngredients);
@@ -227,7 +209,69 @@ namespace Components.Machines
         //TO Change : special for destructor behavior
         private void ShowItem(IngredientTemplate ingredient)
         {
+            if (!Machine.Template.ShowItem)
+            {
+                return;
+            }
+            
 			_ingredientController.CreateFavoriteSellerItemRepresentationFromTemplate(ingredient);
 		}
+
+        // ------------------------------------------------------------------------- CONTEXTUAL ACTIONS -------------------------------------------------------------------------
+        public void Move()
+        {
+            Machine.OnMove?.Invoke(Machine);
+        }
+
+        public void Configure()
+        {
+            Machine.OnConfigure?.Invoke(Machine);
+        }
+
+        public void Retrieve()
+        {
+            Machine.OnRetrieve?.Invoke(Machine, true);
+        }
+        
+        // ------------------------------------------------------------------------- DIRECTIONAL ARROWS -------------------------------------------------------------------------
+        private void SetupDirectionalArrows(MachineTemplate machineTemplate)
+        {
+            _directionalArrows = new List<GameObject>();
+            
+            foreach (var node in machineTemplate.Nodes)
+            {
+                foreach (var port in node.Ports)
+                {
+                    var previewArrow = Instantiate(port.Way == Way.IN ? _inPreview : _outPreview, _view.transform);
+                    
+                    previewArrow.transform.localPosition = new Vector3(node.LocalPosition.x, previewArrow.transform.position.y, node.LocalPosition.y);
+                    
+                    // TODO: Find why we need to invert the angle when the machine is only 1x1 (especially with curved conveyor).
+                    previewArrow.transform.Rotate(Vector3.up, port.Side.AngleFromSide(machineTemplate.Nodes.Count == 1));
+                    
+                    _directionalArrows.Add(previewArrow);
+                }
+            }
+        }
+        
+        private void ToggleDirectionalArrows(bool toggle)
+        {
+            for (int i = 0; i < _directionalArrows.Count; i++)
+            {
+                _directionalArrows[i].SetActive(toggle);
+            }
+        }
+        
+        // ------------------------------------------------------------------------- HANDLERS -------------------------------------------------------------------------
+        private void HandleMachineSelected(Machine machine, bool selected)
+        {
+            if (Machine != machine)
+            {
+                ToggleDirectionalArrows(false);
+                return;
+            }
+            
+            ToggleDirectionalArrows(selected);
+        }
     }
 }

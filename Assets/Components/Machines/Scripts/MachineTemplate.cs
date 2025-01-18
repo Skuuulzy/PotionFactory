@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Components.Machines
 {
-    [CreateAssetMenu(fileName = "New Machine Template", menuName = "Machines/Machine Template")]
+    [CreateAssetMenu(fileName = "New Machine Template", menuName = "Component/Machines/Machine Template")]
     public class MachineTemplate : ScriptableObject
     {
         [Header("Definition")]
@@ -19,8 +19,9 @@ namespace Components.Machines
 
         [Header("Structure")] 
         [SerializeField] private List<Node> _nodes;
-        
-        [Header("Process")]
+
+        [Header("Process")] 
+        [SerializeField, Tooltip("Show the item in the machine on the map 3D view")] private bool _showItem;
         [SerializeField] private bool _canTakeInfiniteIngredients;
         [SerializeField] private int _inSlotIngredientCount = 1;
         [SerializeField] private int _outSlotIngredientCount = 1;
@@ -37,6 +38,11 @@ namespace Components.Machines
         [SerializeField] private List<UIContextualComponent> _contextualComponents;
         [SerializeField] private string _uiGameplayDescription;
         [SerializeField] private string _uiLoreDescription;
+        [SerializeField] private int _contextMenuHeight = 2;
+        [SerializeField] private bool _canSell = true;
+        [SerializeField] private bool _canMove = true;
+        [SerializeField] private bool _canConfigure = true;
+
         
         public string Name => _name;
         public MachineType Type => _type;
@@ -46,6 +52,7 @@ namespace Components.Machines
 
         public List<Node> Nodes => GetNodeInstance();
 
+        public bool ShowItem => _showItem;
         public bool CanTakeInfiniteIngredients => _canTakeInfiniteIngredients;
         public int InSlotIngredientCount => _inSlotIngredientCount;
         public int OutSlotIngredientCount => _outSlotIngredientCount;
@@ -54,6 +61,8 @@ namespace Components.Machines
         public int ProcessTime => _processTime;
 
         public float ShopSpawnProbability => _shopSpawnProbability;
+
+        public int ContextMenuHeight => _contextMenuHeight;
         public int ShopPrice => _shopPrice;
         public int SellPrice => _sellPrice;
         public bool CannotBeSell => _cannotBeSell;
@@ -61,7 +70,10 @@ namespace Components.Machines
         public List<UIContextualComponent> ContextualComponents => _contextualComponents;
         public string UIGameplayDescription => _uiGameplayDescription;
         public string UILoreDescription => _uiLoreDescription;
-        
+        public bool CanSell => _canSell;
+        public bool CanMove => _canMove;
+        public bool CanConfigure => _canConfigure;
+
         private List<Node> GetNodeInstance()
         {
             List<Node> result = new List<Node>();

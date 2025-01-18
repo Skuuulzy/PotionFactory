@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Components.Machines.Behaviors
 {
-    [CreateAssetMenu(fileName = "New Machine Behaviour", menuName = "Machines/Behavior/Extractor")]
+    [CreateAssetMenu(fileName = "New Machine Behaviour", menuName = "Component/Machines/Behavior/Extractor")]
     public class ExtractorMachineBehaviour : MachineBehavior
     {
         [ShowInInspector, ReadOnly] private IngredientTemplate _ingredientTemplate;

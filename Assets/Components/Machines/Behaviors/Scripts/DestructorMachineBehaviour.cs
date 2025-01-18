@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Components.Machines.Behaviors
 {
-    [CreateAssetMenu(fileName = "New Machine Behaviour", menuName = "Machines/Behavior/Destructor")]
+    [CreateAssetMenu(fileName = "New Machine Behaviour", menuName = "Component/Machines/Behavior/Destructor")]
     public class DestructorMachineBehaviour : MachineBehavior
     {
         private IngredientTemplate _specialIngredientTemplate;

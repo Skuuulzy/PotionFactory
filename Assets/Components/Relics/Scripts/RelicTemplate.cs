@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "New Relic Template", menuName = "Relic/Relic Template")]
+[CreateAssetMenu(fileName = "New Relic Template", menuName = "Component/Relic/Relic Template")]
 
 public class RelicTemplate : ScriptableObject
 {

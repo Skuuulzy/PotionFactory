@@ -15,16 +15,18 @@ namespace Components.Grid
 
         private Machine _hoveredMachine;
         private bool _initialized;
+        private bool _inPreview;
 
         private void Start()
         {
             _camera = Camera.main;
             GridController.OnGridGenerated += HandleGridGenerated;
+            GridPreviewController.OnPreview += HandlePreview;
         }
 
         private void Update()
         {
-            if (!_initialized)
+            if (!_initialized || _inPreview)
             {
                 return;
             }
@@ -35,16 +37,26 @@ namespace Components.Grid
             {
                 TrySelectMachine();
             }
+            if (Input.GetMouseButtonDown(1))
+            {
+                Machine.OnSelected?.Invoke(null, false);
+            }
         }
 
         private void OnDestroy()
         {
             GridController.OnGridGenerated -= HandleGridGenerated;
+            GridPreviewController.OnPreview -= HandlePreview;
         }
 
         private void HandleGridGenerated()
         {
             _initialized = true;
+        }
+        
+        private void HandlePreview(bool preview)
+        {
+            _inPreview = preview;
         }
         
         private void TryHoverMachine()
@@ -98,7 +110,7 @@ namespace Components.Grid
 
             if (chosenCell.ContainsNode)
             {
-                chosenCell.Node.Machine.Select();
+                chosenCell.Node.Machine.Select(true);
             }
         }
     }

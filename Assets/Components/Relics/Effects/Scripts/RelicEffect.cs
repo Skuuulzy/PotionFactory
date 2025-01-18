@@ -10,7 +10,7 @@ public class RelicEffect : ScriptableObject
 	}
 }
 
-[CreateAssetMenu(fileName = "New Increase Machine Process Time Template", menuName = "Relic/Relic Effect")]
+[CreateAssetMenu(fileName = "New Increase Machine Process Time Template", menuName = "Component/Relic/Relic Effect")]
 public class IncreaseMachineProcessTimeEffect : RelicEffect
 {
 	[SerializeField] private float _bonusProcessTime;

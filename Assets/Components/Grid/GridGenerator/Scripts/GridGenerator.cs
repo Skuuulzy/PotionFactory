@@ -9,7 +9,6 @@ using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
-using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
 
 namespace Components.Grid.Generator
@@ -582,11 +581,12 @@ namespace Components.Grid.Generator
 		}
 
 		// ------------------------------------------------------------------------ SAVE AND LOAD MAP -------------------------------------------------------------
+
 		public void SetFileName(string fileName)
 		{
 			_fileName = fileName;
 		}
-		
+#if UNITY_EDITOR
 		public void SaveMap()
 		{
 			SerializedCell[] serializeCellArray = new SerializedCell[_cellList.Count];
@@ -602,7 +602,7 @@ namespace Components.Grid.Generator
 			AssetDatabase.Refresh();
 			Debug.Log($"Map saved to: {Path.Combine(MapsPath, _fileName)}");
 		}
-
+#endif
 		public void LoadMap()
 		{
 			string jsonContent = File.ReadAllText(Path.Combine(MapsPath, _fileName));
