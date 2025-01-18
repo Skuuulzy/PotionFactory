@@ -242,8 +242,10 @@ namespace Components.Map
 							float angle = Mathf.Atan2(endPos.y - startPos.y, endPos.x - startPos.x) * Mathf.Rad2Deg;
 							lineRect.rotation = Quaternion.Euler(0, 0, angle);
 
+							lineObj.SetNormalizedDistance(Mathf.CeilToInt(distance / 150));
 							drawnConnections.Add((node, connectedNode));
 							node.Lines.Add(lineObj);
+							connectedNode.Lines.Add(lineObj);
 						}
 					}
 				}
@@ -363,7 +365,7 @@ namespace Components.Map
 				{
 					foreach(LevelNode node in island.LevelNodeList)
 					{
-						if(node == _startingSelectedNode)
+						if(node == _startingSelectedNode || _startingSelectedNode.ConnectedNodes.Contains(node))
 						{
 							continue;
 						}
