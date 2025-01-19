@@ -6,7 +6,9 @@ using UnityEngine.UI;
 
 public class NodeLineController : MonoBehaviour
 {
-    [SerializeField] private Image _nodeLineImage;
+	[SerializeField] private Transform _nodeLineParent;
+	[SerializeField] private Image _nodeLinePrefab;
+    [SerializeField] private List<Image> _nodeLineImageList = new List<Image>();
 
     [SerializeField] private Color _lineConstructedColor;
     [SerializeField] private Color _lineUnconstructedColor;
@@ -15,21 +17,35 @@ public class NodeLineController : MonoBehaviour
 	private int _normalizedDistance; 
 
 	public int NormalizedDistance => _normalizedDistance;
-	private void Start()
-	{
-        _nodeLineImage.color = _lineUnconstructedColor;
-	}
 
 
-	public void SetConstructedLineColor(bool value)
+
+	public void SetConstructedLineColor(bool value, int roadSectionNumber = 1)
 	{
-        _nodeLineImage.color = value ? _lineConstructedColor : _lineUnconstructedColor;
-		//_distanceText.gameObject.SetActive(value);
+		for(int i = 0; i < _nodeLineImageList.Count; i++)
+		{
+			//Return if we go further the road section number 
+			if(i >= roadSectionNumber)
+			{
+				_nodeLineImageList[i].color = _lineUnconstructedColor;
+			}
+			else
+			{
+				_nodeLineImageList[i].color = value ? _lineConstructedColor : _lineUnconstructedColor;
+			}
+			
+		}
+   
 	}
 
 	public void SetNormalizedDistance(int value)
 	{
 		_normalizedDistance = value;
 		_distanceText.text = value.ToString();
+		for(int i = 0; i < _normalizedDistance; i++)
+		{
+			Image image = Instantiate(_nodeLinePrefab, _nodeLineParent);
+			_nodeLineImageList.Add(image);
+		}
 	}
 }
