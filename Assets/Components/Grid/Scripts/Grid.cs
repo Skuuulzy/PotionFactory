@@ -14,7 +14,7 @@ namespace Components.Grid
         private readonly List<Cell> _cells;
         
         // ------------------------------------------------------------------------- CONSTRUCTOR -------------------------------------------------------------------------
-        public Grid(int width, int height, float cellSize, Vector3 originPosition, Transform parentTransform, bool showDebug)
+        public Grid(int width, int height, float cellSize, Vector3 originPosition, bool showDebug)
         {
             _width = width;
             _height = height;
@@ -36,11 +36,11 @@ namespace Components.Grid
 
             if (showDebug)
             {
-                DrawGridDebug(width, height, cellSize, parentTransform);
+                DrawGridDebug();
             }
         }
 
-        public Grid(int width, int height, float cellSize, Vector3 originPosition, Transform parentTransform, bool showDebug, SerializedCell[] serializedCellList)
+        public Grid(int width, int height, float cellSize, Vector3 originPosition, bool showDebug, SerializedCell[] serializedCellList)
 		{
             _width = width;
             _height = height;
@@ -61,7 +61,7 @@ namespace Components.Grid
 
             if (showDebug)
             {
-                DrawGridDebug(width, height, cellSize, parentTransform);
+                DrawGridDebug();
             }
         }
 
@@ -170,8 +170,7 @@ namespace Components.Grid
 
 			return cellsInCircle;
 		}
-
-
+        
 		public void ClearNodes()
         {
             foreach (var cell in _cells)
@@ -190,33 +189,45 @@ namespace Components.Grid
         }
         
         // ------------------------------------------------------------------------- DEBUG -------------------------------------------------------------------------
-        private void DrawGridDebug(int width, int height, float cellSize, Transform parentTransform)
+        public void DrawGridDebug()
         {
-            TextMesh[][] debugTextArray = new TextMesh[width][];
-            for (int index = 0; index < width; index++)
+            var oldDebug = GameObject.Find("GRID_TEXT_DEBUG");
+            if (oldDebug)
             {
-                debugTextArray[index] = new TextMesh[height];
+                Object.Destroy(oldDebug);
+            }
+            
+            var debugTextArray = new TextMesh[_width][];
+            for (int index = 0; index < _width; index++)
+            {
+                debugTextArray[index] = new TextMesh[_height];
             }
 
+            GameObject parent = new GameObject("GRID_TEXT_DEBUG");
+            
             for (int x = 0; x < _gridArray.GetLength(0); x++)
             {
                 for (int y = 0; y < _gridArray.GetLength(1); y++)
                 {
-                    //Create a new cell and add it to cellLList
-                    Cell cell = new Cell(x, y, cellSize, false);
-                    _cells.Add(cell);
+                    if (!TryGetCellByCoordinates(x,y, out var cell))
+                    {
+                        continue;
+                    }
 
                     var worldPosition = GetWorldPosition(x, y) + new Vector3(_cellSize / 2, 0, _cellSize / 2);
 
-                    debugTextArray[x][y] = UtilsClass.CreateWorldText($"({x},{y})", parentTransform, worldPosition, 18, Color.red, TextAnchor.MiddleCenter);
+                    var color = cell.Unlocked ? Color.white : Color.red;
+                    
+                    debugTextArray[x][y] = UtilsClass.CreateWorldText($"({x},{y})", parent.transform, worldPosition, 16, color, TextAnchor.MiddleCenter);
                     debugTextArray[x][y].transform.rotation = Quaternion.Euler(90, 0, 0);
+                    
                     Debug.DrawLine(GetWorldPosition(x, y), GetWorldPosition(x, y + 1), Color.white, float.PositiveInfinity);
                     Debug.DrawLine(GetWorldPosition(x, y), GetWorldPosition(x + 1, y), Color.white, float.PositiveInfinity);
                 }
             }
 
-            Debug.DrawLine(GetWorldPosition(0, height), GetWorldPosition(width, height), Color.white, float.PositiveInfinity);
-            Debug.DrawLine(GetWorldPosition(width, 0), GetWorldPosition(width, height), Color.white, float.PositiveInfinity);
+            Debug.DrawLine(GetWorldPosition(0, _height), GetWorldPosition(_width, _height), Color.white, float.PositiveInfinity);
+            Debug.DrawLine(GetWorldPosition(_width, 0), GetWorldPosition(_width, _height), Color.white, float.PositiveInfinity);
         }
     }
 }

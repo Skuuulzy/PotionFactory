@@ -144,8 +144,6 @@ namespace Components.Grid.Generator
 			}
 		}
 
-
-
 		// ------------------------------------------------------------------------- SELECTION -------------------------------------------------------------------------
 		private void InstantiateNewPreview()
 		{
@@ -460,7 +458,7 @@ namespace Components.Grid.Generator
 				ClearGrid();
 			}
 
-			_grid = new Grid(_gridXValue, _gridYValue, _cellSize, _startPosition, _groundHolder, false);
+			_grid = new Grid(_gridXValue, _gridYValue, _cellSize, _startPosition, false);
 			_cellList = new List<Cell>();
 			_allTilesController.SelectATileType();
 
@@ -501,7 +499,7 @@ namespace Components.Grid.Generator
 			{
 				ClearGrid();
 			}
-			_grid = new Grid(_gridXValue, _gridYValue, _cellSize, _startPosition, _groundHolder, false, serializedCellList.ToArray());
+			_grid = new Grid(_gridXValue, _gridYValue, _cellSize, _startPosition, false, serializedCellList.ToArray());
 			_cellList = new List<Cell>();
 			// Instantiate ground blocks
 			for (int x = 0; x < _grid.GetWidth(); x++)

@@ -63,7 +63,7 @@ namespace Components.Grid
 		private readonly List<DestructorMachineBehaviour> _sellersBehaviours = new();
 		private readonly List<ExtractorMachineBehaviour> _extractorBehaviours = new();
 		
-		[ShowInInspector] public Grid Grid { get; private set; }
+		public Grid Grid { get; private set; }
 		
 		public Vector3 OriginPosition => _originPosition;
 		
@@ -321,7 +321,7 @@ namespace Components.Grid
 
 		private void GenerateEmptyGrid()
 		{
-			Grid = new Grid(_gridXValue, _gridYValue, _cellSize, _originPosition, _groundHolder, _showDebug);
+			Grid = new Grid(_gridXValue, _gridYValue, _cellSize, _originPosition, _showDebug);
 			_tileController.SelectATileType();
 			
 			// Instantiate ground blocks 
@@ -339,7 +339,7 @@ namespace Components.Grid
 		
 		private void GenerateGridFromTemplate(SerializedCell[] serializedCells)
 		{
-			Grid = new Grid(_gridXValue, _gridYValue, _cellSize, _originPosition, _groundHolder, _showDebug, serializedCells);
+			Grid = new Grid(_gridXValue, _gridYValue, _cellSize, _originPosition, _showDebug, serializedCells);
 
 			// Instantiate ground blocks
 			for (int x = 0; x < Grid.GetWidth(); x++)
@@ -428,6 +428,12 @@ namespace Components.Grid
 					Debug.LogError($"No cell to unlock fond on {parcelCoordinates[i]}");
 				}
 			}
+		}
+
+		[Button(ButtonSizes.Medium)]
+		private void UpdateDebug()
+		{
+			Grid.DrawGridDebug();
 		}
 		
 		// ------------------------------------------------------------------------ MACHINE METHODS ---------------------------------------------------------------------- 
