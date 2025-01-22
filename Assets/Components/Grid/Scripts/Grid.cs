@@ -115,6 +115,14 @@ namespace Components.Grid
             return false;
         }
 
+        public bool TryGetCellByCoordinates(Vector2Int coordinates, out Cell foundCell)
+        {
+            var cellFound = TryGetCellByCoordinates(coordinates.x, coordinates.y, out Cell cell);
+            foundCell = cell;
+
+            return cellFound;
+        }
+
         /// <summary>
         /// From a world position return a cell if one is found.
         /// </summary>

@@ -1,6 +1,5 @@
 using System;
 using Components.Map;
-using Components.Shop.UI;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using VComponent.Tools.Timer;
@@ -11,7 +10,7 @@ public class StateController : MonoBehaviour
 	[SerializeField] private int _planningFactoryStateTime = 180;
 	[SerializeField] private int _resolutionFactoryStateTime = 120;
 
-	[SerializeField] private string _currentDebugStateName;
+	public string CurrentDebugStateName;
 	
 	private CountdownTimer _countdownTimer;
 	private StateMachine _stateMachine;
@@ -84,21 +83,21 @@ public class StateController : MonoBehaviour
 	//------------------------------------------------------------------------ STATE STARTED -------------------------------------------------------------------------------------------- 
 	private void HandleMapState(MapState state)
 	{
-		_currentDebugStateName = "MAP";
+		CurrentDebugStateName = "MAP";
 		
 		MapGenerator.OnMapChoiceConfirm += state.MapChoiceConfirmed;
 	}
 
 	private void HandleShopState(ShopState state)
 	{
-		_currentDebugStateName = "SHOP";
+		CurrentDebugStateName = "SHOP";
 		_countdownTimer = null;
 		OnStateStarted?.Invoke(state);
 	}
 
 	private void HandlePlanningFactoryState(PlanningFactoryState state)
 	{
-		_currentDebugStateName = "PLANNING";
+		CurrentDebugStateName = "PLANNING";
 		
 		_countdownTimer = new CountdownTimer(_planningFactoryStateTime);
 		BaseState.OnStateEnded += _countdownTimer.Stop;
@@ -110,7 +109,7 @@ public class StateController : MonoBehaviour
 
 	private void HandleResolutionFactoryState(ResolutionFactoryState state)
 	{
-		_currentDebugStateName = "RESOLUTION";
+		CurrentDebugStateName = "RESOLUTION";
 		
 		_countdownTimer = new CountdownTimer(_resolutionFactoryStateTime);
 		BaseState.OnStateEnded += _countdownTimer.Stop;

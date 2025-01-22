@@ -1,21 +1,21 @@
 using UnityEngine;
 using System.Collections.Generic;
-using Components.Machines;
 using Sirenix.OdinInspector;
 using System;
 using System.Linq;
+using Components.Machines;
+using Components.Machines.Behaviors;
 using Components.Grid.Tile;
 using Components.Grid.Obstacle;
-using Components.Ingredients;
-using Components.Inventory;
-using Components.Machines.Behaviors;
-using Components.Tools.ExtensionMethods;
-using Database;
-using Components.Map;
-using Components.Bundle;
 using Components.Grid.Decorations;
 using Components.Grid.Generator;
+using Components.Ingredients;
+using Components.Inventory;
+using Components.Map;
+using Components.Bundle;
 using Components.Tick;
+using Components.Tools.ExtensionMethods;
+using Database;
 
 namespace Components.Grid
 {
@@ -52,6 +52,10 @@ namespace Components.Grid
 		[Header("Sellers Parameters")]
 		[SerializeField] private List<Vector2Int> _sellersCoordinates;
 
+		[Header("Grid Parcels")] 
+		[SerializeField] private GridParcel _startParcel;
+		[SerializeField] private List<GridParcel> _unlockableParcels;
+
 		// Grid 
 		private readonly List<MachineController> _instancedObjects = new();
 		
@@ -59,7 +63,7 @@ namespace Components.Grid
 		private readonly List<DestructorMachineBehaviour> _sellersBehaviours = new();
 		private readonly List<ExtractorMachineBehaviour> _extractorBehaviours = new();
 		
-		public Grid Grid { get; private set; }
+		[ShowInInspector] public Grid Grid { get; private set; }
 		
 		public Vector3 OriginPosition => _originPosition;
 		
@@ -252,6 +256,8 @@ namespace Components.Grid
 			{
 				GenerateEmptyGrid();
 			}
+			
+			UnlockParcel(_startParcel);
 		}
 
 		private void ClearGrid()
@@ -333,7 +339,7 @@ namespace Components.Grid
 		
 		private void GenerateGridFromTemplate(SerializedCell[] serializedCells)
 		{
-			Grid = new Grid(_gridXValue, _gridYValue, _cellSize, _originPosition, _groundHolder, false, serializedCells);
+			Grid = new Grid(_gridXValue, _gridYValue, _cellSize, _originPosition, _groundHolder, _showDebug, serializedCells);
 
 			// Instantiate ground blocks
 			for (int x = 0; x < Grid.GetWidth(); x++)
@@ -406,6 +412,23 @@ namespace Components.Grid
 				Debug.LogError("No water prefab found.");
 			}
 		}
+
+		private void UnlockParcel(GridParcel parcel)
+		{
+			var parcelCoordinates = parcel.Coordinates();
+			
+			for (int i = 0; i < parcelCoordinates.Count; i++)
+			{
+				if (Grid.TryGetCellByCoordinates(parcelCoordinates[i], out var cell))
+				{
+					cell.Unlock();
+				}
+				else
+				{
+					Debug.LogError($"No cell to unlock fond on {parcelCoordinates[i]}");
+				}
+			}
+		}
 		
 		// ------------------------------------------------------------------------ MACHINE METHODS ---------------------------------------------------------------------- 
 		private void ClearMachineGridData(Machine machineToClear)
@@ -444,9 +467,9 @@ namespace Components.Grid
 		}
 
 		// -------------------------------------------------------------------------- EXTRACTOR & MARCHANDS -------------------------------------------------------------------------- 
-		private List<(int, int)> GetExtractorRandomCoordinates(int extractorCount)
+		private List<Vector2Int> GetExtractorRandomCoordinates(int extractorCount)
 		{
-			var extractorPotentialCoordinates = new List<(int, int)>();
+			var extractorPotentialCoordinates = new List<Vector2Int>();
 			
 			// Getting potential coordinates
 			for (int x = 0; x < Grid.GetWidth() - 4; x++)
@@ -456,14 +479,14 @@ namespace Components.Grid
 					// Get the zone where the extractors can be placed 
 					if ((x == 0 && z <= Grid.GetWidth() / 2) || z == Grid.GetHeight() - 1 || z == 0)
 					{
-						extractorPotentialCoordinates.Add(new ValueTuple<int, int>(x, z));
+						extractorPotentialCoordinates.Add(new Vector2Int(x, z));
 					}
 				}
 			}
 
 			// Selecting random coordinates
 			var randomExtractorCoordinates = ListExtensionsMethods.GetRandomIndexes(extractorPotentialCoordinates.Count, extractorCount);
-			var randomSelectedCoordinates = new List<(int, int)>();
+			var randomSelectedCoordinates = new List<Vector2Int>();
 			for (int i = 0; i < randomExtractorCoordinates.Count; i++)
 			{
 				randomSelectedCoordinates.Add(extractorPotentialCoordinates[randomExtractorCoordinates[i]]);
@@ -480,7 +503,7 @@ namespace Components.Grid
 			// Placing extractors
 			for (int i = 0; i < randomCoordinates.Count; i++)
 			{
-				Grid.TryGetCellByCoordinates(randomCoordinates[i].Item1, randomCoordinates[i].Item2, out var chosenCell);
+				Grid.TryGetCellByCoordinates(randomCoordinates[i].x, randomCoordinates[i].y, out var chosenCell);
 					
 				var extractorTemplate = ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("Dispenser");
 
