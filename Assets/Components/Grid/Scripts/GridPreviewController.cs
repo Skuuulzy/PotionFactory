@@ -342,7 +342,7 @@ namespace Components.Grid
 
             return true;
         }
-
+        
         // ------------------------------------------------------------------------- EVENT HANDLERS -------------------------------------------------------------------------------- 
         private void HandlePlanningFactoryState(PlanningFactoryState _)
         {

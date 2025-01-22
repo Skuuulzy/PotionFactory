@@ -15,6 +15,7 @@ public class RunConfiguration : ScriptableObject
 	[Tooltip("For every gold interest value give the GoldInterestAmountPerRound as bonus gold")]
 	[SerializeField] private int _goldInterestValue = 5;
 	[SerializeField] private int _goldInterestAmountPerRound = 1;
+	
 	public List<RunStateConfiguration> RunStateList => _runStateList;
 	public int GoldAmountPerRound => _goldAmountPerRound;
 	public int GoldInterestValue => _goldInterestValue;
@@ -23,7 +24,6 @@ public class RunConfiguration : ScriptableObject
 	//-------------------------------------------------------------------------------------------------- METHODS -------------------------------------------------------------------------------------------------------------------
 	public List<IngredientTemplate> GetPossibleIngredients(int stateNumber, List<IngredientTemplate> baseIngredients)
 	{
-		List<IngredientTemplate> finalListOfIngredient = new List<IngredientTemplate>();
 		RunStateConfiguration runStateConfiguration = _runStateList.Find(configuration => configuration.StateNumber == stateNumber);
 
 		//Get all items
@@ -45,11 +45,8 @@ public class RunConfiguration : ScriptableObject
 				break;
 		}
 
-
 		//Second filter : Get only ingredient that can be done by basic ingredient
-		finalListOfIngredient = IngredientTransformation.FindMakeableIngredients(allRecipes, baseIngredients).ToList();
-
-		return finalListOfIngredient;
+		return IngredientTransformation.FindMakeableIngredients(allRecipes, baseIngredients).ToList();
 	}
 
 	//-------------------------------------------------------------------------------------------------- STRUCTS -------------------------------------------------------------------------------------------------------------------
