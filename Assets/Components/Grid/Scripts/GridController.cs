@@ -2,7 +2,9 @@ using UnityEngine;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using System;
+using System.Collections;
 using System.Linq;
+using System.Threading.Tasks;
 using Components.Machines;
 using Components.Machines.Behaviors;
 using Components.Grid.Tile;
@@ -15,6 +17,7 @@ using Components.Map;
 using Components.Bundle;
 using Components.Tick;
 using Components.Tools.ExtensionMethods;
+using Cysharp.Threading.Tasks;
 using Database;
 
 namespace Components.Grid
@@ -55,6 +58,7 @@ namespace Components.Grid
 		[Header("Grid Parcels")] 
 		[SerializeField] private GridParcel _startParcel;
 		[SerializeField] private List<GridParcel> _parcelsToUnlock;
+		[SerializeField] private float _parcelAnimationUnlockTime = 2f;
 		
 		// Grid 
 		private readonly List<MachineController> _machines = new();
@@ -63,7 +67,7 @@ namespace Components.Grid
 		//Sellers & Extractor
 		private readonly List<DestructorMachineBehaviour> _sellersBehaviours = new();
 		private readonly List<ExtractorMachineBehaviour> _extractorBehaviours = new();
-		
+
 		public Grid Grid { get; private set; }
 		
 		public Vector3 OriginPosition => _originPosition;
@@ -426,22 +430,41 @@ namespace Components.Grid
 			}
 		}
 
-		private void UnlockParcel(GridParcel parcel)
+		private async void UnlockParcel(GridParcel parcel)
 		{
 			var parcelCoordinates = parcel.Coordinates();
+			var tilesToUnlock = new List<TileController>();
 			
+			// Set the data
 			for (int i = 0; i < parcelCoordinates.Count; i++)
 			{
 				if (Grid.TryGetCellByCoordinates(parcelCoordinates[i], out var cell))
 				{
 					cell.Unlock();
-					_tiles[parcelCoordinates[i]].SetLockedState(false);
+					tilesToUnlock.Add(_tiles[parcelCoordinates[i]]);
 				}
 				else
 				{
 					Debug.LogError($"No cell to unlock fond on {parcelCoordinates[i]}");
 				}
 			}
+
+			// Animate unlock in parallel (to avoid frame rate issues)
+			var tasks = new List<UniTask>();
+			for (int i = 0; i < tilesToUnlock.Count; i++)
+			{
+				float delay = i * (_parcelAnimationUnlockTime / tilesToUnlock.Count);
+				tasks.Add(AnimateUnlock(tilesToUnlock[i], delay));
+			}
+			
+			await UniTask.WhenAll(tasks);
+		}
+		
+		// Helper Method
+		private async UniTask AnimateUnlock(TileController tile, float delay)
+		{
+			await UniTask.WaitForSeconds(delay);
+			tile.SetLockedState(false);
 		}
 
 		[Button(ButtonSizes.Medium)]
