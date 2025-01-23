@@ -16,9 +16,9 @@ namespace Components.Grid
         {
             List<Vector2Int> _coordinates = new List<Vector2Int>();
 
-            for (int x = 0; x < Lenght; x++)
+            for (int x = 0; x <= Lenght; x++)
             {
-                for (int y = 0; y < Width; y++)
+                for (int y = 0; y <= Width; y++)
                 {
                     _coordinates.Add(new Vector2Int(OriginPosition.x + x, OriginPosition.y + y));
                 }

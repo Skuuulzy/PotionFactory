@@ -445,6 +445,12 @@ namespace Components.Grid
 		}
 
 		[Button(ButtonSizes.Medium)]
+		private void UnlockParcelIndex(int index)
+		{
+			UnlockParcel(_parcelsToUnlock[index]);
+		}
+
+		[Button(ButtonSizes.Medium)]
 		private void UpdateDebug()
 		{
 			Grid.DrawGridDebug();

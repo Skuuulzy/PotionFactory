@@ -20561,9 +20561,18 @@ MonoBehaviour:
   - {x: 39, y: 30}
   _startParcel:
     OriginPosition: {x: 19, y: 19}
-    Lenght: 20
-    Width: 20
-  _unlockableParcels: []
+    Lenght: 19
+    Width: 19
+  _parcelsToUnlock:
+  - OriginPosition: {x: 1, y: 19}
+    Lenght: 18
+    Width: 19
+  - OriginPosition: {x: 1, y: 1}
+    Lenght: 18
+    Width: 18
+  - OriginPosition: {x: 19, y: 1}
+    Lenght: 19
+    Width: 19
 --- !u!1 &3142047636608174042
 GameObject:
   m_ObjectHideFlags: 0
