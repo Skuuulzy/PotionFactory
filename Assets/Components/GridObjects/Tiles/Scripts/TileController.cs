@@ -7,16 +7,27 @@ namespace Components.Grid.Tile
         [SerializeField] private TileType _tileType;
         
         public TileType TileType => _tileType;
+        
+        private TileTemplate TileTemplate => Template as TileTemplate;
 
         // ------------------------------------------------------------------------- INIT -------------------------------------------------------------------------		
         public void SetTileType(TileType tileType)
         {
             _tileType = tileType;
         }
-
-        public override void InstantiatePreview(GridObjectTemplate template, float scale)
+        
+        public void SetLockedState(bool locked)
         {
-            base.InstantiatePreview(template, scale);
+            if (View.TryGetComponent(out MeshRenderer meshRenderer))
+            {
+                meshRenderer.material = locked ? TileTemplate.LockedMaterial : TileTemplate.UnlockedMaterial;
+            }
+        }
+
+        // TODO: Convert the getter to this
+        public TileType GetTileType()
+        {
+            return TileTemplate.TileType;
         }
     }
 

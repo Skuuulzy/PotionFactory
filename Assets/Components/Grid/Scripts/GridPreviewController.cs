@@ -333,8 +333,7 @@ namespace Components.Grid
                     return false;
                 }
                 
-                // One node of the machine overlap a cell that already contain an object, is not unlocked or is water. 
-                if (!overlapCell.Unlocked || overlapCell.ContainsObject || overlapCell.TileController.TileType == TileType.WATER)
+                if (!overlapCell.IsConstructable())
                 {
                     return false;
                 }

@@ -57,8 +57,8 @@ namespace Components.Grid
 		[SerializeField] private List<GridParcel> _parcelsToUnlock;
 		
 		// Grid 
-		private readonly List<MachineController> _instancedObjects = new();
-		private readonly List<GridObjectController> _instancedGridObjects = new();
+		private readonly List<MachineController> _machines = new();
+		private readonly Dictionary<Vector2Int, TileController> _tiles = new();
 		
 		//Sellers & Extractor
 		private readonly List<DestructorMachineBehaviour> _sellersBehaviours = new();
@@ -96,10 +96,10 @@ namespace Components.Grid
 		// ------------------------------------------------------------------------- ADD OBJECT ------------------------------------------------------------------------- 
 		public void AddMachineToGrid(MachineController machineController, Cell originCell, bool fetchFromInventory)
 		{
-			_instancedObjects.Add(machineController);
+			_machines.Add(machineController);
 
 			machineController.transform.position = Grid.GetWorldPosition(originCell.X, originCell.Y) + new Vector3(_cellSize / 2, 0, _cellSize / 2);
-			machineController.transform.name = $"{machineController.Machine.Template.Name}_{_instancedObjects.Count}";
+			machineController.transform.name = $"{machineController.Machine.Template.Name}_{_machines.Count}";
 			machineController.transform.parent = _objectsHolder;
 
 			// Adding nodes to the cells.
@@ -146,13 +146,12 @@ namespace Components.Grid
 			}
 		}
 
+		// TODO: ALL OBJECT MUST USE THIS METHOD (OBSTACLES, TILES, MACHINES)
 		private GridObjectController AddObjectToGridFromTemplate(GridObjectTemplate template, Cell cell, float cellSize)
 		{
 			var gridObjectInstance = Instantiate(template.GridObject);
 			gridObjectInstance.InstantiateOnGrid(template, Grid.GetWorldPosition(cell.X, cell.Y), cellSize, _groundHolder);
 			
-			_instancedGridObjects.Add(gridObjectInstance);
-
 			return gridObjectInstance;
 		}
 
@@ -273,7 +272,7 @@ namespace Components.Grid
 
 		private void ClearGrid()
 		{
-			foreach (var machineController in _instancedObjects)
+			foreach (var machineController in _machines)
 			{
 				Destroy(machineController.gameObject);
 			}
@@ -295,18 +294,18 @@ namespace Components.Grid
 
 			Grid.ClearNodes();
 			Grid.ClearObstacles();
-			_instancedObjects.Clear();
+			_machines.Clear();
 		}
 
 		private void ClearMachines()
 		{
-			foreach (var machineController in _instancedObjects)
+			foreach (var machineController in _machines)
 			{
 				Destroy(machineController.gameObject);
 			}
 			
 			Grid.ClearNodes();
-			_instancedObjects.Clear();
+			_machines.Clear();
 		}
 
 		public bool ScanForPotentialConnection(Vector2Int cellPosition, Side sideToScan, Way desiredWay)
@@ -364,7 +363,12 @@ namespace Components.Grid
 
 					// TILES
 					var template = ScriptableObjectDatabase.GetTileTemplateByType(serializedCell.TileType);
-					AddObjectToGridFromTemplate(template, chosenCell, _cellSize);
+					var gridController = AddObjectToGridFromTemplate(template, chosenCell, _cellSize);
+					if (gridController is TileController tileController)
+					{
+						_tiles.Add(new Vector2Int(x, z), tileController);
+						tileController.SetLockedState(true);
+					}
 
 					// OBSTACLES
 					if (serializedCell.ObstacleType != ObstacleType.NONE)
@@ -431,6 +435,7 @@ namespace Components.Grid
 				if (Grid.TryGetCellByCoordinates(parcelCoordinates[i], out var cell))
 				{
 					cell.Unlock();
+					_tiles[parcelCoordinates[i]].SetLockedState(false);
 				}
 				else
 				{
@@ -468,7 +473,7 @@ namespace Components.Grid
 			ClearMachineGridData(machineToSell);
 			
 			// Remove 3D objects
-			_instancedObjects.Remove(machineToSell.Controller);
+			_machines.Remove(machineToSell.Controller);
 			Destroy(machineToSell.Controller.gameObject);
 
 			// Give back to the player

@@ -19,6 +19,7 @@ namespace Components.Grid
         public bool ContainsTile { get; private set; }
         public bool Unlocked { get; private set; }
 
+        private GridObjectController _gridObjectController;
 		private ObstacleController _obstacleController; 
 		private TileController _tileController; 
 		private Node _node; 
@@ -28,9 +29,9 @@ namespace Components.Grid
         private List<DecorationController> _decorationControllers;
        
         public ObstacleController ObstacleController => _obstacleController;  
-        public TileController TileController => _tileController;  
-        public Node Node => _node;
+        public TileController TileController => _tileController;
         public List<DecorationController> DecorationControllers => _decorationControllers;
+        public Node Node => _node;
 
         public Cell(int x, int y, float size, bool containsObject)
         {
@@ -125,5 +126,23 @@ namespace Components.Grid
         }
 
         public Vector2Int Position => new(X, Y);
+
+        public bool IsConstructable()
+        {
+	        if (!Unlocked || ContainsObject)
+	        {
+		        return false;
+	        }
+
+	        if (_gridObjectController is TileController tileController)
+	        {
+		        if (tileController.GetTileType() == TileType.WATER)
+		        {
+			        return false;
+		        }
+	        }
+
+	        return true;
+        }
     }
 }
