@@ -54,10 +54,11 @@ namespace Components.Grid
 
 		[Header("Grid Parcels")] 
 		[SerializeField] private GridParcel _startParcel;
-		[SerializeField] private List<GridParcel> _unlockableParcels;
-
+		[SerializeField] private List<GridParcel> _parcelsToUnlock;
+		
 		// Grid 
 		private readonly List<MachineController> _instancedObjects = new();
+		private readonly List<GridObjectController> _instancedGridObjects = new();
 		
 		//Sellers & Extractor
 		private readonly List<DestructorMachineBehaviour> _sellersBehaviours = new();
@@ -143,6 +144,16 @@ namespace Components.Grid
 				//Remove one machine from the inventory 
 				GrimoireController.Instance.DecreaseMachineToPlayerInventory(machineController.Machine.Template, 1);
 			}
+		}
+
+		private GridObjectController AddObjectToGridFromTemplate(GridObjectTemplate template, Cell cell, float cellSize)
+		{
+			var gridObjectInstance = Instantiate(template.GridObject);
+			gridObjectInstance.InstantiateOnGrid(template, Grid.GetWorldPosition(cell.X, cell.Y), cellSize, _groundHolder);
+			
+			_instancedGridObjects.Add(gridObjectInstance);
+
+			return gridObjectInstance;
 		}
 
 		private void TryConnectPort(Port port, Vector2Int neighbourPosition)
@@ -352,10 +363,8 @@ namespace Components.Grid
 					SerializedCell serializedCell = serializedCells.ToList().Find(cell => cell.X == x && cell.Y == z);
 
 					// TILES
-					if (serializedCell.TileType != TileType.NONE)
-					{
-						_tileController.GenerateTileFromType(chosenCell, Grid, _groundHolder, _cellSize, serializedCell.TileType);
-					}
+					var template = ScriptableObjectDatabase.GetTileTemplateByType(serializedCell.TileType);
+					AddObjectToGridFromTemplate(template, chosenCell, _cellSize);
 
 					// OBSTACLES
 					if (serializedCell.ObstacleType != ObstacleType.NONE)
