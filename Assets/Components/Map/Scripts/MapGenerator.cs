@@ -315,14 +315,21 @@ namespace Components.Map
 			_startingGameIngredientsBundles = _startingGameIngredientsBundles.OrderBy(_ => UnityEngine.Random.value).ToList();
 			List<LevelNode> potentialStartingLevelNodes = new List<LevelNode>();
 
+			var startingRoundIngredientsBundles = _startingRoundIngredientsBundles.OrderBy(_ => UnityEngine.Random.value).ToList();
 			for( int i = 0; i < _islandsControllers.Count; i++)
 			{
 				//Set starting bundle for Starting node of each island
 				_islandsControllers[i].InitStartingBundle(_startingGameIngredientsBundles[i]);
 				potentialStartingLevelNodes.Add(_islandsControllers[i].StartingLevelNode);
+
+				//checking if we have enough ingredients to fill the island
+				if(startingRoundIngredientsBundles.Count < _islandsControllers[i].NumberOfNodes)
+				{
+					startingRoundIngredientsBundles = _startingRoundIngredientsBundles.OrderBy(_ => UnityEngine.Random.value).ToList();
+				}
 				//Set ingredient bundle for every node except the starting node
-				_startingRoundIngredientsBundles = _startingRoundIngredientsBundles.OrderBy(_ => UnityEngine.Random.value).ToList();
-				_islandsControllers[i].Init(_startingRoundIngredientsBundles.Take(_islandsControllers[i].NumberOfNodes).ToArray());
+				_islandsControllers[i].Init(startingRoundIngredientsBundles.Take(_islandsControllers[i].NumberOfNodes).ToArray());
+				startingRoundIngredientsBundles.RemoveRange(0,_islandsControllers[i].NumberOfNodes);
 			}
 
 
