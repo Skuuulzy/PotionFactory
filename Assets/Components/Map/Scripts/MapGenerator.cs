@@ -1,5 +1,6 @@
 using Components.Bundle;
 using Components.Island;
+using Components.Order;
 using Components.Recipes;
 using Database;
 using System;
@@ -21,9 +22,8 @@ namespace Components.Map
 		[SerializeField] private List<UIIslandController> _islandsControllers = new List<UIIslandController>();
 
 		[Header("Helps")]
-		[SerializeField] private GameObject _explicationGO;
-		[SerializeField] private GameObject _firstExplicationGO;
-		[SerializeField] private GameObject _newTradeRoadExplicationGO;
+		[SerializeField] private OrderDialogueController _orderDialogueController;
+
 
 		private LevelNode _selectedNode;
 		private LevelNode _startingSelectedNode;
@@ -59,21 +59,20 @@ namespace Components.Map
 		private void Init(MapState state)
 		{
 			_mapGameObject.SetActive(true);
-			_explicationGO.SetActive(true);
+			_orderDialogueController.gameObject.SetActive(true);
 
 			//First map generation
 			if (state.StateIndex == 1)
 			{
 				RegenerateMap();
-				_firstExplicationGO.gameObject.SetActive(true);
-				_newTradeRoadExplicationGO.gameObject.SetActive(false);
+				_orderDialogueController.SetText("Choose your departure city, young apprentice!");
 			}
 			else
 			{
 				_isFirstGameChoice = false;
 				SelectStartingRoundNode(_startingSelectedNode);
-				_firstExplicationGO.gameObject.SetActive(false);
-				_newTradeRoadExplicationGO.gameObject.SetActive(true);
+				_orderDialogueController.SetText("Build a new trade route!");
+
 			}
 		}
 
