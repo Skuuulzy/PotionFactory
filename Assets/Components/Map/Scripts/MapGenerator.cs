@@ -15,11 +15,16 @@ namespace Components.Map
 	public class MapGenerator : MonoBehaviour
 	{
 		[SerializeField] private GameObject _mapGameObject;
-		[SerializeField] private List<RectTransform> _islandsParents;
 		[SerializeField] private RectTransform _nodeLineParent;
 		[SerializeField] private NodeLineController _linePrefab;
 		[SerializeField] private Button _confirmButton;
-		private List<UIIslandController> _islandsControllers = new List<UIIslandController>();
+		[SerializeField] private List<UIIslandController> _islandsControllers = new List<UIIslandController>();
+
+		[Header("Helps")]
+		[SerializeField] private GameObject _explicationGO;
+		[SerializeField] private GameObject _firstExplicationGO;
+		[SerializeField] private GameObject _newTradeRoadExplicationGO;
+
 		private LevelNode _selectedNode;
 		private LevelNode _startingSelectedNode;
 		private List<LevelNode> _alreadyConnectedLevelNodes;
@@ -54,16 +59,21 @@ namespace Components.Map
 		private void Init(MapState state)
 		{
 			_mapGameObject.SetActive(true);
+			_explicationGO.SetActive(true);
 
 			//First map generation
 			if (state.StateIndex == 1)
 			{
 				RegenerateMap();
+				_firstExplicationGO.gameObject.SetActive(true);
+				_newTradeRoadExplicationGO.gameObject.SetActive(false);
 			}
 			else
 			{
 				_isFirstGameChoice = false;
 				SelectStartingRoundNode(_startingSelectedNode);
+				_firstExplicationGO.gameObject.SetActive(false);
+				_newTradeRoadExplicationGO.gameObject.SetActive(true);
 			}
 		}
 
@@ -82,20 +92,13 @@ namespace Components.Map
 
 		private void ClearMap()
 		{
-			for(int i = 0; i < _islandsParents.Count; i++)
-			{
-				foreach (Transform child in _islandsParents[i])
-				{
-					Destroy(child.gameObject);
-				}
-			}
 
 			foreach (Transform child in _nodeLineParent)
 			{
 				Destroy(child.gameObject);
 			}
 
-			_islandsControllers = new List<UIIslandController>();
+			//_islandsControllers = new List<UIIslandController>();
 			_selectedNode = null;
 			_startingSelectedNode = null;
 			_alreadyConnectedLevelNodes = new List<LevelNode>();
@@ -108,64 +111,74 @@ namespace Components.Map
 		//------------------------------------------------------------------------------------------- MAP GENERATION -------------------------------------------------------------------------------------------
 		private void GenerateIslands()
 		{
-			_allIslandTemplate = _allIslandTemplate.OrderBy(_ => UnityEngine.Random.value).ToList();
-			for (int i = 0; i < _islandsParents.Count; i++)
+			//No more random selection of islands for V1 
+
+			//_allIslandTemplate = _allIslandTemplate.OrderBy(_ => UnityEngine.Random.value).ToList();
+			//for (int i = 0; i < _islandsParents.Count; i++)
+			//{
+			//	UIIslandController controller = Instantiate(_allIslandTemplate[i].Controller, _islandsParents[i]);
+			//	_islandsControllers.Add(controller);
+			//	controller.SetIslandName(_allIslandTemplate[i].Name);
+			//}
+
+			for (int i = 0; i < _islandsControllers.Count; i++)
 			{
-				UIIslandController controller = Instantiate(_allIslandTemplate[i].Controller, _islandsParents[i]);
-				_islandsControllers.Add(controller);
-				controller.SetIslandName(_allIslandTemplate[i].Name);
+				_islandsControllers[i].SetIslandName(_allIslandTemplate[i].Name);
 			}
 		}
 
 		public void ConnectIslands()
 		{
-			Dictionary<LevelNode, LevelNode> confirmedConnections = new Dictionary<LevelNode, LevelNode>();
+			//No more random connections of islands for V1 
 
-			foreach (var island in _islandsControllers)
-			{
-				Dictionary<LevelNode, List<LevelNode>> validConnectionByLevelNode = new Dictionary<LevelNode, List<LevelNode>>();
 
-				// Get all valid connection for each node
-				foreach (var node in island.LevelNodeList)
-				{
-					var validConnections = FindValidConnections(island, node);
-					validConnectionByLevelNode.Add(node, validConnections);
-				}
+			//Dictionary<LevelNode, LevelNode> confirmedConnections = new Dictionary<LevelNode, LevelNode>();
 
-				
-				foreach (var node in validConnectionByLevelNode.Keys)
-				{
-					foreach (var targetNode in validConnectionByLevelNode[node])
-					{
-						// Check if the targetNode is already connected
-						if (confirmedConnections.TryGetValue(targetNode, out var existingNode))
-						{
-							// If new node is closer then we change the old one by it
-							if (GetDistance(targetNode, node) < GetDistance(targetNode, existingNode))
-							{
-								confirmedConnections[targetNode] = node;
-							}
-						}
-						else
-						{
-							// Not connected so we create it
-							confirmedConnections[targetNode] = node;
-						}
-					}
-				}
-			}
+			//foreach (var island in _islandsControllers)
+			//{
+			//	Dictionary<LevelNode, List<LevelNode>> validConnectionByLevelNode = new Dictionary<LevelNode, List<LevelNode>>();
 
-			//Create connections
-			foreach (var kvp in confirmedConnections)
-			{
-				if(kvp.Key.ExternalConnectedNode.Count < 1 && kvp.Value.ExternalConnectedNode.Count < 1)
-				{
-					kvp.Key.ConnectedNodes.Add(kvp.Value);
-					kvp.Key.ExternalConnectedNode.Add(kvp.Value);
-					kvp.Value.ConnectedNodes.Add(kvp.Key);
-					kvp.Value.ExternalConnectedNode.Add(kvp.Key);
-				}
-			}
+			//	// Get all valid connection for each node
+			//	foreach (var node in island.LevelNodeList)
+			//	{
+			//		var validConnections = FindValidConnections(island, node);
+			//		validConnectionByLevelNode.Add(node, validConnections);
+			//	}
+
+
+			//	foreach (var node in validConnectionByLevelNode.Keys)
+			//	{
+			//		foreach (var targetNode in validConnectionByLevelNode[node])
+			//		{
+			//			// Check if the targetNode is already connected
+			//			if (confirmedConnections.TryGetValue(targetNode, out var existingNode))
+			//			{
+			//				// If new node is closer then we change the old one by it
+			//				if (GetDistance(targetNode, node) < GetDistance(targetNode, existingNode))
+			//				{
+			//					confirmedConnections[targetNode] = node;
+			//				}
+			//			}
+			//			else
+			//			{
+			//				// Not connected so we create it
+			//				confirmedConnections[targetNode] = node;
+			//			}
+			//		}
+			//	}
+			//}
+
+			////Create connections
+			//foreach (var kvp in confirmedConnections)
+			//{
+			//	if(kvp.Key.ExternalConnectedNode.Count < 1 && kvp.Value.ExternalConnectedNode.Count < 1)
+			//	{
+			//		kvp.Key.ConnectedNodes.Add(kvp.Value);
+			//		kvp.Key.ExternalConnectedNode.Add(kvp.Value);
+			//		kvp.Value.ConnectedNodes.Add(kvp.Key);
+			//		kvp.Value.ExternalConnectedNode.Add(kvp.Key);
+			//	}
+			//}
 		}
 
 		private float GetDistance(LevelNode a, LevelNode b)
@@ -242,10 +255,11 @@ namespace Components.Map
 							float angle = Mathf.Atan2(endPos.y - startPos.y, endPos.x - startPos.x) * Mathf.Rad2Deg;
 							lineRect.rotation = Quaternion.Euler(0, 0, angle);
 
-							lineObj.SetNormalizedDistance(Mathf.CeilToInt(distance / 150));
+							//We don't need the road segment for now
+							//lineObj.SetNormalizedDistance(Mathf.CeilToInt(distance / 150));
 							drawnConnections.Add((node, connectedNode));
-							node.Lines.Add(lineObj);
-							connectedNode.Lines.Add(lineObj);
+							node.Lines.TryAdd(lineObj, false);
+							connectedNode.Lines.TryAdd(lineObj, true);
 						}
 					}
 				}

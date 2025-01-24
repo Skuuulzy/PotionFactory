@@ -14,14 +14,14 @@ namespace Components.Map
         [SerializeField] private IngredientsBundle _ingredientsBundle;
         [SerializeField] private LevelNodeView _view;
         [SerializeField] private NodeSide _nodeSide;
-        [SerializeField] private List<NodeLineController> _lines = new List<NodeLineController>();
+        private Dictionary<NodeLineController, bool> _lines = new Dictionary<NodeLineController, bool>();
 
         private List<LevelNode> _externalConnectedNode = new List<LevelNode>();
         public List<LevelNode> ConnectedNodes => _connectedNodes;
         public List<LevelNode> ExternalConnectedNode => _externalConnectedNode;
         public IngredientsBundle IngredientsBundle => _ingredientsBundle;
         public NodeSide NodeSizde => _nodeSide;
-        public List<NodeLineController> Lines => _lines;
+        public Dictionary<NodeLineController,bool> Lines => _lines;
 
 		public static Action OnResetNode;
         public static Action<LevelNode> OnNodeSelected;
@@ -93,9 +93,9 @@ namespace Components.Map
 
         public void SetConnectedNodesConstructedLineColor(bool value)
 		{
-            foreach (NodeLineController nodeLine in Lines)
+            foreach (var nodeLine in Lines)
             {
-                nodeLine.SetConstructedLineColor(value);
+                nodeLine.Key.SetConstructedLineColor(value, nodeLine.Value);
             }
         }
 

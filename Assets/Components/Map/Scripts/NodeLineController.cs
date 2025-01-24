@@ -18,24 +18,46 @@ public class NodeLineController : MonoBehaviour
 
 	public int NormalizedDistance => _normalizedDistance;
 
-
-
-	public void SetConstructedLineColor(bool value, int roadSectionNumber = 1)
+	public void SetConstructedLineColor(bool value, bool isReversed)
 	{
-		for(int i = 0; i < _nodeLineImageList.Count; i++)
-		{
-			//Return if we go further the road section number 
-			if(i >= roadSectionNumber)
-			{
-				_nodeLineImageList[i].color = _lineUnconstructedColor;
-			}
-			else
-			{
-				_nodeLineImageList[i].color = value ? _lineConstructedColor : _lineUnconstructedColor;
-			}
-			
-		}
-   
+		_nodeLineImageList[0].color = value ? _lineConstructedColor : _lineUnconstructedColor;
+
+		//if (isReversed)
+		//{
+		//	for (int i = _nodeLineImageList.Count - 1; i >= 0; i--)
+		//	{
+		//		//Return if we go further the road section number 
+		//		if (roadSectionNumber <= 0)
+		//		{
+		//			_nodeLineImageList[i].color = _lineUnconstructedColor;
+		//		}
+		//		else
+		//		{
+		//			_nodeLineImageList[i].color = value ? _lineConstructedColor : _lineUnconstructedColor;
+		//			roadSectionNumber--;
+		//		}
+
+
+		//	}
+		//}
+		//else
+		//{
+		//	for (int i = 0; i < _nodeLineImageList.Count; i++)
+		//	{
+		//		//Return if we go further the road section number 
+		//		if (roadSectionNumber <= 0)
+		//		{
+		//			_nodeLineImageList[i].color = _lineUnconstructedColor;
+		//		}
+		//		else
+		//		{
+		//			_nodeLineImageList[i].color = value ? _lineConstructedColor : _lineUnconstructedColor;
+		//			roadSectionNumber--;
+		//		}
+		//	}
+		//}
+
+
 	}
 
 	public void SetNormalizedDistance(int value)
