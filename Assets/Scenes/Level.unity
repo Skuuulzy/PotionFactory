@@ -20535,7 +20535,7 @@ MonoBehaviour:
   _gridYValue: 40
   _cellSize: 1
   _originPosition: {x: 0, y: 0, z: 0}
-  _showDebug: 1
+  _showDebug: 0
   _loadRandomMap: 1
   _mapToLoadIndex: 0
   _groundTile: {fileID: 5488635875282986484, guid: 763f6990e5d7f74418e2a1161ea2cfeb,
@@ -20573,6 +20573,7 @@ MonoBehaviour:
   - OriginPosition: {x: 19, y: 0}
     Lenght: 20
     Width: 20
+  _parcelAnimationUnlockTime: 2
 --- !u!1 &3142047636608174042
 GameObject:
   m_ObjectHideFlags: 0
