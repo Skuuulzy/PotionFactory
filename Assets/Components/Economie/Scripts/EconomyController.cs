@@ -76,9 +76,9 @@ namespace Components.Economy
 		/// </summary>
 		private void HandleStartShopState(ShopState shopState)
 		{
-			int interest = (_playerMoney / _runConfiguration.GoldInterestValue) * _runConfiguration.GoldInterestAmountPerRound;
-			_totalGoldAmountPerRound = _runConfiguration.GoldAmountPerRound + interest;
-			OnEndRoundGoldValuesCalculated?.Invoke(_totalGoldAmountPerRound, _runConfiguration.GoldAmountPerRound, interest, _stateScoreObjective, _statePlayerScore);
+			int interest = (_playerMoney / _runConfiguration.GuildTicketInterestValue) * _runConfiguration.GuildTicketInterestAmountPerRound;
+			_totalGoldAmountPerRound = _runConfiguration.GuildTicketAmountPerRound + interest;
+			OnEndRoundGoldValuesCalculated?.Invoke(_totalGoldAmountPerRound, _runConfiguration.GuildTicketAmountPerRound, interest, _stateScoreObjective, _statePlayerScore);
 			AddMoney(_totalGoldAmountPerRound);
 		}
 
