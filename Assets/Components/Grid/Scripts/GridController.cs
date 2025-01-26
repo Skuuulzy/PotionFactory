@@ -2,9 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using System;
-using System.Collections;
 using System.Linq;
-using System.Threading.Tasks;
 using Components.Machines;
 using Components.Machines.Behaviors;
 using Components.Grid.Tile;
@@ -57,10 +55,9 @@ namespace Components.Grid
 
 		[Header("Grid Parcels")] 
 		[SerializeField] private GridParcel _startParcel;
-		[SerializeField] private List<GridParcel> _parcelsToUnlock;
 		[SerializeField] private float _parcelAnimationUnlockTime = 2f;
 		
-		// Grid 
+		// Grid
 		private readonly List<MachineController> _machines = new();
 		private readonly Dictionary<Vector2Int, TileController> _tiles = new();
 		
@@ -84,6 +81,8 @@ namespace Components.Grid
 			UIOptionsController.OnClearGrid += ClearMachines;
 			
 			PlanningFactoryState.OnPlanningFactoryStateStarted += HandlePlanningFactoryState;
+
+			GridParcelUnlocker.OnParcelUnlocked += HandleParcelUnlocked;
 		}
 
 		private void OnDestroy()
@@ -460,17 +459,10 @@ namespace Components.Grid
 			await UniTask.WhenAll(tasks);
 		}
 		
-		// Helper Method
 		private async UniTask AnimateUnlock(TileController tile, float delay)
 		{
 			await UniTask.WaitForSeconds(delay);
 			tile.SetLockedState(false);
-		}
-
-		[Button(ButtonSizes.Medium)]
-		private void UnlockParcelIndex(int index)
-		{
-			UnlockParcel(_parcelsToUnlock[index]);
 		}
 
 		[Button(ButtonSizes.Medium)]
@@ -677,6 +669,11 @@ namespace Components.Grid
 		private void HandlePlanningFactoryState(PlanningFactoryState state)
 		{
 			UpdateMarchands(state.StateIndex);
+		}
+		
+		private void HandleParcelUnlocked(GridParcel parcel)
+		{
+			UnlockParcel(parcel);
 		}
 	}
 }
