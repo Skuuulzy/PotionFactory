@@ -121,10 +121,6 @@ namespace Components.Map
 			//	controller.SetIslandName(_allIslandTemplate[i].Name);
 			//}
 
-			for (int i = 0; i < _islandsControllers.Count; i++)
-			{
-				_islandsControllers[i].SetIslandName(_allIslandTemplate[i].Name);
-			}
 		}
 
 		public void ConnectIslands()
