@@ -332,9 +332,8 @@ namespace Components.Grid
                 {
                     return false;
                 }
-
-                // One node of the machine overlap a cell that already contain an object. 
-                if (overlapCell.ContainsObject || overlapCell.TileController.TileType == TileType.WATER)
+                
+                if (!overlapCell.IsConstructable())
                 {
                     return false;
                 }
@@ -342,7 +341,7 @@ namespace Components.Grid
 
             return true;
         }
-
+        
         // ------------------------------------------------------------------------- EVENT HANDLERS -------------------------------------------------------------------------------- 
         private void HandlePlanningFactoryState(PlanningFactoryState _)
         {

@@ -11,12 +11,12 @@ namespace Components.Machines
         [SerializeField] private GameObject _outPreview;
         
         [Header("Outline")]
-        private Outline _outline;
         [SerializeField] private Color _placableColor = Color.green;
         [SerializeField] private Color _unPlacableColor = Color.red;
         [SerializeField] private Color _selectedColor = Color.blue;
         [SerializeField] private Color _hoveredColor = Color.white;
         
+        private Outline _outline;
         private List<GameObject> _directionalArrows;
 
         
@@ -29,7 +29,7 @@ namespace Components.Machines
             {
                 foreach (var port in node.Ports)
                 {
-                    var previewArrow = Instantiate(port.Way == Way.IN ? _inPreview : _outPreview, _3dViewHolder);
+                    var previewArrow = Instantiate(port.Way == Way.IN ? _inPreview : _outPreview, _view.transform);
                     
                     previewArrow.transform.localPosition = new Vector3(node.LocalPosition.x, previewArrow.transform.position.y, node.LocalPosition.y);
                     
@@ -52,12 +52,22 @@ namespace Components.Machines
         // ------------------------------------------------------------------------- OUTLINES -------------------------------------------------------------------------
         private void ToggleOutlines(bool toggle, Color outlineColor = default)
         {
+            if (!_outline)
+            {
+                return;
+            }
+            
             _outline.enabled = toggle;
             _outline.OutlineColor = outlineColor;
         }
         
         public void UpdateOutlineState(bool placable)
         {
+            if (!_outline)
+            {
+                return;
+            }
+            
             _outline.OutlineColor = placable ? _placableColor : _unPlacableColor;
         }
         

@@ -1,11 +1,9 @@
-using System;
 using System.Collections.Generic;
 using Components.Grid.Decorations;
 using Components.Grid.Obstacle;
 using Components.Grid.Tile;
 using Components.Ingredients;
 using Components.Machines;
-using Newtonsoft.Json;
 using UnityEngine;
 
 namespace Components.Grid
@@ -19,22 +17,21 @@ namespace Components.Grid
         public bool ContainsNode { get; private set; }
         public bool ContainsObstacle { get; private set; }
         public bool ContainsTile { get; private set; }
-        public bool ContainsIngredient { get; private set; }
+        public bool Unlocked { get; private set; }
 
-		[SerializeField] private ObstacleController _obstacleController; 
-		[SerializeField] private TileController _tileController; 
-		[SerializeField] private Node _node; 
-		[SerializeField] private IngredientTemplate _ingredient;
+        private GridObjectController _gridObjectController;
+		private ObstacleController _obstacleController; 
+		private TileController _tileController; 
+		private Node _node; 
+		private IngredientTemplate _ingredient;
 
-		[SerializeField] private List<RelicEffect> _relicEffects; 
-        [SerializeField] private List<DecorationController> _decorationControllers;
+		private List<RelicEffect> _relicEffects; 
+        private List<DecorationController> _decorationControllers;
        
         public ObstacleController ObstacleController => _obstacleController;  
-        public TileController TileController => _tileController;  
-        public Node Node => _node;
-        public IngredientTemplate Ingredient => _ingredient;
-        public List<RelicEffect> RelicEffects => _relicEffects;
+        public TileController TileController => _tileController;
         public List<DecorationController> DecorationControllers => _decorationControllers;
+        public Node Node => _node;
 
         public Cell(int x, int y, float size, bool containsObject)
         {
@@ -64,13 +61,7 @@ namespace Components.Grid
 			_tileController = tile;
 			ContainsTile = true;
 		}
-
-		public void RemoveTileFromCell()
-		{
-			_tileController = null;
-			ContainsTile = false;
-		}
-
+		
 		public void AddNodeToCell(Node node)
         {
             ContainsNode = true;
@@ -84,19 +75,10 @@ namespace Components.Grid
             ContainsObject = false;
             _node = null;
         }
-
-        public void AddIngredientToCell(IngredientTemplate ingredientTemplate)
+        
+        public void Unlock()
         {
-	        ContainsObject = true;
-	        ContainsIngredient = true;
-	        _ingredient = ingredientTemplate;
-        }
-
-        public void RemoveIngredientFromCell()
-        {
-	        ContainsObject = false;
-	        ContainsIngredient = false;
-	        _ingredient = null;
+	        Unlocked = true;
         }
 
         public void AddRelicEffectToCell(RelicEffect effect)
@@ -137,22 +119,7 @@ namespace Components.Grid
         {
             _decorationControllers.Remove(decoration);
         }
-
-        public DecorationController GetDecorationController(Vector3 worldMousePosition, float offset)
-        {
-            foreach (var decoration in _decorationControllers)
-            {
-                if (decoration == null) continue;
-
-                if (Vector3.Distance(decoration.transform.position, worldMousePosition) <= offset)
-                {
-                    return decoration;
-                }
-            }
-
-            return null;
-        }
-
+        
         public Vector3 GetCenterPosition(Vector3 originPosition)
         {
 	        return new Vector3(X + Size / 2, 0, Y + Size / 2) * Size + originPosition;
@@ -160,103 +127,22 @@ namespace Components.Grid
 
         public Vector2Int Position => new(X, Y);
 
-		
-	}
-
-
-    [Serializable]
-    public class SerializedCell
-    {
-        [JsonProperty("X")]
-        public int X { get; set; }
-
-        [JsonProperty("Y")]
-        public int Y { get; set; }
-
-        [JsonProperty("Size")]
-        public float Size { get; set; }
-
-        [JsonProperty("ContainsObject")]
-        public bool ContainsObject { get; set; }
-
-        [JsonProperty("ContainsObstacle")]
-        public bool ContainsObstacle { get; set; }
-
-        [JsonProperty("ContainsTile")]
-        public bool ContainsTile { get; set; }
-
-        [JsonProperty("TileType")]
-        public TileType TileType { get; set; }
-
-        [JsonProperty("ObstacleType")]
-        public ObstacleType ObstacleType { get; set; }
-
-        [JsonProperty("ObstacleRotation")]
-        public float[] ObstacleRotation { get; set; }
-
-        [JsonProperty("ObstacleScale")]
-        public float[] ObstacleScale { get; set; }
-
-        [JsonProperty("DecorationTypes")]
-        public DecorationType[] DecorationTypes { get; set; }
-
-        [JsonProperty("DecorationPositions")]
-        public List<float[]> DecorationPositions { get; set; }
-
-        [JsonProperty("DecorationRotations")]
-        public List<float[]> DecorationRotations { get; set; }
-
-        [JsonProperty("DecorationScales")]
-        public List<float[]> DecorationScales { get; set; }
-
-        public SerializedCell() { }
-
-        public SerializedCell(Cell cell)
+        public bool IsConstructable()
         {
-            X = cell.X;
-            Y = cell.Y;
-            Size = cell.Size;
-            ContainsObject = cell.ContainsObject;
-            ContainsObstacle = cell.ContainsObstacle;
-            ContainsTile = cell.ContainsTile;
-            TileType = cell.TileController == null ? TileType.NONE : cell.TileController.TileType;
-            ObstacleType = cell.ObstacleController == null ? ObstacleType.NONE : cell.ObstacleController.ObstacleType;
+	        if (!Unlocked || ContainsObject)
+	        {
+		        return false;
+	        }
 
-            if (cell.ObstacleController != null)
-            {
-                // Serialize obstacle rotation and scale
-                Quaternion rotation = cell.ObstacleController.transform.localRotation;
-                ObstacleRotation = new float[] { rotation.x, rotation.y, rotation.z, rotation.w };
+	        if (_gridObjectController is TileController tileController)
+	        {
+		        if (tileController.GetTileType() == TileType.WATER)
+		        {
+			        return false;
+		        }
+	        }
 
-                Vector3 scale = cell.ObstacleController.transform.localScale;
-                ObstacleScale = new float[] { scale.x, scale.y, scale.z };
-            }
-
-            if (cell.DecorationControllers != null)
-            {
-                DecorationTypes = new DecorationType[cell.DecorationControllers.Count];
-                DecorationPositions = new List<float[]>();
-                DecorationRotations = new List<float[]>();
-                DecorationScales = new List<float[]>();
-
-                for (int i = 0; i < cell.DecorationControllers.Count; i++)
-                {
-                    DecorationTypes[i] = cell.DecorationControllers[i].DecorationType;
-
-                    // Serialize decoration position
-                    Vector3 position = cell.DecorationControllers[i].transform.localPosition;
-                    DecorationPositions.Add(new float[] { position.x, position.y, position.z });
-
-                    // Serialize decoration rotation
-                    Quaternion rotation = cell.DecorationControllers[i].transform.localRotation;
-                    DecorationRotations.Add(new float[] { rotation.x, rotation.y, rotation.z, rotation.w });
-
-                    // Serialize decoration scale
-                    Vector3 scale = cell.DecorationControllers[i].transform.localScale;
-                    DecorationScales.Add(new float[] { scale.x, scale.y, scale.z });
-                }
-            }
+	        return true;
         }
     }
-
 }

@@ -28,7 +28,7 @@ namespace Components.Shop.UI
 		[SerializeField] private Transform _consumableShopUIParent;
 		[SerializeField] private Transform _relicShopUIParent;
 
-		void Start()
+		private void Start()
 		{
 			ShopController.OnShopGenerated += DisplayShopItems;
 			EconomyController.OnEndRoundGoldValuesCalculated += DisplayPayOffInfos;

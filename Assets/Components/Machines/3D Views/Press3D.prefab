@@ -401,6 +401,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 3690640634001239375}
     m_Modifications:
+    - target: {fileID: 278866724989275646, guid: 91821d92be1589d44a891e2d09f2df81,
+        type: 3}
+      propertyPath: m_TagString
+      value: Outlined
+      objectReference: {fileID: 0}
     - target: {fileID: 2835814700197366705, guid: 91821d92be1589d44a891e2d09f2df81,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -455,6 +460,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Press
+      objectReference: {fileID: 0}
+    - target: {fileID: 3175326760487620875, guid: 91821d92be1589d44a891e2d09f2df81,
+        type: 3}
+      propertyPath: m_TagString
+      value: Outlined
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
