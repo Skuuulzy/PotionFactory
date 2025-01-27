@@ -32,6 +32,7 @@ namespace Components.Machines
         [SerializeField] private float _shopSpawnProbability;
         [SerializeField] private int _shopPrice = 200;
         [SerializeField] private bool _cannotBeSell;
+        [SerializeField] private bool _cannotBeBuy;
         [SerializeField] private int _sellPrice = 100;
 
         [Header("Contextual View")] 
@@ -65,6 +66,7 @@ namespace Components.Machines
         public int ContextMenuHeight => _contextMenuHeight;
         public int ShopPrice => _shopPrice;
         public int SellPrice => _sellPrice;
+        public bool CannotBeBuy => _cannotBeBuy;
         public bool CannotBeSell => _cannotBeSell;
 
         public List<UIContextualComponent> ContextualComponents => _contextualComponents;
