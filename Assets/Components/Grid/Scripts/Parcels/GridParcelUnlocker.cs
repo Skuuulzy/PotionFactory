@@ -19,6 +19,7 @@ namespace Components.Grid.Parcel
         [Header("Parcels generator")] 
         [SerializeField] private Vector2Int _gridSize;
         [SerializeField] private int _parcelSize;
+        [SerializeField] private int _parcelPrice;
          
         public static Action<GridParcel> OnParcelUnlocked;
 
@@ -68,12 +69,12 @@ namespace Components.Grid.Parcel
         [Button]
         private void GenerateParcels()
         {
-            var parcels = GenerateParcel(_gridSize, _parcelSize);
+            var parcels = GenerateParcel(_gridSize, _parcelSize, _parcelPrice);
             _parcelsToUnlock = parcels;
         }
         
         /// Generates a list of parcels by splitting the grid into equally sized parcels
-        private List<GridParcel> GenerateParcel(Vector2Int gridSize, int parcelSize)
+        private List<GridParcel> GenerateParcel(Vector2Int gridSize, int parcelSize, int parcelPrice)
         {
             // Validate inputs
             if (gridSize.x <= 0 || gridSize.y <= 0 || parcelSize <= 0)
@@ -109,7 +110,7 @@ namespace Components.Grid.Parcel
                         OriginPosition = origin,
                         Lenght = parcelSize,
                         Width = parcelSize,
-                        Price = 0 // Default price, can be updated later
+                        Price = parcelPrice
                     };
 
                     parcels.Add(parcel);

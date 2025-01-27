@@ -10,7 +10,8 @@ namespace Components.Grid.Parcel
     {
         [SerializeField] private RectTransform _rectTransform;
         [SerializeField] private Button _buyButton;
-        [SerializeField] private TMP_Text _parcelNameTxt;
+        [SerializeField] private TMP_Text _parcelPriceTxt;
+        [SerializeField] private Image _background;
 
         public Action<GridParcelView> OnParcelBought;
 
@@ -25,13 +26,14 @@ namespace Components.Grid.Parcel
         {
             _rectTransform.anchoredPosition = new Vector2(parcel.OriginPosition.x * cellSize, parcel.OriginPosition.y * cellSize);
             _rectTransform.sizeDelta = new Vector2(parcel.Width * cellSize, parcel.Lenght * cellSize);
-
-            _parcelNameTxt.text = $"Parcel {index}";
             
             _price = parcel.Price;
             _unlocked = unlocked;
             _parcel = parcel;
 
+            _parcelPriceTxt.text = _price.ToString();
+            _background.color = ExtensionMethods.GenerateRandomColorWithAlpha(0.1f);
+            
             EconomyController.OnPlayerMoneyUpdated += CheckBuyingEligibility;
             CheckBuyingEligibility(EconomyController.Instance.PlayerMoney);
         }
@@ -50,11 +52,13 @@ namespace Components.Grid.Parcel
             }
 
             OnParcelBought?.Invoke(this);
+            EconomyController.Instance.DecreaseMoney(_price);
         }
         
         private void CheckBuyingEligibility(int playerMoney)
         {
             _buyButton.interactable = _price <= playerMoney;
+            _parcelPriceTxt.color = _buyButton.interactable ? Color.green : Color.red;
         }
     }
 }
