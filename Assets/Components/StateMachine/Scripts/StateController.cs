@@ -126,7 +126,7 @@ public class StateController : MonoBehaviour
 
 	private void HandleEndGameState(EndGameState state)
 	{
-		_currentDebugStateName = "END GAME";
+		CurrentDebugStateName = "END GAME";
 		_countdownTimer = null;
 		OnStateStarted?.Invoke(state);
 	}
