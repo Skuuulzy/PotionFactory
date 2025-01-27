@@ -9,6 +9,7 @@ using Components.Grid.Tile;
 using Components.Grid.Obstacle;
 using Components.Grid.Decorations;
 using Components.Grid.Generator;
+using Components.Grid.Parcel;
 using Components.Ingredients;
 using Components.Inventory;
 using Components.Map;

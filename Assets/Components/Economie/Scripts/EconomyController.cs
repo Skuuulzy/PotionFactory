@@ -13,6 +13,7 @@ namespace Components.Economy
 		private int _statePlayerScore; //Money that the player earn during a current phase
 
 		public int PlayerMoney => _playerMoney;
+		
 		public static Action<int> OnPlayerMoneyUpdated;
 		public static Action<int> OnStatePlayerScoreUpdated;
 		public static Action<int> OnScoreStateObjectiveUpdated;
@@ -20,14 +21,14 @@ namespace Components.Economy
 		public static Action<int, int, int, int ,int> OnEndRoundGoldValuesCalculated;
 
 		private int _totalGoldAmountPerRound;
+		
 		private void Start()
 		{
 			PlanningFactoryState.OnPlanningFactoryStateStarted += HandlePlanningFactoryState;
 			ShopState.OnShopStateStarted += HandleStartShopState;
 			ResolutionFactoryState.OnResolutionFactoryStateEnded += HandleResolutionFactoryStateEnded;
 		}
-
-
+		
 		private void OnDestroy()
 		{
 			PlanningFactoryState.OnPlanningFactoryStateStarted -= HandlePlanningFactoryState;

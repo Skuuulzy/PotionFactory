@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Components.Grid
+namespace Components.Grid.Parcel
 {
     [Serializable]
     public struct GridParcel
@@ -10,8 +10,8 @@ namespace Components.Grid
         public Vector2Int OriginPosition;
         public int Lenght;
         public int Width;
-
-
+        public int Price;
+        
         public List<Vector2Int> Coordinates()
         {
             List<Vector2Int> _coordinates = new List<Vector2Int>();
