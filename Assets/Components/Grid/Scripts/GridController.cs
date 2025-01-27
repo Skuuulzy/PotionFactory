@@ -511,17 +511,18 @@ namespace Components.Grid
 		private List<Vector2Int> GetExtractorRandomCoordinates(int extractorCount)
 		{
 			var extractorPotentialCoordinates = new List<Vector2Int>();
-			
-			// Getting potential coordinates
-			for (int x = 0; x < Grid.GetWidth() - 4; x++)
+			var startCoordinates = _startParcel.Coordinates();
+
+			foreach (var startCoordinate in startCoordinates)
 			{
-				for (int z = 1; z < Grid.GetHeight(); z++)
+				if (Grid.TryGetCellByCoordinates(startCoordinate, out var cell))
 				{
-					// Get the zone where the extractors can be placed 
-					if ((x == 0 && z <= Grid.GetWidth() / 2) || z == Grid.GetHeight() - 1 || z == 0)
+					if (!cell.IsConstructable())
 					{
-						extractorPotentialCoordinates.Add(new Vector2Int(x, z));
+						continue;
 					}
+					
+					extractorPotentialCoordinates.Add(startCoordinate);
 				}
 			}
 
