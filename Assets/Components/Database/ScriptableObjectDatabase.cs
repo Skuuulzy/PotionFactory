@@ -4,6 +4,7 @@ using System.Linq;
 using Components.Bundle;
 using Components.Grid.Decorations;
 using Components.Grid.Obstacle;
+using Components.Grid.Tile;
 using Components.Ingredients;
 using Components.Island;
 using Components.Machines;
@@ -34,13 +35,14 @@ namespace Database
             LoadAllScriptableObjects<RelicTemplate>();
             LoadAllScriptableObjects<ObstacleTemplate>();
             LoadAllScriptableObjects<DecorationTemplate>();
-            LoadAllScriptableObjects<Components.Grid.Tile.TileTemplate>();
+            LoadAllScriptableObjects<TileTemplate>();
             LoadAllScriptableObjects<IslandTemplate>();
         }
 
         private static void LoadAllScriptableObjects<T>() where T : ScriptableObject
         {
             var type = typeof(T);
+            
             if (!DATABASE.ContainsKey(type))
             {
                 DATABASE[type] = new Dictionary<string, ScriptableObject>();
@@ -123,6 +125,24 @@ namespace Database
             // If no recipe was found, return the default.
             recipe = null;
             return false;
+        }
+        
+        // ----------------------------------------- TILES ------------------------------------------
+        public static TileTemplate GetTileTemplateByType(TileType type)
+        {
+            switch (type)
+            {
+                case TileType.GRASS:
+                    return GetScriptableObject<TileTemplate>("GrassTile");
+                case TileType.WATER:
+                    return GetScriptableObject<TileTemplate>("WaterTile");
+                case TileType.NONE:
+                case TileType.SAND:
+                case TileType.STONE:
+                case TileType.DIRT:
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            }
         }
     }
 }

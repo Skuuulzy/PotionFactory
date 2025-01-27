@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Components.Ingredients;
 using Components.Tick;
@@ -7,32 +6,33 @@ using Components.Machines.Behaviors;
 
 namespace Components.Machines
 {
-    public class MachineController : MonoBehaviour
+    public partial class MachineController : MonoBehaviour
     {
         [SerializeField] private Transform _3dViewHolder;
         [SerializeField] private Machine _machine;
         [SerializeField] private IngredientController _ingredientController;
-
-        [SerializeField] private GameObject _inPreview;
-        [SerializeField] private GameObject _outPreview;
         
-        public Machine Machine => _machine;
-
-        private List<GameObject> _directionalArrows;
+        private GameObject _view;
         
         private bool _initialized;
-        private GameObject _view;
+        private bool _selected;
 
         private int _outMachineTickCount;
         
-        // ------------------------------------------------------------------------- INIT -------------------------------------------------------------------------
-        public void InstantiatePreview(MachineTemplate machineTemplate, float scale)
+        public Machine Machine => _machine;
+        
+        // ------------------------------------------------------------------------- INIT -----------------------------------------------------------------------------
+        public void InstantiatePreview(MachineTemplate machineTemplate, float scale, bool showOutlines = false)
         {
             _view = Instantiate(machineTemplate.GridView, _3dViewHolder);
             _machine = new Machine(machineTemplate, this);
             _view.transform.localScale = new Vector3(scale, scale, scale);
 
             SetupDirectionalArrows(machineTemplate);
+
+            _outline = _view.AddComponent<Outline>();
+            _outline.OutlineWidth = 8;
+            ToggleOutlines(showOutlines, _placableColor);
         }
         
         public void RotatePreview(int angle)
@@ -47,6 +47,7 @@ namespace Components.Machines
             _machine.OnPropagateTick += PropagateTick;
             _machine.OnItemAdded += ShowItem;
             Machine.OnSelected += HandleMachineSelected;
+            Machine.OnHovered += HandleMachineHovered;
             
             _initialized = true;
             _machine.Behavior.SetInitialProcessTime(_machine.Template.ProcessTime);
@@ -60,15 +61,17 @@ namespace Components.Machines
             AddMachineToChain();
             
             ToggleDirectionalArrows(false);
+            ToggleOutlines(false);
         }
 
-        // ------------------------------------------------------------------------- DESTROY -------------------------------------------------------------------------
+        // ------------------------------------------------------------------------- DESTROY --------------------------------------------------------------------------
         private void OnDestroy()
         {
             _machine.OnTick -= Tick;
             _machine.OnPropagateTick -= PropagateTick;
             _machine.OnItemAdded -= ShowItem;
             Machine.OnSelected -= HandleMachineSelected;
+            Machine.OnHovered -= HandleMachineHovered;
             
             if (!_initialized)
             {
@@ -78,7 +81,7 @@ namespace Components.Machines
             RemoveMachineFromChain();
         }
 
-        // ------------------------------------------------------------------------- TICK -------------------------------------------------------------------------
+        // ------------------------------------------------------------------------- TICK -----------------------------------------------------------------------------
         // Base tick called by the tick system.
         private void Tick()
         {
@@ -128,7 +131,7 @@ namespace Components.Machines
             _outMachineTickCount = 0;
         }
 
-        // ------------------------------------------------------------------------- CHAIN -------------------------------------------------------------------------
+        // ------------------------------------------------------------------------- CHAIN ----------------------------------------------------------------------------
         private void AddMachineToChain()
         {
             bool hasInMachine = _machine.TryGetInMachine(out List<Machine> inMachines);
@@ -187,37 +190,7 @@ namespace Components.Machines
             }
         }
 
-        // ------------------------------------------------------------------------- ITEM -------------------------------------------------------------------------
-        // TODO: The ingredient should not be controlled by the machine but need to be independent and linked to a machine.
-        private void ShowItem(bool show)
-        {
-            if (!Machine.Template.ShowItem)
-            {
-                return;
-            }
-            
-            if (show)
-            {
-                _ingredientController.CreateRepresentationFromTemplate(_machine.InIngredients);
-            }
-            else
-            {
-                _ingredientController.DestroyRepresentation();
-            }
-        }
-
-        //TO Change : special for destructor behavior
-        private void ShowItem(IngredientTemplate ingredient)
-        {
-            if (!Machine.Template.ShowItem)
-            {
-                return;
-            }
-            
-			_ingredientController.CreateFavoriteSellerItemRepresentationFromTemplate(ingredient);
-		}
-
-        // ------------------------------------------------------------------------- CONTEXTUAL ACTIONS -------------------------------------------------------------------------
+        // ------------------------------------------------------------------------- CONTEXTUAL ACTIONS ---------------------------------------------------------------
         public void Move()
         {
             Machine.OnMove?.Invoke(Machine);
@@ -233,45 +206,38 @@ namespace Components.Machines
             Machine.OnRetrieve?.Invoke(Machine, true);
         }
         
-        // ------------------------------------------------------------------------- DIRECTIONAL ARROWS -------------------------------------------------------------------------
-        private void SetupDirectionalArrows(MachineTemplate machineTemplate)
-        {
-            _directionalArrows = new List<GameObject>();
-            
-            foreach (var node in machineTemplate.Nodes)
-            {
-                foreach (var port in node.Ports)
-                {
-                    var previewArrow = Instantiate(port.Way == Way.IN ? _inPreview : _outPreview, _view.transform);
-                    
-                    previewArrow.transform.localPosition = new Vector3(node.LocalPosition.x, previewArrow.transform.position.y, node.LocalPosition.y);
-                    
-                    // TODO: Find why we need to invert the angle when the machine is only 1x1 (especially with curved conveyor).
-                    previewArrow.transform.Rotate(Vector3.up, port.Side.AngleFromSide(machineTemplate.Nodes.Count == 1));
-                    
-                    _directionalArrows.Add(previewArrow);
-                }
-            }
-        }
-        
-        private void ToggleDirectionalArrows(bool toggle)
-        {
-            for (int i = 0; i < _directionalArrows.Count; i++)
-            {
-                _directionalArrows[i].SetActive(toggle);
-            }
-        }
-        
         // ------------------------------------------------------------------------- HANDLERS -------------------------------------------------------------------------
         private void HandleMachineSelected(Machine machine, bool selected)
         {
             if (Machine != machine)
             {
                 ToggleDirectionalArrows(false);
+                ToggleOutlines(false);
+                _selected = false;
+                
+                return;
+            }
+
+            _selected = true;
+            ToggleDirectionalArrows(selected);
+            ToggleOutlines(selected, _selectedColor);
+        }
+        
+        private void HandleMachineHovered(Machine machine, bool hovered)
+        {
+            if (_selected)
+            {
                 return;
             }
             
-            ToggleDirectionalArrows(selected);
+            if (Machine != machine)
+            {
+                ToggleOutlines(false);
+                return;
+            }
+            
+            ToggleOutlines(hovered, _hoveredColor);
+
         }
     }
 }

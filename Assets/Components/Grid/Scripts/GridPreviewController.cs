@@ -103,7 +103,7 @@ namespace Components.Grid
         private MachineController InstantiateMachine(MachineTemplate template, int rotation)
         {
             var machine = Instantiate(_machineControllerPrefab, _previewHolder);
-            machine.InstantiatePreview(template, Grid.GetCellSize());
+            machine.InstantiatePreview(template, Grid.GetCellSize(), true);
             machine.RotatePreview(rotation);
 
             return machine;
@@ -154,6 +154,11 @@ namespace Components.Grid
 
                     _previewHolder.transform.position = cellPosition;
                     _lastCellPosition = cellPosition;
+
+                    if (_currentMachinePreview)
+                    {
+                        Preview.UpdateOutlineState(IsMachinePlacable(cell));
+                    }
                 }
             }
             else
@@ -270,21 +275,9 @@ namespace Components.Grid
             }
 
             // Check if the machine can be placed on the grid. 
-            foreach (var node in Preview.Machine.Nodes)
+            if (!IsMachinePlacable(chosenCell))
             {
-                var nodeGridPosition = node.SetGridPosition(new Vector2Int(chosenCell.X, chosenCell.Y));
-
-                // One node does not overlap a constructable cell. 
-                if (!Grid.TryGetCellByCoordinates(nodeGridPosition.x, nodeGridPosition.y, out Cell overlapCell))
-                {
-                    return;
-                }
-
-                // One node of the machine overlap a cell that already contain an object. 
-                if (overlapCell.ContainsObject || overlapCell.TileController.TileType == TileType.WATER)
-                {
-                    return;
-                }
+                return;
             }
 
             if (_moveMode)
@@ -328,6 +321,27 @@ namespace Components.Grid
             chosenCell.Node.Machine.Controller.Retrieve();
         }
 
+        private bool IsMachinePlacable(Cell originCell)
+        {
+            foreach (var node in Preview.Machine.Nodes)
+            {
+                var nodeGridPosition = node.SetGridPosition(new Vector2Int(originCell.X, originCell.Y));
+
+                // One node does not overlap a constructable cell. 
+                if (!Grid.TryGetCellByCoordinates(nodeGridPosition.x, nodeGridPosition.y, out Cell overlapCell))
+                {
+                    return false;
+                }
+                
+                if (!overlapCell.IsConstructable())
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+        
         // ------------------------------------------------------------------------- EVENT HANDLERS -------------------------------------------------------------------------------- 
         private void HandlePlanningFactoryState(PlanningFactoryState _)
         {
