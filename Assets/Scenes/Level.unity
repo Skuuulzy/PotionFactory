@@ -20541,21 +20541,71 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _parcelsToUnlock:
-  - OriginPosition: {x: 20, y: 0}
-    Lenght: 20
-    Width: 20
-    Price: 0
   - OriginPosition: {x: 0, y: 0}
-    Lenght: 20
-    Width: 20
+    Lenght: 10
+    Width: 10
+    Price: 0
+  - OriginPosition: {x: 10, y: 0}
+    Lenght: 10
+    Width: 10
+    Price: 0
+  - OriginPosition: {x: 20, y: 0}
+    Lenght: 10
+    Width: 10
+    Price: 0
+  - OriginPosition: {x: 30, y: 0}
+    Lenght: 10
+    Width: 10
+    Price: 0
+  - OriginPosition: {x: 0, y: 10}
+    Lenght: 10
+    Width: 10
+    Price: 0
+  - OriginPosition: {x: 10, y: 10}
+    Lenght: 10
+    Width: 10
+    Price: 0
+  - OriginPosition: {x: 20, y: 10}
+    Lenght: 10
+    Width: 10
+    Price: 0
+  - OriginPosition: {x: 30, y: 10}
+    Lenght: 10
+    Width: 10
     Price: 0
   - OriginPosition: {x: 0, y: 20}
-    Lenght: 20
-    Width: 20
+    Lenght: 10
+    Width: 10
+    Price: 0
+  - OriginPosition: {x: 10, y: 20}
+    Lenght: 10
+    Width: 10
+    Price: 0
+  - OriginPosition: {x: 20, y: 20}
+    Lenght: 10
+    Width: 10
+    Price: 0
+  - OriginPosition: {x: 30, y: 20}
+    Lenght: 10
+    Width: 10
+    Price: 0
+  - OriginPosition: {x: 0, y: 30}
+    Lenght: 10
+    Width: 10
+    Price: 0
+  - OriginPosition: {x: 10, y: 30}
+    Lenght: 10
+    Width: 10
+    Price: 0
+  - OriginPosition: {x: 20, y: 30}
+    Lenght: 10
+    Width: 10
     Price: 0
   _parcelViewPrefab: {fileID: 7465517095681075245, guid: 62d2b97395a02604c9be2c6b2cd8c51f,
     type: 3}
   _parcelViewHolder: {fileID: 572131217}
+  _gridSize: {x: 40, y: 40}
+  _parcelSize: 10
 --- !u!1 &1922617409
 GameObject:
   m_ObjectHideFlags: 0
@@ -21053,9 +21103,9 @@ MonoBehaviour:
   - {x: 39, y: 23}
   - {x: 39, y: 30}
   _startParcel:
-    OriginPosition: {x: 20, y: 20}
-    Lenght: 20
-    Width: 20
+    OriginPosition: {x: 30, y: 30}
+    Lenght: 10
+    Width: 10
     Price: 0
   _parcelAnimationUnlockTime: 2
 --- !u!1 &3142047636608174042
