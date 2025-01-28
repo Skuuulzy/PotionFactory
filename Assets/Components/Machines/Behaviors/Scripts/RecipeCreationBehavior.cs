@@ -24,7 +24,7 @@ namespace Components.Machines.Behaviors
             // Try to find a recipe based on the machine and the items inside the machine.
             if (!ProcessingRecipe)
             {
-                if (ScriptableObjectDatabase.TryFindRecipe(machine.Template, machine.InIngredients, out RecipeTemplate recipe))
+                if (ScriptableObjectDatabase.TryFindRecipeMachine(machine.Template, machine.InIngredients, out var recipe))
                 {
                     _currentRecipe = recipe;
                     _additionalRecipeProcessTime = Mathf.RoundToInt(machine.Template.ProcessTime * recipe.ProcessTimeModifier);

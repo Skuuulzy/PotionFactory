@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using Components.Grid;
+using Components.Ingredients;
 using Components.Inventory;
+using Components.Machines;
 using Components.Machines.Behaviors;
 using Database;
 using UnityEngine;
@@ -44,31 +46,18 @@ namespace Components.Recipes.Grimoire
             
             // Get player machines
             var playerMachines = GrimoireController.Instance.PlayerMachinesDictionary.Keys.ToList();
-            
+
             // Get extracted resources
             var playerResources = GridController.Instance.ExtractedIngredients;
-            
-            for (int i = 0; i < playerMachines.Count; i++)
-            {
-                var machine = playerMachines[i];
 
-                // We only check machine capable of creating resources (conveyor, merger, ... are excluded)
-                if (machine.GetBehaviorClone().GetType() != typeof(RecipeCreationBehavior))
+            var potentialRecipes = ScriptableObjectDatabase.FindAllPotentialRecipes(playerMachines, playerResources);
+            for (int i = 0; i < potentialRecipes.Count; i++)
+            {
+                // Activate the corresponding entry view for this recipe.
+                var entryView = _allEntryViews.FirstOrDefault(entry => entry.RecipeName == potentialRecipes[i].name);
+                if (entryView != null)
                 {
-                    continue;
-                }
-                
-                Debug.Log($"Trying to find potential recipe with machine: {machine.Name}, and ingredients:");
-                for (int j = 0; j < playerResources.Count; j++)
-                {
-                    Debug.Log($"{playerResources[j].Name}");
-                }
-                
-                if (ScriptableObjectDatabase.TryFindRecipe(machine, playerResources, out var recipe))
-                {
-                    // TODO: This will need some optimisation in the future.
-                    _allEntryViews.First(entry => entry.RecipeName == recipe.name).gameObject.SetActive(true);
-                    Debug.Log($"Recipe found: {recipe.name}");
+                    entryView.gameObject.SetActive(true);
                 }
             }
         }
