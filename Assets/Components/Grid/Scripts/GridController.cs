@@ -65,6 +65,7 @@ namespace Components.Grid
 		//Sellers & Extractor
 		private readonly List<DestructorMachineBehaviour> _sellersBehaviours = new();
 		private readonly List<ExtractorMachineBehaviour> _extractorBehaviours = new();
+		private List<IngredientTemplate> _extractedIngredients = new();
 
 		public Grid Grid { get; private set; }
 		
@@ -538,10 +539,9 @@ namespace Components.Grid
 			return randomSelectedCoordinates;
 		}
  		
-		private void PlaceExtractors(List<IngredientTemplate> ingredientsToExtract)
+		private void AddExtractors(int count)
 		{			
-			_extractorBehaviours.Clear();
-			var randomCoordinates = GetExtractorRandomCoordinates(ingredientsToExtract.Count);
+			var randomCoordinates = GetExtractorRandomCoordinates(count);
 			
 			// Placing extractors
 			for (int i = 0; i < randomCoordinates.Count; i++)
@@ -574,15 +574,16 @@ namespace Components.Grid
 					Debug.LogError($"An extractor has been placed but no {nameof(ExtractorMachineBehaviour)} found on it.");
 				}
 			}
-			
-			UpdateIngredientsToExtract(ingredientsToExtract);
 		}
 
 		private void UpdateIngredientsToExtract(List<IngredientTemplate> ingredientsToExtract)
 		{
 			if (ingredientsToExtract.Count != _extractorBehaviours.Count)
 			{
-				Debug.LogError($"You want to extract {ingredientsToExtract.Count} ingredients but there is only {_extractorBehaviours.Count}");
+				var extractorCountToAdd = ingredientsToExtract.Count - _extractorBehaviours.Count;
+				Debug.Log($"You want to extract {ingredientsToExtract.Count} ingredients but there is only {_extractorBehaviours.Count} extractors, adding {extractorCountToAdd} extractors.");
+				
+				AddExtractors(extractorCountToAdd);
 			}
 			
 			for (int i = 0; i < ingredientsToExtract.Count; i++)
@@ -659,12 +660,18 @@ namespace Components.Grid
 			if (isFirstGameChoice)
 			{
 				GenerateGrid();
-				PlaceExtractors(bundle.IngredientsTemplatesList);
+				
+				// Marchands
 				PlaceMarchands();
+				
+				// Extractors
+				_extractedIngredients = new List<IngredientTemplate>(bundle.IngredientsTemplatesList);
+				UpdateIngredientsToExtract(_extractedIngredients);
 			}
 			else
 			{
-				UpdateIngredientsToExtract(bundle.IngredientsTemplatesList);
+				_extractedIngredients.AddRange(bundle.IngredientsTemplatesList);
+				UpdateIngredientsToExtract(_extractedIngredients);
 			}
 		}
 		
