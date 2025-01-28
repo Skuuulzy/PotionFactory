@@ -29,7 +29,7 @@ namespace Components.Machines.UIView
             string cleanMachineName = machine.Controller.name.Replace("_", " ");
             _machineName.text = cleanMachineName;
 
-            if (machine.Template.CannotBeSell)
+            if (machine.Template.CanRetrieve)
             {
                 _sellButton.interactable = false;
                 _sellPriceTxt.text = $"Cannot be sell";
