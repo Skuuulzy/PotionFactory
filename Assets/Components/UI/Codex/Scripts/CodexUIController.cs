@@ -55,11 +55,13 @@ public class CodexUIController : MonoBehaviour
             switch (machine.Behavior)
             {
                 case DestructorMachineBehaviour destructorMachineBehaviour:
+                    _genericMachineTitle.text += $" ({destructorMachineBehaviour.SpecialIngredientTemplate.Name.ToLower()})";
                     _genericMachineImage.sprite = destructorMachineBehaviour.SpecialIngredientTemplate.Icon;
                     break;
                 case ExtractorMachineBehaviour extractorMachineBehaviour:
-                    if ( extractorMachineBehaviour.IngredientTemplate)
+                    if (extractorMachineBehaviour.IngredientTemplate)
                     {
+                        _genericMachineTitle.text += $" ({extractorMachineBehaviour.IngredientTemplate.Name.ToLower()})";
                         _genericMachineImage.sprite = extractorMachineBehaviour.IngredientTemplate.Icon;
                     }
                     break;

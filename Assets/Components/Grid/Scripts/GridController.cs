@@ -18,10 +18,12 @@ using Components.Tick;
 using Components.Tools.ExtensionMethods;
 using Cysharp.Threading.Tasks;
 using Database;
+using Sirenix.Utilities;
+using VComponent.Tools.Singletons;
 
 namespace Components.Grid
 {
-	public class GridController : MonoBehaviour
+	public class GridController : Singleton<GridController>
 	{
 		[Header("Generation Parameters")]
 		[SerializeField] private int _gridXValue = 64;
@@ -65,11 +67,12 @@ namespace Components.Grid
 		//Sellers & Extractor
 		private readonly List<DestructorMachineBehaviour> _sellersBehaviours = new();
 		private readonly List<ExtractorMachineBehaviour> _extractorBehaviours = new();
-		private List<IngredientTemplate> _extractedIngredients = new();
+		private readonly List<IngredientTemplate> _extractedIngredients = new();
 
 		public Grid Grid { get; private set; }
 		
 		public Vector3 OriginPosition => _originPosition;
+		public List<IngredientTemplate> ExtractedIngredients => _extractedIngredients;
 		
 		public static Action OnGridGenerated;
 
@@ -663,16 +666,10 @@ namespace Components.Grid
 				
 				// Marchands
 				PlaceMarchands();
-				
-				// Extractors
-				_extractedIngredients = new List<IngredientTemplate>(bundle.IngredientsTemplatesList);
-				UpdateIngredientsToExtract(_extractedIngredients);
 			}
-			else
-			{
-				_extractedIngredients.AddRange(bundle.IngredientsTemplatesList);
-				UpdateIngredientsToExtract(_extractedIngredients);
-			}
+
+			_extractedIngredients.AddRange(bundle.IngredientsTemplatesList);
+			UpdateIngredientsToExtract(_extractedIngredients);
 		}
 		
 		private void HandlePlanningFactoryState(PlanningFactoryState state)
