@@ -24,6 +24,7 @@ MonoBehaviour:
     _ports:
     - _side: 2
       _way: 1
+  _showItem: 0
   _canTakeInfiniteIngredients: 0
   _inSlotIngredientCount: 1
   _outSlotIngredientCount: 1
@@ -32,6 +33,7 @@ MonoBehaviour:
   _shopSpawnProbability: 0
   _shopPrice: 0
   _cannotBeSell: 1
+  _cannotBeBuy: 1
   _sellPrice: 0
   _contextualComponents:
   - {fileID: 7706745679750095, guid: ad1416cb9a463d54eab6523dcdc6b95f, type: 3}
@@ -39,6 +41,6 @@ MonoBehaviour:
   _uiLoreDescription: Were does it come from ? We do not know yet, but it works why
     bother ?
   _contextMenuHeight: 3
-  _canSell: 0
+  _canRetrieve: 0
   _canMove: 1
   _canConfigure: 1

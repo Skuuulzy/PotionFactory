@@ -24,14 +24,16 @@ MonoBehaviour:
     _ports:
     - _side: 3
       _way: 0
+  _showItem: 0
   _canTakeInfiniteIngredients: 1
   _inSlotIngredientCount: 1
   _outSlotIngredientCount: 1
   _ingredientsPerSlotCount: 1
   _processTime: 0
-  _shopSpawnProbability: 0.1
-  _shopPrice: 15000
+  _shopSpawnProbability: 0
+  _shopPrice: 0
   _cannotBeSell: 0
+  _cannotBeBuy: 1
   _sellPrice: 100
   _contextualComponents:
   - {fileID: 2118422002032948451, guid: c06a405510495ef4ca72a085e2d58892, type: 3}
@@ -40,6 +42,6 @@ MonoBehaviour:
   _uiLoreDescription: What the marchand will do with the stuff you sell ? I don't
     kown, ask the question yourself.
   _contextMenuHeight: 2
-  _canSell: 0
+  _canRetrieve: 0
   _canMove: 0
   _canConfigure: 1

@@ -61,7 +61,7 @@ namespace Components.Machines.ContextMenu
             transform.localPosition = new Vector3(0, machine.Template.ContextMenuHeight, 0);
             _configureBtn.interactable = machine.Template.CanConfigure;
             _moveBtn.interactable = machine.Template.CanMove;
-            _retrieveBtn.interactable = machine.Template.CanSell;
+            _retrieveBtn.interactable = machine.Template.CanRetrieve;
             _canvas.gameObject.SetActive(selected);
         }
 

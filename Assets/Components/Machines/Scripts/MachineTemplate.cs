@@ -32,6 +32,7 @@ namespace Components.Machines
         [SerializeField] private float _shopSpawnProbability;
         [SerializeField] private int _shopPrice = 200;
         [SerializeField] private bool _cannotBeSell;
+        [SerializeField] private bool _cannotBeBuy;
         [SerializeField] private int _sellPrice = 100;
 
         [Header("Contextual View")] 
@@ -39,7 +40,7 @@ namespace Components.Machines
         [SerializeField] private string _uiGameplayDescription;
         [SerializeField] private string _uiLoreDescription;
         [SerializeField] private int _contextMenuHeight = 2;
-        [SerializeField] private bool _canSell = true;
+        [SerializeField] private bool _canRetrieve = true;
         [SerializeField] private bool _canMove = true;
         [SerializeField] private bool _canConfigure = true;
 
@@ -65,12 +66,12 @@ namespace Components.Machines
         public int ContextMenuHeight => _contextMenuHeight;
         public int ShopPrice => _shopPrice;
         public int SellPrice => _sellPrice;
-        public bool CannotBeSell => _cannotBeSell;
+        public bool CannotBeBuy => _cannotBeBuy;
 
         public List<UIContextualComponent> ContextualComponents => _contextualComponents;
         public string UIGameplayDescription => _uiGameplayDescription;
         public string UILoreDescription => _uiLoreDescription;
-        public bool CanSell => _canSell;
+        public bool CanRetrieve => _canRetrieve;
         public bool CanMove => _canMove;
         public bool CanConfigure => _canConfigure;
 
