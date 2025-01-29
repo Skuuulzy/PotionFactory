@@ -1,4 +1,3 @@
-using System;
 using Components.Machines;
 using UnityEngine;
 using TMPro;
@@ -17,6 +16,8 @@ public class CodexUIController : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _machineState;
     [SerializeField] private List<UIIngredientSlotController> _inIngredientSlots;
     [SerializeField] private UIIngredientSlotController _outIngredientSlot;
+    [SerializeField] private Slider _processTimeSlider;
+    [SerializeField] private TMP_Text _processTimeText;
 
     [Header("Generic")]
     [SerializeField] private GameObject _contextGenericWindow;
@@ -26,11 +27,47 @@ public class CodexUIController : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _genericMachineLore;
     
     private Machine _hoveredMachine;
+    private bool _recipeMachine;
     
     private void Start()
     {
         Machine.OnHovered += HandleMachineHovered;
         _window.SetActive(false);
+        
+        _processTimeSlider.value = 0;
+        _processTimeText.text = "0/0 ticks";
+    }
+
+    private void Update()
+    {
+        if (!_recipeMachine)
+        {
+            Debug.Log("No recipe machine hover");
+            return;
+        }
+
+        if (_hoveredMachine.Behavior is not RecipeCreationBehavior recipeCreationBehavior)
+        {
+            Debug.Log("No recipe behaviour found");
+            return;
+        }
+
+        if (!recipeCreationBehavior.ProcessingRecipe)
+        {
+            _processTimeSlider.value = 0;
+            _processTimeText.text = "0/0 ticks";
+            
+            return;
+        }
+
+        // Temporary solution to show what recipe is currently processed.
+        if (_outIngredientSlot.ShowEmpty)
+        {
+            _outIngredientSlot.SetIngredientSlot(recipeCreationBehavior.CurrentRecipe.OutIngredient.Icon,0,_hoveredMachine.Template.IngredientsPerSlotCount);
+        }
+        
+        _processTimeSlider.value = recipeCreationBehavior.CurrentProcessTime / (float)recipeCreationBehavior.FullProcessTime;
+        _processTimeText.text = $"{recipeCreationBehavior.CurrentProcessTime}/{recipeCreationBehavior.FullProcessTime} ticks";
     }
 
     private void OnDestroy()
@@ -41,6 +78,7 @@ public class CodexUIController : MonoBehaviour
     private void HandleMachineHovered(Machine machine, bool hovered)
     {
         _window.SetActive(hovered);
+        _recipeMachine = false;
         
         // Special case for other machine. TODO: Handle it directly in the template to have generic method here.
         if (machine.Template.Type == MachineType.DISPENSER || machine.Template.Type == MachineType.MARCHAND)
@@ -51,7 +89,7 @@ public class CodexUIController : MonoBehaviour
             _genericMachineTitle.text = machine.Template.Name;
             _genericMachineState.text = machine.Template.UIGameplayDescription;
             _genericMachineLore.text = machine.Template.UILoreDescription;
-
+            
             switch (machine.Behavior)
             {
                 case DestructorMachineBehaviour destructorMachineBehaviour:
@@ -102,6 +140,11 @@ public class CodexUIController : MonoBehaviour
         
         UpdateIngredientInSlots(machine);
         _hoveredMachine.OnItemAdded += HandleIngredientInMachineUpdated;
+
+        if (machine.Behavior is RecipeCreationBehavior)
+        {
+            _recipeMachine = true;
+        }
     }
 
     private void HandleIngredientInMachineUpdated(bool _)

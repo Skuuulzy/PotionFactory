@@ -248,7 +248,7 @@ namespace Components.Machines
                 return false;
             }
             
-            return EmptyInSlotCount() > 0;
+            return way == Way.IN ? EmptyInSlotCount() > 0 : _outIngredients.Count < Template.IngredientsPerSlotCount;
         }
 
         // ------------------------------------------------------------------------- TICK -------------------------------------------------------------------------
