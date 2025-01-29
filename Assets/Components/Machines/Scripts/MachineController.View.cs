@@ -15,10 +15,12 @@ namespace Components.Machines
         [SerializeField] private Color _unPlacableColor = Color.red;
         [SerializeField] private Color _selectedColor = Color.blue;
         [SerializeField] private Color _hoveredColor = Color.white;
+
+        [Header("Animation")] 
+        [SerializeField] private Animator _sellFeedbackAnimator;
         
         private Outline _outline;
         private List<GameObject> _directionalArrows;
-
         
         // ------------------------------------------------------------------------- DIRECTIONAL ARROWS ---------------------------------------------------------------
         private void SetupDirectionalArrows(MachineTemplate machineTemplate)
@@ -99,6 +101,13 @@ namespace Components.Machines
             }
             
             _ingredientController.CreateFavoriteSellerItemRepresentationFromTemplate(ingredient);
+        }
+        
+        // ------------------------------------------------------------------------- SELL FEEDBACK -----------------------------------------------------------------------------
+        private void ShowSellFeedback()
+        {
+            Debug.Log("Sell feedback");
+            _sellFeedbackAnimator.SetTrigger("Play");
         }
     }
 }

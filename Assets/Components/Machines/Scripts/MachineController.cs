@@ -46,6 +46,7 @@ namespace Components.Machines
             _machine.OnTick += Tick;
             _machine.OnPropagateTick += PropagateTick;
             _machine.OnItemAdded += ShowItem;
+            _machine.OnItemSell += ShowSellFeedback;
             Machine.OnSelected += HandleMachineSelected;
             Machine.OnHovered += HandleMachineHovered;
             
@@ -56,7 +57,7 @@ namespace Components.Machines
             if(_machine.Behavior is DestructorMachineBehaviour destructor)
             {
                 destructor.OnSpecialIngredientChanged += ShowItem;
-			}
+            }
 
             AddMachineToChain();
             
@@ -70,6 +71,7 @@ namespace Components.Machines
             _machine.OnTick -= Tick;
             _machine.OnPropagateTick -= PropagateTick;
             _machine.OnItemAdded -= ShowItem;
+            _machine.OnItemSell -= ShowSellFeedback;
             Machine.OnSelected -= HandleMachineSelected;
             Machine.OnHovered -= HandleMachineHovered;
             

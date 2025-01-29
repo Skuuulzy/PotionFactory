@@ -42,13 +42,11 @@ public class CodexUIController : MonoBehaviour
     {
         if (!_recipeMachine)
         {
-            Debug.Log("No recipe machine hover");
             return;
         }
 
         if (_hoveredMachine.Behavior is not RecipeCreationBehavior recipeCreationBehavior)
         {
-            Debug.Log("No recipe behaviour found");
             return;
         }
 

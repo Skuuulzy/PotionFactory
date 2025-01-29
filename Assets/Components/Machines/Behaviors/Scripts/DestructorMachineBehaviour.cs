@@ -15,6 +15,11 @@ namespace Components.Machines.Behaviors
         public Action<IngredientTemplate> OnSpecialIngredientChanged;
         public override void Process(Machine machine)
         {
+            if (machine.InIngredients.Count == 0)
+            {
+                return;
+            }
+            
             // Sell items
             int sellPrice = 0;
             foreach(IngredientTemplate ingredientTemplate in machine.InIngredients)
@@ -30,6 +35,7 @@ namespace Components.Machines.Behaviors
             }
             
             EconomyController.Instance.AddScore(sellPrice);
+            machine.OnItemSell?.Invoke();
             
             // Clear the machine items
             machine.RemoveAllItems();
