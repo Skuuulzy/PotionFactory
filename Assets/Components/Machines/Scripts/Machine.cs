@@ -219,7 +219,7 @@ namespace Components.Machines
                 {
                     return true;
                 }
-                if (_outIngredients.Count > Template.OutSlotIngredientCount)
+                if (_outIngredients.Count >= Template.IngredientsPerSlotCount)
                 {
                     return false;
                 }
@@ -253,7 +253,6 @@ namespace Components.Machines
         public int EmptyInSlotCount()
         {
             int remainingSlot = Template.InSlotIngredientCount - _inIngredients.GroupedByTypeAndCount().Count;
-
             return remainingSlot < 0 ? 0 : remainingSlot;
         }
 
