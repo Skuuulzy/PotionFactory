@@ -17,6 +17,7 @@ namespace Components.Machines
         [SerializeField] private List<IngredientTemplate> _inIngredients;
         [SerializeField] private List<IngredientTemplate> _outIngredients;
         [SerializeField] private List<Node> _nodes;
+        
         [SerializeField, ReadOnly] private MachineController _controller;
         [SerializeField] private MachineBehavior _behavior;
         
@@ -29,8 +30,6 @@ namespace Components.Machines
         public MachineBehavior Behavior => _behavior;
         public List<IngredientTemplate> InIngredients => _inIngredients;
         public List<IngredientTemplate> OutIngredients => _outIngredients;
-        public Dictionary<IngredientTemplate, int> GroupedInIngredients => _inIngredients.GroupedByTypeAndCount();
-        public Dictionary<IngredientTemplate, int> GroupedOutIngredients => _outIngredients.GroupedByTypeAndCount();
         public virtual List<Node> Nodes => _nodes;
 
         // ------------------------------------------------------------------------- ACTIONS -------------------------------------------------------------------------
@@ -47,6 +46,7 @@ namespace Components.Machines
         public Action OnItemSell;
         
         // --------------------------------------------------------------------- INITIALISATION -------------------------------------------------------------------------
+        
         public Machine(MachineTemplate template, MachineController controller)
         {
             _template = template;
@@ -70,6 +70,7 @@ namespace Components.Machines
         }
         
         // ------------------------------------------------------------------------- NODES -------------------------------------------------------------------------
+        
         public void LinkNodeData()
         {
             foreach (var node in Nodes)
@@ -143,18 +144,6 @@ namespace Components.Machines
         }
 
         // ------------------------------------------------------------------------- INGREDIENTS -------------------------------------------------------------------------
-        /// Base input behaviour of a machine. Check if any room left if so store the item in the correct slot.
-        public virtual bool TryInput(IngredientTemplate ingredient)
-        {
-            if (!CanAddIngredientOfTypeInSlot(ingredient, Way.IN))
-            {
-                return false;
-            }
-
-            AddIngredient(ingredient, Way.IN);
-            
-            return true;
-        }
         
         public void AddIngredient(IngredientTemplate ingredient , Way way)
         {
@@ -172,9 +161,90 @@ namespace Components.Machines
                     Debug.LogError("Way of adding item not handle.");
                     return;
             }
+            
+            OnItemAdded?.Invoke(true);
+        }
+        
+        public void RemoveIngredient(IngredientTemplate ingredientToRemove, Way slotType)
+        {
+            switch (slotType)
+            {
+                case Way.IN:
+                    if (_inIngredients.Contains(ingredientToRemove))
+                    {
+                        _inIngredients.Remove(ingredientToRemove);
+                    }
+                    else
+                    {
+                        Debug.LogError($"Cannot remove ingredient: {ingredientToRemove.Name} from out slot of {_controller.name} because it cannot be found."); 
+                    }
+                    break;
+                case Way.OUT:
+                    if (_outIngredients.Contains(ingredientToRemove))
+                    {
+                        _outIngredients.Remove(ingredientToRemove);
+                    }
+                    else
+                    {
+                        Debug.LogError($"Cannot remove ingredient: {ingredientToRemove.Name} from out slot of {_controller.name} because it cannot be found."); 
+                    }
+                    break;
+                case Way.NONE:
+                    Debug.LogError("Cannot remove an ingredient if the slot type is not defined."); 
+                    return;
+            }
+            
+            OnItemAdded?.Invoke(false);
         }
 
-        public IngredientTemplate TakeOlderIngredient()
+        public void ClearSlot(Way slotType)
+        {
+            if (slotType == Way.IN)
+            {
+                _inIngredients.Clear();
+            }
+            else
+            {
+                _outIngredients.Clear();
+            }
+            
+            OnItemAdded?.Invoke(false);
+        }
+        
+        public bool CanTakeIngredientInSlot(IngredientTemplate ingredient, Way way)
+        {
+            if (!ingredient)
+            {
+                return false;
+            }
+
+            if (way == Way.OUT)
+            {
+                if (_outIngredients.Count == 0)
+                {
+                    return true;
+                }
+                if (_outIngredients.Count > Template.OutSlotIngredientCount)
+                {
+                    return false;
+                }
+                
+                return _outIngredients[0].Name == ingredient.Name;
+            }
+            
+            var groupedIngredients = _inIngredients.GroupedByTypeAndCount();
+
+            // If the ingredient is not stored in any slot we check if there is an empty in slot.
+            if (!groupedIngredients.TryGetValue(ingredient, out var groupedIngredientCount))
+            {
+                return EmptyInSlotCount() > 0;
+            }
+            
+            // If the ingredient is already stored we check if the slot is not full yet.
+            return groupedIngredientCount < Template.IngredientsPerSlotCount;
+        }
+        
+        public IngredientTemplate OlderOutIngredient()
         {
             if (_outIngredients.Count == 0)
             {
@@ -182,27 +252,7 @@ namespace Components.Machines
             }
 
             var ingredient = _outIngredients.First();
-            _outIngredients.Remove(ingredient);
-
             return ingredient;
-        }
-        
-        public void RemoveAllItems()
-        {
-            InIngredients.Clear();
-            OnItemAdded?.Invoke(false);
-        }
-
-        public void RemoveItem(int index)
-        {
-            _outIngredients.RemoveAt(index);
-            OnItemAdded?.Invoke(false);
-        }
-        
-        public void RemoveInItems(List<IngredientTemplate> ingredientToRemove)
-        {
-            _inIngredients.RemoveAll(item => ingredientToRemove.Any(b => b.Name == item.Name));            
-            OnItemAdded?.Invoke(false);
         }
         
         public int EmptyInSlotCount()
@@ -211,31 +261,9 @@ namespace Components.Machines
 
             return remainingSlot < 0 ? 0 : remainingSlot;
         }
-        
-        public bool CanAddIngredientOfTypeInSlot(IngredientTemplate ingredient, Way way)
-        {
-            if (ingredient == null)
-            {
-                return false;
-            }
-            
-            var ingredientsToLook = way == Way.IN ? _inIngredients : _outIngredients;
-            var groupedIngredients = ingredientsToLook.GroupedByTypeAndCount();
-            
-            if (groupedIngredients.TryGetValue(ingredient, out var groupedIngredientCount))
-            {
-                if (groupedIngredientCount < Template.IngredientsPerSlotCount)
-                {
-                    return true;
-                }
-
-                return false;
-            }
-            
-            return way == Way.IN ? EmptyInSlotCount() > 0 : _outIngredients.Count < Template.IngredientsPerSlotCount;
-        }
 
         // ------------------------------------------------------------------------- TICK -------------------------------------------------------------------------
+        
         public void Tick()
         {
             Behavior.Execute();
@@ -282,6 +310,7 @@ namespace Components.Machines
         }
         
         // ------------------------------------------------------------------- PORTS & ROTATIONS -------------------------------------------------------------------------
+        
         public void ReplaceNodesViaRotation(int angle, bool clockwise)
         {
             if (!clockwise)
@@ -303,6 +332,7 @@ namespace Components.Machines
         }
         
         // ------------------------------------------------------------------------- SELECT BEHAVIOUR -------------------------------------------------------------------------
+        
         public void Select(bool select)
         {
             OnSelected?.Invoke(this, select);

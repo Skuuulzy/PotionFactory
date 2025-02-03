@@ -42,7 +42,7 @@ namespace Components.Machines.Behaviors
             Machine.OnItemSell?.Invoke();
             
             // Clear the machine items
-            Machine.RemoveAllItems();
+            Machine.ClearSlot(Way.IN);
         }
     }
 }

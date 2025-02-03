@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using System.Linq;
+using Components.Ingredients;
 using Components.Machines.Behaviors;
 
 public class CodexUIController : MonoBehaviour
@@ -153,7 +154,7 @@ public class CodexUIController : MonoBehaviour
     private void UpdateIngredientInSlots(Machine machine)
     {
         // Setup in ingredients slots
-        var inIngredientCountByType = machine.GroupedInIngredients;
+        var inIngredientCountByType = machine.InIngredients.GroupedByTypeAndCount();
         
         for (var i = 0; i < _inIngredientSlots.Count; i++)
         {
@@ -176,11 +177,12 @@ public class CodexUIController : MonoBehaviour
             ingredientSlot.SetEmpty(machine.Template.IngredientsPerSlotCount);
         }
 
+        var outIngredientCountByType = machine.OutIngredients.GroupedByTypeAndCount();
         
-        if (machine.GroupedOutIngredients.Count > 0)
+        if (outIngredientCountByType.Count > 0)
         {
             // The out ingredients should only have one category of item.
-            var ingredientData = machine.GroupedOutIngredients.ElementAt(0);
+            var ingredientData = outIngredientCountByType.ElementAt(0);
             _outIngredientSlot.SetIngredientSlot(ingredientData.Key.Icon, ingredientData.Value, machine.Template.IngredientsPerSlotCount);
         }
         else

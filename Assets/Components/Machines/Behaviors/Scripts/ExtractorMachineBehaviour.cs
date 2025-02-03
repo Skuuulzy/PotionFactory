@@ -16,7 +16,7 @@ namespace Components.Machines.Behaviors
 		protected override void ProcessAction()
         {
             // Extract ingredients if any room left
-            if (Machine.CanAddIngredientOfTypeInSlot(IngredientToExtract, Way.IN))
+            if (Machine.CanTakeIngredientInSlot(IngredientToExtract, Way.IN))
             {
                 Machine.AddIngredient(IngredientToExtract, Way.IN);
             }

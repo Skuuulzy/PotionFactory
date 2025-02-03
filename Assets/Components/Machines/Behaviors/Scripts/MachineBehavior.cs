@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using Components.Ingredients;
-using Components.Tick;
 using UnityEngine;
 
 namespace Components.Machines.Behaviors
@@ -63,36 +60,49 @@ namespace Components.Machines.Behaviors
             {
                 return;
             }
+
+            var ingredientToMove = Machine.InIngredients[0];
             
             // Is there any space left in the out slot.
-            if (Machine.CanAddIngredientOfTypeInSlot(Machine.InIngredients[0], Way.OUT))
+            if (Machine.CanTakeIngredientInSlot(ingredientToMove, Way.OUT))
             {
-                // Add the ingredient to the machine out slot.
-                Machine.AddIngredient(Machine.InIngredients[0], Way.OUT);
-                // TODO: Remove ingredient from in
+                Machine.AddIngredient(ingredientToMove, Way.OUT);
+                Machine.RemoveIngredient(ingredientToMove, Way.IN);
             }
         }
 
         /// Base out behaviour of a machine. Check if any item to give and if any valid receiver.
-        protected virtual void Output()
+        private void Output()
         {
             if (Machine.OutIngredients.Count <= 0)
             {
                 return;
             }
 
-            if (!Machine.TryGetOutMachines(out List<Machine> outMachines))
-            {
-                return;
-            }
-
-            // By default, a machine should only have one input, otherwise override this method.
-            if (!outMachines[0].TryInput(Machine.OutIngredients[0]))
+            var machineToOutput = OutputMachine();
+            if (machineToOutput == null)
             {
                 return;
             }
             
-            Machine.RemoveItem(0);
+            var ingredientToOutput = Machine.OlderOutIngredient();
+            if (!ingredientToOutput)
+            {
+                return;
+            }
+
+            if (!machineToOutput.CanTakeIngredientInSlot(ingredientToOutput, Way.IN))
+            {
+                return;
+            }
+
+            machineToOutput.AddIngredient(ingredientToOutput, Way.IN);
+            Machine.RemoveIngredient(ingredientToOutput, Way.OUT);
+        }
+
+        protected virtual Machine OutputMachine()
+        {
+            return !Machine.TryGetOutMachines(out var outMachines) ? null : outMachines[0];
         }
         
         // ------------------------------------------------------------------------- RELICS -------------------------------------------------------------------------

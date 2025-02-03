@@ -45,6 +45,11 @@ namespace Components.Machines
         
         private void ToggleDirectionalArrows(bool toggle)
         {
+            if (!this)
+            {
+                return;
+            }
+            
             for (int i = 0; i < _directionalArrows.Count; i++)
             {
                 _directionalArrows[i].SetActive(toggle);
