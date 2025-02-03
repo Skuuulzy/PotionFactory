@@ -14,6 +14,7 @@ namespace Components.Machines.Behaviors
         
         public int CurrentProcessTime { get; private set; }
         public int ProcessTime => _baseProcessTime + AdditionalProcessTime;
+        
         public void Initialize(Machine machine)
         {
             _baseProcessTime = machine.Template.ProcessTime;
@@ -25,19 +26,24 @@ namespace Components.Machines.Behaviors
             return Instantiate(this);
         }
         
-        // ------------------------------------------------------------------------- PROCESS LOOP -------------------------------------------------------------------------
+        // ------------------------------------------------------------------------- EXECUTION LOOP -------------------------------------------------------------------------
+        
+        /// Main execution loop of the machine:
+        /// 1. Apply pre-process.
+        /// 2. Apply Process.
+        /// 3. Output the result.
+        public void Execute()
+        {
+            PreProcess();
+            Process();
+            Output();
+        }
         
         /// Optional pre-process, happen before the process, not affected by the process time of the machine, happen at each tick.
         protected virtual void PreProcess() { }
         
-        /// Base process of the machine:
-        /// 1. Apply pre-process.
-        /// 2. Check if the machine can process based on the tick.
-        /// 3. Apply machine process behaviour.
-        public void Process()
+        private void Process()
         {
-            PreProcess();
-            
             // Check if we can process
             CurrentProcessTime++;
             
@@ -47,12 +53,11 @@ namespace Components.Machines.Behaviors
             }
             CurrentProcessTime = 0;
             
-            SubProcess();
+            ProcessAction();
         }
 
-        /// Base sub process for all machine, transfer ingredient from in to out slot, FIFO.
-        /// Override for specific process.
-        protected virtual void SubProcess()
+        /// Base sub process for all machine, transfer ingredient from in to out slot, FIFO. Override for specific process.
+        protected virtual void ProcessAction()
         {
             if (Machine.InIngredients.Count <= 0)
             {
@@ -68,42 +73,26 @@ namespace Components.Machines.Behaviors
             }
         }
 
-        // ------------------------------------------------------------------------- IN/OUT -------------------------------------------------------------------------
-
-        /// Base input behaviour of a machine. Check if any room left if so store the item in the correct slot.
-        public virtual bool TryInput(IngredientTemplate ingredient)
-        {
-            if (!Machine.CanAddIngredientOfTypeInSlot(ingredient, Way.IN))
-            {
-                return false;
-            }
-
-            Machine.AddIngredient(ingredient, Way.IN);
-            
-            return true;
-        }
-        
         /// Base out behaviour of a machine. Check if any item to give and if any valid receiver.
-        public virtual bool TryOutput()
+        protected virtual void Output()
         {
             if (Machine.OutIngredients.Count <= 0)
             {
-                return false;
+                return;
             }
 
             if (!Machine.TryGetOutMachines(out List<Machine> outMachines))
             {
-                return false;
+                return;
             }
 
             // By default, a machine should only have one input, otherwise override this method.
-            if (!outMachines[0].Behavior.TryInput(Machine.OutIngredients[0]))
+            if (!outMachines[0].TryInput(Machine.OutIngredients[0]))
             {
-                return false;
+                return;
             }
             
             Machine.RemoveItem(0);
-            return true;
         }
         
         // ------------------------------------------------------------------------- RELICS -------------------------------------------------------------------------

@@ -8,14 +8,15 @@ namespace Components.Machines.Behaviors
     {
         private Machine _lastMachineGivenTo;
 
-        public override bool TryOutput()
+        protected override void Output()
         {
             // If there is only one out machine, the behaviour do not change.
             if (Machine.TryGetOutMachines(out List<Machine> outMachines))
             {
                 if (outMachines.Count == 1)
                 {
-                    return base.TryOutput();
+                    base.Output();
+                    return;
                 }
             }
 
@@ -25,7 +26,7 @@ namespace Components.Machines.Behaviors
                 {
                     var outMachine = outMachines[i];
                 
-                    if (outMachine.Behavior.TryInput(Machine.OutIngredients[0]))
+                    if (outMachine.TryInput(Machine.OutIngredients[0]))
                     {
                         _lastMachineGivenTo = outMachine;
                         Machine.RemoveItem(0);
@@ -33,7 +34,7 @@ namespace Components.Machines.Behaviors
                     }
                 }
                 
-                return true;
+                return;
             }
 
             for (int i = 0; i < outMachines.Count; i++)
@@ -43,7 +44,7 @@ namespace Components.Machines.Behaviors
                 if (outMachine == _lastMachineGivenTo)
                     continue;
 
-                if (outMachine.Behavior.TryInput(Machine.OutIngredients[0]))
+                if (outMachine.TryInput(Machine.OutIngredients[0]))
                 {
                     _lastMachineGivenTo = outMachine;
                     Machine.RemoveItem(0);
@@ -52,7 +53,6 @@ namespace Components.Machines.Behaviors
             }
 
             _lastMachineGivenTo = null;
-            return true;
         }
     }
 }

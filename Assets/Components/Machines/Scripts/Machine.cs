@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
 using Components.Ingredients;
 using Components.Machines.Behaviors;
 using Components.Tick;
@@ -30,8 +29,8 @@ namespace Components.Machines
         public MachineBehavior Behavior => _behavior;
         public List<IngredientTemplate> InIngredients => _inIngredients;
         public List<IngredientTemplate> OutIngredients => _outIngredients;
-        public Dictionary<IngredientTemplate, int> GroupedInIngredients => GroupIngredientByTypeAndCount(_inIngredients);
-        public Dictionary<IngredientTemplate, int> GroupedOutIngredients => GroupIngredientByTypeAndCount(_outIngredients);
+        public Dictionary<IngredientTemplate, int> GroupedInIngredients => _inIngredients.GroupedByTypeAndCount();
+        public Dictionary<IngredientTemplate, int> GroupedOutIngredients => _outIngredients.GroupedByTypeAndCount();
         public virtual List<Node> Nodes => _nodes;
 
         // ------------------------------------------------------------------------- ACTIONS -------------------------------------------------------------------------
@@ -143,7 +142,20 @@ namespace Components.Machines
             return false;
         }
 
-        // ------------------------------------------------------------------------- ITEMS -------------------------------------------------------------------------
+        // ------------------------------------------------------------------------- INGREDIENTS -------------------------------------------------------------------------
+        /// Base input behaviour of a machine. Check if any room left if so store the item in the correct slot.
+        public virtual bool TryInput(IngredientTemplate ingredient)
+        {
+            if (!CanAddIngredientOfTypeInSlot(ingredient, Way.IN))
+            {
+                return false;
+            }
+
+            AddIngredient(ingredient, Way.IN);
+            
+            return true;
+        }
+        
         public void AddIngredient(IngredientTemplate ingredient , Way way)
         {
             switch (way)
@@ -183,7 +195,7 @@ namespace Components.Machines
 
         public void RemoveItem(int index)
         {
-            InIngredients.RemoveAt(index);
+            _outIngredients.RemoveAt(index);
             OnItemAdded?.Invoke(false);
         }
         
@@ -192,27 +204,10 @@ namespace Components.Machines
             _inIngredients.RemoveAll(item => ingredientToRemove.Any(b => b.Name == item.Name));            
             OnItemAdded?.Invoke(false);
         }
-
-        /// Return a dictionary with ingredients grouped by type and count.
-        /// <param name="ingredientsToLook"></param>
-        private Dictionary<IngredientTemplate, int> GroupIngredientByTypeAndCount(List<IngredientTemplate> ingredientsToLook)
-        {
-            var counts = new Dictionary<IngredientTemplate, int>();
-            
-            foreach (var ingredient in ingredientsToLook)
-            {
-                if (!counts.TryAdd(ingredient, 1))
-                {
-                    counts[ingredient]++;
-                }
-            }
-            
-            return counts;
-        }
         
         public int EmptyInSlotCount()
         {
-            int remainingSlot = Template.InSlotIngredientCount - GroupIngredientByTypeAndCount(_inIngredients).Count;
+            int remainingSlot = Template.InSlotIngredientCount - _inIngredients.GroupedByTypeAndCount().Count;
 
             return remainingSlot < 0 ? 0 : remainingSlot;
         }
@@ -225,11 +220,11 @@ namespace Components.Machines
             }
             
             var ingredientsToLook = way == Way.IN ? _inIngredients : _outIngredients;
-            var groupedIngredients = GroupIngredientByTypeAndCount(ingredientsToLook);
+            var groupedIngredients = ingredientsToLook.GroupedByTypeAndCount();
             
-            if (groupedIngredients.ContainsKey(ingredient))
+            if (groupedIngredients.TryGetValue(ingredient, out var groupedIngredientCount))
             {
-                if (groupedIngredients[ingredient] < Template.IngredientsPerSlotCount)
+                if (groupedIngredientCount < Template.IngredientsPerSlotCount)
                 {
                     return true;
                 }
@@ -243,8 +238,7 @@ namespace Components.Machines
         // ------------------------------------------------------------------------- TICK -------------------------------------------------------------------------
         public void Tick()
         {
-            Behavior.Process();
-            Behavior.TryOutput();
+            Behavior.Execute();
             
             // Propagate tick
             if (TryGetInMachine(out List<Machine> previousMachines))
@@ -271,8 +265,7 @@ namespace Components.Machines
                 return;
             }
             
-            Behavior.Process();
-            Behavior.TryOutput();
+            Behavior.Execute();
 
             // Propagate tick
             if (!TryGetInMachine(out List<Machine> previousMachines))

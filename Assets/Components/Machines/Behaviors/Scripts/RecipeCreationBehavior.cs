@@ -33,7 +33,7 @@ namespace Components.Machines.Behaviors
             Debug.Log($"Machine: {Machine.Controller.name} found recipe: {CurrentRecipe.name}. Start processing for {ProcessTime} ticks.");
         }
 
-        protected override void SubProcess()
+        protected override void ProcessAction()
         {
             if (!ProcessingRecipe)
             {

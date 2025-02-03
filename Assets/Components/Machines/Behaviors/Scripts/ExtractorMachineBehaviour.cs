@@ -13,7 +13,7 @@ namespace Components.Machines.Behaviors
             IngredientToExtract = ingredientTemplate;
 		}
         
-		protected override void SubProcess()
+		protected override void ProcessAction()
         {
             // Extract ingredients if any room left
             if (Machine.CanAddIngredientOfTypeInSlot(IngredientToExtract, Way.IN))
@@ -22,7 +22,7 @@ namespace Components.Machines.Behaviors
             }
             
             // Apply the base transfer ingredient sub process
-            base.SubProcess();
+            base.ProcessAction();
         }
     }
 }

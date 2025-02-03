@@ -17,7 +17,7 @@ namespace Components.Machines.Behaviors
             OnSpecialIngredientChanged?.Invoke(specialIngredient);
         }
         
-        protected override void SubProcess()
+        protected override void ProcessAction()
         {
             if (Machine.InIngredients.Count == 0)
             {
