@@ -20,10 +20,9 @@ namespace Components.Machines
         [SerializeField] private List<Node> _nodes;
         [SerializeField, ReadOnly] private MachineController _controller;
         [SerializeField] private MachineBehavior _behavior;
-
-        [ShowInInspector] private int _internalRotationDebug;
         
         private readonly MachineTemplate _template;
+        private int _outMachineTickCount;
         
         // ----------------------------------------------------------------------- PUBLIC FIELDS -------------------------------------------------------------------------
         public MachineTemplate Template => _template;
@@ -63,7 +62,6 @@ namespace Components.Machines
 
         public void UpdateNodesRotation(int rotation)
         {
-            _internalRotationDebug = rotation;
             ReplaceNodesViaRotation(rotation, true);
         }
 
@@ -257,12 +255,49 @@ namespace Components.Machines
         // ------------------------------------------------------------------------- TICK -------------------------------------------------------------------------
         public void Tick()
         {
-            OnTick?.Invoke();
+            Behavior.Process();
+            Behavior.TryGiveOutIngredient();
+            
+            // Propagate tick
+            if (TryGetInMachine(out List<Machine> previousMachines))
+            {
+                foreach (var previousMachine in previousMachines)
+                {
+                    previousMachine.PropagateTick();
+                }
+            }
         }
         
         public void PropagateTick()
         {
-            OnPropagateTick?.Invoke();
+            _outMachineTickCount++;
+
+            if (!TryGetOutMachines(out var connectedMachines))
+            {
+                return;            
+            }
+
+            // The machine has not received the propagation of all his next machine.
+            if (_outMachineTickCount < connectedMachines.Count)
+            {
+                return;
+            }
+            
+            Behavior.Process();
+            Behavior.TryGiveOutIngredient();
+
+            // Propagate tick
+            if (!TryGetInMachine(out List<Machine> previousMachines))
+            {
+                return;
+            }
+            
+            foreach (var previousMachine in previousMachines)
+            {
+                previousMachine.PropagateTick();
+            }
+
+            _outMachineTickCount = 0;
         }
         
         // ------------------------------------------------------------------- PORTS & ROTATIONS -------------------------------------------------------------------------

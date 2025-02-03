@@ -8,26 +8,26 @@ namespace Components.Machines.Behaviors
     {
         private Machine _lastMachineGivenTo;
 
-        public override void Process(Machine machine)
+        public override void Process()
         {
             
         }
 
-        public override void TryGiveOutIngredient(Machine machine)
+        public override void TryGiveOutIngredient()
         {
-            if (machine.InIngredients.Count == 0)
+            if (Machine.InIngredients.Count == 0)
             {
                 return;
             }
 
-            if (!machine.TryGetOutMachines(out List<Machine> outMachines)) 
+            if (!Machine.TryGetOutMachines(out List<Machine> outMachines)) 
                 return;
 
             if (outMachines.Count == 1)
             {
-                if (outMachines[0].TryGiveIngredient(machine.InIngredients[0], machine))
+                if (outMachines[0].TryGiveIngredient(Machine.InIngredients[0], Machine))
                 {
-                    machine.RemoveItem(0);
+                    Machine.RemoveItem(0);
                 }
                 
                 return;
@@ -39,10 +39,10 @@ namespace Components.Machines.Behaviors
                 {
                     var outMachine = outMachines[i];
                 
-                    if (outMachine.TryGiveIngredient(machine.InIngredients[0], machine))
+                    if (outMachine.TryGiveIngredient(Machine.InIngredients[0], Machine))
                     {
                         _lastMachineGivenTo = outMachine;
-                        machine.RemoveItem(0);
+                        Machine.RemoveItem(0);
                         break;
                     }
                 }
@@ -57,10 +57,10 @@ namespace Components.Machines.Behaviors
                 if (outMachine == _lastMachineGivenTo)
                     continue;
 
-                if (outMachine.TryGiveIngredient(machine.InIngredients[0], machine))
+                if (outMachine.TryGiveIngredient(Machine.InIngredients[0], Machine))
                 {
                     _lastMachineGivenTo = outMachine;
-                    machine.RemoveItem(0);
+                    Machine.RemoveItem(0);
                     return;
                 }
             }

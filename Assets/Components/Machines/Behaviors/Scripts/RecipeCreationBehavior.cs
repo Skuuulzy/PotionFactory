@@ -15,21 +15,21 @@ namespace Components.Machines.Behaviors
         private int _currentProcessTime;
         private int _additionalRecipeProcessTime;
 
-        public int FullProcessTime => InitialProcessTime + _additionalRecipeProcessTime - Mathf.RoundToInt((InitialProcessTime + _additionalRecipeProcessTime) * RelicEffectBonusProcessTime);
+        public int FullProcessTime => _initialProcessTime + _additionalRecipeProcessTime - Mathf.RoundToInt((_initialProcessTime + _additionalRecipeProcessTime) * RelicEffectBonusProcessTime);
         public int CurrentProcessTime => _currentProcessTime;
         public RecipeTemplate CurrentRecipe => _currentRecipe;
 
-        public override void Process(Machine machine)
+        public override void Process()
         {
             // Try to find a recipe based on the machine and the items inside the machine.
             if (!ProcessingRecipe)
             {
-                if (ScriptableObjectDatabase.TryFindRecipeMachine(machine.Template, machine.InIngredients, out var recipe))
+                if (ScriptableObjectDatabase.TryFindRecipeMachine(Machine.Template, Machine.InIngredients, out var recipe))
                 {
                     _currentRecipe = recipe;
-                    _additionalRecipeProcessTime = Mathf.RoundToInt(machine.Template.ProcessTime * recipe.ProcessTimeModifier);
+                    _additionalRecipeProcessTime = Mathf.RoundToInt(Machine.Template.ProcessTime * recipe.ProcessTimeModifier);
                     
-                    Debug.Log($"Machine: {machine.Controller.name} found recipe: {_currentRecipe.name}. Start processing for {FullProcessTime} ticks.");
+                    Debug.Log($"Machine: {Machine.Controller.name} found recipe: {_currentRecipe.name}. Start processing for {FullProcessTime} ticks.");
                 }
                 else
                 {
@@ -47,15 +47,15 @@ namespace Components.Machines.Behaviors
             }
 
             // Is there any space left in the out slot.
-            if (machine.CanAddIngredientOfTypeInSlot(_currentRecipe.OutIngredient, Way.OUT))
+            if (Machine.CanAddIngredientOfTypeInSlot(_currentRecipe.OutIngredient, Way.OUT))
             {
                 // Add the ingredient to the machine out slot.
-                machine.AddIngredient(_currentRecipe.OutIngredient, Way.OUT);
+                Machine.AddIngredient(_currentRecipe.OutIngredient, Way.OUT);
                 
                 ProcessingRecipe = false;
                 
                 // Remove items used for the recipe.
-                machine.RemoveInItems(_currentRecipe.Ingredients.Keys.ToList());
+                Machine.RemoveInItems(_currentRecipe.Ingredients.Keys.ToList());
                 
                 // Reset the recipe.
                 _currentRecipe = null;
@@ -63,28 +63,28 @@ namespace Components.Machines.Behaviors
             }
         }
 
-        public override void TryGiveOutIngredient(Machine machine)
+        public override void TryGiveOutIngredient()
         {
             // Try to give the item to the next machine.
-            if (machine.OutIngredients.Count <= 0)
+            if (Machine.OutIngredients.Count <= 0)
             {
                 return;
             }
             
-            if (machine.TryGetOutMachines(out List<Machine> outMachines))
+            if (Machine.TryGetOutMachines(out List<Machine> outMachines))
             {
                 var outMachine = outMachines[0];
                 
-                if (outMachine.CanAddIngredientOfTypeInSlot(machine.OutIngredients.First(), Way.IN))
+                if (outMachine.CanAddIngredientOfTypeInSlot(Machine.OutIngredients.First(), Way.IN))
                 {
-                    var ingredientToGive = machine.TakeOlderIngredient();
+                    var ingredientToGive = Machine.TakeOlderIngredient();
                     outMachine.AddIngredient(ingredientToGive, Way.IN);
                     
-                    Debug.Log($"Machine: {machine.Controller.name} outputting: {ingredientToGive.name} to: {outMachine.Controller.name}.");
+                    Debug.Log($"Machine: {Machine.Controller.name} outputting: {ingredientToGive.name} to: {outMachine.Controller.name}.");
                 }
                 else
                 {
-                    Debug.Log($"Machine: {machine.Controller.name} cannot output to: {outMachine.Controller.name}. Because {outMachine.Controller.name} is full.");
+                    Debug.Log($"Machine: {Machine.Controller.name} cannot output to: {outMachine.Controller.name}. Because {outMachine.Controller.name} is full.");
                 }
             }
             else

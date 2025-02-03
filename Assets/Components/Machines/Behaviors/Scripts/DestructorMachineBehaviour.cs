@@ -13,16 +13,16 @@ namespace Components.Machines.Behaviors
         public IngredientTemplate SpecialIngredientTemplate => _specialIngredientTemplate;
 
         public Action<IngredientTemplate> OnSpecialIngredientChanged;
-        public override void Process(Machine machine)
+        public override void Process()
         {
-            if (machine.InIngredients.Count == 0)
+            if (Machine.InIngredients.Count == 0)
             {
                 return;
             }
             
             // Sell items
             int sellPrice = 0;
-            foreach(IngredientTemplate ingredientTemplate in machine.InIngredients)
+            foreach(IngredientTemplate ingredientTemplate in Machine.InIngredients)
             {
                 if(ingredientTemplate != null && ingredientTemplate.Name == _specialIngredientTemplate.Name)
                 {
@@ -35,13 +35,13 @@ namespace Components.Machines.Behaviors
             }
             
             EconomyController.Instance.AddScore(sellPrice);
-            machine.OnItemSell?.Invoke();
+            Machine.OnItemSell?.Invoke();
             
             // Clear the machine items
-            machine.RemoveAllItems();
+            Machine.RemoveAllItems();
         }
 
-        public override void TryGiveOutIngredient(Machine machine)
+        public override void TryGiveOutIngredient()
         {
             
         }

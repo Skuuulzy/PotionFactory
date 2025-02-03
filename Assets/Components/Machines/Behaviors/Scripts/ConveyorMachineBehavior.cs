@@ -6,25 +6,25 @@ namespace Components.Machines.Behaviors
     [CreateAssetMenu(fileName = "New Machine Behaviour", menuName = "Component/Machines/Behavior/Conveyor")]
     public class ConveyorMachineBehavior : MachineBehavior
     {
-        public override void Process(Machine machine)
+        public override void Process()
         {
             
         }
 
-        public override void TryGiveOutIngredient(Machine machine)
+        public override void TryGiveOutIngredient()
         {
-            if (machine.InIngredients.Count != 1)
+            if (Machine.InIngredients.Count != 1)
             {
                 return;
             }
 
-            if (machine.TryGetOutMachines(out List<Machine> outMachines))
+            if (Machine.TryGetOutMachines(out List<Machine> outMachines))
             {
                 var outMachine = outMachines[0];
                 
-                if (outMachine.TryGiveIngredient(machine.InIngredients[0], machine))
+                if (outMachine.TryGiveIngredient(Machine.InIngredients[0], Machine))
                 {
-                    machine.RemoveItem(0);
+                    Machine.RemoveItem(0);
                 }
             }
         }

@@ -17,7 +17,6 @@ namespace Components.Machines
         private bool _initialized;
         private bool _selected;
 
-        private int _outMachineTickCount;
         
         public Machine Machine => _machine;
         
@@ -51,7 +50,7 @@ namespace Components.Machines
             Machine.OnHovered += HandleMachineHovered;
             
             _initialized = true;
-            _machine.Behavior.SetInitialProcessTime(_machine.Template.ProcessTime);
+            _machine.Behavior.Initialize(_machine);
             _machine.LinkNodeData();
 
             if(_machine.Behavior is DestructorMachineBehaviour destructor)
@@ -87,50 +86,13 @@ namespace Components.Machines
         // Base tick called by the tick system.
         private void Tick()
         {
-            _machine.Behavior.Process(_machine);
-            _machine.Behavior.TryGiveOutIngredient(_machine);
-            
-            // Propagate tick
-            if (_machine.TryGetInMachine(out List<Machine> previousMachines))
-            {
-                foreach (var previousMachine in previousMachines)
-                {
-                    previousMachine.PropagateTick();
-                }
-            }
+
         }
 
         // Tick propagation called by the next machine.
         private void PropagateTick()
         {
-            _outMachineTickCount++;
 
-            if (!_machine.TryGetOutMachines(out var connectedMachines))
-            {
-                return;            
-            }
-
-            // The machine has not received the propagation of all his next machine.
-            if (_outMachineTickCount < connectedMachines.Count)
-            {
-                return;
-            }
-            
-            _machine.Behavior.Process(_machine);
-            _machine.Behavior.TryGiveOutIngredient(_machine);
-
-            // Propagate tick
-            if (!_machine.TryGetInMachine(out List<Machine> previousMachines))
-            {
-                return;
-            }
-            
-            foreach (var previousMachine in previousMachines)
-            {
-                previousMachine.PropagateTick();
-            }
-
-            _outMachineTickCount = 0;
         }
 
         // ------------------------------------------------------------------------- CHAIN ----------------------------------------------------------------------------

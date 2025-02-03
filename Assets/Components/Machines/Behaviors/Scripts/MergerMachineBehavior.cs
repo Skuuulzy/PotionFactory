@@ -8,7 +8,6 @@ namespace Components.Machines.Behaviors
     public class MergerMachineBehavior : MachineBehavior
     {
         private Machine _lastMachineTakenFrom;
-        
 
         public override bool CanTakeItem(Machine machine, Machine fromMachine, IngredientTemplate ingredient)
         {
@@ -42,25 +41,25 @@ namespace Components.Machines.Behaviors
             return true;
         }
         
-        public override void Process(Machine machine)
+        public override void Process()
         {
             
         }
         
-        public override void TryGiveOutIngredient(Machine machine)
+        public override void TryGiveOutIngredient()
         {
-            if (machine.InIngredients.Count == 0)
+            if (Machine.InIngredients.Count == 0)
             {
                 return;
             }
 
-            if (machine.TryGetOutMachines(out List<Machine> outMachines))
+            if (Machine.TryGetOutMachines(out List<Machine> outMachines))
             {
                 var outMachine = outMachines[0];
 
-                if (outMachine.TryGiveIngredient(machine.InIngredients[0], machine))
+                if (outMachine.TryGiveIngredient(Machine.InIngredients[0], Machine))
                 {
-                    machine.RemoveItem(0);
+                    Machine.RemoveItem(0);
                 }
             }
         }

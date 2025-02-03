@@ -18,7 +18,7 @@ namespace Components.Machines.Behaviors
             _ingredientTemplate = ingredientTemplate;
 		}
         
-		public override void Process(Machine machine)
+		public override void Process()
         {
             if (!_ingredientTemplate)
             {
@@ -28,19 +28,19 @@ namespace Components.Machines.Behaviors
             CurrentTick++;
         }
 
-        public override void TryGiveOutIngredient(Machine machine)
+        public override void TryGiveOutIngredient()
         {
             if (!CanProcess(CurrentTick))
             {
                 return;
             }
             
-            if (machine.TryGetOutMachines(out List<Machine> outMachines))
+            if (Machine.TryGetOutMachines(out List<Machine> outMachines))
             {
                 var outMachine = outMachines[0];
                 
                 _outMachineName = outMachine.Controller.name;
-                outMachine.TryGiveIngredient(_ingredientTemplate, machine);
+                outMachine.TryGiveIngredient(_ingredientTemplate, Machine);
             }
             else
             {
