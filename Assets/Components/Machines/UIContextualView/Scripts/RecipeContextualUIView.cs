@@ -34,7 +34,7 @@ public class RecipeContextualUIView : UIContextualComponent
 
         if (_recipeCreationBehavior.ProcessingRecipe)
         {
-            _currentRecipeText.text = $"{_recipeCreationBehavior.CurrentRecipe.name}, in process: {_recipeCreationBehavior.CurrentProcessTime}/{_recipeCreationBehavior.FullProcessTime} ticks.";
+            _currentRecipeText.text = $"{_recipeCreationBehavior.CurrentRecipe.name}, in process: {_recipeCreationBehavior.CurrentProcessTime}/{_recipeCreationBehavior.ProcessTime} ticks.";
         }
         else
         {

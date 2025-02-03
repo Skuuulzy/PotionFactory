@@ -161,18 +161,6 @@ namespace Components.Machines
                     return;
             }
         }
-        
-        public bool TryGiveIngredient(IngredientTemplate ingredient, Machine fromMachine)
-        {
-            if (!Behavior.CanTakeItem(this, fromMachine, ingredient))
-            {
-                return false;
-            }
-            
-            AddIngredient(ingredient, Way.IN);
-            
-            return true;
-        }
 
         public IngredientTemplate TakeOlderIngredient()
         {
@@ -256,7 +244,7 @@ namespace Components.Machines
         public void Tick()
         {
             Behavior.Process();
-            Behavior.TryGiveOutIngredient();
+            Behavior.TryOutput();
             
             // Propagate tick
             if (TryGetInMachine(out List<Machine> previousMachines))
@@ -284,7 +272,7 @@ namespace Components.Machines
             }
             
             Behavior.Process();
-            Behavior.TryGiveOutIngredient();
+            Behavior.TryOutput();
 
             // Propagate tick
             if (!TryGetInMachine(out List<Machine> previousMachines))

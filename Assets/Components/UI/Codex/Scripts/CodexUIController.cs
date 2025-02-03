@@ -64,8 +64,8 @@ public class CodexUIController : MonoBehaviour
             _outIngredientSlot.SetIngredientSlot(recipeCreationBehavior.CurrentRecipe.OutIngredient.Icon,0,_hoveredMachine.Template.IngredientsPerSlotCount);
         }
         
-        _processTimeSlider.value = recipeCreationBehavior.CurrentProcessTime / (float)recipeCreationBehavior.FullProcessTime;
-        _processTimeText.text = $"{recipeCreationBehavior.CurrentProcessTime}/{recipeCreationBehavior.FullProcessTime} ticks";
+        _processTimeSlider.value = recipeCreationBehavior.CurrentProcessTime / (float)recipeCreationBehavior.ProcessTime;
+        _processTimeText.text = $"{recipeCreationBehavior.CurrentProcessTime}/{recipeCreationBehavior.ProcessTime} ticks";
     }
 
     private void OnDestroy()
@@ -91,14 +91,14 @@ public class CodexUIController : MonoBehaviour
             switch (machine.Behavior)
             {
                 case DestructorMachineBehaviour destructorMachineBehaviour:
-                    _genericMachineTitle.text += $" ({destructorMachineBehaviour.SpecialIngredientTemplate.Name.ToLower()})";
-                    _genericMachineImage.sprite = destructorMachineBehaviour.SpecialIngredientTemplate.Icon;
+                    _genericMachineTitle.text += $" ({destructorMachineBehaviour.FavoriteIngredient.Name.ToLower()})";
+                    _genericMachineImage.sprite = destructorMachineBehaviour.FavoriteIngredient.Icon;
                     break;
                 case ExtractorMachineBehaviour extractorMachineBehaviour:
-                    if (extractorMachineBehaviour.IngredientTemplate)
+                    if (extractorMachineBehaviour.IngredientToExtract)
                     {
-                        _genericMachineTitle.text += $" ({extractorMachineBehaviour.IngredientTemplate.Name.ToLower()})";
-                        _genericMachineImage.sprite = extractorMachineBehaviour.IngredientTemplate.Icon;
+                        _genericMachineTitle.text += $" ({extractorMachineBehaviour.IngredientToExtract.Name.ToLower()})";
+                        _genericMachineImage.sprite = extractorMachineBehaviour.IngredientToExtract.Icon;
                     }
                     break;
             }

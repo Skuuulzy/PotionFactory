@@ -8,29 +8,15 @@ namespace Components.Machines.Behaviors
     {
         private Machine _lastMachineGivenTo;
 
-        public override void Process()
+        public override bool TryOutput()
         {
-            
-        }
-
-        public override void TryGiveOutIngredient()
-        {
-            if (Machine.InIngredients.Count == 0)
+            // If there is only one out machine, the behaviour do not change.
+            if (Machine.TryGetOutMachines(out List<Machine> outMachines))
             {
-                return;
-            }
-
-            if (!Machine.TryGetOutMachines(out List<Machine> outMachines)) 
-                return;
-
-            if (outMachines.Count == 1)
-            {
-                if (outMachines[0].TryGiveIngredient(Machine.InIngredients[0], Machine))
+                if (outMachines.Count == 1)
                 {
-                    Machine.RemoveItem(0);
+                    return base.TryOutput();
                 }
-                
-                return;
             }
 
             if (_lastMachineGivenTo == null)
@@ -39,7 +25,7 @@ namespace Components.Machines.Behaviors
                 {
                     var outMachine = outMachines[i];
                 
-                    if (outMachine.TryGiveIngredient(Machine.InIngredients[0], Machine))
+                    if (outMachine.Behavior.TryInput(Machine.OutIngredients[0]))
                     {
                         _lastMachineGivenTo = outMachine;
                         Machine.RemoveItem(0);
@@ -47,7 +33,7 @@ namespace Components.Machines.Behaviors
                     }
                 }
                 
-                return;
+                return true;
             }
 
             for (int i = 0; i < outMachines.Count; i++)
@@ -57,15 +43,16 @@ namespace Components.Machines.Behaviors
                 if (outMachine == _lastMachineGivenTo)
                     continue;
 
-                if (outMachine.TryGiveIngredient(Machine.InIngredients[0], Machine))
+                if (outMachine.Behavior.TryInput(Machine.OutIngredients[0]))
                 {
                     _lastMachineGivenTo = outMachine;
                     Machine.RemoveItem(0);
-                    return;
+                    break;
                 }
             }
 
             _lastMachineGivenTo = null;
+            return true;
         }
     }
 }

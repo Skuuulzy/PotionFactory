@@ -596,7 +596,7 @@ namespace Components.Grid
 					break;
 				}
 				
-				_extractorBehaviours[i].Init(ingredientsToExtract[i]);
+				_extractorBehaviours[i].SetExtractedIngredient(ingredientsToExtract[i]);
 			}
 		}
 
@@ -633,7 +633,7 @@ namespace Components.Grid
 			//Get base ingredients extract by extractors
 			foreach(var extractor in _extractorBehaviours)
 			{
-				baseIngredients.Add(extractor.IngredientTemplate);
+				baseIngredients.Add(extractor.IngredientToExtract);
 			}
 
 			//Get the ingredient based on current state index and the base ingredients
@@ -653,7 +653,7 @@ namespace Components.Grid
 			{
 				//Add ingredient as special ingredient 
 				var ingredient = selectedIngredients.Dequeue();
-				behavior.SetSpecialIngredientTemplate(ingredient);
+				behavior.SetFavoriteIngredient(ingredient);
 			}
 		}
 

@@ -8,12 +8,16 @@ namespace Components.Machines.Behaviors
     [CreateAssetMenu(fileName = "New Machine Behaviour", menuName = "Component/Machines/Behavior/Destructor")]
     public class DestructorMachineBehaviour : MachineBehavior
     {
-        private IngredientTemplate _specialIngredientTemplate;
-
-        public IngredientTemplate SpecialIngredientTemplate => _specialIngredientTemplate;
-
+        public IngredientTemplate FavoriteIngredient { get; private set; }
         public Action<IngredientTemplate> OnSpecialIngredientChanged;
-        public override void Process()
+        
+        public void SetFavoriteIngredient(IngredientTemplate specialIngredient)
+        {
+            FavoriteIngredient = specialIngredient;
+            OnSpecialIngredientChanged?.Invoke(specialIngredient);
+        }
+        
+        protected override void SubProcess()
         {
             if (Machine.InIngredients.Count == 0)
             {
@@ -24,7 +28,7 @@ namespace Components.Machines.Behaviors
             int sellPrice = 0;
             foreach(IngredientTemplate ingredientTemplate in Machine.InIngredients)
             {
-                if(ingredientTemplate != null && ingredientTemplate.Name == _specialIngredientTemplate.Name)
+                if(ingredientTemplate != null && ingredientTemplate.Name == FavoriteIngredient.Name)
                 {
                     sellPrice += ingredientTemplate.Price * 2;
                 }
@@ -40,16 +44,5 @@ namespace Components.Machines.Behaviors
             // Clear the machine items
             Machine.RemoveAllItems();
         }
-
-        public override void TryGiveOutIngredient()
-        {
-            
-        }
-
-        public void SetSpecialIngredientTemplate(IngredientTemplate specialIngredient)
-        {
-            _specialIngredientTemplate = specialIngredient;
-            OnSpecialIngredientChanged?.Invoke(specialIngredient);
-		}
     }
 }

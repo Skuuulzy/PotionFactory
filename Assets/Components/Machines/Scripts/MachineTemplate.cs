@@ -54,7 +54,6 @@ namespace Components.Machines
         public List<Node> Nodes => GetNodeInstance();
 
         public bool ShowItem => _showItem;
-        public bool CanTakeInfiniteIngredients => _canTakeInfiniteIngredients;
         public int InSlotIngredientCount => _inSlotIngredientCount;
         public int OutSlotIngredientCount => _outSlotIngredientCount;
         public int IngredientsPerSlotCount => _ingredientsPerSlotCount;

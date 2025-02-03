@@ -106,7 +106,6 @@ namespace Components.Machines
         // ------------------------------------------------------------------------- SELL FEEDBACK -----------------------------------------------------------------------------
         private void ShowSellFeedback()
         {
-            Debug.Log("Sell feedback");
             _sellFeedbackAnimator.SetTrigger("Play");
         }
     }

@@ -42,8 +42,6 @@ namespace Components.Machines
         
         public void ConfirmPlacement()
         {
-            _machine.OnTick += Tick;
-            _machine.OnPropagateTick += PropagateTick;
             _machine.OnItemAdded += ShowItem;
             _machine.OnItemSell += ShowSellFeedback;
             Machine.OnSelected += HandleMachineSelected;
@@ -67,8 +65,6 @@ namespace Components.Machines
         // ------------------------------------------------------------------------- DESTROY --------------------------------------------------------------------------
         private void OnDestroy()
         {
-            _machine.OnTick -= Tick;
-            _machine.OnPropagateTick -= PropagateTick;
             _machine.OnItemAdded -= ShowItem;
             _machine.OnItemSell -= ShowSellFeedback;
             Machine.OnSelected -= HandleMachineSelected;
@@ -80,19 +76,6 @@ namespace Components.Machines
             }
             
             RemoveMachineFromChain();
-        }
-
-        // ------------------------------------------------------------------------- TICK -----------------------------------------------------------------------------
-        // Base tick called by the tick system.
-        private void Tick()
-        {
-
-        }
-
-        // Tick propagation called by the next machine.
-        private void PropagateTick()
-        {
-
         }
 
         // ------------------------------------------------------------------------- CHAIN ----------------------------------------------------------------------------
