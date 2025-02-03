@@ -63,11 +63,6 @@ namespace Components.Machines
         {
             ReplaceNodesViaRotation(rotation, true);
         }
-
-        public void SetNodeData()
-        {
-            
-        }
         
         // ------------------------------------------------------------------------- NODES -------------------------------------------------------------------------
         

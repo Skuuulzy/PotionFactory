@@ -177,6 +177,10 @@ namespace Components.Grid
 						}
 					}
 				}
+				else
+				{
+					port.Disconnect();
+				}
 			}
 		}
 
