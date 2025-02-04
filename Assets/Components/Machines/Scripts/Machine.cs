@@ -163,6 +163,70 @@ namespace Components.Machines
             return false;
         }
 
+        // ------------------------------------------------------------------------- TICK CHAIN ----------------------------------------------------------------------------
+        public void AddMachineToChain()
+        {
+            bool hasInMachine = TryGetInMachine(out List<Machine> inMachines);
+            bool hasOutMachine = TryGetOutMachines(out _);
+
+            // The machine is not connected to any chain, create a new one.
+            if (!hasInMachine && !hasOutMachine)
+            {
+                TickSystem.AddTickable(this);
+            }
+            // The machine only has an IN, it is now the end of the chain.
+            if (hasInMachine && !hasOutMachine)
+            {
+                foreach (var inMachine in inMachines)
+                {
+                    TickSystem.ReplaceTickable(inMachine, this);
+                }
+            }
+            // The machine has an IN and an OUT, it makes a link between two existing chains,
+            // remove the IN tickable since the out chain already has a tickable.
+            if (hasInMachine && hasOutMachine)
+            {
+                foreach (var inMachine in inMachines)
+                {
+                    TickSystem.RemoveTickable(inMachine);
+                }
+            }
+        }
+
+        public void RemoveMachineFromChain()
+        {
+            bool hasInMachine = TryGetInMachine(out List<Machine> inMachines);
+            bool hasOutMachine = TryGetOutMachines(out _);
+            
+            // The machine is not connected to any chain, create a new one.
+            if (!hasInMachine && !hasOutMachine)
+            {
+                TickSystem.RemoveTickable(this);
+            }
+            // The machine only has an IN, it is now the end of the chain.
+            if (hasInMachine && !hasOutMachine)
+            {
+                foreach (var inMachine in inMachines)
+                {
+                    TickSystem.ReplaceTickable(this, inMachine);
+                }
+            }
+            // The machine has an IN and an OUT, it breaks a chain in two.
+            // Add the IN tickable since to create the second chain.
+            if (hasInMachine && hasOutMachine)
+            {
+                foreach (var inMachine in inMachines)
+                {
+                    // If the machine has out machine it is already part of a tick chain.
+                    if (inMachine.TryGetOutMachines(out _))
+                    {
+                        continue;
+                    }
+                    TickSystem.AddTickable(inMachine);
+                }
+            }
+        }
+        
         // ------------------------------------------------------------------------- INGREDIENTS -------------------------------------------------------------------------
         
         public void AddIngredient(IngredientTemplate ingredient , Way way)
@@ -312,6 +376,8 @@ namespace Components.Machines
                 return;
             }
             
+            _outMachineTickCount = 0;
+            
             Behavior.Execute();
 
             // Propagate tick
@@ -324,8 +390,6 @@ namespace Components.Machines
             {
                 previousMachine.PropagateTick();
             }
-
-            _outMachineTickCount = 0;
         }
         
         // ------------------------------------------------------------------- PORTS & ROTATIONS -------------------------------------------------------------------------

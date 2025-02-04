@@ -55,7 +55,7 @@ namespace Components.Machines
                 destructor.OnSpecialIngredientChanged += ShowItem;
             }
 
-            AddMachineToChain();
+            _machine.AddMachineToChain();
             
             ToggleDirectionalArrows(false);
             ToggleOutlines(false);
@@ -74,66 +74,7 @@ namespace Components.Machines
                 return;
             }
             
-            RemoveMachineFromChain();
-        }
-
-        // ------------------------------------------------------------------------- CHAIN ----------------------------------------------------------------------------
-        private void AddMachineToChain()
-        {
-            bool hasInMachine = _machine.TryGetInMachine(out List<Machine> inMachines);
-            bool hasOutMachine = _machine.TryGetOutMachines(out _);
-
-            // The machine is not connected to any chain, create a new one.
-            if (!hasInMachine && !hasOutMachine)
-            {
-                TickSystem.AddTickable(_machine);
-            }
-            // The machine only has an IN, it is now the end of the chain.
-            if (hasInMachine && !hasOutMachine)
-            {
-                foreach (var inMachine in inMachines)
-                {
-                    TickSystem.ReplaceTickable(inMachine, _machine);
-                }
-            }
-            // The machine has an IN and an OUT, it makes a link between two existing chains,
-            // remove the IN tickable since the out chain already has a tickable.
-            if (hasInMachine && hasOutMachine)
-            {
-                foreach (var inMachine in inMachines)
-                {
-                    TickSystem.RemoveTickable(inMachine);
-                }
-            }
-        }
-
-        private void RemoveMachineFromChain()
-        {
-            bool hasInMachine = _machine.TryGetInMachine(out List<Machine> inMachines);
-            bool hasOutMachine = _machine.TryGetOutMachines(out _);
-            
-            // The machine is not connected to any chain, create a new one.
-            if (!hasInMachine && !hasOutMachine)
-            {
-                TickSystem.RemoveTickable(_machine);
-            }
-            // The machine only has an IN, it is now the end of the chain.
-            if (hasInMachine && !hasOutMachine)
-            {
-                foreach (var inMachine in inMachines)
-                {
-                    TickSystem.ReplaceTickable(_machine, inMachine);
-                }
-            }
-            // The machine has an IN and an OUT, it makes a link between two existing chains,
-            // remove the IN tickable since the out chain already has a tickable.
-            if (hasInMachine && hasOutMachine)
-            {
-                foreach (var inMachine in inMachines)
-                {
-                    TickSystem.AddTickable(inMachine);
-                }
-            }
+            _machine.RemoveMachineFromChain();
         }
 
         // ------------------------------------------------------------------------- CONTEXTUAL ACTIONS ---------------------------------------------------------------
