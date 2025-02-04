@@ -48,10 +48,9 @@ namespace Components.Machines
             Machine.OnHovered += HandleMachineHovered;
             
             _initialized = true;
-            _machine.Behavior.Initialize(_machine);
             _machine.LinkNodeData();
 
-            if(_machine.Behavior is DestructorMachineBehaviour destructor)
+            if(_machine.Behavior is MarchandMachineBehaviour destructor)
             {
                 destructor.OnSpecialIngredientChanged += ShowItem;
             }

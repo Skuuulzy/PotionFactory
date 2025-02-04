@@ -65,7 +65,7 @@ namespace Components.Grid
 		private readonly Dictionary<Vector2Int, TileController> _tiles = new();
 		
 		//Sellers & Extractor
-		private readonly List<DestructorMachineBehaviour> _sellersBehaviours = new();
+		private readonly List<MarchandMachineBehaviour> _sellersBehaviours = new();
 		private readonly List<ExtractorMachineBehaviour> _extractorBehaviours = new();
 		private readonly List<IngredientTemplate> _extractedIngredients = new();
 
@@ -555,7 +555,7 @@ namespace Components.Grid
 			{
 				Grid.TryGetCellByCoordinates(randomCoordinates[i].x, randomCoordinates[i].y, out var chosenCell);
 					
-				var extractorTemplate = ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("Dispenser");
+				var extractorTemplate = ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("Extractor");
 
 				var machine = Instantiate(_machineControllerPrefab);
 				machine.InstantiatePreview(extractorTemplate, _cellSize);
@@ -623,7 +623,7 @@ namespace Components.Grid
 				
 				AddMachineToGrid(machine, chosenCell, false);
 
-				if (chosenCell.Node.Machine.Behavior is DestructorMachineBehaviour destructorMachineBehaviour)
+				if (chosenCell.Node.Machine.Behavior is MarchandMachineBehaviour destructorMachineBehaviour)
 				{
 					_sellersBehaviours.Add(destructorMachineBehaviour);
 				}

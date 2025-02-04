@@ -1,15 +1,15 @@
 using Components.Economy;
 using Components.Ingredients;
 using System;
-using UnityEngine;
 
 namespace Components.Machines.Behaviors
 {
-    [CreateAssetMenu(fileName = "New Machine Behaviour", menuName = "Component/Machines/Behavior/Destructor")]
-    public class DestructorMachineBehaviour : MachineBehavior
+    public class MarchandMachineBehaviour : MachineBehavior
     {
         public IngredientTemplate FavoriteIngredient { get; private set; }
         public Action<IngredientTemplate> OnSpecialIngredientChanged;
+        
+        public MarchandMachineBehaviour(Machine machine) : base(machine) { }
         
         public void SetFavoriteIngredient(IngredientTemplate specialIngredient)
         {

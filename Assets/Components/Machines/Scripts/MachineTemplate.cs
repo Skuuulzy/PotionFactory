@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Components.Machines.Behaviors;
 using Components.Machines.UIView;
 using UnityEngine;
 
@@ -12,10 +11,8 @@ namespace Components.Machines
         [Header("Definition")]
         [SerializeField] private string _name;
         [SerializeField] private MachineType _type;
-
         [SerializeField] private GameObject _gridView;
         [SerializeField] private Sprite _uiView;
-        [SerializeField] private MachineBehavior _behavior;
 
         [Header("Structure")] 
         [SerializeField] private List<Node> _nodes;
@@ -43,7 +40,6 @@ namespace Components.Machines
         [SerializeField] private bool _canRetrieve = true;
         [SerializeField] private bool _canMove = true;
         [SerializeField] private bool _canConfigure = true;
-
         
         public string Name => _name;
         public MachineType Type => _type;
@@ -85,11 +81,6 @@ namespace Components.Machines
             }
 
             return result;
-        }
-        
-        public MachineBehavior GetBehaviorClone()
-        {
-            return _behavior.Clone();
         }
         
         /// Return the size of the machine based on his nodes.

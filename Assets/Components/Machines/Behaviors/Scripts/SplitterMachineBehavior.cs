@@ -1,12 +1,12 @@
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace Components.Machines.Behaviors
 {
-    [CreateAssetMenu(fileName = "New Machine Behaviour", menuName = "Component/Machines/Behavior/Splitter")]
     public class SplitterMachineBehavior : MachineBehavior
     {
         private Machine _lastMachineGivenTo;
+
+        public SplitterMachineBehavior(Machine machine) : base(machine) { }
 
         protected override Machine OutputMachine()
         {

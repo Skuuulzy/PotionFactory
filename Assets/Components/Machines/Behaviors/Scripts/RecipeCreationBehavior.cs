@@ -1,16 +1,16 @@
-using System.Linq;
 using Components.Recipes;
 using Database;
 using UnityEngine;
 
 namespace Components.Machines.Behaviors
 {
-    [CreateAssetMenu(fileName = "New Machine Behaviour", menuName = "Component/Machines/Behavior/Test")]
     public class RecipeCreationBehavior : MachineBehavior
     {
         public RecipeTemplate CurrentRecipe { get; private set; }
         public bool ProcessingRecipe => CurrentRecipe != null;
 
+        public RecipeCreationBehavior(Machine machine) : base(machine) { }
+        
         protected override void PreProcess()
         {
             // Try to find a recipe based on the machine and the items inside the machine.

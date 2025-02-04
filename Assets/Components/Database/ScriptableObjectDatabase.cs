@@ -149,10 +149,15 @@ namespace Database
                 {
                     var machine = playerMachines[i];
 
-                    // Skip machines that cannot create resources.
-                    if (machine.GetBehaviorClone().GetType() != typeof(RecipeCreationBehavior))
+                    // Skip machine that cannot create recipes.
+                    switch (machine.Type)
                     {
-                        continue;
+                        case MachineType.CONVEYOR:
+                        case MachineType.MARCHAND:
+                        case MachineType.EXTRACTOR:
+                        case MachineType.MERGER:
+                        case MachineType.SPLITTER:
+                            continue;
                     }
                     
                     // Get all potential recipes the machine can create with the current list of resources.

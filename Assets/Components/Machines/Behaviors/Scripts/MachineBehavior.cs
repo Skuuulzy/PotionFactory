@@ -1,26 +1,18 @@
-using UnityEngine;
-
 namespace Components.Machines.Behaviors
 {
-    public abstract class MachineBehavior : ScriptableObject
+    public class MachineBehavior
     {
-        protected Machine Machine;
-
-        private int _baseProcessTime;
+        protected readonly Machine Machine;
+        private readonly int _baseProcessTime;
         protected int AdditionalProcessTime;
         
         public int CurrentProcessTime { get; private set; }
         public int ProcessTime => _baseProcessTime + AdditionalProcessTime;
         
-        public void Initialize(Machine machine)
+        public MachineBehavior(Machine machine)
         {
-            _baseProcessTime = machine.Template.ProcessTime;
             Machine = machine;
-        }
-        
-        public MachineBehavior Clone()
-        {
-            return Instantiate(this);
+            _baseProcessTime = machine.Template.ProcessTime;
         }
         
         // ------------------------------------------------------------------------- EXECUTION LOOP -------------------------------------------------------------------------
@@ -53,7 +45,7 @@ namespace Components.Machines.Behaviors
             ProcessAction();
         }
 
-        /// Base sub process for all machine, transfer ingredient from in to out slot, FIFO. Override for specific process.
+        /// Base process action for all machine, transfer ingredient from IN to OUT slot, FIFO. Override for specific process.
         protected virtual void ProcessAction()
         {
             if (Machine.InIngredients.Count <= 0)

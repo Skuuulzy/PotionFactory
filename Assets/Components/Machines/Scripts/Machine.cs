@@ -50,13 +50,38 @@ namespace Components.Machines
         public Machine(MachineTemplate template, MachineController controller)
         {
             _template = template;
-            _behavior = template.GetBehaviorClone();
+            _behavior = GetBehavior(template.Type);
             _controller = controller;
 
             UpdateNodesRotation(0);
             
             _inIngredients = new List<IngredientTemplate>();
             _outIngredients = new List<IngredientTemplate>();
+        }
+
+        private MachineBehavior GetBehavior(MachineType type)
+        {
+            switch (type)
+            {
+                case MachineType.CAULDRON:
+                case MachineType.DISTILLER:
+                case MachineType.MIXER:
+                case MachineType.PRESS:
+                    return new RecipeCreationBehavior(this);
+                case MachineType.CONVEYOR:
+                    return new ConveyorMachineBehavior(this);
+                case MachineType.MARCHAND:
+                    return new MarchandMachineBehaviour(this);
+                case MachineType.EXTRACTOR:
+                    return new ExtractorMachineBehaviour(this);
+                case MachineType.MERGER:
+                    return new MergerMachineBehavior(this);
+                case MachineType.SPLITTER:
+                    return new SplitterMachineBehavior(this);
+                default:
+                    Debug.LogError($"Unknown behaviour linked to type: {type}. Default behaviour used.");
+                    return new MachineBehavior(this);
+            }
         }
 
         public void UpdateNodesRotation(int rotation)
@@ -274,13 +299,13 @@ namespace Components.Machines
         
         public void PropagateTick()
         {
-            _outMachineTickCount++;
-
             if (!TryGetOutMachines(out var connectedMachines))
             {
                 return;            
             }
 
+            _outMachineTickCount++;
+            
             // The machine has not received the propagation of all his next machine.
             if (_outMachineTickCount < connectedMachines.Count)
             {

@@ -80,7 +80,7 @@ public class CodexUIController : MonoBehaviour
         _recipeMachine = false;
         
         // Special case for other machine. TODO: Handle it directly in the template to have generic method here.
-        if (machine.Template.Type == MachineType.DISPENSER || machine.Template.Type == MachineType.MARCHAND)
+        if (machine.Template.Type == MachineType.EXTRACTOR || machine.Template.Type == MachineType.MARCHAND)
         {
             _contextGenericWindow.SetActive(hovered);
             _contextMachineWindow.SetActive(!hovered);
@@ -91,7 +91,7 @@ public class CodexUIController : MonoBehaviour
             
             switch (machine.Behavior)
             {
-                case DestructorMachineBehaviour destructorMachineBehaviour:
+                case MarchandMachineBehaviour destructorMachineBehaviour:
                     _genericMachineTitle.text += $" ({destructorMachineBehaviour.FavoriteIngredient.Name.ToLower()})";
                     _genericMachineImage.sprite = destructorMachineBehaviour.FavoriteIngredient.Icon;
                     break;

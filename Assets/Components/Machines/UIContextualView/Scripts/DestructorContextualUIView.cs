@@ -29,7 +29,7 @@ namespace Components.Machines.UIView
 
             // Set up the dropdown to the selected extractor ingredient if there is one.
             var machineBehavior = _associatedMachine.Behavior;
-            if (machineBehavior is DestructorMachineBehaviour destructorMachineBehaviour)
+            if (machineBehavior is MarchandMachineBehaviour destructorMachineBehaviour)
             {
                 if (destructorMachineBehaviour.FavoriteIngredient != null)
                 {
@@ -56,7 +56,7 @@ namespace Components.Machines.UIView
         private void SetSelectedIngredient(IngredientTemplate template)
         {
             var machineBehavior = _associatedMachine.Behavior;
-            if (machineBehavior is DestructorMachineBehaviour destructorMachineBehaviour)
+            if (machineBehavior is MarchandMachineBehaviour destructorMachineBehaviour)
             {
                 destructorMachineBehaviour.SetFavoriteIngredient(template);
             }

@@ -1,11 +1,11 @@
 using Components.Ingredients;
-using UnityEngine;
 
 namespace Components.Machines.Behaviors
 {
-    [CreateAssetMenu(fileName = "New Machine Behaviour", menuName = "Component/Machines/Behavior/Extractor")]
     public class ExtractorMachineBehaviour : MachineBehavior
     {
+        public ExtractorMachineBehaviour(Machine machine) : base(machine) { }
+
         public IngredientTemplate IngredientToExtract { get; private set; }
 
         public void SetExtractedIngredient(IngredientTemplate ingredientTemplate)
