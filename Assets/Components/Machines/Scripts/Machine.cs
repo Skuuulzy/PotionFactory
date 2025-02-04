@@ -217,11 +217,15 @@ namespace Components.Machines
             {
                 foreach (var inMachine in inMachines)
                 {
-                    // If the machine has out machine it is already part of a tick chain.
-                    if (inMachine.TryGetOutMachines(out _))
+                    // If the machine has multiple out machines it is already part of a tick chain.
+                    if (inMachine.TryGetOutMachines(out var outMachines))
                     {
-                        continue;
+                        if (outMachines.Count > 1)
+                        {
+                            continue;
+                        }
                     }
+                    
                     TickSystem.AddTickable(inMachine);
                 }
             }
@@ -235,11 +239,9 @@ namespace Components.Machines
             {
                 case Way.IN:
                     _inIngredients.Add(ingredient);
-                    OnItemAdded?.Invoke(true);
                     break;
                 case Way.OUT:
                     _outIngredients.Add(ingredient);
-                    OnItemAdded?.Invoke(true);
                     break;
                 case Way.NONE:
                     Debug.LogError("Way of adding item not handle.");

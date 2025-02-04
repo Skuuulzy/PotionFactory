@@ -86,12 +86,12 @@ namespace Components.Machines
             {
                 return;
             }
-            
+
             if (show)
             {
                 _ingredientController.CreateRepresentationFromTemplate(_machine.InIngredients);
             }
-            else
+            else if (_machine.InIngredients.Count == 0 && _machine.OutIngredients.Count == 0)
             {
                 _ingredientController.DestroyRepresentation();
             }
