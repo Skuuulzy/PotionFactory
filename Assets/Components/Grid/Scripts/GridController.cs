@@ -18,7 +18,6 @@ using Components.Tick;
 using Components.Tools.ExtensionMethods;
 using Cysharp.Threading.Tasks;
 using Database;
-using Sirenix.Utilities;
 using VComponent.Tools.Singletons;
 
 namespace Components.Grid
@@ -36,7 +35,7 @@ namespace Components.Grid
 
 		[Header("Prefabs")]
 		[SerializeField] private GameObject _groundTile;
-		[SerializeField] private MachineController _machineControllerPrefab;
+		[SerializeField] private MachineController _machineGridControllerPrefab;
 		[SerializeField] private GameObject _waterPlanePrefab;
 
 		[Header("Holders")]
@@ -557,7 +556,7 @@ namespace Components.Grid
 					
 				var extractorTemplate = ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("Extractor");
 
-				var machine = Instantiate(_machineControllerPrefab);
+				var machine = Instantiate(_machineGridControllerPrefab);
 				machine.InstantiatePreview(extractorTemplate, _cellSize);
 
 				// Make sure that the machine are correctly oriented. 
@@ -618,7 +617,7 @@ namespace Components.Grid
 				
 				var destructorTemplate = ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("Marchand");
 
-				var machine = Instantiate(_machineControllerPrefab);
+				var machine = Instantiate(_machineGridControllerPrefab);
 				machine.InstantiatePreview(destructorTemplate, _cellSize);
 				
 				AddMachineToGrid(machine, chosenCell, false);

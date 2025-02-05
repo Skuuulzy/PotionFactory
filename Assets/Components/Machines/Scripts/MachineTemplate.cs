@@ -11,9 +11,12 @@ namespace Components.Machines
         [Header("Definition")]
         [SerializeField] private string _name;
         [SerializeField] private MachineType _type;
-        [SerializeField] private GameObject _gridView;
         [SerializeField] private Sprite _uiView;
 
+        [Header("Grid view")] // TODO: Merge those two prefabs ?
+        [SerializeField] private GameObject _gridView;
+        [SerializeField] private List<MachineGridComponent> _gridComponents;
+        
         [Header("Structure")] 
         [SerializeField] private List<Node> _nodes;
 
@@ -43,9 +46,10 @@ namespace Components.Machines
         
         public string Name => _name;
         public MachineType Type => _type;
+        public Sprite UIView => _uiView;
 
         public GameObject GridView => _gridView;
-        public Sprite UIView => _uiView;
+        public List<MachineGridComponent> GridComponents => _gridComponents;
 
         public List<Node> Nodes => GetNodeInstance();
 
