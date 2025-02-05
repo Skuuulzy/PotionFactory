@@ -10,11 +10,10 @@ namespace Components.Ingredients
 
 		public SpriteRenderer IngredientView => _spriteRenderer;
 
-		public void CreateRepresentationFromTemplate(List<IngredientTemplate> ingredientTemplate, Vector3 position)
+		public void CreateRepresentationFromTemplate(List<IngredientTemplate> ingredientTemplate)
 		{
 			// TODO: See how we handle multiple items inside the machine ?
 			_spriteRenderer.sprite = ingredientTemplate[0].Icon;
-			_spriteRenderer.transform.position = position;
 		}
 
 		public void CreateFavoriteSellerItemRepresentationFromTemplate(IngredientTemplate ingredientTemplate)

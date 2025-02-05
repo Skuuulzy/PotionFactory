@@ -25,6 +25,7 @@ namespace Components.Machines
         private List<GameObject> _directionalArrows;
         
         private GameObject _view;
+        private List<MachineGridComponent> _gridComponents = new();
         
         private bool _initialized;
         private bool _selected;
@@ -43,12 +44,25 @@ namespace Components.Machines
             _outline = _view.AddComponent<Outline>();
             _outline.OutlineWidth = 8;
             ToggleOutlines(showOutlines, _placableColor);
+            
+            // Instantiate grid components
+            for (int i = 0; i < _machine.Template.GridComponents.Count; i++)
+            {
+                var gridComponent = Instantiate(_machine.Template.GridComponents[i], transform);
+                gridComponent.Initialize(_machine);
+                _gridComponents.Add(gridComponent);
+            }
         }
         
         public void RotatePreview(int angle)
         {
             _view.transform.rotation = Quaternion.Euler(new Vector3(0, angle, 0));
             _machine.UpdateNodesRotation(angle);
+
+            for (int i = 0; i < _gridComponents.Count; i++)
+            {
+                _gridComponents[i].transform.rotation = Quaternion.Euler(new Vector3(0, angle, 0));
+            }
         }
         
         public void ConfirmPlacement()
@@ -63,13 +77,6 @@ namespace Components.Machines
             
             ToggleDirectionalArrows(false);
             ToggleOutlines(false);
-            
-            // Instantiate grid components
-            for (int i = 0; i < _machine.Template.GridComponents.Count; i++)
-            {
-                var gridComponent = Instantiate(_machine.Template.GridComponents[i], transform);
-                gridComponent.Initialize(_machine);
-            }
         }
 
         // ------------------------------------------------------------------------- DESTROY --------------------------------------------------------------------------

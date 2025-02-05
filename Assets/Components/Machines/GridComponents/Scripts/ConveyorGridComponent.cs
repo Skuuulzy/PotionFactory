@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using Components.Ingredients;
 using Components.Tick;
 using UnityEngine;
@@ -11,8 +12,7 @@ namespace Components.Machines
         [Header("Ingredient")]
         [SerializeField] private IngredientController _ingredientController;
         
-        [SerializeField] private Transform _startTranslationPosition;
-        [SerializeField] private Transform _endTranslationPosition;
+        [SerializeField] private List<Transform> _translationPositions;
         
         protected override void SetUp()
         {
@@ -34,7 +34,7 @@ namespace Components.Machines
 
             if (show)
             {
-                _ingredientController.CreateRepresentationFromTemplate(Machine.InIngredients, _startTranslationPosition.position);
+                _ingredientController.CreateRepresentationFromTemplate(Machine.InIngredients);
                 TranslateItem();
             }
             else if (Machine.InIngredients.Count == 0 && Machine.OutIngredients.Count == 0)
@@ -42,29 +42,40 @@ namespace Components.Machines
                 _ingredientController.DestroyRepresentation();
             }
         }
-        
+
         private void TranslateItem()
         {
-            StartCoroutine(MoveTransform(_ingredientController.IngredientView.transform, _startTranslationPosition.position, _endTranslationPosition.position,
-                TickSystem.Instance.CurrentTickDuration));
+            StartCoroutine(MoveThroughTransforms(_ingredientController.IngredientView.transform, _translationPositions,TickSystem.Instance.CurrentTickDuration));
         }
         
-        /// Coroutine to move the transform from one position to another over a given duration.
-        private static IEnumerator MoveTransform(Transform objectToMove, Vector3 startPosition, Vector3 targetPosition, float duration)
+        /// Coroutine to move the transform through multiple positions over a given total duration.
+        private static IEnumerator MoveThroughTransforms(Transform objectToMove, List<Transform> targets, float duration)
         {
-            objectToMove.position = startPosition;
+            objectToMove.position = targets[0].position;
 
-            float elapsedTime = 0f;
-
-            while (elapsedTime < duration)
+            // Making sure the object always have a Y world rotation of 0.
+            Vector3 fixedRotation = objectToMove.eulerAngles;
+            fixedRotation.y = 0f;
+            objectToMove.rotation = Quaternion.Euler(fixedRotation);
+            
+            var segmentDuration = duration / (targets.Count - 1);
+            
+            for (int i = 0; i < targets.Count - 1; i++)
             {
-                elapsedTime += Time.deltaTime;
-                float t = elapsedTime / duration;
-                objectToMove.position = Vector3.Lerp(startPosition, targetPosition, t);
-                yield return null;
-            }
+                var startPosition = targets[i].position;
+                var targetPosition = targets[i + 1].position;
+                var elapsedTime = 0f;
 
-            objectToMove.position = targetPosition; // Ensure it reaches exact target position at the end
+                while (elapsedTime < segmentDuration)
+                {
+                    elapsedTime += Time.deltaTime;
+                    var t = elapsedTime / segmentDuration;
+                    objectToMove.position = Vector3.Lerp(startPosition, targetPosition, t);
+                    yield return null;
+                }
+            
+                objectToMove.position = targetPosition; // Ensure it reaches exact target position at the end of segment
+            }
         }
     }
 }
