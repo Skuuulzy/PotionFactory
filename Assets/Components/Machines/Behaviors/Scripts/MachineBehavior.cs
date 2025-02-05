@@ -1,3 +1,5 @@
+using Components.Ingredients;
+
 namespace Components.Machines.Behaviors
 {
     public class MachineBehavior
@@ -16,6 +18,12 @@ namespace Components.Machines.Behaviors
         }
         
         // ------------------------------------------------------------------------- EXECUTION LOOP -------------------------------------------------------------------------
+
+        /// Base behavior to determine if a machine can receive an ingredient.
+        protected virtual bool CanReceive(IngredientTemplate ingredientToInput)
+        {
+            return Machine.CanTakeIngredientInSlot(ingredientToInput, Way.IN);
+        }
         
         /// Main execution loop of the machine:
         /// 1. Apply pre-process.
@@ -60,6 +68,7 @@ namespace Components.Machines.Behaviors
             {
                 Machine.AddIngredient(ingredientToMove, Way.OUT);
                 Machine.RemoveIngredient(ingredientToMove, Way.IN);
+                Machine.OnProcess?.Invoke();
             }
         }
 
@@ -83,7 +92,7 @@ namespace Components.Machines.Behaviors
                 return;
             }
 
-            if (!machineToOutput.CanTakeIngredientInSlot(ingredientToOutput, Way.IN))
+            if (!machineToOutput.Behavior.CanReceive(ingredientToOutput))
             {
                 return;
             }

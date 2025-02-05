@@ -10,7 +10,6 @@ namespace Components.Machines
     {
         [SerializeField] private Transform _3dViewHolder;
         [SerializeField] private Machine _machine;
-        [SerializeField] private IngredientController _ingredientController;
         
         private GameObject _view;
         

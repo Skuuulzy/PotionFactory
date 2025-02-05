@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Components.Ingredients;
+using Components.Tick;
 using UnityEngine;
 
 namespace Components.Machines
@@ -18,6 +19,9 @@ namespace Components.Machines
 
         [Header("Animation")] 
         [SerializeField] private Animator _sellFeedbackAnimator;
+        
+        [Header("Ingredient")]
+        [SerializeField] private IngredientController _ingredientController;
         
         private Outline _outline;
         private List<GameObject> _directionalArrows;
@@ -90,6 +94,7 @@ namespace Components.Machines
             if (show)
             {
                 _ingredientController.CreateRepresentationFromTemplate(_machine.InIngredients);
+                TranslateItem();
             }
             else if (_machine.InIngredients.Count == 0 && _machine.OutIngredients.Count == 0)
             {
@@ -106,6 +111,11 @@ namespace Components.Machines
             }
             
             _ingredientController.CreateFavoriteSellerItemRepresentationFromTemplate(ingredient);
+        }
+        
+        private void TranslateItem()
+        {
+            _ingredientController.TranslateItem(TickSystem.Instance.CurrentTickDuration);
         }
         
         // ------------------------------------------------------------------------- SELL FEEDBACK -----------------------------------------------------------------------------

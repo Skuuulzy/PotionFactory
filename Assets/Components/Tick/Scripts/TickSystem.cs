@@ -15,7 +15,9 @@ namespace Components.Tick
         private float _currentTickDuration;
 		private bool _isPause;
 
-		// ------------------------------------------------------------------------- MONO -------------------------------------------------------------------------
+        public float CurrentTickDuration => _currentTickDuration;
+
+        // ------------------------------------------------------------------------- MONO -------------------------------------------------------------------------
 		protected override void Awake()
         {
             base.Awake();

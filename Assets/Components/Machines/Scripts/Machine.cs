@@ -36,6 +36,7 @@ namespace Components.Machines
         public Action OnTick;
         public Action OnPropagateTick;
         public Action<bool> OnItemAdded;
+        public Action OnProcess;
         public static Action<Machine, bool> OnSelected;
         public static Action<Machine, bool> OnHovered;
         public static Action<Machine, bool> OnRetrieve;
