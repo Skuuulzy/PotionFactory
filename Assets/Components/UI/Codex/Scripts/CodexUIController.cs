@@ -115,7 +115,7 @@ public class CodexUIController : MonoBehaviour
             // Reset listener of previous hovered machine
             if (_hoveredMachine != null)
             {
-                _hoveredMachine.OnItemAdded -= HandleIngredientInMachineUpdated;
+                _hoveredMachine.OnSlotUpdated -= HandleIngredientInMachineUpdated;
             }
             _hoveredMachine = null;
             
@@ -130,7 +130,7 @@ public class CodexUIController : MonoBehaviour
         // Reset listener of previous hovered machine
         if (_hoveredMachine != null)
         {
-            _hoveredMachine.OnItemAdded -= HandleIngredientInMachineUpdated;
+            _hoveredMachine.OnSlotUpdated -= HandleIngredientInMachineUpdated;
         }
         
         _hoveredMachine = machine;
@@ -138,7 +138,7 @@ public class CodexUIController : MonoBehaviour
         _machineTitle.text = machine.Template.Name;
         
         UpdateIngredientInSlots(machine);
-        _hoveredMachine.OnItemAdded += HandleIngredientInMachineUpdated;
+        _hoveredMachine.OnSlotUpdated += HandleIngredientInMachineUpdated;
 
         if (machine.Behavior is RecipeCreationBehavior)
         {
@@ -146,7 +146,7 @@ public class CodexUIController : MonoBehaviour
         }
     }
 
-    private void HandleIngredientInMachineUpdated(bool _)
+    private void HandleIngredientInMachineUpdated()
     {
         UpdateIngredientInSlots(_hoveredMachine);
     }

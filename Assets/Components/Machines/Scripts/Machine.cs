@@ -30,13 +30,15 @@ namespace Components.Machines
         public MachineBehavior Behavior => _behavior;
         public List<IngredientTemplate> InIngredients => _inIngredients;
         public List<IngredientTemplate> OutIngredients => _outIngredients;
+        public List<IngredientTemplate> AllIngredients => _inIngredients.Concat(_outIngredients).ToList();
         public virtual List<Node> Nodes => _nodes;
 
         // ------------------------------------------------------------------------- ACTIONS -------------------------------------------------------------------------
         public Action OnTick;
         public Action OnPropagateTick;
-        public Action<bool> OnItemAdded;
+        public Action OnSlotUpdated;
         public Action OnProcess;
+        public Action OnOutput;
         public static Action<Machine, bool> OnSelected;
         public static Action<Machine, bool> OnHovered;
         public static Action<Machine, bool> OnRetrieve;
@@ -249,7 +251,7 @@ namespace Components.Machines
                     return;
             }
             
-            OnItemAdded?.Invoke(true);
+            OnSlotUpdated?.Invoke();
         }
         
         public void RemoveIngredient(IngredientTemplate ingredientToRemove, Way slotType)
@@ -281,7 +283,7 @@ namespace Components.Machines
                     return;
             }
             
-            OnItemAdded?.Invoke(false);
+            OnSlotUpdated?.Invoke();
         }
 
         public void ClearSlot(Way slotType)
@@ -295,7 +297,7 @@ namespace Components.Machines
                 _outIngredients.Clear();
             }
             
-            OnItemAdded?.Invoke(false);
+            OnSlotUpdated?.Invoke();
         }
         
         public bool CanTakeIngredientInSlot(IngredientTemplate ingredient, Way way)

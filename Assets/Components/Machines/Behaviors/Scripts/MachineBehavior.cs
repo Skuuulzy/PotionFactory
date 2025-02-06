@@ -50,6 +50,7 @@ namespace Components.Machines.Behaviors
             }
             CurrentProcessTime = 0;
             
+            Machine.OnProcess?.Invoke();
             ProcessAction();
         }
 
@@ -68,7 +69,6 @@ namespace Components.Machines.Behaviors
             {
                 Machine.AddIngredient(ingredientToMove, Way.OUT);
                 Machine.RemoveIngredient(ingredientToMove, Way.IN);
-                Machine.OnProcess?.Invoke();
             }
         }
 
@@ -99,6 +99,8 @@ namespace Components.Machines.Behaviors
 
             machineToOutput.AddIngredient(ingredientToOutput, Way.IN);
             Machine.RemoveIngredient(ingredientToOutput, Way.OUT);
+            
+            Machine.OnOutput?.Invoke();
         }
 
         protected virtual Machine OutputMachine()
