@@ -85,7 +85,7 @@ namespace Components.Grid
                     AddSelectedMachineToGrid();
                 }
             }
-            if (Input.GetMouseButtonDown(2))
+            if (Input.GetMouseButtonDown(2) || Input.GetKey(KeyCode.R))
             {
                 RotatePreview();
             }
