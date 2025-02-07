@@ -23,7 +23,6 @@ public class UIStateController : MonoBehaviour
 
 	private void Awake()
 	{
-		BaseState.OnStateStarted += DisplayNewState;
 		EconomyController.OnGameOver += HandleGameOver;
 		StateController.OnCountdown += SetCountdownTime;
 		StateController.OnStateStarted += HandleStateStarted;
@@ -31,7 +30,6 @@ public class UIStateController : MonoBehaviour
 
 	private void OnDestroy()
 	{
-		BaseState.OnStateStarted -= DisplayNewState;
 		EconomyController.OnGameOver -= HandleGameOver;
 		StateController.OnCountdown -= SetCountdownTime;
 		StateController.OnStateStarted -= HandleStateStarted;
@@ -52,6 +50,7 @@ public class UIStateController : MonoBehaviour
 				break;
 			case ResolutionFactoryState resolutionFactoryState:
 				DisplayFinishStateButton(resolutionFactoryState);
+				DisplayNewState(resolutionFactoryState);
 				break;
 			case EndGameState endGameState:
 				DisplayEndGameState();
@@ -61,7 +60,7 @@ public class UIStateController : MonoBehaviour
 
 	private void DisplayNewState(BaseState state)
 	{
-		_stateNameText.text = $"{state.StateName} : {state.StateIndex}";
+		_stateNameText.text = $"Day {state.StateIndex}";
 		_stateUITitleAnimator.SetTrigger(DISPLAY_STATE);
 	}
 
