@@ -77,7 +77,7 @@ namespace Components.Machines
                     mapping[Side.NONE] = Side.NONE;
                     break;
                 default:
-                    throw new ArgumentException("Invalid rotation angle. Only 90, 180, and 270 degrees are allowed.");
+                    throw new ArgumentException($"Invalid rotation angle {angle}. Only 90, 180, and 270 degrees are allowed.");
             }
 
             return mapping;

@@ -82,11 +82,17 @@ namespace Components.Grid
                 else
                 {
                     AddSelectedMachineToGrid();
+                    AutomaticPlacement();
                 }
             }
             if (Input.GetMouseButtonDown(2) || Input.GetKey(KeyCode.R))
             {
                 RotatePreview();
+            }
+
+            if (Input.GetMouseButtonUp(0))
+            {
+                _previousCells.Clear();
             }
         }
 
@@ -252,6 +258,173 @@ namespace Components.Grid
             }
 
             ShowPreview(true);
+        }
+
+        private List<Cell> _previousCells = new List<Cell>();
+        
+        private void AutomaticPlacement()
+        {
+            // Try to get the position on the grid. 
+            if (!UtilsClass.ScreenToWorldPositionIgnoringUI(Input.mousePosition, _camera, out Vector3 worldMousePosition))
+            {
+                return;
+            }
+
+            // Try getting the cell 
+            if (!Grid.TryGetCellByPosition(worldMousePosition, out Cell chosenCell))
+            {
+                return;
+            }
+            
+            // Check if the cell is already the last recorded one to avoid duplicates.
+            if (_previousCells.Count > 0 && _previousCells[^1] == chosenCell)
+            {
+                return;
+            }
+
+            // Add the new cell while keeping only the last two.
+            _previousCells.Add(chosenCell);
+
+            if (_previousCells.Count > 3)
+            {
+                _previousCells.RemoveAt(0);
+            }
+
+            if (_previousCells.Count != 3)
+            {
+                return;
+            }
+            
+            Debug.Log("Path found !");
+            Debug.Log($"Cell 0: {_previousCells[0].Position}");
+            Debug.Log($"Cell 1: {_previousCells[1].Position}");
+            Debug.Log($"Cell 2: {_previousCells[2].Position}");
+            DetectAngle();
+        }
+        
+        // ----------------------------------------- ANGLE DETECTION -------------------------------------------------
+        private void DetectAngle()
+        {
+            // Get the last three cells.
+            Cell cell0 = _previousCells[0];
+            Cell cell1 = _previousCells[1];
+            Cell cell2 = _previousCells[2];
+
+            // Compute direction vectors.
+            Vector2Int dir1 = cell1.Position - cell0.Position;
+            Vector2Int dir2 = cell2.Position - cell1.Position;
+
+            // Determine the movement type.
+            string startDirection = GetDirectionName(dir1);
+            string turnDirection = GetTurnDirection(dir1, dir2);
+            string endDirection = GetDirectionName(dir2);
+
+            if (startDirection != "None" && endDirection != "None" && turnDirection != "None")
+            {
+                Debug.Log($"[AutomaticPlacement] Player turned from {startDirection} to {turnDirection} to {endDirection}");
+            }
+
+            PlaceMachines(cell0, cell1, cell2, dir1, dir2);
+        }
+
+
+        // ----------------------------------------- MACHINE PLACEMENT -------------------------------------------------
+        
+        private void PlaceMachines(Cell cell0, Cell cell1, Cell cell2, Vector2Int dir1, Vector2Int dir2)
+        {
+            MachineTemplate startMachineTemplate = ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("ConveyorLeftToRight");
+            MachineTemplate turnMachineTemplate;
+            MachineTemplate endMachineTemplate = ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("ConveyorLeftToRight");
+
+            int startRotation = GetRotationForDirection(dir1);
+            int turnRotation = GetTurnRotation(dir1, dir2);
+            int endRotation = GetRotationForDirection(dir2);
+
+            // Determine correct turn machine type and rotation
+            if (dir1.x != 0 && dir2.y != 0) // Turning from horizontal to vertical
+            {
+                turnMachineTemplate = ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("ConveyorLeftToDown");
+            }
+            else if (dir1.y != 0 && dir2.x != 0) // Turning from vertical to horizontal
+            {
+                turnMachineTemplate = ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("ConveyorLeftToUp");
+            }
+            else
+            {
+                Debug.LogError("[AutomaticPlacement] Invalid turn detected.");
+                return;
+            }
+
+            // Instantiate machines at respective positions.
+            var startMachine = InstantiateMachine(startMachineTemplate, startRotation);
+            _gridController.AddMachineToGrid(startMachine, cell0, false);
+
+            var turnMachine = InstantiateMachine(turnMachineTemplate, turnRotation);
+            _gridController.AddMachineToGrid(turnMachine, cell1, false);
+
+            var endMachine = InstantiateMachine(endMachineTemplate, endRotation);
+            _gridController.AddMachineToGrid(endMachine, cell2, false);
+        }
+
+        // ----------------------------------------- HELPER METHODS -------------------------------------------------
+
+        /// Returns a string representation of a direction based on a Vector2Int movement.
+        private string GetDirectionName(Vector2Int direction)
+        {
+            if (direction == Vector2Int.up) return "Down to Up";
+            if (direction == Vector2Int.down) return "Up to Down";
+            if (direction == Vector2Int.left) return "Right to Left";
+            if (direction == Vector2Int.right) return "Left to Right";
+            return "None";
+        }
+
+        /// Determines the general turn direction.
+        private string GetTurnDirection(Vector2Int firstDirection, Vector2Int secondDirection)
+        {
+            if (firstDirection == Vector2Int.right && secondDirection == Vector2Int.down) return "Left to Down";
+            if (firstDirection == Vector2Int.right && secondDirection == Vector2Int.up) return "Left to Up";
+
+            if (firstDirection == Vector2Int.left && secondDirection == Vector2Int.down) return "Right to Down";
+            if (firstDirection == Vector2Int.left && secondDirection == Vector2Int.up) return "Right to Up";
+
+            if (firstDirection == Vector2Int.up && secondDirection == Vector2Int.right) return "Down to Right";
+            if (firstDirection == Vector2Int.up && secondDirection == Vector2Int.left) return "Down to Left";
+
+            if (firstDirection == Vector2Int.down && secondDirection == Vector2Int.right) return "Up to Right";
+            if (firstDirection == Vector2Int.down && secondDirection == Vector2Int.left) return "Up to Left";
+
+            return "None";
+        }
+
+        /// Returns the appropriate rotation for a given movement direction.
+        private int GetRotationForDirection(Vector2Int direction)
+        {
+            if (direction == Vector2Int.right) return 0; 
+            if (direction == Vector2Int.down) return 90;
+            if (direction == Vector2Int.left) return 180;
+            if (direction == Vector2Int.up) return 270;
+
+            return 0;
+        }
+
+        /// Returns the rotation needed for a turn piece.
+        private int GetTurnRotation(Vector2Int firstDirection, Vector2Int secondDirection)
+        {
+            if (firstDirection == Vector2Int.right && secondDirection == Vector2Int.down) return 0;
+            if (firstDirection == Vector2Int.right && secondDirection == Vector2Int.up) return 270;
+
+            if (firstDirection == Vector2Int.left && secondDirection == Vector2Int.down) return 90;
+            if (firstDirection == Vector2Int.left && secondDirection == Vector2Int.up) return 180;
+
+            if (firstDirection == Vector2Int.up && secondDirection == Vector2Int.right) return 270;
+            if (firstDirection == Vector2Int.up && secondDirection == Vector2Int.left) return 180;
+
+            if (firstDirection == Vector2Int.down && secondDirection == Vector2Int.right) return 0;
+            if (firstDirection == Vector2Int.down && secondDirection == Vector2Int.left) return 90;
+
+            return 0;
+
+            return 0;
         }
 
         // ------------------------------------------------------------------------- GRID COMMUNICATION -------------------------------------------------------------------------------- 
