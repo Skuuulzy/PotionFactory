@@ -29,7 +29,7 @@ namespace Components.Machines.UIView
             string cleanMachineName = machine.Controller.name.Replace("_", " ");
             _machineName.text = cleanMachineName;
 
-            if (machine.Template.CannotBeSell)
+            if (machine.Template.CanRetrieve)
             {
                 _sellButton.interactable = false;
                 _sellPriceTxt.text = $"Cannot be sell";
@@ -40,13 +40,13 @@ namespace Components.Machines.UIView
                 _sellPriceTxt.text = $"Sell ({machine.Template.SellPrice})";
             }
 
-            HandleItemAdded(false);
-            _associatedMachine.OnItemAdded += HandleItemAdded;
+            HandleItemAdded();
+            _associatedMachine.OnSlotUpdated += HandleItemAdded;
         }
 
         private void OnDestroy()
         {
-            _associatedMachine.OnItemAdded -= HandleItemAdded;
+            _associatedMachine.OnSlotUpdated -= HandleItemAdded;
         }
 
         public void AddComponents(List<UIContextualComponent> contextualComponents)
@@ -80,7 +80,7 @@ namespace Components.Machines.UIView
         }
         
         // ------------------------------------------------------- BASE MACHINE CONTEXTUAL ------------------------------------------------------
-        private void HandleItemAdded(bool _)
+        private void HandleItemAdded()
         {
             _heldIngredients.text = "Empty";
 

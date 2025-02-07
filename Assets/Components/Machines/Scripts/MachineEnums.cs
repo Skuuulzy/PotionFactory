@@ -21,7 +21,6 @@
         CAULDRON,
         CONVEYOR,
         MARCHAND,
-        DISPENSER,
         DISTILLER,
         EXTRACTOR,
         MIXER,

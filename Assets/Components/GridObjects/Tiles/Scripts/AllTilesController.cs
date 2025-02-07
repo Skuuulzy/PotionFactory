@@ -39,7 +39,6 @@ namespace Components.Grid.Tile
                 
                 return tile;
             }
-
         }
 
         public TileController GenerateTileFromPrefab(Cell cell, Grid grid, Transform groundHolder, float cellSize, TileController tileController)

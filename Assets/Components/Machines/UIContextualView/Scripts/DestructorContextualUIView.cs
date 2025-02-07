@@ -29,12 +29,12 @@ namespace Components.Machines.UIView
 
             // Set up the dropdown to the selected extractor ingredient if there is one.
             var machineBehavior = _associatedMachine.Behavior;
-            if (machineBehavior is DestructorMachineBehaviour destructorMachineBehaviour)
+            if (machineBehavior is MarchandMachineBehaviour destructorMachineBehaviour)
             {
-                if (destructorMachineBehaviour.SpecialIngredientTemplate != null)
+                if (destructorMachineBehaviour.FavoriteIngredient != null)
                 {
                     // +1 because there is the NONE at index 0.
-                    _destructorResourceTypeDropdown.SetValueWithoutNotify(_allIngredients.IndexOf(destructorMachineBehaviour.SpecialIngredientTemplate) + 1);
+                    _destructorResourceTypeDropdown.SetValueWithoutNotify(_allIngredients.IndexOf(destructorMachineBehaviour.FavoriteIngredient) + 1);
                 }
             }
         }
@@ -56,9 +56,9 @@ namespace Components.Machines.UIView
         private void SetSelectedIngredient(IngredientTemplate template)
         {
             var machineBehavior = _associatedMachine.Behavior;
-            if (machineBehavior is DestructorMachineBehaviour destructorMachineBehaviour)
+            if (machineBehavior is MarchandMachineBehaviour destructorMachineBehaviour)
             {
-                destructorMachineBehaviour.SetSpecialIngredientTemplate(template);
+                destructorMachineBehaviour.SetFavoriteIngredient(template);
             }
         }
     }

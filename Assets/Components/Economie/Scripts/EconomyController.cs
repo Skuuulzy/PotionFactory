@@ -13,27 +13,26 @@ namespace Components.Economy
 		private int _statePlayerScore; //Money that the player earn during a current phase
 
 		public int PlayerMoney => _playerMoney;
+		
 		public static Action<int> OnPlayerMoneyUpdated;
 		public static Action<int> OnStatePlayerScoreUpdated;
 		public static Action<int> OnScoreStateObjectiveUpdated;
 		public static Action OnGameOver;
-		public static Action<int, int, int> OnEndRoundGoldValuesCalculated;
+		public static Action<int, int, int, int ,int> OnEndRoundGoldValuesCalculated;
 
 		private int _totalGoldAmountPerRound;
+		
 		private void Start()
 		{
 			PlanningFactoryState.OnPlanningFactoryStateStarted += HandlePlanningFactoryState;
-			PayoffState.OnPayoffStateStarted += HandleStartPayoffState;
-			PayoffState.OnPayoffStateEnded += HandleEndPayoffState;
+			ShopState.OnShopStateStarted += HandleStartShopState;
 			ResolutionFactoryState.OnResolutionFactoryStateEnded += HandleResolutionFactoryStateEnded;
 		}
-
-
+		
 		private void OnDestroy()
 		{
 			PlanningFactoryState.OnPlanningFactoryStateStarted -= HandlePlanningFactoryState;
-			PayoffState.OnPayoffStateStarted -= HandleStartPayoffState;
-			PayoffState.OnPayoffStateEnded -= HandleEndPayoffState;
+			ShopState.OnShopStateStarted -= HandleStartShopState;
 			ResolutionFactoryState.OnResolutionFactoryStateEnded -= HandleResolutionFactoryStateEnded;
 
 		}
@@ -76,21 +75,13 @@ namespace Components.Economy
 		/// <summary>
 		/// Calcultate the gold amount to give to the player at the start of the payoff State
 		/// </summary>
-		private void HandleStartPayoffState(PayoffState payoffState)
+		private void HandleStartShopState(ShopState shopState)
 		{
-			int interest = (_playerMoney / _runConfiguration.GoldInterestValue) * _runConfiguration.GoldInterestAmountPerRound;
-			_totalGoldAmountPerRound = _runConfiguration.GoldAmountPerRound + interest;
-			OnEndRoundGoldValuesCalculated?.Invoke(_totalGoldAmountPerRound, _runConfiguration.GoldAmountPerRound, interest);
-		}
-
-		/// <summary>
-		/// Give the gold amount previously calculated to player
-		/// </summary>
-		private void HandleEndPayoffState(PayoffState payoffState)
-		{
+			int interest = (_playerMoney / _runConfiguration.GuildTicketInterestValue) * _runConfiguration.GuildTicketInterestAmountPerRound;
+			_totalGoldAmountPerRound = _runConfiguration.GuildTicketAmountPerRound + interest;
+			OnEndRoundGoldValuesCalculated?.Invoke(_totalGoldAmountPerRound, _runConfiguration.GuildTicketAmountPerRound, interest, _stateScoreObjective, _statePlayerScore);
 			AddMoney(_totalGoldAmountPerRound);
 		}
-
 
 	}
 }

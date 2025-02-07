@@ -40,10 +40,35 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 6705137668480981363}
     m_Modifications:
+    - target: {fileID: 1078245386266709899, guid: 8e81199cf8503f145b53082afbb3bfb5,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1078245386266709899, guid: 8e81199cf8503f145b53082afbb3bfb5,
+        type: 3}
+      propertyPath: m_TagString
+      value: Outlined
+      objectReference: {fileID: 0}
     - target: {fileID: 1130881038638079915, guid: 8e81199cf8503f145b53082afbb3bfb5,
         type: 3}
       propertyPath: m_Name
       value: Cauldron
+      objectReference: {fileID: 0}
+    - target: {fileID: 1130881038638079915, guid: 8e81199cf8503f145b53082afbb3bfb5,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1130881038638079915, guid: 8e81199cf8503f145b53082afbb3bfb5,
+        type: 3}
+      propertyPath: m_TagString
+      value: Outlined
+      objectReference: {fileID: 0}
+    - target: {fileID: 3680162318313227806, guid: 8e81199cf8503f145b53082afbb3bfb5,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4749251150384263040, guid: 8e81199cf8503f145b53082afbb3bfb5,
         type: 3}
@@ -94,6 +119,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6379522252166346881, guid: 8e81199cf8503f145b53082afbb3bfb5,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7632884252330219013, guid: 8e81199cf8503f145b53082afbb3bfb5,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

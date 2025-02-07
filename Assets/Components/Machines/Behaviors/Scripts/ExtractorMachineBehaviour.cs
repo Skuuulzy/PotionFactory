@@ -1,51 +1,28 @@
-using System.Collections.Generic;
 using Components.Ingredients;
-using Sirenix.OdinInspector;
-using UnityEngine;
 
 namespace Components.Machines.Behaviors
 {
-    [CreateAssetMenu(fileName = "New Machine Behaviour", menuName = "Machines/Behavior/Extractor")]
     public class ExtractorMachineBehaviour : MachineBehavior
     {
-        [ShowInInspector, ReadOnly] private IngredientTemplate _ingredientTemplate;
-        [ShowInInspector, ReadOnly] private string _outMachineName;
+        public ExtractorMachineBehaviour(Machine machine) : base(machine) { }
 
-        public IngredientTemplate IngredientTemplate => _ingredientTemplate;
+        public IngredientTemplate IngredientToExtract { get; private set; }
 
-        public void Init(IngredientTemplate ingredientTemplate)
+        public void SetExtractedIngredient(IngredientTemplate ingredientTemplate)
 		{
-            _ingredientTemplate = ingredientTemplate;
+            IngredientToExtract = ingredientTemplate;
 		}
         
-		public override void Process(Machine machine)
+		protected override void ProcessAction()
         {
-            if (!_ingredientTemplate)
+            // Extract ingredients if any room left
+            if (Machine.CanTakeIngredientInSlot(IngredientToExtract, Way.IN))
             {
-                return;
+                Machine.AddIngredient(IngredientToExtract, Way.IN);
             }
             
-            CurrentTick++;
-        }
-
-        public override void TryGiveOutIngredient(Machine machine)
-        {
-            if (!CanProcess(CurrentTick))
-            {
-                return;
-            }
-            
-            if (machine.TryGetOutMachines(out List<Machine> outMachines))
-            {
-                var outMachine = outMachines[0];
-                
-                _outMachineName = outMachine.Controller.name;
-                outMachine.TryGiveIngredient(_ingredientTemplate, machine);
-            }
-            else
-            {
-                _outMachineName = "None";
-            }
+            // Apply the base transfer ingredient sub process
+            base.ProcessAction();
         }
     }
 }

@@ -1,71 +1,30 @@
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace Components.Machines.Behaviors
 {
-    [CreateAssetMenu(fileName = "New Machine Behaviour", menuName = "Machines/Behavior/Splitter")]
     public class SplitterMachineBehavior : MachineBehavior
     {
-        private Machine _lastMachineGivenTo;
+        private int _outputIndex;
 
-        public override void Process(Machine machine)
-        {
-            
-        }
+        public SplitterMachineBehavior(Machine machine) : base(machine) { }
 
-        public override void TryGiveOutIngredient(Machine machine)
+        protected override Machine OutputMachine()
         {
-            if (machine.InIngredients.Count == 0)
+            // If there is only one out machine, the behaviour do not change.
+            if (!Machine.TryGetOutMachines(out List<Machine> outMachines))
             {
-                return;
+                return null;
             }
-
-            if (!machine.TryGetOutMachines(out List<Machine> outMachines)) 
-                return;
-
+            
             if (outMachines.Count == 1)
             {
-                if (outMachines[0].TryGiveIngredient(machine.InIngredients[0], machine))
-                {
-                    machine.RemoveItem(0);
-                }
-                
-                return;
+                return base.OutputMachine();
             }
 
-            if (_lastMachineGivenTo == null)
-            {
-                for (int i = 0; i < outMachines.Count; i++)
-                {
-                    var outMachine = outMachines[i];
-                
-                    if (outMachine.TryGiveIngredient(machine.InIngredients[0], machine))
-                    {
-                        _lastMachineGivenTo = outMachine;
-                        machine.RemoveItem(0);
-                        break;
-                    }
-                }
-                
-                return;
-            }
-
-            for (int i = 0; i < outMachines.Count; i++)
-            {
-                var outMachine = outMachines[i];
-
-                if (outMachine == _lastMachineGivenTo)
-                    continue;
-
-                if (outMachine.TryGiveIngredient(machine.InIngredients[0], machine))
-                {
-                    _lastMachineGivenTo = outMachine;
-                    machine.RemoveItem(0);
-                    return;
-                }
-            }
-
-            _lastMachineGivenTo = null;
+            // Cycle through potential out machines index to dispatch resources.
+            _outputIndex = (_outputIndex + 1) % outMachines.Count;
+            
+            return outMachines[_outputIndex];
         }
     }
 }

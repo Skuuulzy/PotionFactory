@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
 using Components.Ingredients;
 using Components.Machines.Behaviors;
 using Components.Tick;
@@ -18,12 +17,12 @@ namespace Components.Machines
         [SerializeField] private List<IngredientTemplate> _inIngredients;
         [SerializeField] private List<IngredientTemplate> _outIngredients;
         [SerializeField] private List<Node> _nodes;
+        
         [SerializeField, ReadOnly] private MachineController _controller;
         [SerializeField] private MachineBehavior _behavior;
-
-        [ShowInInspector] private int _internalRotationDebug;
         
         private readonly MachineTemplate _template;
+        private int _outMachineTickCount;
         
         // ----------------------------------------------------------------------- PUBLIC FIELDS -------------------------------------------------------------------------
         public MachineTemplate Template => _template;
@@ -31,25 +30,28 @@ namespace Components.Machines
         public MachineBehavior Behavior => _behavior;
         public List<IngredientTemplate> InIngredients => _inIngredients;
         public List<IngredientTemplate> OutIngredients => _outIngredients;
-        public Dictionary<IngredientTemplate, int> GroupedInIngredients => GroupIngredientByTypeAndCount(_inIngredients);
-        public Dictionary<IngredientTemplate, int> GroupedOutIngredients => GroupIngredientByTypeAndCount(_outIngredients);
+        public List<IngredientTemplate> AllIngredients => _inIngredients.Concat(_outIngredients).ToList();
         public virtual List<Node> Nodes => _nodes;
 
         // ------------------------------------------------------------------------- ACTIONS -------------------------------------------------------------------------
         public Action OnTick;
         public Action OnPropagateTick;
-        public Action<bool> OnItemAdded;
+        public Action OnSlotUpdated;
         public static Action<Machine, bool> OnSelected;
         public static Action<Machine, bool> OnHovered;
         public static Action<Machine, bool> OnRetrieve;
         public static Action<Machine> OnMove;
         public static Action<Machine> OnConfigure;
+
+        // TODO: This should not be here, some machine have specific event linked with specifics views.
+        public Action OnItemSell;
         
         // --------------------------------------------------------------------- INITIALISATION -------------------------------------------------------------------------
+        
         public Machine(MachineTemplate template, MachineController controller)
         {
             _template = template;
-            _behavior = template.GetBehaviorClone();
+            _behavior = GetBehavior(template.Type);
             _controller = controller;
 
             UpdateNodesRotation(0);
@@ -58,18 +60,38 @@ namespace Components.Machines
             _outIngredients = new List<IngredientTemplate>();
         }
 
-        public void UpdateNodesRotation(int rotation)
+        private MachineBehavior GetBehavior(MachineType type)
         {
-            _internalRotationDebug = rotation;
-            ReplaceNodesViaRotation(rotation, true);
+            switch (type)
+            {
+                case MachineType.CAULDRON:
+                case MachineType.DISTILLER:
+                case MachineType.MIXER:
+                case MachineType.PRESS:
+                    return new RecipeCreationBehavior(this);
+                case MachineType.CONVEYOR:
+                    return new ConveyorMachineBehavior(this);
+                case MachineType.MARCHAND:
+                    return new MarchandMachineBehaviour(this);
+                case MachineType.EXTRACTOR:
+                    return new ExtractorMachineBehaviour(this);
+                case MachineType.MERGER:
+                    return new MergerMachineBehavior(this);
+                case MachineType.SPLITTER:
+                    return new SplitterMachineBehavior(this);
+                default:
+                    Debug.LogError($"Unknown behaviour linked to type: {type}. Default behaviour used.");
+                    return new MachineBehavior(this);
+            }
         }
 
-        public void SetNodeData()
+        public void UpdateNodesRotation(int rotation)
         {
-            
+            ReplaceNodesViaRotation(rotation, true);
         }
         
         // ------------------------------------------------------------------------- NODES -------------------------------------------------------------------------
+        
         public void LinkNodeData()
         {
             foreach (var node in Nodes)
@@ -142,38 +164,174 @@ namespace Components.Machines
             return false;
         }
 
-        // ------------------------------------------------------------------------- ITEMS -------------------------------------------------------------------------
+        // ------------------------------------------------------------------------- TICK CHAIN ----------------------------------------------------------------------------
+        public void AddMachineToChain()
+        {
+            bool hasInMachine = TryGetInMachine(out List<Machine> inMachines);
+            bool hasOutMachine = TryGetOutMachines(out _);
+
+            // The machine is not connected to any chain, create a new one.
+            if (!hasInMachine && !hasOutMachine)
+            {
+                TickSystem.AddTickable(this);
+            }
+            // The machine only has an IN, it is now the end of the chain.
+            if (hasInMachine && !hasOutMachine)
+            {
+                foreach (var inMachine in inMachines)
+                {
+                    TickSystem.ReplaceTickable(inMachine, this);
+                }
+            }
+            // The machine has an IN and an OUT, it makes a link between two existing chains,
+            // remove the IN tickable since the out chain already has a tickable.
+            if (hasInMachine && hasOutMachine)
+            {
+                foreach (var inMachine in inMachines)
+                {
+                    TickSystem.RemoveTickable(inMachine);
+                }
+            }
+        }
+
+        public void RemoveMachineFromChain()
+        {
+            bool hasInMachine = TryGetInMachine(out List<Machine> inMachines);
+            bool hasOutMachine = TryGetOutMachines(out _);
+            
+            // The machine is not connected to any chain, create a new one.
+            if (!hasInMachine && !hasOutMachine)
+            {
+                TickSystem.RemoveTickable(this);
+            }
+            // The machine only has an IN, it is now the end of the chain.
+            if (hasInMachine && !hasOutMachine)
+            {
+                foreach (var inMachine in inMachines)
+                {
+                    TickSystem.ReplaceTickable(this, inMachine);
+                }
+            }
+            // The machine has an IN and an OUT, it breaks a chain in two.
+            // Add the IN tickable since to create the second chain.
+            if (hasInMachine && hasOutMachine)
+            {
+                foreach (var inMachine in inMachines)
+                {
+                    // If the machine has multiple out machines it is already part of a tick chain.
+                    if (inMachine.TryGetOutMachines(out var outMachines))
+                    {
+                        if (outMachines.Count > 1)
+                        {
+                            continue;
+                        }
+                    }
+                    
+                    TickSystem.AddTickable(inMachine);
+                }
+            }
+        }
+        
+        // ------------------------------------------------------------------------- INGREDIENTS -------------------------------------------------------------------------
+        
         public void AddIngredient(IngredientTemplate ingredient , Way way)
         {
             switch (way)
             {
                 case Way.IN:
                     _inIngredients.Add(ingredient);
-                    OnItemAdded?.Invoke(true);
                     break;
                 case Way.OUT:
                     _outIngredients.Add(ingredient);
-                    OnItemAdded?.Invoke(true);
                     break;
                 case Way.NONE:
                     Debug.LogError("Way of adding item not handle.");
                     return;
             }
+            
+            OnSlotUpdated?.Invoke();
         }
         
-        public bool TryGiveIngredient(IngredientTemplate ingredient, Machine fromMachine)
+        public void RemoveIngredient(IngredientTemplate ingredientToRemove, Way slotType)
         {
-            if (!Behavior.CanTakeItem(this, fromMachine, ingredient))
+            switch (slotType)
+            {
+                case Way.IN:
+                    if (_inIngredients.Contains(ingredientToRemove))
+                    {
+                        _inIngredients.Remove(ingredientToRemove);
+                    }
+                    else
+                    {
+                        Debug.LogError($"Cannot remove ingredient: {ingredientToRemove.Name} from out slot of {_controller.name} because it cannot be found."); 
+                    }
+                    break;
+                case Way.OUT:
+                    if (_outIngredients.Contains(ingredientToRemove))
+                    {
+                        _outIngredients.Remove(ingredientToRemove);
+                    }
+                    else
+                    {
+                        Debug.LogError($"Cannot remove ingredient: {ingredientToRemove.Name} from out slot of {_controller.name} because it cannot be found."); 
+                    }
+                    break;
+                case Way.NONE:
+                    Debug.LogError("Cannot remove an ingredient if the slot type is not defined."); 
+                    return;
+            }
+            
+            OnSlotUpdated?.Invoke();
+        }
+
+        public void ClearSlot(Way slotType)
+        {
+            if (slotType == Way.IN)
+            {
+                _inIngredients.Clear();
+            }
+            else
+            {
+                _outIngredients.Clear();
+            }
+            
+            OnSlotUpdated?.Invoke();
+        }
+        
+        public bool CanTakeIngredientInSlot(IngredientTemplate ingredient, Way way)
+        {
+            if (!ingredient)
             {
                 return false;
             }
-            
-            AddIngredient(ingredient, Way.IN);
-            
-            return true;
-        }
 
-        public IngredientTemplate TakeOlderIngredient()
+            if (way == Way.OUT)
+            {
+                if (_outIngredients.Count == 0)
+                {
+                    return true;
+                }
+                if (_outIngredients.Count >= Template.IngredientsPerSlotCount)
+                {
+                    return false;
+                }
+                
+                return _outIngredients[0].Name == ingredient.Name;
+            }
+            
+            var groupedIngredients = _inIngredients.GroupedByTypeAndCount();
+
+            // If the ingredient is not stored in any slot we check if there is an empty in slot.
+            if (!groupedIngredients.TryGetValue(ingredient, out var groupedIngredientCount))
+            {
+                return EmptyInSlotCount() > 0;
+            }
+            
+            // If the ingredient is already stored we check if the slot is not full yet.
+            return groupedIngredientCount < Template.IngredientsPerSlotCount;
+        }
+        
+        public IngredientTemplate OlderOutIngredient()
         {
             if (_outIngredients.Count == 0)
             {
@@ -181,88 +339,64 @@ namespace Components.Machines
             }
 
             var ingredient = _outIngredients.First();
-            _outIngredients.Remove(ingredient);
-
             return ingredient;
-        }
-        
-        public void RemoveAllItems()
-        {
-            InIngredients.Clear();
-            OnItemAdded?.Invoke(false);
-        }
-
-        public void RemoveItem(int index)
-        {
-            InIngredients.RemoveAt(index);
-            OnItemAdded?.Invoke(false);
-        }
-        
-        public void RemoveInItems(List<IngredientTemplate> ingredientToRemove)
-        {
-            _inIngredients.RemoveAll(item => ingredientToRemove.Any(b => b.Name == item.Name));            
-            OnItemAdded?.Invoke(false);
-        }
-
-        /// Return a dictionary with ingredients grouped by type and count.
-        /// <param name="ingredientsToLook"></param>
-        private Dictionary<IngredientTemplate, int> GroupIngredientByTypeAndCount(List<IngredientTemplate> ingredientsToLook)
-        {
-            var counts = new Dictionary<IngredientTemplate, int>();
-            
-            foreach (var ingredient in ingredientsToLook)
-            {
-                if (!counts.TryAdd(ingredient, 1))
-                {
-                    counts[ingredient]++;
-                }
-            }
-            
-            return counts;
         }
         
         public int EmptyInSlotCount()
         {
-            int remainingSlot = Template.InSlotIngredientCount - GroupIngredientByTypeAndCount(_inIngredients).Count;
-
+            int remainingSlot = Template.InSlotIngredientCount - _inIngredients.GroupedByTypeAndCount().Count;
             return remainingSlot < 0 ? 0 : remainingSlot;
-        }
-        
-        public bool CanAddIngredientOfTypeInSlot(IngredientTemplate ingredient, Way way)
-        {
-            if (ingredient == null)
-            {
-                return false;
-            }
-            
-            var ingredientsToLook = way == Way.IN ? _inIngredients : _outIngredients;
-            var groupedIngredients = GroupIngredientByTypeAndCount(ingredientsToLook);
-            
-            if (groupedIngredients.ContainsKey(ingredient))
-            {
-                if (groupedIngredients[ingredient] < Template.IngredientsPerSlotCount)
-                {
-                    return true;
-                }
-
-                return false;
-            }
-            
-            return EmptyInSlotCount() > 0;
         }
 
         // ------------------------------------------------------------------------- TICK -------------------------------------------------------------------------
+        
         public void Tick()
         {
-            OnTick?.Invoke();
+            Behavior.Execute();
+            
+            // Propagate tick
+            if (TryGetInMachine(out List<Machine> previousMachines))
+            {
+                foreach (var previousMachine in previousMachines)
+                {
+                    previousMachine.PropagateTick();
+                }
+            }
         }
         
         public void PropagateTick()
         {
-            OnPropagateTick?.Invoke();
+            if (!TryGetOutMachines(out var connectedMachines))
+            {
+                return;            
+            }
+
+            _outMachineTickCount++;
+            
+            // The machine has not received the propagation of all his next machine.
+            if (_outMachineTickCount < connectedMachines.Count)
+            {
+                return;
+            }
+            
+            _outMachineTickCount = 0;
+            
+            Behavior.Execute();
+
+            // Propagate tick
+            if (!TryGetInMachine(out List<Machine> previousMachines))
+            {
+                return;
+            }
+            
+            foreach (var previousMachine in previousMachines)
+            {
+                previousMachine.PropagateTick();
+            }
         }
         
         // ------------------------------------------------------------------- PORTS & ROTATIONS -------------------------------------------------------------------------
+        
         public void ReplaceNodesViaRotation(int angle, bool clockwise)
         {
             if (!clockwise)
@@ -284,6 +418,7 @@ namespace Components.Machines
         }
         
         // ------------------------------------------------------------------------- SELECT BEHAVIOUR -------------------------------------------------------------------------
+        
         public void Select(bool select)
         {
             OnSelected?.Invoke(this, select);

@@ -9,16 +9,25 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "New Run Configuration", menuName = "Configuration/RunConfiguration")]
 public class RunConfiguration : ScriptableObject
 {
+	[Header("")]
 	[SerializeField] private List<RunStateConfiguration> _runStateList;
-	[SerializeField] private int _goldAmountPerRound = 5;
 
+	[Header("GuildTicket")]
+	[SerializeField] private int _guildTicketAmountPerRound = 5;
 	[Tooltip("For every gold interest value give the GoldInterestAmountPerRound as bonus gold")]
-	[SerializeField] private int _goldInterestValue = 5;
-	[SerializeField] private int _goldInterestAmountPerRound = 1;
+	[SerializeField] private int _guildTicketInterestValue = 5;
+	[SerializeField] private int _guildTicketInterestAmountPerRound = 1;
+
+	[Header("StateTime")]
+	[SerializeField] private int _planningFactoryStateTime = 120;
+	[SerializeField] private int _resolutionFactoryStateTime = 180;
+
 	public List<RunStateConfiguration> RunStateList => _runStateList;
-	public int GoldAmountPerRound => _goldAmountPerRound;
-	public int GoldInterestValue => _goldInterestValue;
-	public int GoldInterestAmountPerRound => _goldInterestAmountPerRound;
+	public int GuildTicketAmountPerRound => _guildTicketAmountPerRound;
+	public int GuildTicketInterestValue => _guildTicketInterestValue;
+	public int GuildTicketInterestAmountPerRound => _guildTicketInterestAmountPerRound;
+	public int PlanningFactoryStateTime => _planningFactoryStateTime;
+	public int ResolutionFactoryStateTime => _resolutionFactoryStateTime;
 
 	//-------------------------------------------------------------------------------------------------- METHODS -------------------------------------------------------------------------------------------------------------------
 	public List<IngredientTemplate> GetPossibleIngredients(int stateNumber, List<IngredientTemplate> baseIngredients)

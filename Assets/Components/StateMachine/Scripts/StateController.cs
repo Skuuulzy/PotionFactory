@@ -6,11 +6,11 @@ using VComponent.Tools.Timer;
 
 public class StateController : MonoBehaviour
 {
+	[SerializeField] private RunConfiguration _runConfiguration;
 	[SerializeField] private bool _disable;
-	[SerializeField] private int _planningFactoryStateTime = 180;
-	[SerializeField] private int _resolutionFactoryStateTime = 120;
 
-	[SerializeField] private string _currentDebugStateName;
+
+	public string CurrentDebugStateName;
 	
 	private CountdownTimer _countdownTimer;
 	private StateMachine _stateMachine;
@@ -29,8 +29,8 @@ public class StateController : MonoBehaviour
 		MapState.OnMapStateStarted += HandleMapState;
 		PlanningFactoryState.OnPlanningFactoryStateStarted += HandlePlanningFactoryState;
 		ResolutionFactoryState.OnResolutionFactoryStateStarted += HandleResolutionFactoryState;
-		PayoffState.OnPayoffStateStarted += HandlePayoffState;
 		ShopState.OnShopStateStarted += HandleShopState;
+		EndGameState.OnEndGameStateStarted += HandleEndGameState;
 
 		//State Machine 
 		_stateMachine = new StateMachine();
@@ -39,14 +39,14 @@ public class StateController : MonoBehaviour
 		MapState mapState = new MapState();
 		PlanningFactoryState planningFactoryState = new PlanningFactoryState();
 		ResolutionFactoryState resolutionFactoryState = new ResolutionFactoryState();
-		PayoffState payoffState = new PayoffState();
 		ShopState shopState = new ShopState();
+		EndGameState endGameState = new EndGameState();
 
 		//Define transitions  
 		At(mapState, planningFactoryState, new FuncPredicate(() => mapState.IsFinished));
 		At(planningFactoryState, resolutionFactoryState, new FuncPredicate(() => planningFactoryState.IsFinished));
-		At(resolutionFactoryState, payoffState, new FuncPredicate(() => resolutionFactoryState.IsFinished));
-		At(payoffState, shopState, new FuncPredicate(() => payoffState.IsFinished));
+		At(resolutionFactoryState, shopState, new FuncPredicate(() => resolutionFactoryState.IsFinished && resolutionFactoryState.StateIndex < _runConfiguration.RunStateList.Count));
+		At(resolutionFactoryState, endGameState, new FuncPredicate(() => resolutionFactoryState.IsFinished && resolutionFactoryState.StateIndex >= _runConfiguration.RunStateList.Count));
 		At(shopState, planningFactoryState, new FuncPredicate(() => shopState.IsFinished && shopState.StateIndex % 4 != 0));
 		At(shopState, mapState, new FuncPredicate(() => shopState.IsFinished && shopState.StateIndex % 4 == 0));
 
@@ -66,6 +66,8 @@ public class StateController : MonoBehaviour
 		PlanningFactoryState.OnPlanningFactoryStateStarted -= HandlePlanningFactoryState;
 		ResolutionFactoryState.OnResolutionFactoryStateStarted -= HandleResolutionFactoryState;
 		ShopState.OnShopStateStarted -= HandleShopState;
+		EndGameState.OnEndGameStateStarted -= HandleEndGameState;
+
 	}
 
 	private void Update()
@@ -86,24 +88,23 @@ public class StateController : MonoBehaviour
 	//------------------------------------------------------------------------ STATE STARTED -------------------------------------------------------------------------------------------- 
 	private void HandleMapState(MapState state)
 	{
-		_currentDebugStateName = "MAP";
+		CurrentDebugStateName = "MAP";
 		
 		MapGenerator.OnMapChoiceConfirm += state.MapChoiceConfirmed;
 	}
 
 	private void HandleShopState(ShopState state)
 	{
-		_currentDebugStateName = "SHOP";
-
+		CurrentDebugStateName = "SHOP";
 		_countdownTimer = null;
 		OnStateStarted?.Invoke(state);
 	}
 
 	private void HandlePlanningFactoryState(PlanningFactoryState state)
 	{
-		_currentDebugStateName = "PLANNING";
+		CurrentDebugStateName = "PLANNING";
 		
-		_countdownTimer = new CountdownTimer(_planningFactoryStateTime);
+		_countdownTimer = new CountdownTimer(_runConfiguration.PlanningFactoryStateTime);
 		BaseState.OnStateEnded += _countdownTimer.Stop;
 		_countdownTimer.OnTimerStop += state.SetStateFinished;
 		_countdownTimer.Start();
@@ -113,9 +114,9 @@ public class StateController : MonoBehaviour
 
 	private void HandleResolutionFactoryState(ResolutionFactoryState state)
 	{
-		_currentDebugStateName = "RESOLUTION";
+		CurrentDebugStateName = "RESOLUTION";
 		
-		_countdownTimer = new CountdownTimer(_resolutionFactoryStateTime);
+		_countdownTimer = new CountdownTimer(_runConfiguration.ResolutionFactoryStateTime);
 		BaseState.OnStateEnded += _countdownTimer.Stop;
 		_countdownTimer.OnTimerStop += state.SetStateFinished;
 		_countdownTimer.Start();
@@ -123,11 +124,9 @@ public class StateController : MonoBehaviour
 		OnStateStarted.Invoke(state);
 	}
 
-	private void HandlePayoffState(PayoffState state)
+	private void HandleEndGameState(EndGameState state)
 	{
-		_currentDebugStateName = "PAYOFF";
-
-		UIPayoffController.OnPayoffConfirm += state.PayoffConfirm;
+		CurrentDebugStateName = "END GAME";
 		_countdownTimer = null;
 		OnStateStarted?.Invoke(state);
 	}

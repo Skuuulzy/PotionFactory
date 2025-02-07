@@ -11,8 +11,12 @@ namespace Components.Recipes.Grimoire
         [SerializeField] private TMP_Text _recipeIngredientsTxt;
         [SerializeField] private Image _recipeSprite;
 
+        public string RecipeName { get; private set; }
+        
         public void Initialize(RecipeTemplate recipeTemplate)
         {
+            RecipeName = recipeTemplate.name;
+            
             _recipeNameTxt.text = recipeTemplate.OutIngredient.Name;
             _recipeSprite.sprite = recipeTemplate.OutIngredient.Icon;
             _machineNameTxt.text = recipeTemplate.Machine.Name;

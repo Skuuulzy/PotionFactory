@@ -30,10 +30,10 @@ namespace Components.Machines.UIView
             var machineBehavior = _associatedMachine.Behavior;
             if (machineBehavior is ExtractorMachineBehaviour extractorMachineBehaviour)
             {
-                if (extractorMachineBehaviour.IngredientTemplate != null)
+                if (extractorMachineBehaviour.IngredientToExtract != null)
                 { 
                     // +1 because there is the NONE at index 0.
-                    _extractorResourceTypeDropdown.SetValueWithoutNotify(_allIngredients.IndexOf(extractorMachineBehaviour.IngredientTemplate) + 1);
+                    _extractorResourceTypeDropdown.SetValueWithoutNotify(_allIngredients.IndexOf(extractorMachineBehaviour.IngredientToExtract) + 1);
                 }
             }
         }
@@ -57,7 +57,7 @@ namespace Components.Machines.UIView
             var machineBehavior = _associatedMachine.Behavior;
             if (machineBehavior is ExtractorMachineBehaviour extractorMachineBehaviour)
             {
-                extractorMachineBehaviour.Init(template);
+                extractorMachineBehaviour.SetExtractedIngredient(template);
             }
         }
     }

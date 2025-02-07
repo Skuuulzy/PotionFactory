@@ -1,32 +1,33 @@
-using System.Collections.Generic;
-using UnityEngine;
+using Components.Ingredients;
 
 namespace Components.Machines.Behaviors
 {
-    [CreateAssetMenu(fileName = "New Machine Behaviour", menuName = "Machines/Behavior/Conveyor")]
     public class ConveyorMachineBehavior : MachineBehavior
     {
-        public override void Process(Machine machine)
-        {
-            
-        }
+        public ConveyorMachineBehavior(Machine machine) : base(machine) { }
 
-        public override void TryGiveOutIngredient(Machine machine)
+        /// The conveyor will not do the base action if the next machine cannot take is ingredient.
+        /// This prevents that the conveyor store 2 ingredients.
+        protected override void ProcessAction()
         {
-            if (machine.InIngredients.Count != 1)
+            if (Machine.InIngredients.Count <= 0)
             {
                 return;
             }
-
-            if (machine.TryGetOutMachines(out List<Machine> outMachines))
+            
+            var machineToOutput = OutputMachine();
+            if (machineToOutput == null)
             {
-                var outMachine = outMachines[0];
-                
-                if (outMachine.TryGiveIngredient(machine.InIngredients[0], machine))
-                {
-                    machine.RemoveItem(0);
-                }
+                return;
             }
+        
+            var ingredientToMove = Machine.InIngredients[0];
+            if (!machineToOutput.CanTakeIngredientInSlot(ingredientToMove, Way.IN))
+            {
+                return;
+            }
+            
+            base.ProcessAction();
         }
     }
 }

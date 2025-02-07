@@ -4,8 +4,11 @@ using System.Linq;
 using Components.Bundle;
 using Components.Grid.Decorations;
 using Components.Grid.Obstacle;
+using Components.Grid.Tile;
 using Components.Ingredients;
+using Components.Island;
 using Components.Machines;
+using Components.Machines.Behaviors;
 using Components.Recipes;
 using UnityEngine;
 
@@ -18,8 +21,6 @@ namespace Database
         public const string INGREDIENTS_SO_PATH = "Components/Ingredients/Resources/";
         public const string RECIPES_SO_PATH = "Components/Recipes/Resources/";
         public const string MACHINE_SO_PATH = "Components/Machines/Resources/";
-        public const string BUNDLE_SO_PATH = "Components/Bundles/Resources/";
-
         
         // -------------------------------------- DATA BASE CONSTRUCTION ---------------------------------------------
         static ScriptableObjectDatabase()
@@ -33,12 +34,14 @@ namespace Database
             LoadAllScriptableObjects<RelicTemplate>();
             LoadAllScriptableObjects<ObstacleTemplate>();
             LoadAllScriptableObjects<DecorationTemplate>();
-            LoadAllScriptableObjects<Components.Grid.Tile.TileTemplate>();
+            LoadAllScriptableObjects<TileTemplate>();
+            LoadAllScriptableObjects<IslandTemplate>();
         }
 
         private static void LoadAllScriptableObjects<T>() where T : ScriptableObject
         {
             var type = typeof(T);
+            
             if (!DATABASE.ContainsKey(type))
             {
                 DATABASE[type] = new Dictionary<string, ScriptableObject>();
@@ -83,7 +86,9 @@ namespace Database
         }
         
         // ----------------------------------------- RECIPE DATA BASE ------------------------------------------
-        public static bool TryFindRecipe(MachineTemplate machineTemplate, List<IngredientTemplate> inputsIngredients, out RecipeTemplate recipe)
+        
+        /// With a precise list of ingredients and a machine, check if a recipe can be made.
+        public static bool TryFindRecipeMachine(MachineTemplate machineTemplate, List<IngredientTemplate> inputsIngredients, out RecipeTemplate recipe)
         {
             foreach (var scriptableObject in DATABASE[typeof(RecipeTemplate)].Values)
             {
@@ -96,7 +101,7 @@ namespace Database
                     continue;
 
                 bool isRecipeValid = true;
-                
+
                 // We go through every ingredient of the recipe.
                 foreach (var recipeIngredient in currentRecipeTemplate.Ingredients)
                 {
@@ -121,6 +126,115 @@ namespace Database
             // If no recipe was found, return the default.
             recipe = null;
             return false;
+        }
+        
+        /// Finds all potential recipes with a list of machines and ingredients, considering transformed ingredients.
+        public static List<RecipeTemplate> FindAllPotentialRecipes(List<MachineTemplate> playerMachines, List<IngredientTemplate> playerResources)
+        {
+            List<RecipeTemplate> foundRecipes = new List<RecipeTemplate>();
+            
+            // Track of all discovered resources (base + transformed).
+            HashSet<IngredientTemplate> allAvailableResources = new HashSet<IngredientTemplate>(playerResources);
+            
+            // Track already discovered recipes.
+            HashSet<string> processedRecipes = new HashSet<string>();
+
+            bool foundNewRecipes;
+            do
+            {
+                foundNewRecipes = false;
+
+                // Iterate through each machine to check recipes it can create.
+                for (int i = 0; i < playerMachines.Count; i++)
+                {
+                    var machine = playerMachines[i];
+
+                    // Skip machine that cannot create recipes.
+                    switch (machine.Type)
+                    {
+                        case MachineType.CONVEYOR:
+                        case MachineType.MARCHAND:
+                        case MachineType.EXTRACTOR:
+                        case MachineType.MERGER:
+                        case MachineType.SPLITTER:
+                            continue;
+                    }
+                    
+                    // Get all potential recipes the machine can create with the current list of resources.
+                    var machineRecipes = FindMachinePotentialRecipe(machine, allAvailableResources.ToList());
+
+                    foreach (var recipe in machineRecipes)
+                    {
+                        // Skip already processed recipes to avoid redundant work.
+                        if (!processedRecipes.Add(recipe.name))
+                        {
+                            continue;
+                        }
+
+                        foundNewRecipes = true;
+                        foundRecipes.Add(recipe);
+
+                        // Add the out ingredient of the recipes to the pool of ingredients.
+                        allAvailableResources.Add(recipe.OutIngredient);
+                    }
+                }
+            } while (foundNewRecipes); // Continue until no new recipes are found.
+
+            return foundRecipes;
+        }
+
+        /// With a list of ingredients and a machine, find potentials recipes. Do not take in account the quantity of ingredients.
+        public static List<RecipeTemplate> FindMachinePotentialRecipe(MachineTemplate machineTemplate, List<IngredientTemplate> inputsIngredients)
+        {
+            var recipes = new List<RecipeTemplate>();
+
+            foreach (var scriptableObject in DATABASE[typeof(RecipeTemplate)].Values)
+            {
+                if (scriptableObject is not RecipeTemplate currentRecipeTemplate)
+                {
+                    continue;
+                }
+
+                if (currentRecipeTemplate.Machine != machineTemplate)
+                    continue;
+
+                bool isRecipeValid = true;
+
+                // We go through every ingredient of the recipe.
+                foreach (var recipeIngredient in currentRecipeTemplate.Ingredients)
+                {
+                    if (!inputsIngredients.Contains(recipeIngredient.Key))
+                    {
+                        isRecipeValid = false;
+                        break;
+                    }
+                }
+
+                if (isRecipeValid)
+                {
+                    recipes.Add(currentRecipeTemplate);
+                }
+            }
+
+            return recipes;
+        }
+        
+        // ----------------------------------------- TILES ------------------------------------------
+        public static TileTemplate GetTileTemplateByType(TileType type)
+        {
+            switch (type)
+            {
+                case TileType.GRASS:
+                    return GetScriptableObject<TileTemplate>("GrassTile");
+                case TileType.WATER:
+                    return GetScriptableObject<TileTemplate>("WaterTile");
+                case TileType.NONE:
+                case TileType.SAND:
+                case TileType.STONE:
+                case TileType.DIRT:
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            }
         }
     }
 }

@@ -6,6 +6,7 @@ namespace Components.Machines.ContextMenu
     public class MachineContextMenuController : MonoBehaviour
     {
         [SerializeField] private Canvas _canvas;
+        [SerializeField] private GameObject _window;
         [SerializeField] private MachineController _controller;
 
         [SerializeField] private Button _configureBtn;
@@ -30,12 +31,12 @@ namespace Components.Machines.ContextMenu
             Machine.OnSelected += HandleMachineSelected;
 
             _canvas.worldCamera = Camera.main;
-            _canvas.gameObject.SetActive(false);
+            _window.SetActive(false);
         }
 
         private void LateUpdate()
         {
-            if (!_initialized || !_canvas.gameObject.activeInHierarchy)
+            if (!_initialized || !_window.activeInHierarchy)
             {
                 return;
             }
@@ -54,21 +55,21 @@ namespace Components.Machines.ContextMenu
         {
             if (machine != _controller.Machine)
             {
-                _canvas.gameObject.SetActive(false);
+                _window.SetActive(false);
                 return;
             }
 
             transform.localPosition = new Vector3(0, machine.Template.ContextMenuHeight, 0);
             _configureBtn.interactable = machine.Template.CanConfigure;
             _moveBtn.interactable = machine.Template.CanMove;
-            _retrieveBtn.interactable = machine.Template.CanSell;
-            _canvas.gameObject.SetActive(selected);
+            _retrieveBtn.interactable = machine.Template.CanRetrieve;
+            _window.SetActive(selected);
         }
 
         public void MoveMachine()
         {
             _controller.Move();
-            _canvas.gameObject.SetActive(false);
+            _window.SetActive(false);
         }
 
         public void ConfigureMachine()
@@ -79,7 +80,7 @@ namespace Components.Machines.ContextMenu
         public void RetrieveMachine()
         {
             _controller.Retrieve();
-            _canvas.gameObject.SetActive(false);
+            _window.SetActive(false);
         }
     }
 }
