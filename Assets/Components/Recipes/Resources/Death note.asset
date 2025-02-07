@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9cd67c4c33928f34894964bb28cabb66, type: 3}
+  m_Name: Death note
+  m_EditorClassIdentifier: 
+  _machine: {fileID: 11400000, guid: 2e90757fd7d3d10459a62e29b5335f12, type: 2}
+  _ingredients:
+    m_Dictionnary:
+    - m_key: {fileID: 11400000, guid: 3e727f45874db16478007ce7a4189d61, type: 2}
+      m_value: 1
+    - m_key: {fileID: 11400000, guid: 9eabb977aeb27014ca043d97ebd862a0, type: 2}
+      m_value: 1
+    - m_key: {fileID: 11400000, guid: d6c531cb24a0b2943959c5896bda462e, type: 2}
+      m_value: 1
+  _outIngredient: {fileID: 11400000, guid: 9181e77d3a9fd3c428df31dde804f91a, type: 2}
+  _processTimeModifier: 7.1

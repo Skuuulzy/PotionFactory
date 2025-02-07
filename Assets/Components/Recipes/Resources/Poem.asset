@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9cd67c4c33928f34894964bb28cabb66, type: 3}
+  m_Name: Poem
+  m_EditorClassIdentifier: 
+  _machine: {fileID: 11400000, guid: d9b4f87b93b82084995dc89e7e2e31b6, type: 2}
+  _ingredients:
+    m_Dictionnary:
+    - m_key: {fileID: 11400000, guid: 17033515286ef76419dae1ae10b07d7c, type: 2}
+      m_value: 1
+    - m_key: {fileID: 11400000, guid: 278109bc3cb1b8b4cb770d5172544a93, type: 2}
+      m_value: 1
+    - m_key: {fileID: 11400000, guid: 2eecdc5dc716e2c4ba7d36379cf68c6d, type: 2}
+      m_value: 3
+  _outIngredient: {fileID: 11400000, guid: c42af6902ec1b514a860ac3d33e3c89f, type: 2}
+  _processTimeModifier: 15.6
