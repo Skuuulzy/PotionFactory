@@ -33,7 +33,8 @@ namespace Components.Grid
             
             TryHoverMachine();
             
-            if (Input.GetMouseButtonDown(0))
+            return;
+            if (Input.GetMouseButtonUp(0))
             {
                 TrySelectMachine();
             }
@@ -110,7 +111,9 @@ namespace Components.Grid
 
             if (chosenCell.ContainsNode)
             {
-                chosenCell.Node.Machine.Select(true);
+                Debug.Log($"Move machine { chosenCell.Node.Machine.Controller.name}");
+                //chosenCell.Node.Machine.Select(true);
+                chosenCell.Node.Machine.Controller.Move();
             }
         }
     }

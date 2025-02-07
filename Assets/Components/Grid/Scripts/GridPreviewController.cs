@@ -36,6 +36,7 @@ namespace Components.Grid
 
         private bool _cleanMode;
         private bool _moveMode;
+        private bool _justPlaced;
 
         public static Action<bool> OnPreview;
 
@@ -64,27 +65,38 @@ namespace Components.Grid
                 return;
             }
 
-            if (!_cleanMode)
+            // Selection mode
+            if (!_currentMachinePreview)
             {
-                MovePreview();
+                if (Input.GetMouseButtonUp(0))
+                {
+                    if (_justPlaced)
+                    {
+                        _justPlaced = false;
+                        return;
+                    }
+                    
+                    TryMoveMachine();
+                }
+                if (Input.GetMouseButtonDown(1))
+                {
+                    TryRetrieveMachine();
+                }
+                
+                return;
             }
-
-            if (Input.GetMouseButtonDown(1) && !_moveMode)
+            
+            MovePreview();
+            
+            if (Input.GetMouseButton(0))
+            {
+                AddSelectedMachineToGrid();
+            }
+            if (Input.GetMouseButtonDown(1))
             {
                 DestroyPreview();
             }
-            if (Input.GetMouseButton(0))
-            {
-                if (_cleanMode)
-                {
-                    TryDestroyHoveredMachine();
-                }
-                else
-                {
-                    AddSelectedMachineToGrid();
-                }
-            }
-            if (Input.GetMouseButtonDown(2) || Input.GetKey(KeyCode.R))
+            if (Input.GetKey(KeyCode.R))
             {
                 RotatePreview();
             }
@@ -282,9 +294,11 @@ namespace Components.Grid
 
             if (_moveMode)
             {
+                Debug.Log("Place");
                 _gridController.AddMachineToGrid(_currentMachinePreview, chosenCell, false);
                 _currentMachinePreview = null;
                 _moveMode = false;
+                _justPlaced = true;
             }
             else
             {
@@ -340,6 +354,55 @@ namespace Components.Grid
             }
 
             return true;
+        }
+        
+        private void TryMoveMachine()
+        {
+            // TODO: This click workflow really need to be centralized (maybe in the input sys)
+            // Try to get the position on the grid. 
+            if (!UtilsClass.ScreenToWorldPositionIgnoringUI(Input.mousePosition, _camera, out var worldMousePosition))
+            {
+                return;
+            }
+            
+            // Try getting the cell 
+            if (!Grid.TryGetCellByPosition(worldMousePosition, out var chosenCell))
+            {
+                return;
+            }
+
+            if (chosenCell.ContainsNode)
+            {
+                Debug.Log($"Move machine { chosenCell.Node.Machine.Controller.name}");
+                chosenCell.Node.Machine.Controller.Move();
+            }
+        }
+        
+        private void TryRetrieveMachine()
+        {
+            // TODO: This click workflow really need to be centralized (maybe in the input sys)
+            // Try to get the position on the grid. 
+            if (!UtilsClass.ScreenToWorldPositionIgnoringUI(Input.mousePosition, _camera, out var worldMousePosition))
+            {
+                return;
+            }
+            
+            // Try getting the cell 
+            if (!Grid.TryGetCellByPosition(worldMousePosition, out var chosenCell))
+            {
+                return;
+            }
+
+            if (!chosenCell.ContainsNode) 
+                return;
+
+            if (!chosenCell.Node.Machine.Template.CanRetrieve)
+            {
+                return;
+            }
+            
+            Debug.Log($"Retrieve machine { chosenCell.Node.Machine.Controller.name}");
+            chosenCell.Node.Machine.Controller.Retrieve();
         }
         
         // ------------------------------------------------------------------------- EVENT HANDLERS -------------------------------------------------------------------------------- 
