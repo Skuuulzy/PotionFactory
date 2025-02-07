@@ -81,7 +81,7 @@ namespace Components.Grid
 			Machine.OnRetrieve += RetrieveMachine;
 			Machine.OnMove += ClearMachineGridData;
 
-			MapGenerator.OnMapChoiceConfirm += HandleMapChoiceConfirm;
+			BundleChoiceGenerator.OnBundleChoiceConfirm += HandleMapChoiceConfirm;
 			UIOptionsController.OnClearGrid += ClearMachines;
 			
 			PlanningFactoryState.OnPlanningFactoryStateStarted += HandlePlanningFactoryState;
@@ -94,7 +94,7 @@ namespace Components.Grid
 			Machine.OnRetrieve += RetrieveMachine;
 			Machine.OnMove -= ClearMachineGridData;
 
-			MapGenerator.OnMapChoiceConfirm-= HandleMapChoiceConfirm;
+			BundleChoiceGenerator.OnBundleChoiceConfirm -= HandleMapChoiceConfirm;
 			UIOptionsController.OnClearGrid -= ClearMachines;
 			
 			PlanningFactoryState.OnPlanningFactoryStateStarted -= HandlePlanningFactoryState;

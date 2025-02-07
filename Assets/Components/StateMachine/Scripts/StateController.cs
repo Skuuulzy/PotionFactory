@@ -1,4 +1,5 @@
 using System;
+using Components.Bundle;
 using Components.Map;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -27,6 +28,7 @@ public class StateController : MonoBehaviour
 		}
 
 		MapState.OnMapStateStarted += HandleMapState;
+		BundleChoiceState.OnBundleStateStarted += HandleBundleChoiceState;
 		PlanningFactoryState.OnPlanningFactoryStateStarted += HandlePlanningFactoryState;
 		ResolutionFactoryState.OnResolutionFactoryStateStarted += HandleResolutionFactoryState;
 		ShopState.OnShopStateStarted += HandleShopState;
@@ -36,21 +38,21 @@ public class StateController : MonoBehaviour
 		_stateMachine = new StateMachine();
 
 		//Declare state 
-		MapState mapState = new MapState();
+		BundleChoiceState bundleChoiceState = new BundleChoiceState();
 		PlanningFactoryState planningFactoryState = new PlanningFactoryState();
 		ResolutionFactoryState resolutionFactoryState = new ResolutionFactoryState();
 		ShopState shopState = new ShopState();
 		EndGameState endGameState = new EndGameState();
 
 		//Define transitions  
-		At(mapState, planningFactoryState, new FuncPredicate(() => mapState.IsFinished));
+		At(bundleChoiceState, planningFactoryState, new FuncPredicate(() => bundleChoiceState.IsFinished));
 		At(planningFactoryState, resolutionFactoryState, new FuncPredicate(() => planningFactoryState.IsFinished));
 		At(resolutionFactoryState, shopState, new FuncPredicate(() => resolutionFactoryState.IsFinished && resolutionFactoryState.StateIndex < _runConfiguration.RunStateList.Count));
 		At(resolutionFactoryState, endGameState, new FuncPredicate(() => resolutionFactoryState.IsFinished && resolutionFactoryState.StateIndex >= _runConfiguration.RunStateList.Count));
 		At(shopState, planningFactoryState, new FuncPredicate(() => shopState.IsFinished && shopState.StateIndex % 4 != 0));
-		At(shopState, mapState, new FuncPredicate(() => shopState.IsFinished && shopState.StateIndex % 4 == 0));
+		At(shopState, bundleChoiceState, new FuncPredicate(() => shopState.IsFinished && shopState.StateIndex % 4 == 0));
 
-		StartStateMachine(mapState);
+		StartStateMachine(bundleChoiceState);
 	}
 	
 	private async void StartStateMachine(IState stateToStart)
@@ -67,6 +69,9 @@ public class StateController : MonoBehaviour
 		ResolutionFactoryState.OnResolutionFactoryStateStarted -= HandleResolutionFactoryState;
 		ShopState.OnShopStateStarted -= HandleShopState;
 		EndGameState.OnEndGameStateStarted -= HandleEndGameState;
+
+		BundleChoiceState.OnBundleStateStarted -= HandleBundleChoiceState;
+
 
 	}
 
@@ -91,6 +96,13 @@ public class StateController : MonoBehaviour
 		CurrentDebugStateName = "MAP";
 		
 		MapGenerator.OnMapChoiceConfirm += state.MapChoiceConfirmed;
+	}
+
+	private void HandleBundleChoiceState(BundleChoiceState state)
+	{
+		CurrentDebugStateName = "BUNDLE CHOICE";
+
+		BundleChoiceGenerator.OnBundleChoiceConfirm += state.BundleChoiceConfirmed;
 	}
 
 	private void HandleShopState(ShopState state)
