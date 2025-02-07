@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Components.Tick;
+using System;
 
 namespace VComponent.Tools.Timer
 {
@@ -74,7 +75,31 @@ namespace VComponent.Tools.Timer
         }
     }
 
-    public class StopwatchTimer : Timer
+	public class TickableCountdownTimer : CountdownTimer, ITickable
+	{
+
+        public TickableCountdownTimer(float value) : base (value)
+		{
+            Time = value / TickSystem.Instance.InitialTickDuration ; 
+            InitialTime = Time;
+            TickSystem.AddTickable(this);
+		}
+		public void Tick()
+		{
+            Time--;
+            if(Time <= 0)
+			{
+                Stop();
+			}
+		}
+
+		public override void Tick(float deltaTime)
+		{
+			
+		}
+	}
+
+	public class StopwatchTimer : Timer
     {
         public StopwatchTimer() : base(0)
         {

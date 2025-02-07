@@ -15,6 +15,7 @@ namespace Components.Tick
         private float _currentTickDuration;
 		private bool _isPause;
 
+        public float InitialTickDuration => _initialTickDuration;
         public float CurrentTickDuration => _currentTickDuration;
 
         // ------------------------------------------------------------------------- MONO -------------------------------------------------------------------------
