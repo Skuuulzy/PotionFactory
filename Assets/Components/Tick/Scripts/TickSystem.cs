@@ -69,7 +69,6 @@ namespace Components.Tick
 
         private void TickAll()
         {
-            Debug.Log("TICK");
             foreach (var tickable in TICKABLES)
             {
                 tickable.Tick();
