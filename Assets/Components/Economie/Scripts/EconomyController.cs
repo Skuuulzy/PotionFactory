@@ -24,14 +24,14 @@ namespace Components.Economy
 		
 		private void Start()
 		{
-			PlanningFactoryState.OnPlanningFactoryStateStarted += HandlePlanningFactoryState;
+			ResolutionFactoryState.OnResolutionFactoryStateStarted += HandleResolutionFactoryStateStarted;
 			ShopState.OnShopStateStarted += HandleStartShopState;
 			ResolutionFactoryState.OnResolutionFactoryStateEnded += HandleResolutionFactoryStateEnded;
 		}
 		
 		private void OnDestroy()
 		{
-			PlanningFactoryState.OnPlanningFactoryStateStarted -= HandlePlanningFactoryState;
+			ResolutionFactoryState.OnResolutionFactoryStateStarted -= HandleResolutionFactoryStateStarted;
 			ShopState.OnShopStateStarted -= HandleStartShopState;
 			ResolutionFactoryState.OnResolutionFactoryStateEnded -= HandleResolutionFactoryStateEnded;
 
@@ -55,7 +55,7 @@ namespace Components.Economy
 			OnPlayerMoneyUpdated?.Invoke(_playerMoney);
 		}
 
-		private void HandlePlanningFactoryState(PlanningFactoryState state)
+		private void HandleResolutionFactoryStateStarted(ResolutionFactoryState state)
 		{
 			_statePlayerScore = 0;
 			_stateScoreObjective = _runConfiguration.RunStateList.Find(x => x.StateNumber == state.StateIndex).MoneyObjective;

@@ -45,11 +45,11 @@ public class StateController : MonoBehaviour
 		EndGameState endGameState = new EndGameState();
 
 		//Define transitions  
-		At(bundleChoiceState, planningFactoryState, new FuncPredicate(() => bundleChoiceState.IsFinished));
-		At(planningFactoryState, resolutionFactoryState, new FuncPredicate(() => planningFactoryState.IsFinished));
+		At(bundleChoiceState, resolutionFactoryState, new FuncPredicate(() => bundleChoiceState.IsFinished));
+		//At(planningFactoryState, resolutionFactoryState, new FuncPredicate(() => planningFactoryState.IsFinished));
 		At(resolutionFactoryState, shopState, new FuncPredicate(() => resolutionFactoryState.IsFinished && resolutionFactoryState.StateIndex < _runConfiguration.RunStateList.Count));
 		At(resolutionFactoryState, endGameState, new FuncPredicate(() => resolutionFactoryState.IsFinished && resolutionFactoryState.StateIndex >= _runConfiguration.RunStateList.Count));
-		At(shopState, planningFactoryState, new FuncPredicate(() => shopState.IsFinished && shopState.StateIndex % 4 != 0));
+		At(shopState, resolutionFactoryState, new FuncPredicate(() => shopState.IsFinished && shopState.StateIndex % 4 != 0));
 		At(shopState, bundleChoiceState, new FuncPredicate(() => shopState.IsFinished && shopState.StateIndex % 4 == 0));
 
 		StartStateMachine(bundleChoiceState);
