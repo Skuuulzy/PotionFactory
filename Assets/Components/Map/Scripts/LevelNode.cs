@@ -14,16 +14,19 @@ namespace Components.Map
         [SerializeField] private IngredientsBundle _ingredientsBundle;
         [SerializeField] private LevelNodeView _view;
         [SerializeField] private NodeSide _nodeSide;
+        private Dictionary<NodeLineController, bool> _lines = new Dictionary<NodeLineController, bool>();
 
         private List<LevelNode> _externalConnectedNode = new List<LevelNode>();
         public List<LevelNode> ConnectedNodes => _connectedNodes;
         public List<LevelNode> ExternalConnectedNode => _externalConnectedNode;
         public IngredientsBundle IngredientsBundle => _ingredientsBundle;
+        public NodeSide NodeSizde => _nodeSide;
+        public Dictionary<NodeLineController,bool> Lines => _lines;
 
 		public static Action OnResetNode;
         public static Action<LevelNode> OnNodeSelected;
-        public NodeSide NodeSizde => _nodeSide;
-
+        private bool _isAlreadyConnected = false;
+        private bool _isFirstNode = false;
         /// <summary>
         /// Initializes the node, setting up its locked or unlocked state.
         /// </summary>
@@ -45,11 +48,17 @@ namespace Components.Map
         public void SelectNodeAsFirst()
 		{
             _button.interactable = false;
-            _button.image.color = Color.yellow;
+            _button.image.color = Color.magenta;
+            _isFirstNode = true;
         }
 
         public void UnselectNode()
 		{
+            if(_isAlreadyConnected || _isFirstNode)
+			{
+                return;
+			}
+            _button.interactable = true;
             _button.image.color = Color.white;
         }
 
@@ -57,17 +66,38 @@ namespace Components.Map
         /// <summary>
         /// Unlocks this node, making it selectable.
         /// </summary>
-        public void UnlockNode()
+        public void UnlockNode(bool isFirstChoice)
         {
-            _button.interactable = true;
             UnselectNode();
 		}
 
-        public void LockNode()
+        public void SetNodeAsConnected()
         {
+            _isAlreadyConnected = true;
 			_button.interactable = false;
+			_button.image.color = Color.yellow;
+		}
+
+		public void LockNode()
+        {
+			if (_isAlreadyConnected)
+			{
+				return;
+			}
+
+            SetConnectedNodesConstructedLineColor(false);
+
+            _button.interactable = false;
             _button.image.color = Color.black;
 		}
+
+        public void SetConnectedNodesConstructedLineColor(bool value)
+		{
+            foreach (var nodeLine in Lines)
+            {
+                nodeLine.Key.SetConstructedLineColor(value, nodeLine.Value);
+            }
+        }
 
 		public void ResetIngredientBundle()
 		{

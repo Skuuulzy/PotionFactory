@@ -64,7 +64,7 @@ namespace Components.Grid.Generator
 		public bool CleanMode => _cleanMode;
 		public float CleanRadius => _cleanRadius;
 
-		public static string MapsPath => Path.Combine(Application.dataPath, "JsonData/Maps/");
+		public static string MapsPath => Path.Combine(Application.streamingAssetsPath, "Maps");
 
 		// ------------------------------------------------------------------------- MONO -------------------------------------------------------------------------
 		private void Start()
@@ -143,8 +143,6 @@ namespace Components.Grid.Generator
 				_currentDecorationController = null;
 			}
 		}
-
-
 
 		// ------------------------------------------------------------------------- SELECTION -------------------------------------------------------------------------
 		private void InstantiateNewPreview()
@@ -460,7 +458,7 @@ namespace Components.Grid.Generator
 				ClearGrid();
 			}
 
-			_grid = new Grid(_gridXValue, _gridYValue, _cellSize, _startPosition, _groundHolder, false);
+			_grid = new Grid(_gridXValue, _gridYValue, _cellSize, _startPosition, false);
 			_cellList = new List<Cell>();
 			_allTilesController.SelectATileType();
 
@@ -501,7 +499,7 @@ namespace Components.Grid.Generator
 			{
 				ClearGrid();
 			}
-			_grid = new Grid(_gridXValue, _gridYValue, _cellSize, _startPosition, _groundHolder, false, serializedCellList.ToArray());
+			_grid = new Grid(_gridXValue, _gridYValue, _cellSize, _startPosition, false, serializedCellList.ToArray());
 			_cellList = new List<Cell>();
 			// Instantiate ground blocks
 			for (int x = 0; x < _grid.GetWidth(); x++)

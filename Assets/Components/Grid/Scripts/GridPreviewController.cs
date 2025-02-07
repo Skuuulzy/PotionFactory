@@ -72,7 +72,6 @@ namespace Components.Grid
             if (Input.GetMouseButtonDown(1) && !_moveMode)
             {
                 DestroyPreview();
-                OnPreview?.Invoke(false);
             }
             if (Input.GetMouseButton(0))
             {
@@ -85,7 +84,7 @@ namespace Components.Grid
                     AddSelectedMachineToGrid();
                 }
             }
-            if (Input.GetMouseButtonDown(2))
+            if (Input.GetMouseButtonDown(2) || Input.GetKey(KeyCode.R))
             {
                 RotatePreview();
             }
@@ -207,6 +206,7 @@ namespace Components.Grid
             if (_currentMachinePreview)
             {
                 Destroy(_currentMachinePreview.gameObject);
+                OnPreview?.Invoke(false);
             }
         }
 
@@ -332,9 +332,8 @@ namespace Components.Grid
                 {
                     return false;
                 }
-
-                // One node of the machine overlap a cell that already contain an object. 
-                if (overlapCell.ContainsObject || overlapCell.TileController.TileType == TileType.WATER)
+                
+                if (!overlapCell.IsConstructable())
                 {
                     return false;
                 }
@@ -342,7 +341,7 @@ namespace Components.Grid
 
             return true;
         }
-
+        
         // ------------------------------------------------------------------------- EVENT HANDLERS -------------------------------------------------------------------------------- 
         private void HandlePlanningFactoryState(PlanningFactoryState _)
         {

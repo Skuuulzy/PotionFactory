@@ -14,10 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _name: Conveyor
   _type: 1
+  _uiView: {fileID: 21300000, guid: 43baf03b300ee9646901e425eedf19f3, type: 3}
   _gridView: {fileID: 1691528847705169943, guid: 113670807ae43d94d9e624eb601fbbe4,
     type: 3}
-  _uiView: {fileID: 21300000, guid: 43baf03b300ee9646901e425eedf19f3, type: 3}
-  _behavior: {fileID: 11400000, guid: f3d403794d898ac40b5d56bac13fe50c, type: 2}
+  _gridComponents:
+  - {fileID: 9044706959645954946, guid: b514072cd8aa2bf4886873ee9a28c452, type: 3}
   _nodes:
   - _localPosition: {x: 0, y: 0}
     _gridPosition: {x: 0, y: 0}
@@ -32,14 +33,15 @@ MonoBehaviour:
   _outSlotIngredientCount: 1
   _ingredientsPerSlotCount: 1
   _processTime: 1
-  _shopSpawnProbability: 0.7
-  _shopPrice: 1
+  _shopSpawnProbability: 0
+  _shopPrice: 0
   _cannotBeSell: 0
+  _cannotBeBuy: 1
   _sellPrice: 1
   _contextualComponents: []
   _uiGameplayDescription: 
   _uiLoreDescription: 
   _contextMenuHeight: 2
-  _canSell: 1
+  _canRetrieve: 1
   _canMove: 1
   _canConfigure: 1

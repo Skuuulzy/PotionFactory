@@ -14,24 +14,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _name: Marchand
   _type: 2
+  _uiView: {fileID: 21300000, guid: dafed84662c74164ea80c926098dc96e, type: 3}
   _gridView: {fileID: 5776661972514393347, guid: 90a602ef077d8dd40bda7d47a2884a66,
     type: 3}
-  _uiView: {fileID: 21300000, guid: dafed84662c74164ea80c926098dc96e, type: 3}
-  _behavior: {fileID: 11400000, guid: fbd2336df64b98448b6cbb27bd42805c, type: 2}
+  _gridComponents:
+  - {fileID: 2749455511503755389, guid: 889fa309be07d8e499853f04ca9789f0, type: 3}
   _nodes:
   - _localPosition: {x: 0, y: 0}
     _gridPosition: {x: 0, y: 0}
     _ports:
     - _side: 3
       _way: 0
+  _showItem: 0
   _canTakeInfiniteIngredients: 1
   _inSlotIngredientCount: 1
   _outSlotIngredientCount: 1
   _ingredientsPerSlotCount: 1
   _processTime: 0
-  _shopSpawnProbability: 0.1
-  _shopPrice: 15000
+  _shopSpawnProbability: 0
+  _shopPrice: 0
   _cannotBeSell: 0
+  _cannotBeBuy: 1
   _sellPrice: 100
   _contextualComponents:
   - {fileID: 2118422002032948451, guid: c06a405510495ef4ca72a085e2d58892, type: 3}
@@ -40,6 +43,6 @@ MonoBehaviour:
   _uiLoreDescription: What the marchand will do with the stuff you sell ? I don't
     kown, ask the question yourself.
   _contextMenuHeight: 2
-  _canSell: 0
+  _canRetrieve: 0
   _canMove: 0
   _canConfigure: 1

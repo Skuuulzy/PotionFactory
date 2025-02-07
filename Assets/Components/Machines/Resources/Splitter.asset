@@ -13,11 +13,12 @@ MonoBehaviour:
   m_Name: Splitter
   m_EditorClassIdentifier: 
   _name: Splitter
-  _type: 9
+  _type: 8
+  _uiView: {fileID: 21300000, guid: 29113fd48aea94a8da6bffefdb2d5bfa, type: 3}
   _gridView: {fileID: 4377708450514837446, guid: a28a45fa4642bb04fb4e721059560c15,
     type: 3}
-  _uiView: {fileID: 21300000, guid: 9b2db208432e74069a526b81826489b9, type: 3}
-  _behavior: {fileID: 11400000, guid: 6c81c11a340a5c74eab122fe500d84a1, type: 2}
+  _gridControllerPrefab: {fileID: 5488635875282986484, guid: 859503caaa5f96242b5ba83dccd721c9,
+    type: 3}
   _nodes:
   - _localPosition: {x: 0, y: 0}
     _gridPosition: {x: 0, y: 0}
@@ -30,6 +31,7 @@ MonoBehaviour:
       _way: 1
     - _side: 2
       _way: 1
+  _showItem: 0
   _canTakeInfiniteIngredients: 0
   _inSlotIngredientCount: 1
   _outSlotIngredientCount: 1
@@ -38,10 +40,12 @@ MonoBehaviour:
   _shopSpawnProbability: 0
   _shopPrice: 200
   _cannotBeSell: 0
+  _cannotBeBuy: 0
   _sellPrice: 100
   _contextualComponents: []
   _uiGameplayDescription: 
   _uiLoreDescription: 
-  _canSell: 1
+  _contextMenuHeight: 2
+  _canRetrieve: 1
   _canMove: 1
   _canConfigure: 1

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Components.Machines.Behaviors;
 using Components.Machines.UIView;
 using UnityEngine;
 
@@ -12,11 +11,12 @@ namespace Components.Machines
         [Header("Definition")]
         [SerializeField] private string _name;
         [SerializeField] private MachineType _type;
-
-        [SerializeField] private GameObject _gridView;
         [SerializeField] private Sprite _uiView;
-        [SerializeField] private MachineBehavior _behavior;
 
+        [Header("Grid view")] // TODO: Merge those two prefabs ?
+        [SerializeField] private GameObject _gridView;
+        [SerializeField] private List<MachineGridComponent> _gridComponents;
+        
         [Header("Structure")] 
         [SerializeField] private List<Node> _nodes;
 
@@ -32,6 +32,7 @@ namespace Components.Machines
         [SerializeField] private float _shopSpawnProbability;
         [SerializeField] private int _shopPrice = 200;
         [SerializeField] private bool _cannotBeSell;
+        [SerializeField] private bool _cannotBeBuy;
         [SerializeField] private int _sellPrice = 100;
 
         [Header("Contextual View")] 
@@ -39,21 +40,20 @@ namespace Components.Machines
         [SerializeField] private string _uiGameplayDescription;
         [SerializeField] private string _uiLoreDescription;
         [SerializeField] private int _contextMenuHeight = 2;
-        [SerializeField] private bool _canSell = true;
+        [SerializeField] private bool _canRetrieve = true;
         [SerializeField] private bool _canMove = true;
         [SerializeField] private bool _canConfigure = true;
-
         
         public string Name => _name;
         public MachineType Type => _type;
+        public Sprite UIView => _uiView;
 
         public GameObject GridView => _gridView;
-        public Sprite UIView => _uiView;
+        public List<MachineGridComponent> GridComponents => _gridComponents;
 
         public List<Node> Nodes => GetNodeInstance();
 
         public bool ShowItem => _showItem;
-        public bool CanTakeInfiniteIngredients => _canTakeInfiniteIngredients;
         public int InSlotIngredientCount => _inSlotIngredientCount;
         public int OutSlotIngredientCount => _outSlotIngredientCount;
         public int IngredientsPerSlotCount => _ingredientsPerSlotCount;
@@ -65,12 +65,12 @@ namespace Components.Machines
         public int ContextMenuHeight => _contextMenuHeight;
         public int ShopPrice => _shopPrice;
         public int SellPrice => _sellPrice;
-        public bool CannotBeSell => _cannotBeSell;
+        public bool CannotBeBuy => _cannotBeBuy;
 
         public List<UIContextualComponent> ContextualComponents => _contextualComponents;
         public string UIGameplayDescription => _uiGameplayDescription;
         public string UILoreDescription => _uiLoreDescription;
-        public bool CanSell => _canSell;
+        public bool CanRetrieve => _canRetrieve;
         public bool CanMove => _canMove;
         public bool CanConfigure => _canConfigure;
 
@@ -85,11 +85,6 @@ namespace Components.Machines
             }
 
             return result;
-        }
-        
-        public MachineBehavior GetBehaviorClone()
-        {
-            return _behavior.Clone();
         }
         
         /// Return the size of the machine based on his nodes.

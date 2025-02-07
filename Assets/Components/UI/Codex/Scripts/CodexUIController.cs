@@ -1,10 +1,10 @@
-using System;
 using Components.Machines;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using System.Linq;
+using Components.Ingredients;
 using Components.Machines.Behaviors;
 
 public class CodexUIController : MonoBehaviour
@@ -17,6 +17,8 @@ public class CodexUIController : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _machineState;
     [SerializeField] private List<UIIngredientSlotController> _inIngredientSlots;
     [SerializeField] private UIIngredientSlotController _outIngredientSlot;
+    [SerializeField] private Slider _processTimeSlider;
+    [SerializeField] private TMP_Text _processTimeText;
 
     [Header("Generic")]
     [SerializeField] private GameObject _contextGenericWindow;
@@ -26,11 +28,45 @@ public class CodexUIController : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _genericMachineLore;
     
     private Machine _hoveredMachine;
+    private bool _recipeMachine;
     
     private void Start()
     {
         Machine.OnHovered += HandleMachineHovered;
         _window.SetActive(false);
+        
+        _processTimeSlider.value = 0;
+        _processTimeText.text = "0/0 ticks";
+    }
+
+    private void Update()
+    {
+        if (!_recipeMachine)
+        {
+            return;
+        }
+
+        if (_hoveredMachine.Behavior is not RecipeCreationBehavior recipeCreationBehavior)
+        {
+            return;
+        }
+
+        if (!recipeCreationBehavior.ProcessingRecipe)
+        {
+            _processTimeSlider.value = 0;
+            _processTimeText.text = "0/0 ticks";
+            
+            return;
+        }
+
+        // Temporary solution to show what recipe is currently processed.
+        if (_outIngredientSlot.ShowEmpty)
+        {
+            _outIngredientSlot.SetIngredientSlot(recipeCreationBehavior.CurrentRecipe.OutIngredient.Icon,0,_hoveredMachine.Template.IngredientsPerSlotCount);
+        }
+        
+        _processTimeSlider.value = recipeCreationBehavior.CurrentProcessTime / (float)recipeCreationBehavior.ProcessTime;
+        _processTimeText.text = $"{recipeCreationBehavior.CurrentProcessTime}/{recipeCreationBehavior.ProcessTime} ticks";
     }
 
     private void OnDestroy()
@@ -41,9 +77,10 @@ public class CodexUIController : MonoBehaviour
     private void HandleMachineHovered(Machine machine, bool hovered)
     {
         _window.SetActive(hovered);
+        _recipeMachine = false;
         
         // Special case for other machine. TODO: Handle it directly in the template to have generic method here.
-        if (machine.Template.Type == MachineType.DISPENSER || machine.Template.Type == MachineType.MARCHAND)
+        if (machine.Template.Type == MachineType.EXTRACTOR || machine.Template.Type == MachineType.MARCHAND)
         {
             _contextGenericWindow.SetActive(hovered);
             _contextMachineWindow.SetActive(!hovered);
@@ -51,16 +88,18 @@ public class CodexUIController : MonoBehaviour
             _genericMachineTitle.text = machine.Template.Name;
             _genericMachineState.text = machine.Template.UIGameplayDescription;
             _genericMachineLore.text = machine.Template.UILoreDescription;
-
+            
             switch (machine.Behavior)
             {
-                case DestructorMachineBehaviour destructorMachineBehaviour:
-                    _genericMachineImage.sprite = destructorMachineBehaviour.SpecialIngredientTemplate.Icon;
+                case MarchandMachineBehaviour destructorMachineBehaviour:
+                    _genericMachineTitle.text += $" ({destructorMachineBehaviour.FavoriteIngredient.Name.ToLower()})";
+                    _genericMachineImage.sprite = destructorMachineBehaviour.FavoriteIngredient.Icon;
                     break;
                 case ExtractorMachineBehaviour extractorMachineBehaviour:
-                    if ( extractorMachineBehaviour.IngredientTemplate)
+                    if (extractorMachineBehaviour.IngredientToExtract)
                     {
-                        _genericMachineImage.sprite = extractorMachineBehaviour.IngredientTemplate.Icon;
+                        _genericMachineTitle.text += $" ({extractorMachineBehaviour.IngredientToExtract.Name.ToLower()})";
+                        _genericMachineImage.sprite = extractorMachineBehaviour.IngredientToExtract.Icon;
                     }
                     break;
             }
@@ -76,7 +115,7 @@ public class CodexUIController : MonoBehaviour
             // Reset listener of previous hovered machine
             if (_hoveredMachine != null)
             {
-                _hoveredMachine.OnItemAdded -= HandleIngredientInMachineUpdated;
+                _hoveredMachine.OnSlotUpdated -= HandleIngredientInMachineUpdated;
             }
             _hoveredMachine = null;
             
@@ -91,7 +130,7 @@ public class CodexUIController : MonoBehaviour
         // Reset listener of previous hovered machine
         if (_hoveredMachine != null)
         {
-            _hoveredMachine.OnItemAdded -= HandleIngredientInMachineUpdated;
+            _hoveredMachine.OnSlotUpdated -= HandleIngredientInMachineUpdated;
         }
         
         _hoveredMachine = machine;
@@ -99,10 +138,15 @@ public class CodexUIController : MonoBehaviour
         _machineTitle.text = machine.Template.Name;
         
         UpdateIngredientInSlots(machine);
-        _hoveredMachine.OnItemAdded += HandleIngredientInMachineUpdated;
+        _hoveredMachine.OnSlotUpdated += HandleIngredientInMachineUpdated;
+
+        if (machine.Behavior is RecipeCreationBehavior)
+        {
+            _recipeMachine = true;
+        }
     }
 
-    private void HandleIngredientInMachineUpdated(bool _)
+    private void HandleIngredientInMachineUpdated()
     {
         UpdateIngredientInSlots(_hoveredMachine);
     }
@@ -110,7 +154,7 @@ public class CodexUIController : MonoBehaviour
     private void UpdateIngredientInSlots(Machine machine)
     {
         // Setup in ingredients slots
-        var inIngredientCountByType = machine.GroupedInIngredients;
+        var inIngredientCountByType = machine.InIngredients.GroupedByTypeAndCount();
         
         for (var i = 0; i < _inIngredientSlots.Count; i++)
         {
@@ -133,11 +177,12 @@ public class CodexUIController : MonoBehaviour
             ingredientSlot.SetEmpty(machine.Template.IngredientsPerSlotCount);
         }
 
+        var outIngredientCountByType = machine.OutIngredients.GroupedByTypeAndCount();
         
-        if (machine.GroupedOutIngredients.Count > 0)
+        if (outIngredientCountByType.Count > 0)
         {
             // The out ingredients should only have one category of item.
-            var ingredientData = machine.GroupedOutIngredients.ElementAt(0);
+            var ingredientData = outIngredientCountByType.ElementAt(0);
             _outIngredientSlot.SetIngredientSlot(ingredientData.Key.Icon, ingredientData.Value, machine.Template.IngredientsPerSlotCount);
         }
         else

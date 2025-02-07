@@ -14,12 +14,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _name: Distiller
   _type: 4
+  _uiView: {fileID: 21300000, guid: d87726815f87f954ba06e6f69c233cbf, type: 3}
   _gridView: {fileID: 3656516272554326776, guid: e432badd85479fa42a1a4965ba8139bc,
     type: 3}
-  _uiView: {fileID: 21300000, guid: d87726815f87f954ba06e6f69c233cbf, type: 3}
-  _behavior: {fileID: 11400000, guid: 150ba0f5943b5cf478cf810bb3648a20, type: 2}
+  _gridControllerPrefab: {fileID: 5488635875282986484, guid: 859503caaa5f96242b5ba83dccd721c9,
+    type: 3}
   _nodes:
   - _localPosition: {x: 0, y: 0}
+    _gridPosition: {x: 0, y: 0}
+    _ports:
+    - _side: 3
+      _way: 0
+  - _localPosition: {x: 0, y: 1}
+    _gridPosition: {x: 0, y: 0}
+    _ports: []
+  - _localPosition: {x: 0, y: 2}
     _gridPosition: {x: 0, y: 0}
     _ports:
     - _side: 3
@@ -27,11 +36,15 @@ MonoBehaviour:
   - _localPosition: {x: 1, y: 0}
     _gridPosition: {x: 0, y: 0}
     _ports: []
-  - _localPosition: {x: 2, y: 0}
+  - _localPosition: {x: 1, y: 1}
     _gridPosition: {x: 0, y: 0}
     _ports:
     - _side: 2
       _way: 1
+  - _localPosition: {x: 1, y: 2}
+    _gridPosition: {x: 0, y: 0}
+    _ports: []
+  _showItem: 0
   _canTakeInfiniteIngredients: 0
   _inSlotIngredientCount: 3
   _outSlotIngredientCount: 1
@@ -40,12 +53,13 @@ MonoBehaviour:
   _shopSpawnProbability: 0.5
   _shopPrice: 7
   _cannotBeSell: 0
+  _cannotBeBuy: 0
   _sellPrice: 7
   _contextualComponents:
   - {fileID: -7985585081776399288, guid: 587b9316180125b4597d80cce119472f, type: 3}
   _uiGameplayDescription: 
   _uiLoreDescription: 
   _contextMenuHeight: 4
-  _canSell: 1
+  _canRetrieve: 1
   _canMove: 1
   _canConfigure: 1

@@ -37,12 +37,6 @@ namespace Components.Machines
 
         public void ConnectTo(Port connectedPort)
         {
-            // Prevent recursive call. Not sure if this a design error. 
-            if (_connectedPort == connectedPort)
-            {
-                return;
-            }
-            
             // The two port have the same connection type.
             if (_way == connectedPort.Way)
             {
@@ -50,10 +44,21 @@ namespace Components.Machines
                 return;
             }
             
-            _connectedPort = connectedPort;
-            
             // Tell to the other port too.
-            connectedPort.ConnectTo(this);
+            connectedPort._connectedPort = this;
+            _connectedPort = connectedPort;
+        }
+
+        public void Disconnect()
+        {
+            if (_connectedPort == null)
+            {
+                return;
+            }
+            
+            // Tell the other port to also disconnect
+            _connectedPort._connectedPort = null;
+            _connectedPort = null;
         }
     }
 }

@@ -1,5 +1,6 @@
 using Components.Bundle;
 using Components.Island;
+using Components.Order;
 using Components.Recipes;
 using Database;
 using System;
@@ -15,13 +16,18 @@ namespace Components.Map
 	public class MapGenerator : MonoBehaviour
 	{
 		[SerializeField] private GameObject _mapGameObject;
-		[SerializeField] private List<RectTransform> _islandsParents;
 		[SerializeField] private RectTransform _nodeLineParent;
-		[SerializeField] private GameObject _linePrefab;
+		[SerializeField] private NodeLineController _linePrefab;
 		[SerializeField] private Button _confirmButton;
-		private List<UIIslandController> _islandsControllers = new List<UIIslandController>();
+		[SerializeField] private List<UIIslandController> _islandsControllers = new List<UIIslandController>();
+
+		[Header("Helps")]
+		[SerializeField] private OrderDialogueController _orderDialogueController;
+
+
 		private LevelNode _selectedNode;
 		private LevelNode _startingSelectedNode;
+		private List<LevelNode> _alreadyConnectedLevelNodes;
 		private bool _isFirstGameChoice;
 
 		private List<IngredientsBundle> _startingGameIngredientsBundles;
@@ -53,16 +59,20 @@ namespace Components.Map
 		private void Init(MapState state)
 		{
 			_mapGameObject.SetActive(true);
+			_orderDialogueController.gameObject.SetActive(true);
 
 			//First map generation
 			if (state.StateIndex == 1)
 			{
 				RegenerateMap();
+				_orderDialogueController.SetText("Choose your departure city, young apprentice!");
 			}
 			else
 			{
 				_isFirstGameChoice = false;
-				SelectStartingRoundNode(_selectedNode);
+				SelectStartingRoundNode(_startingSelectedNode);
+				_orderDialogueController.SetText("Build a new trade route!");
+
 			}
 		}
 
@@ -74,68 +84,108 @@ namespace Components.Map
 			GenerateIslands();
 			ConnectIslands();
 			DrawConnections();
-			SelectStartingGameNode();
+			SetStartingGameNodes();
 		}
 
 
 
 		private void ClearMap()
 		{
-			for(int i = 0; i < _islandsParents.Count; i++)
-			{
-				foreach (Transform child in _islandsParents[i])
-				{
-					Destroy(child.gameObject);
-				}
-			}
 
 			foreach (Transform child in _nodeLineParent)
 			{
 				Destroy(child.gameObject);
 			}
 
-			_islandsControllers = new List<UIIslandController>();
+			//_islandsControllers = new List<UIIslandController>();
 			_selectedNode = null;
 			_startingSelectedNode = null;
+			_alreadyConnectedLevelNodes = new List<LevelNode>();
 
 			_startingGameIngredientsBundles = ScriptableObjectDatabase.GetAllScriptableObjectOfType<IngredientsBundle>().Where(bundle => bundle.IsStartingGameBundle).ToList();
 			_startingRoundIngredientsBundles = ScriptableObjectDatabase.GetAllScriptableObjectOfType<IngredientsBundle>().Where(bundle => !bundle.IsStartingGameBundle).ToList();
 			_allIslandTemplate = ScriptableObjectDatabase.GetAllScriptableObjectOfType<IslandTemplate>().ToList();
 		}
+
 		//------------------------------------------------------------------------------------------- MAP GENERATION -------------------------------------------------------------------------------------------
 		private void GenerateIslands()
 		{
-			_allIslandTemplate = _allIslandTemplate.OrderBy(_ => UnityEngine.Random.value).ToList();
-			for (int i = 0; i < _islandsParents.Count; i++)
-			{
-				UIIslandController controller = Instantiate(_allIslandTemplate[i].Controller, _islandsParents[i]);
-				_islandsControllers.Add(controller);
-				controller.SetIslandName(_allIslandTemplate[i].Name);
-			}
+			//No more random selection of islands for V1 
+
+			//_allIslandTemplate = _allIslandTemplate.OrderBy(_ => UnityEngine.Random.value).ToList();
+			//for (int i = 0; i < _islandsParents.Count; i++)
+			//{
+			//	UIIslandController controller = Instantiate(_allIslandTemplate[i].Controller, _islandsParents[i]);
+			//	_islandsControllers.Add(controller);
+			//	controller.SetIslandName(_allIslandTemplate[i].Name);
+			//}
+
 		}
 
 		public void ConnectIslands()
 		{
-			foreach (var island in _islandsControllers)
-			{
-				foreach (var node in island.LevelNodeList)
-				{
-					var validConnections = FindValidConnections(island,node);
+			//No more random connections of islands for V1 
 
-					foreach (var connection in validConnections)
-					{
-						if (!node.ConnectedNodes.Contains(connection) && node.ExternalConnectedNode.Count < 1 && connection.ExternalConnectedNode.Count < 1)
-						{
-							node.ConnectedNodes.Add(connection);
-							node.ExternalConnectedNode.Add(connection);
-							connection.ConnectedNodes.Add(node);
-							connection.ExternalConnectedNode.Add(node);
-						}
-					}
-				}
-			}
+
+			//Dictionary<LevelNode, LevelNode> confirmedConnections = new Dictionary<LevelNode, LevelNode>();
+
+			//foreach (var island in _islandsControllers)
+			//{
+			//	Dictionary<LevelNode, List<LevelNode>> validConnectionByLevelNode = new Dictionary<LevelNode, List<LevelNode>>();
+
+			//	// Get all valid connection for each node
+			//	foreach (var node in island.LevelNodeList)
+			//	{
+			//		var validConnections = FindValidConnections(island, node);
+			//		validConnectionByLevelNode.Add(node, validConnections);
+			//	}
+
+
+			//	foreach (var node in validConnectionByLevelNode.Keys)
+			//	{
+			//		foreach (var targetNode in validConnectionByLevelNode[node])
+			//		{
+			//			// Check if the targetNode is already connected
+			//			if (confirmedConnections.TryGetValue(targetNode, out var existingNode))
+			//			{
+			//				// If new node is closer then we change the old one by it
+			//				if (GetDistance(targetNode, node) < GetDistance(targetNode, existingNode))
+			//				{
+			//					confirmedConnections[targetNode] = node;
+			//				}
+			//			}
+			//			else
+			//			{
+			//				// Not connected so we create it
+			//				confirmedConnections[targetNode] = node;
+			//			}
+			//		}
+			//	}
+			//}
+
+			////Create connections
+			//foreach (var kvp in confirmedConnections)
+			//{
+			//	if(kvp.Key.ExternalConnectedNode.Count < 1 && kvp.Value.ExternalConnectedNode.Count < 1)
+			//	{
+			//		kvp.Key.ConnectedNodes.Add(kvp.Value);
+			//		kvp.Key.ExternalConnectedNode.Add(kvp.Value);
+			//		kvp.Value.ConnectedNodes.Add(kvp.Key);
+			//		kvp.Value.ExternalConnectedNode.Add(kvp.Key);
+			//	}
+			//}
 		}
 
+		private float GetDistance(LevelNode a, LevelNode b)
+		{
+			
+			return Vector3.Distance(a.transform.position, b.transform.position);
+		}
+
+
+		/// <summary>
+		/// Get a list of level node which can be connected to a node
+		/// </summary>
 		private List<LevelNode> FindValidConnections(UIIslandController island,LevelNode node)
 		{
 			List<LevelNode> validConnections = new List<LevelNode>();
@@ -148,20 +198,22 @@ namespace Components.Map
 				}
 				foreach (var otherNode in otherIsland.LevelNodeList)
 				{
+					//Security check but can't happen normally with the previous check
 					if (node == otherNode) continue;
 
 					if (AreNodesConnectable(node, otherNode))
 					{
-						float distance = Vector3.Distance(node.transform.position, otherNode.transform.position);
-
 						validConnections.Add(otherNode);
 					}
 				}
 			}
 
-			return validConnections.OrderBy(n => Vector3.Distance(node.transform.position, n.transform.position)).ToList();
+			return validConnections.OrderBy(n => GetDistance(node, n)).ToList();
 		}
 
+		/// <summary>
+		/// Check if a node can connect to another one
+		/// </summary>
 		private bool AreNodesConnectable(LevelNode nodeA, LevelNode nodeB)
 		{
 			return (nodeA.NodeSizde == NodeSide.EAST && nodeB.NodeSizde != NodeSide.EAST && nodeB.NodeSizde != NodeSide.DEFAULT) ||
@@ -183,7 +235,7 @@ namespace Components.Map
 					{
 						if (!drawnConnections.Contains((node, connectedNode)) && !drawnConnections.Contains((connectedNode, node)))
 						{
-							GameObject lineObj = Instantiate(_linePrefab, _nodeLineParent);
+							NodeLineController lineObj = Instantiate(_linePrefab, _nodeLineParent);
 							RectTransform lineRect = lineObj.GetComponent<RectTransform>();
 
 							Vector2 startPos = node.transform.position;
@@ -198,19 +250,25 @@ namespace Components.Map
 							float angle = Mathf.Atan2(endPos.y - startPos.y, endPos.x - startPos.x) * Mathf.Rad2Deg;
 							lineRect.rotation = Quaternion.Euler(0, 0, angle);
 
+							//We don't need the road segment for now
+							//lineObj.SetNormalizedDistance(Mathf.CeilToInt(distance / 150));
 							drawnConnections.Add((node, connectedNode));
+							node.Lines.TryAdd(lineObj, false);
+							connectedNode.Lines.TryAdd(lineObj, true);
 						}
 					}
 				}
 			}
-			
 		}
 
 		//------------------------------------------------------------------------------------------- NODE SELECTION -------------------------------------------------------------------------------------------
 		private void HandleNodeSelected(LevelNode nodeSelected)
 		{
 			_confirmButton.interactable = true;
-			if (_selectedNode != _startingSelectedNode && _selectedNode != nodeSelected)
+
+
+
+			if (_selectedNode != null && _selectedNode != nodeSelected)
 			{
 				_selectedNode.UnselectNode();
 			}
@@ -218,32 +276,30 @@ namespace Components.Map
 			_selectedNode = nodeSelected;
 		}
 
-		private void SelectNodeAsDefaultForRound(LevelNode nodeSelected)
+		private void SetNodesState()
 		{
-			_startingSelectedNode = nodeSelected;
-
-			foreach (var island in _islandsControllers)
+			foreach(LevelNode node in _startingSelectedNode.ConnectedNodes)
 			{
-				foreach(var node in island.LevelNodeList)
-				{
-					if (node == nodeSelected || nodeSelected.ConnectedNodes.Contains(node))
-					{
-						node.UnlockNode();
-					}
-					else
-					{
-						node.LockNode();
-					}
-				}
-
+				node.UnlockNode(false);
 			}
+
+			foreach(LevelNode alreadyConnectedNode in _alreadyConnectedLevelNodes)
+			{
+				alreadyConnectedNode.SetNodeAsConnected();
+
+				foreach (LevelNode node in alreadyConnectedNode.ConnectedNodes)
+				{
+					node.UnlockNode(false);
+				}
+			}
+
 			_selectedNode = _startingSelectedNode;
 			_startingSelectedNode.SelectNodeAsFirst();
 			_confirmButton.interactable = false;
 		}
 
 		//Use for starting round only
-		private void SelectStartingGameNode()
+		private void SetStartingGameNodes()
 		{
 			if (_islandsControllers == null || _islandsControllers.Count == 0)
 			{
@@ -251,27 +307,46 @@ namespace Components.Map
 				return;
 			}
 
-			//Select starting island
-			UIIslandController startingIslandController = _islandsControllers.OrderByDescending(island => island.NumberOfNodes).FirstOrDefault();
-			//Select starting node
-			LevelNode startingNode = startingIslandController.StartingLevelNode;
-			//Set starting game ingredient bundles to each node in this island
 			_startingGameIngredientsBundles = _startingGameIngredientsBundles.OrderBy(_ => UnityEngine.Random.value).ToList();
-			startingIslandController.Init(_startingGameIngredientsBundles.Take(startingIslandController.NumberOfNodes).ToArray());
-			//Reset starting node bundle
-			startingNode.ResetIngredientBundle();
+			List<LevelNode> potentialStartingLevelNodes = new List<LevelNode>();
 
-			//All island except the starting one
-			UIIslandController[] nonStartingIslandControllers = _islandsControllers.Where(island => island != startingIslandController).ToArray();
-			foreach(UIIslandController nonStartingIslandController in nonStartingIslandControllers)
+			var startingRoundIngredientsBundles = _startingRoundIngredientsBundles.OrderBy(_ => UnityEngine.Random.value).ToList();
+			for( int i = 0; i < _islandsControllers.Count; i++)
 			{
-				//Randomize ingredients bundle list
-				_startingRoundIngredientsBundles = _startingRoundIngredientsBundles.OrderBy(_ => UnityEngine.Random.value).ToList(); 
-				nonStartingIslandController.Init(_startingRoundIngredientsBundles.Take(nonStartingIslandController.NumberOfNodes).ToArray());
+				//Set starting bundle for Starting node of each island
+				_islandsControllers[i].InitStartingBundle(_startingGameIngredientsBundles[i]);
+				potentialStartingLevelNodes.Add(_islandsControllers[i].StartingLevelNode);
+
+				//checking if we have enough ingredients to fill the island
+				if(startingRoundIngredientsBundles.Count < _islandsControllers[i].NumberOfNodes)
+				{
+					startingRoundIngredientsBundles = _startingRoundIngredientsBundles.OrderBy(_ => UnityEngine.Random.value).ToList();
+				}
+				//Set ingredient bundle for every node except the starting node
+				_islandsControllers[i].Init(startingRoundIngredientsBundles.Take(_islandsControllers[i].NumberOfNodes).ToArray());
+				startingRoundIngredientsBundles.RemoveRange(0,_islandsControllers[i].NumberOfNodes);
 			}
 
 
-			SelectNodeAsDefaultForRound(startingNode);
+			SetStartingGameNodesState(potentialStartingLevelNodes);
+		}
+
+		private void SetStartingGameNodesState(List<LevelNode> potentialStartingLevelNodes)
+		{
+			foreach(UIIslandController islandController in _islandsControllers)
+			{
+				foreach(LevelNode levelNode in islandController.LevelNodeList)
+				{
+					if (potentialStartingLevelNodes.Contains(levelNode))
+					{
+						levelNode.UnlockNode(true);
+					}
+					else
+					{
+						levelNode.LockNode();
+					}
+				}
+			}
 		}
 
 		//Use for every rounds except the first one of the game
@@ -290,13 +365,37 @@ namespace Components.Map
 			}
 
 			startingNode.ResetIngredientBundle();
-			SelectNodeAsDefaultForRound(startingNode);
+			SetNodesState();
 		}
 
 		//------------------------------------------------------------------------------------------- CONFIRM -------------------------------------------------------------------------------------------
 
 		public void Confirm()
 		{
+			_selectedNode.SetConnectedNodesConstructedLineColor(true);
+
+			if (_startingSelectedNode == null)
+			{
+				_startingSelectedNode = _selectedNode;
+				foreach(UIIslandController island in _islandsControllers)
+				{
+					foreach(LevelNode node in island.LevelNodeList)
+					{
+						if(node == _startingSelectedNode || _startingSelectedNode.ConnectedNodes.Contains(node))
+						{
+							continue;
+						}
+
+						node.LockNode();
+					}
+				}
+			}
+
+			if(_selectedNode != _startingSelectedNode)
+			{
+				_alreadyConnectedLevelNodes.Add(_selectedNode);
+			}
+
 			OnMapChoiceConfirm?.Invoke(_selectedNode.IngredientsBundle, _isFirstGameChoice);
 			_mapGameObject.SetActive(false);
 		}

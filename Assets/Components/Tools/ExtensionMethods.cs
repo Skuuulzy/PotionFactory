@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Random = UnityEngine.Random;
 
 public static class ExtensionMethods
 {
@@ -71,4 +72,13 @@ public static class ExtensionMethods
     }
 
     #endregion
+    
+    public static Color GenerateRandomColorWithAlpha(float alpha)
+    {
+        var r = Random.Range(0f, 1f);
+        var g = Random.Range(0f, 1f);
+        var b = Random.Range(0f, 1f);
+
+        return new Color(r, g, b, alpha);
+    }
 }

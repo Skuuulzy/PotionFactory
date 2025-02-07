@@ -1,7 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-
 
 namespace Components.Grid.Tile
 {
@@ -9,8 +6,11 @@ namespace Components.Grid.Tile
 	public class TileTemplate : GridObjectTemplate
 	{
 		[SerializeField] private TileType _tileType;
-		public TileType TileType => _tileType;
+		[SerializeField] private Material _lockedMaterial;
+		[SerializeField] private Material _unlockedMaterial;
 
+		public TileType TileType => _tileType;
+		public Material LockedMaterial => _lockedMaterial;
+		public Material UnlockedMaterial => _unlockedMaterial;
 	}
 }
-

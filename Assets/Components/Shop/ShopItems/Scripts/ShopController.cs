@@ -44,15 +44,8 @@ namespace Components.Shop
 			List<ShopItem> shopItemListToGenerate = new List<ShopItem>();
 
 			//Get all existing machines
-			List<MachineTemplate> allMachinesTemplate = ScriptableObjectDatabase.GetAllScriptableObjectOfType<MachineTemplate>();
+			List<MachineTemplate> allMachinesTemplate = ScriptableObjectDatabase.GetAllScriptableObjectOfType<MachineTemplate>().FindAll(x => !x.CannotBeBuy);
 
-			//Get the classic convoyer machine to add it to the shopItemList 
-			MachineTemplate convoyer = allMachinesTemplate.Find(x => x.Name == "Conveyor");
-			ShopItem conveyorShopItem = new ShopItem(convoyer, -1);
-			shopItemListToGenerate.Add(conveyorShopItem);
-
-			//Remove it to not selection it for the shop
-			allMachinesTemplate.Remove(convoyer);
 
 			for (int i = 0; i < allMachinesTemplate.Count; i++)
 			{

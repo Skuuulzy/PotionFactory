@@ -1,4 +1,5 @@
 using Components.Economy;
+using Components.Order;
 using Components.Shop.ShopItems;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,9 @@ namespace Components.Shop.UI
 	public class UIShopController : MonoBehaviour
 	{
 		[SerializeField] private GameObject _shopUIView;
+		[SerializeField] private GameObject _letterGO;
+		[SerializeField] private GameObject _scrollView;
+		[SerializeField] private OrderDialogueController _orderDialogueController;
 
 		[Header("PayOff")]
 		[SerializeField] private TextMeshProUGUI _objectiveText;
@@ -24,7 +28,7 @@ namespace Components.Shop.UI
 		[SerializeField] private Transform _consumableShopUIParent;
 		[SerializeField] private Transform _relicShopUIParent;
 
-		void Start()
+		private void Start()
 		{
 			ShopController.OnShopGenerated += DisplayShopItems;
 			EconomyController.OnEndRoundGoldValuesCalculated += DisplayPayOffInfos;
@@ -47,6 +51,10 @@ namespace Components.Shop.UI
 
 		private void DisplayShopItems(List<ShopItem> shopItems)
 		{
+			_letterGO.SetActive(true);
+			_orderDialogueController.gameObject.SetActive(true);
+			_scrollView.SetActive(false);
+
 			//Destroying all child before instantiate new ones
 			foreach (Transform child in _machineShopUIParent)
 			{

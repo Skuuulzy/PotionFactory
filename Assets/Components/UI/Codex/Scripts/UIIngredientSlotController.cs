@@ -8,6 +8,8 @@ public class UIIngredientSlotController : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _countTxt;
     [SerializeField] private Sprite _emptySprite;
 
+    public bool ShowEmpty => _icon.sprite == _emptySprite;
+    
     public void SetEmpty(int maxIngredientInSlotCount)
     {
         _icon.sprite = _emptySprite;
