@@ -53,7 +53,7 @@ namespace Components.Inventory
 
         private void HandleStateStarted(BaseState state)
         {
-            if (state is PlanningFactoryState)
+            if (state is ResolutionFactoryState)
             {
                 _animator.SetTrigger("Apparition");
             }

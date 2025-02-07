@@ -39,12 +39,12 @@ namespace Components.Inventory
 			
 
 
-			MapGenerator.OnMapChoiceConfirm += HandleMapChoiceConfirm;
+			BundleChoiceGenerator.OnBundleChoiceConfirm += HandleMapChoiceConfirm;
 		}
 
 		private void OnDestroy()
 		{
-			MapGenerator.OnMapChoiceConfirm -= HandleMapChoiceConfirm;
+			BundleChoiceGenerator.OnBundleChoiceConfirm -= HandleMapChoiceConfirm;
 		}
 		
 		//--------------------------------------------------------- ADDING AND REMOVING MACHINES CONSUMABLE AND RELICS --------------------------------------------------------------

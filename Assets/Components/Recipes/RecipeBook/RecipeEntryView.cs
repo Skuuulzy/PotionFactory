@@ -9,6 +9,7 @@ namespace Components.Recipes.Grimoire
         [SerializeField] private TMP_Text _recipeNameTxt;
         [SerializeField] private TMP_Text _machineNameTxt;
         [SerializeField] private TMP_Text _recipeIngredientsTxt;
+        [SerializeField] private TMP_Text _recipePriceTxt;
         [SerializeField] private Image _recipeSprite;
 
         public string RecipeName { get; private set; }
@@ -20,7 +21,7 @@ namespace Components.Recipes.Grimoire
             _recipeNameTxt.text = recipeTemplate.OutIngredient.Name;
             _recipeSprite.sprite = recipeTemplate.OutIngredient.Icon;
             _machineNameTxt.text = recipeTemplate.Machine.Name;
-
+            _recipePriceTxt.text = $"{recipeTemplate.OutIngredient.Price}";
             var ingredientsNeeded = string.Empty;
             
             foreach (var recipeTemplateIngredient in recipeTemplate.Ingredients)

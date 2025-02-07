@@ -21,9 +21,12 @@ namespace Components.Machines.Behaviors
         {
             if (Machine.InIngredients.Count == 0)
             {
+                Machine.OnProcess?.Invoke(Machine, false);
                 return;
             }
-            
+
+            Machine.OnProcess?.Invoke(Machine, true);
+
             // Sell items
             int sellPrice = 0;
             foreach(IngredientTemplate ingredientTemplate in Machine.InIngredients)

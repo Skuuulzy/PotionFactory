@@ -44,9 +44,6 @@ namespace Components.Map
 			MapState.OnMapStateStarted += Init;
 
 			//Set up ingredients bundles list
-
-
-			_mapGameObject.SetActive(true);
 			_confirmButton.interactable = false;
 		}
 		private void OnDestroy()

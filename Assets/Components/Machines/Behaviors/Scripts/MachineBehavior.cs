@@ -68,6 +68,11 @@ namespace Components.Machines.Behaviors
             {
                 Machine.AddIngredient(ingredientToMove, Way.OUT);
                 Machine.RemoveIngredient(ingredientToMove, Way.IN);
+                Machine.OnProcess?.Invoke(Machine, true);
+            }
+			else
+			{
+                Machine.OnProcess?.Invoke(Machine, false);
             }
         }
 
