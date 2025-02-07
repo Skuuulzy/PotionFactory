@@ -72,7 +72,6 @@ namespace Components.Grid
             if (Input.GetMouseButtonDown(1) && !_moveMode)
             {
                 DestroyPreview();
-                OnPreview?.Invoke(false);
             }
             if (Input.GetMouseButton(0))
             {
@@ -207,6 +206,7 @@ namespace Components.Grid
             if (_currentMachinePreview)
             {
                 Destroy(_currentMachinePreview.gameObject);
+                OnPreview?.Invoke(false);
             }
         }
 
