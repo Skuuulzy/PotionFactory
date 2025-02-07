@@ -342,6 +342,7 @@ namespace Components.Grid
 
 		private void GenerateEmptyGrid()
 		{
+			Debug.Log("Generating empty maps");
 			Grid = new Grid(_gridXValue, _gridYValue, _cellSize, _originPosition, _showDebug);
 			_tileController.SelectATileType();
 			
@@ -351,7 +352,16 @@ namespace Components.Grid
 				for (int z = 0; z < Grid.GetHeight(); z++)
 				{
 					Grid.TryGetCellByCoordinates(x, z, out var chosenCell);
-					_tileController.GenerateTile(chosenCell, Grid, _groundHolder, _cellSize);
+					
+					// TILES
+					var template = ScriptableObjectDatabase.GetTileTemplateByType(TileType.GRASS);
+					var gridController = AddObjectToGridFromTemplate(template, chosenCell, _cellSize);
+					if (gridController is TileController tileController)
+					{
+						_tiles.Add(new Vector2Int(x, z), tileController);
+						tileController.SetLockedState(true);
+					}
+
 				}
 			}
 			

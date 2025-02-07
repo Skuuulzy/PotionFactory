@@ -64,7 +64,7 @@ namespace Components.Grid.Generator
 		public bool CleanMode => _cleanMode;
 		public float CleanRadius => _cleanRadius;
 
-		public static string MapsPath => Path.Combine(Application.dataPath, "JsonData/Maps/");
+		public static string MapsPath => Path.Combine(Application.streamingAssetsPath, "Maps");
 
 		// ------------------------------------------------------------------------- MONO -------------------------------------------------------------------------
 		private void Start()
