@@ -12,6 +12,7 @@ namespace Components.Machines.Behaviors
         {
             if (Machine.InIngredients.Count <= 0)
             {
+                Machine.OnProcess(Machine, false);
                 return;
             }
             
