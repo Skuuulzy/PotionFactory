@@ -26,6 +26,8 @@ namespace Components.Grid
 
         private void Update()
         {
+            
+            return;
             if (!_initialized || _inPreview)
             {
                 return;

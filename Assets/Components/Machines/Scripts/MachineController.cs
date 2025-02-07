@@ -128,11 +128,6 @@ namespace Components.Machines
         
         private void HandleMachineHovered(Machine machine, bool hovered)
         {
-            if (_selected)
-            {
-                return;
-            }
-            
             if (Machine != machine)
             {
                 ToggleOutlines(false);
