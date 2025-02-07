@@ -80,7 +80,7 @@ namespace Components.Grid
                     
                     TryMoveMachine();
                 }
-                if (Input.GetMouseButtonDown(1))
+                if (Input.GetMouseButton(1))
                 {
                     TryRetrieveMachine();
                 }
@@ -224,6 +224,7 @@ namespace Components.Grid
                     return;
                 }
                 
+                Debug.Log("Destroying preview");
                 Destroy(_currentMachinePreview.gameObject);
                 OnPreview?.Invoke(false);
             }
