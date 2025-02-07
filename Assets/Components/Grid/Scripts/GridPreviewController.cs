@@ -50,7 +50,7 @@ namespace Components.Grid
             _camera = Camera.main;
 
             MachineManager.OnChangeSelectedMachine += InstantiatePreview;
-            PlanningFactoryState.OnPlanningFactoryStateStarted += HandlePlanningFactoryState;
+            ResolutionFactoryState.OnResolutionFactoryStateStarted += HandleResolutionFactoryState;
             ShopState.OnShopStateStarted += HandleShopState;
             UIGrimoireController.OnEnableCleanMode += HandleCleanMode;
             GrimoireButton.OnGrimoireButtonDeselect += HandleGrimoireDeselect;
@@ -105,7 +105,7 @@ namespace Components.Grid
         private void OnDestroy()
         {
             MachineManager.OnChangeSelectedMachine -= InstantiatePreview;
-            PlanningFactoryState.OnPlanningFactoryStateStarted -= HandlePlanningFactoryState;
+            ResolutionFactoryState.OnResolutionFactoryStateStarted -= HandleResolutionFactoryState;
             ShopState.OnShopStateStarted -= HandleShopState;
             UIGrimoireController.OnEnableCleanMode -= HandleCleanMode;
             GrimoireButton.OnGrimoireButtonDeselect -= HandleGrimoireDeselect;
@@ -406,7 +406,7 @@ namespace Components.Grid
         }
         
         // ------------------------------------------------------------------------- EVENT HANDLERS -------------------------------------------------------------------------------- 
-        private void HandlePlanningFactoryState(PlanningFactoryState _)
+        private void HandleResolutionFactoryState(ResolutionFactoryState _)
         {
             _isFactoryState = true;
         }

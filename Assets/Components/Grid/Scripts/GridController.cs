@@ -81,10 +81,10 @@ namespace Components.Grid
 			Machine.OnRetrieve += RetrieveMachine;
 			Machine.OnMove += ClearMachineGridData;
 
-			MapGenerator.OnMapChoiceConfirm += HandleMapChoiceConfirm;
+			BundleChoiceGenerator.OnBundleChoiceConfirm += HandleMapChoiceConfirm;
 			UIOptionsController.OnClearGrid += ClearMachines;
 			
-			PlanningFactoryState.OnPlanningFactoryStateStarted += HandlePlanningFactoryState;
+			ResolutionFactoryState.OnResolutionFactoryStateStarted += HandleResolutionFactoryStarted;
 
 			GridParcelUnlocker.OnParcelUnlocked += HandleParcelUnlocked;
 		}
@@ -94,10 +94,10 @@ namespace Components.Grid
 			Machine.OnRetrieve += RetrieveMachine;
 			Machine.OnMove -= ClearMachineGridData;
 
-			MapGenerator.OnMapChoiceConfirm-= HandleMapChoiceConfirm;
+			BundleChoiceGenerator.OnBundleChoiceConfirm -= HandleMapChoiceConfirm;
 			UIOptionsController.OnClearGrid -= ClearMachines;
-			
-			PlanningFactoryState.OnPlanningFactoryStateStarted -= HandlePlanningFactoryState;
+
+			ResolutionFactoryState.OnResolutionFactoryStateStarted -= HandleResolutionFactoryStarted;
 		}
 
 		// ------------------------------------------------------------------------- ADD OBJECT ------------------------------------------------------------------------- 
@@ -685,7 +685,7 @@ namespace Components.Grid
 			UpdateIngredientsToExtract(_extractedIngredients);
 		}
 		
-		private void HandlePlanningFactoryState(PlanningFactoryState state)
+		private void HandleResolutionFactoryStarted(ResolutionFactoryState state)
 		{
 			UpdateMarchands(state.StateIndex);
 		}
