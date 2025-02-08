@@ -91,7 +91,7 @@ public class UIStateController : MonoBehaviour
         _stateCountdownImage.fillAmount = currentTime / duration;
 		*/
 
-		_stateCountdownText.text = $"{ currentTime / duration}";
+		_stateCountdownText.text = $"{ currentTime}";
 	}
 
 	private void HideCountdown()
