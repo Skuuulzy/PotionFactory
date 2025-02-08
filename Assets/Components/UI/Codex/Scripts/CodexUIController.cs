@@ -26,6 +26,9 @@ public class CodexUIController : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _genericMachineTitle;
     [SerializeField] private TextMeshProUGUI _genericMachineState;
     [SerializeField] private TextMeshProUGUI _genericMachineLore;
+
+    [Header("Ressources")]
+    [SerializeField] private Sprite _marchandSprite;
     
     private Machine _hoveredMachine;
     private bool _recipeMachine;
@@ -92,8 +95,19 @@ public class CodexUIController : MonoBehaviour
             switch (machine.Behavior)
             {
                 case MarchandMachineBehaviour destructorMachineBehaviour:
-                    _genericMachineTitle.text += $" ({destructorMachineBehaviour.FavoriteIngredient.Name.ToLower()})";
-                    _genericMachineImage.sprite = destructorMachineBehaviour.FavoriteIngredient.Icon;
+
+                    if(destructorMachineBehaviour.FavoriteIngredient == null)
+					{
+                        _genericMachineTitle.text += $"";
+                        _genericMachineImage.sprite = _marchandSprite;
+                    }
+                     
+					else
+					{
+                        _genericMachineTitle.text += $" ({destructorMachineBehaviour.FavoriteIngredient.Name.ToLower()})";
+                        _genericMachineImage.sprite = destructorMachineBehaviour.FavoriteIngredient.Icon;
+                    }
+                    
                     break;
                 case ExtractorMachineBehaviour extractorMachineBehaviour:
                     if (extractorMachineBehaviour.IngredientToExtract)
