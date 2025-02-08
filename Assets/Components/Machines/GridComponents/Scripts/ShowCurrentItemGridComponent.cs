@@ -35,6 +35,10 @@ namespace Components.Machines
 
 			if (Machine.Behavior is MarchandMachineBehaviour marchandBehaviour)
 			{
+				if(marchandBehaviour.FavoriteIngredient == null)
+				{
+					return;
+				}
 				_ingredientImage.sprite = marchandBehaviour.FavoriteIngredient.Icon;
 			}
 			else if (Machine.Behavior is RecipeCreationBehavior recipeCreationBehavior)
