@@ -36,6 +36,7 @@ namespace Components.Grid
 
         private bool _moveMode;
         private bool _justPlaced;
+        private bool _justRemoved;
         private Machine _hoveredMachine;
 
         public static Action<bool> OnPreview;
@@ -82,6 +83,12 @@ namespace Components.Grid
                 }
                 if (Input.GetMouseButton(1))
                 {
+					if (_justRemoved)
+					{
+                        _justRemoved = false;
+                        return;
+					}
+
                     TryRetrieveMachine();
                 }
                 
@@ -223,7 +230,8 @@ namespace Components.Grid
                 {
                     return;
                 }
-                
+
+                _justRemoved = true;
                 Debug.Log("Destroying preview");
                 Destroy(_currentMachinePreview.gameObject);
                 OnPreview?.Invoke(false);
