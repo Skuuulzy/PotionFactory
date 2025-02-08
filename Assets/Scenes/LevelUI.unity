@@ -2613,8 +2613,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_text: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
-    nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: c788b96af0e2ada498a6562676a7cb66, type: 2}
   m_sharedMaterial: {fileID: -2957863670162953686, guid: c788b96af0e2ada498a6562676a7cb66,
@@ -5862,6 +5862,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1637442227}
     m_Modifications:
+    - target: {fileID: 2387014207386489227, guid: c4143b45c0ba7da4cab9be15bdc49033,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2889497025257969356, guid: c4143b45c0ba7da4cab9be15bdc49033,
         type: 3}
       propertyPath: m_hasFontAssetChanged
