@@ -37,7 +37,7 @@ namespace Components.Machines
 			{
 				_ingredientImage.sprite = marchandBehaviour.FavoriteIngredient.Icon;
 			}
-			if (Machine.Behavior is RecipeCreationBehavior recipeCreationBehavior)
+			else if (Machine.Behavior is RecipeCreationBehavior recipeCreationBehavior)
 			{
 				if (!recipeCreationBehavior.ProcessingRecipe)
 				{
