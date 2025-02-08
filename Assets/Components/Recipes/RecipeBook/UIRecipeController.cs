@@ -37,6 +37,11 @@ namespace Components.Recipes.Grimoire
             ResolutionFactoryState.OnResolutionFactoryStateStarted += HandleStartResolution;
         }
 
+        private void OnDestroy()
+        {
+            ResolutionFactoryState.OnResolutionFactoryStateStarted -= HandleStartResolution;
+        }
+
         private void HandleStartResolution(ResolutionFactoryState obj)
         {
             DisplayPotentialRecipes(true);
