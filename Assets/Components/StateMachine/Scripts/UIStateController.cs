@@ -10,6 +10,7 @@ public class UIStateController : MonoBehaviour
 {
 	[SerializeField] private Animator _stateUITitleAnimator;
 	[SerializeField] private TextMeshProUGUI _stateNameText;
+	[SerializeField] private TextMeshProUGUI _stateCountdownText;
 	[SerializeField] private Image _stateCountdownImage;
 	[SerializeField] private Button _finishStateButton;
 
@@ -81,12 +82,16 @@ public class UIStateController : MonoBehaviour
 	private void SetCountdownTime(float currentTime, float duration)
 	{
 		//Check if the timer is display 
+		/*
 		if (_stateCountdownImage.gameObject.activeSelf == false)
 		{
 			_stateCountdownImage.gameObject.SetActive(true);
 		}
 
-		_stateCountdownImage.fillAmount = currentTime / duration;
+        _stateCountdownImage.fillAmount = currentTime / duration;
+		*/
+
+		_stateCountdownText.text = $"{ currentTime}";
 	}
 
 	private void HideCountdown()
