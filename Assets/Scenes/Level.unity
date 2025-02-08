@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 1139725090}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
+  m_IndirectSpecularColor: {r: 0.08579673, g: 0.16692773, b: 0.33199155, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -273,12 +273,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 5280213544075544414, guid: 81a17b8c773d69a4d894a0f833556242,
-        type: 3}
-      propertyPath: _defaultPlayerInventory
-      value: 
-      objectReference: {fileID: 11400000, guid: dd53609b428ee6944b26ca7fea18e135,
-        type: 2}
     - target: {fileID: 7114295549541747410, guid: 81a17b8c773d69a4d894a0f833556242,
         type: 3}
       propertyPath: m_Name
@@ -20519,63 +20513,63 @@ MonoBehaviour:
   - OriginPosition: {x: 0, y: 0}
     Lenght: 10
     Width: 10
-    Price: 10
+    Price: 3
   - OriginPosition: {x: 10, y: 0}
     Lenght: 10
     Width: 10
-    Price: 10
+    Price: 3
   - OriginPosition: {x: 20, y: 0}
     Lenght: 10
     Width: 10
-    Price: 10
+    Price: 3
   - OriginPosition: {x: 30, y: 0}
     Lenght: 10
     Width: 10
-    Price: 10
+    Price: 3
   - OriginPosition: {x: 0, y: 10}
     Lenght: 10
     Width: 10
-    Price: 10
+    Price: 3
   - OriginPosition: {x: 10, y: 10}
     Lenght: 10
     Width: 10
-    Price: 10
+    Price: 3
   - OriginPosition: {x: 20, y: 10}
     Lenght: 10
     Width: 10
-    Price: 10
-  - OriginPosition: {x: 30, y: 10}
-    Lenght: 10
-    Width: 10
-    Price: 10
+    Price: 3
   - OriginPosition: {x: 0, y: 20}
     Lenght: 10
     Width: 10
-    Price: 10
+    Price: 3
   - OriginPosition: {x: 10, y: 20}
     Lenght: 10
     Width: 10
-    Price: 10
+    Price: 3
   - OriginPosition: {x: 20, y: 20}
     Lenght: 10
     Width: 10
-    Price: 10
+    Price: 3
   - OriginPosition: {x: 30, y: 20}
     Lenght: 10
     Width: 10
-    Price: 10
+    Price: 3
   - OriginPosition: {x: 0, y: 30}
     Lenght: 10
     Width: 10
-    Price: 10
+    Price: 3
   - OriginPosition: {x: 10, y: 30}
     Lenght: 10
     Width: 10
-    Price: 10
+    Price: 3
   - OriginPosition: {x: 20, y: 30}
     Lenght: 10
     Width: 10
-    Price: 10
+    Price: 3
+  - OriginPosition: {x: 30, y: 30}
+    Lenght: 10
+    Width: 10
+    Price: 3
   _parcelViewPrefab: {fileID: 7465517095681075245, guid: 62d2b97395a02604c9be2c6b2cd8c51f,
     type: 3}
   _parcelViewHolder: {fileID: 572131217}
@@ -21074,10 +21068,10 @@ MonoBehaviour:
     type: 2}
   _runConfiguration: {fileID: 11400000, guid: da80af7889f90f442a52ec167f8abb86, type: 2}
   _sellersCoordinates:
-  - {x: 39, y: 5}
-  - {x: 39, y: 12}
-  - {x: 39, y: 19}
-  - {x: 39, y: 26}
+  - {x: 39, y: 7}
+  - {x: 39, y: 14}
+  - {x: 39, y: 21}
+  - {x: 39, y: 28}
   _startParcel:
     OriginPosition: {x: 30, y: 10}
     Lenght: 10

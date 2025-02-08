@@ -61,6 +61,18 @@ public class RunConfiguration : ScriptableObject
 		return finalListOfIngredient;
 	}
 
+	public int GetStateTime(int stateNumber)
+	{
+		if(_runStateList[stateNumber].CustomTime != 0)
+		{
+			return _runStateList[stateNumber].CustomTime;
+		}
+		else
+		{
+			return ResolutionFactoryStateTime;
+		}
+	}
+
 	//-------------------------------------------------------------------------------------------------- STRUCTS -------------------------------------------------------------------------------------------------------------------
 	[Serializable]
 	public struct RunStateConfiguration
@@ -69,6 +81,7 @@ public class RunConfiguration : ScriptableObject
 		public int NumberOfTransformationAsked;
 		public TypeOfNumberTransformation TypeOfNumberTransformation;
 		public int MoneyObjective;
+		public int CustomTime;
 	}
 
 	[Serializable]
