@@ -496,7 +496,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 0
   m_OnCullStateChanged:
@@ -558,7 +558,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 8815328723270220947}
         m_TargetAssemblyTypeName: Components.Economy.UIEconomieController, Assembly-CSharp
-        m_MethodName: DebugAddScore
+        m_MethodName: DebugAddMoney
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -900,7 +900,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 8815328723270220947}
         m_TargetAssemblyTypeName: Components.Economy.UIEconomieController, Assembly-CSharp
-        m_MethodName: DebugAddMoney
+        m_MethodName: DebugAddScore
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
