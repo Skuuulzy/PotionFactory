@@ -128,7 +128,7 @@ public class StateController : MonoBehaviour
 	{
 		CurrentDebugStateName = "RESOLUTION";
 		
-		_countdownTimer = new TickableCountdownTimer(_runConfiguration.ResolutionFactoryStateTime);
+		_countdownTimer = new TickableCountdownTimer(_runConfiguration.GetStateTime(state.StateIndex));
 		BaseState.OnStateEnded += _countdownTimer.Stop;
 		_countdownTimer.OnTimerStop += state.SetStateFinished;
 		_countdownTimer.Start();
