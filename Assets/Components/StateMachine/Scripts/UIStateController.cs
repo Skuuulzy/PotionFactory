@@ -1,3 +1,4 @@
+using System;
 using Components.Economy;
 using TMPro;
 using UnityEngine;
@@ -9,6 +10,7 @@ public class UIStateController : MonoBehaviour
 {
 	[SerializeField] private Animator _stateUITitleAnimator;
 	[SerializeField] private TextMeshProUGUI _stateNameText;
+	[SerializeField] private TextMeshProUGUI _stateCountdownText;
 	[SerializeField] private Image _stateCountdownImage;
 	[SerializeField] private Button _finishStateButton;
 
@@ -33,6 +35,8 @@ public class UIStateController : MonoBehaviour
 		EconomyController.OnGameOver -= HandleGameOver;
 		StateController.OnCountdown -= SetCountdownTime;
 		StateController.OnStateStarted -= HandleStateStarted;
+		
+		EconomyController.OnStatePlayerScoreUpdated -= HandleScoreUpdated;
 	}
 	
 	private void HandleStateStarted(BaseState state)
@@ -43,18 +47,29 @@ public class UIStateController : MonoBehaviour
 		{
 			case EndOfDayState shopState:
 				HideCountdown();
-				DisplayFinishStateButton(shopState);
+				_finishStateButton.gameObject.SetActive(false);
 				break;
 			case PlanningFactoryState planningFactoryState:
-				DisplayFinishStateButton(planningFactoryState);
 				break;
 			case ResolutionFactoryState resolutionFactoryState:
-				DisplayFinishStateButton(resolutionFactoryState);
+				EconomyController.OnStatePlayerScoreUpdated -= HandleScoreUpdated;
+				EconomyController.OnStatePlayerScoreUpdated += HandleScoreUpdated;
 				DisplayNewState(resolutionFactoryState);
+				_finishStateButton.gameObject.SetActive(false);
 				break;
 			case EndGameState endGameState:
 				DisplayEndGameState();
+				_finishStateButton.gameObject.SetActive(false);
 				break;
+		}
+	}
+
+	private void HandleScoreUpdated(int score)
+	{
+		if (score >= EconomyController.Instance.StateScoreObjective)
+		{
+			DisplayFinishStateButton(_currentState);
+			EconomyController.OnStatePlayerScoreUpdated -= HandleScoreUpdated;
 		}
 	}
 
@@ -67,12 +82,16 @@ public class UIStateController : MonoBehaviour
 	private void SetCountdownTime(float currentTime, float duration)
 	{
 		//Check if the timer is display 
+		/*
 		if (_stateCountdownImage.gameObject.activeSelf == false)
 		{
 			_stateCountdownImage.gameObject.SetActive(true);
 		}
 
-		_stateCountdownImage.fillAmount = currentTime / duration;
+        _stateCountdownImage.fillAmount = currentTime / duration;
+		*/
+
+		_stateCountdownText.text = $"{ currentTime}";
 	}
 
 	private void HideCountdown()

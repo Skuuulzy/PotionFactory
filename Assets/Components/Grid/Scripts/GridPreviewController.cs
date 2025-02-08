@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using CodeMonkey.Utils;
-using Components.Grid.Tile;
 using Components.Inventory;
 using Components.Machines;
 using Database;
@@ -330,28 +329,6 @@ namespace Components.Grid
                     DestroyPreview();
                 }
             }
-        }
-
-        private void TryDestroyHoveredMachine()
-        {
-            // Try to get the position on the grid. 
-            if (!UtilsClass.ScreenToWorldPositionIgnoringUI(Input.mousePosition, _camera, out Vector3 worldMousePosition))
-            {
-                return;
-            }
-
-            // Try getting the cell 
-            if (!Grid.TryGetCellByPosition(worldMousePosition, out Cell chosenCell))
-            {
-                return;
-            }
-
-            if (!chosenCell.ContainsNode)
-            {
-                return;
-            }
-
-            chosenCell.Node.Machine.Controller.Retrieve();
         }
 
         private bool IsMachinePlacable(Cell originCell)
