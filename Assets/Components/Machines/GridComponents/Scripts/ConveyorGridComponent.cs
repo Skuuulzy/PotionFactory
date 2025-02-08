@@ -30,7 +30,6 @@ namespace Components.Machines
         
         private void ShowItem(bool show, IngredientTemplate ingredientToShow)
         {
-            Debug.Log($"Show item: {show} on {Machine.Controller.name}");
             if (show)
             {
                 _ingredientController.CreateRepresentationFromTemplate(ingredientToShow, _translationPositions[0].position);
@@ -50,11 +49,8 @@ namespace Components.Machines
                 return;
             }
             
-            Debug.Log($"Translate coroutine on {Machine.Controller.name}");
-
             if (Machine.InIngredients.Count == 0)
             {
-                Debug.Log($"No item to translate on {Machine.Controller.name}");
                 return;
             }
 
