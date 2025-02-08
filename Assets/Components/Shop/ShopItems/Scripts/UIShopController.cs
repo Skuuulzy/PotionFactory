@@ -1,59 +1,37 @@
-using Components.Economy;
-using Components.Order;
+using Components.Machines;
 using Components.Shop.ShopItems;
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 
-namespace Components.Shop.UI
+namespace Components.Shop
 {
 	public class UIShopController : MonoBehaviour
 	{
-		[SerializeField] private GameObject _shopUIView;
-		[SerializeField] private GameObject _letterGO;
-		[SerializeField] private GameObject _scrollView;
-		[SerializeField] private OrderDialogueController _orderDialogueController;
-
-		[Header("PayOff")]
-		[SerializeField] private TextMeshProUGUI _objectiveText;
-		[SerializeField] private TextMeshProUGUI _resultText;
-		[SerializeField] private TextMeshProUGUI _payoffText;
 
 		[Header("Shop")]
+		[SerializeField] private GameObject _shopUIView;
 		[SerializeField] private UIMachineShopItemViewController _machineShopUIViewController;
-		[SerializeField] private UIConsumableShopItemViewController _consumableShopUIViewController;
-		[SerializeField] private UIRelicShopItemViewController _relicShopUIViewController;
-		[SerializeField] private Transform _machineShopUIParent;
-		[SerializeField] private Transform _consumableShopUIParent;
-		[SerializeField] private Transform _relicShopUIParent;
+		[SerializeField] private UIBuyedItemController _buyedItemController;
 
-		private void Start()
+		[SerializeField] private Transform _machineShopUIParent;
+		[SerializeField] private Transform _itemsBuyedParent;
+
+		private void Awake()
 		{
-			ShopController.OnShopGenerated += DisplayShopItems;
-			EconomyController.OnEndRoundGoldValuesCalculated += DisplayPayOffInfos;
-			ShopState.OnShopStateEnded += HideShop;
+			ShopController.OnShopGenerated += SetInfos;
+			UIMachineShopItemViewController.OnMachineBuyed += AddMachineToBuyedItems;
 		}
+
 
 		private void OnDestroy()
 		{
-			ShopController.OnShopGenerated -= DisplayShopItems;
-			EconomyController.OnEndRoundGoldValuesCalculated -= DisplayPayOffInfos;
-			ShopState.OnShopStateEnded -= HideShop;
+			ShopController.OnShopGenerated -= SetInfos;
 		}
 
-		private void DisplayPayOffInfos(int totalGoldEarned, int baseGoldAmount, int goldInterest, int objectiveScore, int playerScore)
+		public void SetInfos(List<ShopItem> shopItems)
 		{
-			_objectiveText.text = $"Your objective was to make <b><color=red>{objectiveScore}</b></color> golds";
-			_resultText.text = $"You succeeded by obtaining <b><color=red>{playerScore}</b></color> golds";
-			_payoffText.text = $"The order rewards you by granting you <b><color=#EF33E9>{totalGoldEarned}</b></color> order tickets.\n \n Use them as you wish within our market";
-		}
-
-		private void DisplayShopItems(List<ShopItem> shopItems)
-		{
-			_letterGO.SetActive(true);
-			_orderDialogueController.gameObject.SetActive(true);
-			_scrollView.SetActive(false);
 
 			//Destroying all child before instantiate new ones
 			foreach (Transform child in _machineShopUIParent)
@@ -61,17 +39,6 @@ namespace Components.Shop.UI
 				Destroy(child.gameObject);
 			}
 
-			foreach (Transform child in _consumableShopUIParent)
-			{
-				Destroy(child.gameObject);
-			}
-
-			foreach (Transform child in _relicShopUIParent)
-			{
-				Destroy(child.gameObject);
-			}
-
-			_shopUIView.SetActive(true);
 
 			//Instantiate all shop items
 			foreach (ShopItem shopItem in shopItems)
@@ -82,22 +49,24 @@ namespace Components.Shop.UI
 					UIMachineShopItemViewController UIMachineShopItemViewController = Instantiate(_machineShopUIViewController, _machineShopUIParent);
 					UIMachineShopItemViewController.Init(shopItem);
 				}
-				else if(shopItem.ConsumableTemplate != null)
-				{
-					UIShopItemViewController UIShopItemViewController = Instantiate(_consumableShopUIViewController, _consumableShopUIParent);
-					UIShopItemViewController.Init(shopItem);
-				}
-				else if(shopItem.RelicTemplate != null)
-				{
-					UIRelicShopItemViewController UIRelicShopItemViewController = Instantiate(_relicShopUIViewController, _relicShopUIParent);
-					UIRelicShopItemViewController.Init(shopItem);
-				}
+			}
+
+		}
+
+		public void OnOpenShop()
+		{
+			//Destroying all child before instantiate new ones
+			foreach (Transform child in _itemsBuyedParent)
+			{
+				Destroy(child.gameObject);
 			}
 		}
 
-		private void HideShop(ShopState state)
+		private void AddMachineToBuyedItems(MachineTemplate template)
 		{
-			_shopUIView.SetActive(false);
+			var newItem = Instantiate(_buyedItemController, _itemsBuyedParent);
+			newItem.SetInfos(template);
 		}
 	}
+
 }

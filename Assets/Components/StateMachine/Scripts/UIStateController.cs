@@ -41,7 +41,7 @@ public class UIStateController : MonoBehaviour
 
 		switch (state)
 		{
-			case ShopState shopState:
+			case EndOfDayState shopState:
 				HideCountdown();
 				DisplayFinishStateButton(shopState);
 				break;
