@@ -34,8 +34,9 @@ namespace Components.Grid
         private bool _isFactoryState = true;
         private Vector3 _lastCellPosition = new(-1, -1, -1);
 
-        private bool _cleanMode;
         private bool _moveMode;
+        private bool _justPlaced;
+        private Machine _hoveredMachine;
 
         public static Action<bool> OnPreview;
 
@@ -64,27 +65,40 @@ namespace Components.Grid
                 return;
             }
 
-            if (!_cleanMode)
+            // Selection mode
+            if (!_currentMachinePreview)
             {
-                MovePreview();
+                TryHoverMachine();   
+                
+                if (Input.GetMouseButtonUp(0))
+                {
+                    if (_justPlaced)
+                    {
+                        _justPlaced = false;
+                        return;
+                    }
+                    
+                    TryMoveMachine();
+                }
+                if (Input.GetMouseButton(1))
+                {
+                    TryRetrieveMachine();
+                }
+                
+                return;
             }
-
-            if (Input.GetMouseButtonDown(1) && !_moveMode)
+            
+            MovePreview();
+            
+            if (Input.GetMouseButton(0))
+            {
+                AddSelectedMachineToGrid();
+            }
+            if (Input.GetMouseButtonDown(1))
             {
                 DestroyPreview();
             }
-            if (Input.GetMouseButton(0))
-            {
-                if (_cleanMode)
-                {
-                    TryDestroyHoveredMachine();
-                }
-                else
-                {
-                    AddSelectedMachineToGrid();
-                }
-            }
-            if (Input.GetMouseButtonDown(2) || Input.GetKey(KeyCode.R))
+            if (Input.GetKeyDown(KeyCode.R))
             {
                 RotatePreview();
             }
@@ -111,10 +125,10 @@ namespace Components.Grid
         // ------------------------------------------------------------------------- PREVIEW BEHAVIOUR -------------------------------------------------------------------------------- 
         private void InstantiatePreview(MachineTemplate template)
         {
-            OnPreview?.Invoke(true);
-            
+            OnPreview?.Invoke(false);
             DestroyPreview();
             _currentMachinePreview = InstantiateMachine(template, _currentInputRotation);
+            Debug.Log($"Selecting {_currentMachinePreview.name}");
         }
 
         private void ShowPreview(bool show)
@@ -205,6 +219,12 @@ namespace Components.Grid
         {
             if (_currentMachinePreview)
             {
+                if (!_currentMachinePreview.Machine.Template.CanRetrieve)
+                {
+                    return;
+                }
+                
+                Debug.Log("Destroying preview");
                 Destroy(_currentMachinePreview.gameObject);
                 OnPreview?.Invoke(false);
             }
@@ -282,14 +302,19 @@ namespace Components.Grid
 
             if (_moveMode)
             {
+                Debug.Log($"Adding machine :{_currentMachinePreview.Machine.Controller.name} to grid");
                 _gridController.AddMachineToGrid(_currentMachinePreview, chosenCell, false);
+                _currentMachinePreview.Machine.Select(false);
                 _currentMachinePreview = null;
                 _moveMode = false;
+                _justPlaced = true;
             }
             else
             {
+                Debug.Log($"Adding machine :{_currentMachinePreview.Machine.Controller.name} to grid");
                 var machineToAdd = InstantiateMachine(Preview.Machine.Template, _currentMachineRotation);
                 _gridController.AddMachineToGrid(machineToAdd, chosenCell, true);
+                _justPlaced = true;
                 
                 //Instantiate the same machine type if we have enough in the inventory.
                 if (GrimoireController.Instance.CountMachineOfType(Preview.Machine.Template.Type) <= 0)
@@ -342,6 +367,92 @@ namespace Components.Grid
             return true;
         }
         
+        private void TryMoveMachine()
+        {
+            // TODO: This click workflow really need to be centralized (maybe in the input sys)
+            // Try to get the position on the grid. 
+            if (!UtilsClass.ScreenToWorldPositionIgnoringUI(Input.mousePosition, _camera, out var worldMousePosition))
+            {
+                return;
+            }
+            
+            // Try getting the cell 
+            if (!Grid.TryGetCellByPosition(worldMousePosition, out var chosenCell))
+            {
+                return;
+            }
+
+            if (chosenCell.ContainsNode)
+            {
+                var machine = chosenCell.Node.Machine;
+                
+                Debug.Log($"Move machine {machine.Controller.name}");
+                machine.Controller.Move();
+                machine.Select(true);
+            }
+        }
+        
+        private void TryRetrieveMachine()
+        {
+            // TODO: This click workflow really need to be centralized (maybe in the input sys)
+            // Try to get the position on the grid. 
+            if (!UtilsClass.ScreenToWorldPositionIgnoringUI(Input.mousePosition, _camera, out var worldMousePosition))
+            {
+                return;
+            }
+            
+            // Try getting the cell 
+            if (!Grid.TryGetCellByPosition(worldMousePosition, out var chosenCell))
+            {
+                return;
+            }
+
+            if (!chosenCell.ContainsNode) 
+                return;
+
+            if (!chosenCell.Node.Machine.Template.CanRetrieve)
+            {
+                return;
+            }
+            
+            Debug.Log($"Retrieve machine { chosenCell.Node.Machine.Controller.name}");
+            chosenCell.Node.Machine.Controller.Retrieve();
+        }
+        
+        private void TryHoverMachine()
+        {
+            // TODO: This click workflow really need to be centralized (maybe in the input sys)
+            // Try to get the position on the grid. 
+            if (!UtilsClass.ScreenToWorldPositionIgnoringUI(Input.mousePosition, _camera, out var worldMousePosition))
+            {
+                return;
+            }
+            
+            // Try getting the cell 
+            if (!Grid.TryGetCellByPosition(worldMousePosition, out var chosenCell))
+            {
+                return;
+            }
+
+            if (!chosenCell.ContainsNode)
+            {
+                // Un hover previous machine if it exists
+                _hoveredMachine?.Hover(false);
+                _hoveredMachine = null;
+                
+                return;
+            }
+
+            if (_hoveredMachine == chosenCell.Node.Machine)
+            {
+                return;
+            }
+
+            // Hover current machine
+            _hoveredMachine = chosenCell.Node.Machine;
+            _hoveredMachine.Hover(true);
+        }
+        
         // ------------------------------------------------------------------------- EVENT HANDLERS -------------------------------------------------------------------------------- 
         private void HandleResolutionFactoryState(ResolutionFactoryState _)
         {
@@ -355,8 +466,6 @@ namespace Components.Grid
 
         private void HandleCleanMode(bool cleanMode)
         {
-            _cleanMode = cleanMode;
-
             // Hide the preview
             if (_currentMachinePreview)
             {

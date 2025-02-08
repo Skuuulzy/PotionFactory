@@ -15,6 +15,7 @@ namespace Components.Tick
         private float _currentTickDuration;
 		private bool _isPause;
 
+        public float InitialTickDuration => _initialTickDuration;
         public float CurrentTickDuration => _currentTickDuration;
 
         // ------------------------------------------------------------------------- MONO -------------------------------------------------------------------------
@@ -68,7 +69,6 @@ namespace Components.Tick
 
         private void TickAll()
         {
-            Debug.Log("TICK");
             foreach (var tickable in TICKABLES)
             {
                 tickable.Tick();
