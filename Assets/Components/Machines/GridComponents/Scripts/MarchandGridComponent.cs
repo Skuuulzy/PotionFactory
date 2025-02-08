@@ -1,13 +1,12 @@
+using System.Collections;
 using UnityEngine;
 
 namespace Components.Machines
 {
     public class MarchandGridComponent : MachineGridComponent
     {
-        private static readonly int PLAY = Animator.StringToHash("Play");
-        
-        [Header("Animation")] 
-        [SerializeField] private Animator _sellFeedbackAnimator;
+        [SerializeField] private Transform _sellFeedbackHolder;
+        [SerializeField] private GameObject _sellFeedback;
 
         protected override void SetUp()
         {
@@ -22,7 +21,15 @@ namespace Components.Machines
         // ------------------------------------------------------------------------- SELL FEEDBACK -----------------------------------------------------------------------------
         private void ShowSellFeedback()
         {
-            _sellFeedbackAnimator.SetTrigger(PLAY);
+            // TODO: Change for pool system
+            var feedback = Instantiate(_sellFeedback, _sellFeedbackHolder);
+            StartCoroutine(DestroyAfter(feedback, 1f));
+        }
+
+        private IEnumerator DestroyAfter(GameObject objectToDestroy , float time)
+        {
+            yield return new WaitForSeconds(time);
+            Destroy(objectToDestroy);
         }
     }
 }

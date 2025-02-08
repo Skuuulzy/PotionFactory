@@ -31,7 +31,7 @@ public class StateController : MonoBehaviour
 		BundleChoiceState.OnBundleStateStarted += HandleBundleChoiceState;
 		PlanningFactoryState.OnPlanningFactoryStateStarted += HandlePlanningFactoryState;
 		ResolutionFactoryState.OnResolutionFactoryStateStarted += HandleResolutionFactoryState;
-		ShopState.OnShopStateStarted += HandleShopState;
+		EndOfDayState.OnEndOfDayStateStarted += HandleShopState;
 		EndGameState.OnEndGameStateStarted += HandleEndGameState;
 
 		//State Machine 
@@ -41,7 +41,7 @@ public class StateController : MonoBehaviour
 		BundleChoiceState bundleChoiceState = new BundleChoiceState();
 		PlanningFactoryState planningFactoryState = new PlanningFactoryState();
 		ResolutionFactoryState resolutionFactoryState = new ResolutionFactoryState();
-		ShopState shopState = new ShopState();
+		EndOfDayState shopState = new EndOfDayState();
 		EndGameState endGameState = new EndGameState();
 
 		//Define transitions  
@@ -67,7 +67,7 @@ public class StateController : MonoBehaviour
 	{
 		PlanningFactoryState.OnPlanningFactoryStateStarted -= HandlePlanningFactoryState;
 		ResolutionFactoryState.OnResolutionFactoryStateStarted -= HandleResolutionFactoryState;
-		ShopState.OnShopStateStarted -= HandleShopState;
+		EndOfDayState.OnEndOfDayStateStarted -= HandleShopState;
 		EndGameState.OnEndGameStateStarted -= HandleEndGameState;
 
 		BundleChoiceState.OnBundleStateStarted -= HandleBundleChoiceState;
@@ -105,7 +105,7 @@ public class StateController : MonoBehaviour
 		BundleChoiceGenerator.OnBundleChoiceConfirm += state.BundleChoiceConfirmed;
 	}
 
-	private void HandleShopState(ShopState state)
+	private void HandleShopState(EndOfDayState state)
 	{
 		CurrentDebugStateName = "SHOP";
 		_countdownTimer = null;

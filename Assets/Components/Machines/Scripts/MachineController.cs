@@ -35,8 +35,6 @@ namespace Components.Machines
         
         private bool _initialized;
         private bool _selected;
-
-       
         
         public Machine Machine => _machine;
         
@@ -150,9 +148,11 @@ namespace Components.Machines
             if (Machine != machine)
             {
                 ToggleOutlines(false);
+                ToggleDirectionalArrows(false);
                 return;
             }
             
+            ToggleDirectionalArrows(hovered);
             ToggleOutlines(hovered, _hoveredColor);
         }
         

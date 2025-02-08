@@ -19,24 +19,23 @@ namespace Components.Shop
 
 		private void Start()
 		{
-			ShopState.OnShopStateStarted += GenerateShop;
+			ResolutionFactoryState.OnStateStarted += GenerateShop;
 		}
 		
 		private void OnDestroy()
 		{
-			ShopState.OnShopStateStarted -= GenerateShop;
+			ResolutionFactoryState.OnStateStarted -= GenerateShop;
 		}
-		
-		private void GenerateShop(ShopState state)
+
+		private void GenerateShop(BaseState state)
 		{
 			List<ShopItem> shopItemListToGenerate = new List<ShopItem>();
 			shopItemListToGenerate.AddRange(GenerateMachinesInShop());
-			shopItemListToGenerate.AddRange(GenerateConsumablesInShop());
-			shopItemListToGenerate.AddRange(GenerateRelicsInShop());
 			//ShopIsGenerated
 			OnShopGenerated?.Invoke(shopItemListToGenerate);
+			ResolutionFactoryState.OnStateStarted -= GenerateShop;
 		}
-		
+
 		private List<ShopItem> GenerateMachinesInShop()
 		{
 			//Generate allItemList to select random items from it and the shopItemList to generate in shop
@@ -49,14 +48,11 @@ namespace Components.Shop
 
 			for (int i = 0; i < allMachinesTemplate.Count; i++)
 			{
-				ShopItem shopItem = new ShopItem(allMachinesTemplate[i]);
+				ShopItem shopItem = new ShopItem(allMachinesTemplate[i], -1);
 				allMachineShopItemList.Add(shopItem);
 			}
 
-			//Generate random list of shop items
-			shopItemListToGenerate.AddRange(GetRandomItemList(_numberOfMachineItemInShop, allMachineShopItemList));
-
-			return shopItemListToGenerate;
+			return allMachineShopItemList;
 		}
 
 		private List<ShopItem> GenerateConsumablesInShop()

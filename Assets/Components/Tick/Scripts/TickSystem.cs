@@ -36,7 +36,7 @@ namespace Components.Tick
             _currentTickDuration = _initialTickDuration;
             PlanningFactoryState.OnPlanningFactoryStateStarted += HandlePlanningFactoryState;
             ResolutionFactoryState.OnResolutionFactoryStateStarted += HandleResolutionFactoryState;
-            ShopState.OnShopStateStarted += HandleShopState;
+            EndOfDayState.OnEndOfDayStateStarted += HandleShopState;
             UIOptionsController.OnTickSpeedUpdated += ChangeTimeSpeed;
         }
 
@@ -44,7 +44,7 @@ namespace Components.Tick
         {
             PlanningFactoryState.OnPlanningFactoryStateStarted -= HandlePlanningFactoryState;
             ResolutionFactoryState.OnResolutionFactoryStateStarted -= HandleResolutionFactoryState;
-            ShopState.OnShopStateStarted -= HandleShopState;
+            EndOfDayState.OnEndOfDayStateStarted -= HandleShopState;
         
         }
 
@@ -124,7 +124,7 @@ namespace Components.Tick
 
         // ------------------------------------------------------------------------- STATE METHODS -------------------------------------------------------------------------
 
-        private void HandleShopState(ShopState obj)
+        private void HandleShopState(EndOfDayState obj)
         {
             ChangeTimeSpeed(0);
         }
