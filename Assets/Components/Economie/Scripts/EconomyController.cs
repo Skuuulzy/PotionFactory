@@ -21,7 +21,9 @@ namespace Components.Economy
 		public static Action<int, int, int, int ,int> OnEndRoundGoldValuesCalculated;
 
 		private int _totalGoldAmountPerRound;
-		
+
+		public int StateScoreObjective => _stateScoreObjective;
+
 		private void Start()
 		{
 			ResolutionFactoryState.OnResolutionFactoryStateStarted += HandleResolutionFactoryStateStarted;
