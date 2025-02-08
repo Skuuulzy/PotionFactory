@@ -51,7 +51,7 @@ namespace Components.Grid
 
             MachineManager.OnChangeSelectedMachine += InstantiatePreview;
             ResolutionFactoryState.OnResolutionFactoryStateStarted += HandleResolutionFactoryState;
-            ShopState.OnShopStateStarted += HandleShopState;
+            EndOfDayState.OnEndOfDayStateStarted += HandleShopState;
             UIGrimoireController.OnEnableCleanMode += HandleCleanMode;
             GrimoireButton.OnGrimoireButtonDeselect += HandleGrimoireDeselect;
             Machine.OnMove += HandleMovingMachine;
@@ -114,7 +114,7 @@ namespace Components.Grid
         {
             MachineManager.OnChangeSelectedMachine -= InstantiatePreview;
             ResolutionFactoryState.OnResolutionFactoryStateStarted -= HandleResolutionFactoryState;
-            ShopState.OnShopStateStarted -= HandleShopState;
+            EndOfDayState.OnEndOfDayStateStarted -= HandleShopState;
             UIGrimoireController.OnEnableCleanMode -= HandleCleanMode;
             GrimoireButton.OnGrimoireButtonDeselect -= HandleGrimoireDeselect;
         }
@@ -449,7 +449,7 @@ namespace Components.Grid
             _isFactoryState = true;
         }
 
-        private void HandleShopState(ShopState _)
+        private void HandleShopState(EndOfDayState _)
         {
             _isFactoryState = false;
         }
