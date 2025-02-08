@@ -1,5 +1,6 @@
 using Components.Economy;
 using Components.Inventory;
+using Components.Machines;
 using System;
 using UnityEngine;
 
@@ -7,6 +8,8 @@ namespace Components.Shop.ShopItems
 {
     public class UIMachineShopItemViewController : UIShopItemViewController
     {
+
+		public static Action<MachineTemplate> OnMachineBuyed;
         public override void Init(ShopItem shopItem)
         {
             base.Init(shopItem);
@@ -62,7 +65,7 @@ namespace Components.Shop.ShopItems
 					_soldItemGO.SetActive(true);
 				}
 			}
-
+			OnMachineBuyed?.Invoke(_shopItem.MachineTemplate);
 			GrimoireController.Instance.AddMachineToPlayerInventory(_shopItem.MachineTemplate, 1);
 
 		}

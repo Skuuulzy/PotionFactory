@@ -3,10 +3,10 @@ using System;
 using UnityEngine;
 using VComponent.Tools.Timer;
 
-public class ShopState : BaseState
+public class EndOfDayState : BaseState
 {
-	public static Action<ShopState> OnShopStateStarted;
-	public static Action<ShopState> OnShopStateEnded;
+	public static Action<EndOfDayState> OnEndOfDayStateStarted;
+	public static Action<EndOfDayState> OnEndOfDayStateEnded;
 
 	public override void SetName()
 	{
@@ -17,7 +17,7 @@ public class ShopState : BaseState
 	{
 		base.OnEnter();
 		_isFinished = false;
-		OnShopStateStarted?.Invoke(this);
+		OnEndOfDayStateStarted?.Invoke(this);
 	}
 
 	public override void Update()
@@ -29,7 +29,7 @@ public class ShopState : BaseState
 	{
 		base.OnExit();
 		_isFinished = true;
-		OnShopStateEnded?.Invoke(this);
+		OnEndOfDayStateEnded?.Invoke(this);
 	}
 
 }

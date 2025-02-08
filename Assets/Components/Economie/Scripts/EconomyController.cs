@@ -21,18 +21,20 @@ namespace Components.Economy
 		public static Action<int, int, int, int ,int> OnEndRoundGoldValuesCalculated;
 
 		private int _totalGoldAmountPerRound;
-		
+
+		public int StateScoreObjective => _stateScoreObjective;
+
 		private void Start()
 		{
 			ResolutionFactoryState.OnResolutionFactoryStateStarted += HandleResolutionFactoryStateStarted;
-			ShopState.OnShopStateStarted += HandleStartShopState;
+			EndOfDayState.OnEndOfDayStateStarted += HandleEndOfDayState;
 			ResolutionFactoryState.OnResolutionFactoryStateEnded += HandleResolutionFactoryStateEnded;
 		}
 		
 		private void OnDestroy()
 		{
 			ResolutionFactoryState.OnResolutionFactoryStateStarted -= HandleResolutionFactoryStateStarted;
-			ShopState.OnShopStateStarted -= HandleStartShopState;
+			EndOfDayState.OnEndOfDayStateStarted -= HandleEndOfDayState;
 			ResolutionFactoryState.OnResolutionFactoryStateEnded -= HandleResolutionFactoryStateEnded;
 
 		}
@@ -75,7 +77,7 @@ namespace Components.Economy
 		/// <summary>
 		/// Calcultate the gold amount to give to the player at the start of the payoff State
 		/// </summary>
-		private void HandleStartShopState(ShopState shopState)
+		private void HandleEndOfDayState(EndOfDayState shopState)
 		{
 			int interest = (_playerMoney / _runConfiguration.GuildTicketInterestValue) * _runConfiguration.GuildTicketInterestAmountPerRound;
 			_totalGoldAmountPerRound = _runConfiguration.GuildTicketAmountPerRound + interest;

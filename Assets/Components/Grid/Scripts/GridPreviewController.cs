@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using CodeMonkey.Utils;
-using Components.Grid.Tile;
 using Components.Inventory;
 using Components.Machines;
 using Database;
@@ -52,7 +51,7 @@ namespace Components.Grid
 
             MachineManager.OnChangeSelectedMachine += InstantiatePreview;
             ResolutionFactoryState.OnResolutionFactoryStateStarted += HandleResolutionFactoryState;
-            ShopState.OnShopStateStarted += HandleShopState;
+            EndOfDayState.OnEndOfDayStateStarted += HandleShopState;
             UIGrimoireController.OnEnableCleanMode += HandleCleanMode;
             GrimoireButton.OnGrimoireButtonDeselect += HandleGrimoireDeselect;
             Machine.OnMove += HandleMovingMachine;
@@ -115,7 +114,7 @@ namespace Components.Grid
         {
             MachineManager.OnChangeSelectedMachine -= InstantiatePreview;
             ResolutionFactoryState.OnResolutionFactoryStateStarted -= HandleResolutionFactoryState;
-            ShopState.OnShopStateStarted -= HandleShopState;
+            EndOfDayState.OnEndOfDayStateStarted -= HandleShopState;
             UIGrimoireController.OnEnableCleanMode -= HandleCleanMode;
             GrimoireButton.OnGrimoireButtonDeselect -= HandleGrimoireDeselect;
         }
@@ -332,28 +331,6 @@ namespace Components.Grid
             }
         }
 
-        private void TryDestroyHoveredMachine()
-        {
-            // Try to get the position on the grid. 
-            if (!UtilsClass.ScreenToWorldPositionIgnoringUI(Input.mousePosition, _camera, out Vector3 worldMousePosition))
-            {
-                return;
-            }
-
-            // Try getting the cell 
-            if (!Grid.TryGetCellByPosition(worldMousePosition, out Cell chosenCell))
-            {
-                return;
-            }
-
-            if (!chosenCell.ContainsNode)
-            {
-                return;
-            }
-
-            chosenCell.Node.Machine.Controller.Retrieve();
-        }
-
         private bool IsMachinePlacable(Cell originCell)
         {
             foreach (var node in Preview.Machine.Nodes)
@@ -472,7 +449,7 @@ namespace Components.Grid
             _isFactoryState = true;
         }
 
-        private void HandleShopState(ShopState _)
+        private void HandleShopState(EndOfDayState _)
         {
             _isFactoryState = false;
         }

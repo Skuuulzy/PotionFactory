@@ -1,3 +1,4 @@
+using System;
 using Components.Economy;
 using TMPro;
 using UnityEngine;
@@ -34,6 +35,8 @@ public class UIStateController : MonoBehaviour
 		EconomyController.OnGameOver -= HandleGameOver;
 		StateController.OnCountdown -= SetCountdownTime;
 		StateController.OnStateStarted -= HandleStateStarted;
+		
+		EconomyController.OnStatePlayerScoreUpdated -= HandleScoreUpdated;
 	}
 	
 	private void HandleStateStarted(BaseState state)
@@ -42,20 +45,31 @@ public class UIStateController : MonoBehaviour
 
 		switch (state)
 		{
-			case ShopState shopState:
+			case EndOfDayState shopState:
 				HideCountdown();
-				DisplayFinishStateButton(shopState);
+				_finishStateButton.gameObject.SetActive(false);
 				break;
 			case PlanningFactoryState planningFactoryState:
-				DisplayFinishStateButton(planningFactoryState);
 				break;
 			case ResolutionFactoryState resolutionFactoryState:
-				DisplayFinishStateButton(resolutionFactoryState);
+				EconomyController.OnStatePlayerScoreUpdated -= HandleScoreUpdated;
+				EconomyController.OnStatePlayerScoreUpdated += HandleScoreUpdated;
 				DisplayNewState(resolutionFactoryState);
+				_finishStateButton.gameObject.SetActive(false);
 				break;
 			case EndGameState endGameState:
 				DisplayEndGameState();
+				_finishStateButton.gameObject.SetActive(false);
 				break;
+		}
+	}
+
+	private void HandleScoreUpdated(int score)
+	{
+		if (score >= EconomyController.Instance.StateScoreObjective)
+		{
+			DisplayFinishStateButton(_currentState);
+			EconomyController.OnStatePlayerScoreUpdated -= HandleScoreUpdated;
 		}
 	}
 
