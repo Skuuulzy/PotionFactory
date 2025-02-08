@@ -13,6 +13,7 @@ public class UIStateController : MonoBehaviour
 	[SerializeField] private TextMeshProUGUI _stateCountdownText;
 	[SerializeField] private Image _stateCountdownImage;
 	[SerializeField] private Button _finishStateButton;
+	[SerializeField] private TMP_Text _finishStateButtonText;
 
 	[Header("EndGame")]
 	[SerializeField] private GameObject _endGameGO;
@@ -103,6 +104,7 @@ public class UIStateController : MonoBehaviour
 	{
 		_finishStateButton.gameObject.SetActive(true);
 		_finishStateButton.onClick.AddListener(state.SetStateFinished);
+		//_finishStateButtonText.text = 
 	}
 
 	private void HandleGameOver()
