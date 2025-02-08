@@ -17,7 +17,6 @@ namespace Components.Shop.UI
 
 		[Header("PayOff")]
 		[SerializeField] private TextMeshProUGUI _objectiveText;
-		[SerializeField] private TextMeshProUGUI _resultText;
 		[SerializeField] private TextMeshProUGUI _payoffText;
 
 
@@ -37,9 +36,8 @@ namespace Components.Shop.UI
 
 		private void DisplayPayOffInfos(int totalGoldEarned, int baseGoldAmount, int goldInterest, int objectiveScore, int playerScore)
 		{
-			_objectiveText.text = $"Your objective was to make <b><color=red>{objectiveScore}</b></color> golds";
-			_resultText.text = $"You succeeded by obtaining <b><color=red>{playerScore}</b></color> golds";
-			_payoffText.text = $"The order rewards you by granting you <b><color=#EF33E9>{totalGoldEarned}</b></color> order tickets.\n \n Use them as you wish within our market";
+			_objectiveText.text = $"Your objective was {objectiveScore} gold coins, and you have reached {playerScore} gold coins.";
+			_payoffText.text = $"As a result of your efforts, you have been awarded a total of {totalGoldEarned} units of the Order’s currency. Use it wisely, for the prosperity of the Order must always prevail.";
 		}
 
 		private void DisplayEndOfDay(EndOfDayState state)
