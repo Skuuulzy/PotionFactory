@@ -38,7 +38,7 @@ namespace Components.Machines.Behaviors
                 else
                 {
 					sellPrice += ingredientTemplate.Price;
-				}             
+				}
             }
             
             EconomyController.Instance.AddScore(sellPrice);
