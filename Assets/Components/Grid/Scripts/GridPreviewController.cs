@@ -385,6 +385,11 @@ namespace Components.Grid
             if (chosenCell.ContainsNode)
             {
                 var machine = chosenCell.Node.Machine;
+
+                if (!machine.Template.CanMove)
+                {
+                    return;
+                }
                 
                 Debug.Log($"Move machine {machine.Controller.name}");
                 machine.Controller.Move();

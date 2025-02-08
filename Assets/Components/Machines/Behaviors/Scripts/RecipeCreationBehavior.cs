@@ -25,7 +25,7 @@ namespace Components.Machines.Behaviors
             }
             
             CurrentRecipe = recipe;
-            AdditionalProcessTime += Mathf.RoundToInt(Machine.Template.ProcessTime * recipe.ProcessTimeModifier);
+            AdditionalProcessTime += Mathf.RoundToInt(recipe.ProcessTimeModifier);
             
             // Remove items used for the recipe.
             foreach (var recipeIngredient in CurrentRecipe.Ingredients)
@@ -59,7 +59,7 @@ namespace Components.Machines.Behaviors
             Machine.AddIngredient(CurrentRecipe.OutIngredient, Way.OUT);
                 
             // Reset the recipe.
-            AdditionalProcessTime -= Mathf.RoundToInt(Machine.Template.ProcessTime * CurrentRecipe.ProcessTimeModifier);
+            AdditionalProcessTime -= Mathf.RoundToInt(CurrentRecipe.ProcessTimeModifier);
             CurrentRecipe = null;
         }
     }
