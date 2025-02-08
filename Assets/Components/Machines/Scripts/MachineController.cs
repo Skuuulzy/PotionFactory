@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -20,7 +21,12 @@ namespace Components.Machines
 
         [Header("DEBUG")]
         [SerializeField] private Machine _machine;
-        
+
+        [Header("Animator")]
+        [SerializeField] private Animator _animator;
+
+        private const string PLAY_MACHINE_ANIM = "MachineProcessing";
+
         private Outline _outline;
         private List<GameObject> _directionalArrows;
         
@@ -29,6 +35,8 @@ namespace Components.Machines
         
         private bool _initialized;
         private bool _selected;
+
+       
         
         public Machine Machine => _machine;
         
@@ -36,6 +44,7 @@ namespace Components.Machines
         public void InstantiatePreview(MachineTemplate machineTemplate, float scale, bool showOutlines = false)
         {
             _view = Instantiate(machineTemplate.GridView, _3dViewHolder);
+            _animator = _view.GetComponentInChildren<Animator>();
             _machine = new Machine(machineTemplate, this);
             _view.transform.localScale = new Vector3(scale, scale, scale);
 
@@ -52,9 +61,19 @@ namespace Components.Machines
                 gridComponent.Initialize(_machine);
                 _gridComponents.Add(gridComponent);
             }
+
+            Machine.OnProcess += HandleProcessMachine;
         }
-        
-        public void RotatePreview(int angle)
+
+		private void HandleProcessMachine(Machine machine, bool value)
+		{
+            if(machine == Machine && _animator != null)
+			{
+                _animator.SetBool(PLAY_MACHINE_ANIM, value);
+            }
+        }
+
+		public void RotatePreview(int angle)
         {
             _view.transform.rotation = Quaternion.Euler(new Vector3(0, angle, 0));
             _machine.UpdateNodesRotation(angle);
@@ -128,11 +147,6 @@ namespace Components.Machines
         
         private void HandleMachineHovered(Machine machine, bool hovered)
         {
-            if (_selected)
-            {
-                return;
-            }
-            
             if (Machine != machine)
             {
                 ToggleOutlines(false);

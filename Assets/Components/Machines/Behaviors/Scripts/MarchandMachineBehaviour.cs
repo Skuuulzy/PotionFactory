@@ -13,6 +13,10 @@ namespace Components.Machines.Behaviors
         
         public void SetFavoriteIngredient(IngredientTemplate specialIngredient)
         {
+            //Clear it for now 
+            FavoriteIngredient = null;
+            return;
+
             FavoriteIngredient = specialIngredient;
             OnSpecialIngredientChanged?.Invoke(specialIngredient);
         }
@@ -21,14 +25,17 @@ namespace Components.Machines.Behaviors
         {
             if (Machine.InIngredients.Count == 0)
             {
+                Machine.OnProcess?.Invoke(Machine, false);
                 return;
             }
-            
+
+            Machine.OnProcess?.Invoke(Machine, true);
+
             // Sell items
             int sellPrice = 0;
             foreach(IngredientTemplate ingredientTemplate in Machine.InIngredients)
             {
-                if(ingredientTemplate != null && ingredientTemplate.Name == FavoriteIngredient.Name)
+                if(FavoriteIngredient != null && ingredientTemplate != null && ingredientTemplate.Name == FavoriteIngredient.Name)
                 {
                     sellPrice += ingredientTemplate.Price * 2;
                 }

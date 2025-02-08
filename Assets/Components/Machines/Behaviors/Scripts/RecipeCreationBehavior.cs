@@ -25,7 +25,7 @@ namespace Components.Machines.Behaviors
             }
             
             CurrentRecipe = recipe;
-            AdditionalProcessTime += Mathf.RoundToInt(Machine.Template.ProcessTime * recipe.ProcessTimeModifier);
+            AdditionalProcessTime += Mathf.RoundToInt(recipe.ProcessTimeModifier);
             
             // Remove items used for the recipe.
             foreach (var recipeIngredient in CurrentRecipe.Ingredients)
@@ -43,20 +43,23 @@ namespace Components.Machines.Behaviors
         {
             if (!ProcessingRecipe)
             {
+                Machine.OnProcess?.Invoke(Machine, false);
                 return;
             }
             
             // Is there any space left in the out slot.
             if (!Machine.CanTakeIngredientInSlot(CurrentRecipe.OutIngredient, Way.OUT))
             {
+                Machine.OnProcess?.Invoke(Machine, false);
                 return;
             }
-            
+
+            Machine.OnProcess?.Invoke(Machine, true);
             // Add the ingredient to the machine out slot.
             Machine.AddIngredient(CurrentRecipe.OutIngredient, Way.OUT);
                 
             // Reset the recipe.
-            AdditionalProcessTime -= Mathf.RoundToInt(Machine.Template.ProcessTime * CurrentRecipe.ProcessTimeModifier);
+            AdditionalProcessTime -= Mathf.RoundToInt(CurrentRecipe.ProcessTimeModifier);
             CurrentRecipe = null;
         }
     }

@@ -42,6 +42,7 @@ namespace Components.Machines
         public static Action<Machine, bool> OnRetrieve;
         public static Action<Machine> OnMove;
         public static Action<Machine> OnConfigure;
+        public static Action<Machine, bool> OnProcess;
 
         // TODO: This should not be here, some machine have specific event linked with specifics views.
         public Action OnItemSell;
