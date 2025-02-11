@@ -1,64 +1,62 @@
-using Eflatun.SceneReference;
 using MyGameDevTools.SceneLoading;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using VComponent.Tools.Singletons;
 
 
 namespace VComponent.Tools.SceneLoader
 {
-    public class SceneLoader : Singleton<SceneLoader>
+    public static class SceneLoader
     {
-        [SerializeField] private SceneReference _loadingScene;
-        [SerializeField] private SceneReference _levelScene;
-        [SerializeField] private SceneReference _levelUIScene;
-        [SerializeField] private SceneReference _mainMenuScene;
-        [SerializeField] private SceneReference _sandBoxScene;
-        [SerializeField] private SceneReference _gridGenerator;
+        private static readonly ISceneManager SCENE_MANAGER = new AdvancedSceneManager(true);
+        private static readonly ISceneLoaderUniTask SCENE_LOADER = new SceneLoaderUniTask(SCENE_MANAGER);
 
-        private ISceneManager _sceneManager;
-        private ISceneLoaderUniTask _sceneLoader;
-        private ILoadSceneInfo _loadingSceneInfo;
+        private static readonly ILoadSceneInfo BOOT_SCENE_INFO = new LoadSceneInfoName("Boot");
+        private static readonly ILoadSceneInfo LOADING_SCREEN_SCENE_INFO = new LoadSceneInfoName("LoadingScreen");
+        
+        private static readonly ILoadSceneInfo MAIN_MENU_SCENE_INFO = new LoadSceneInfoName("Main_Menu");
+        private static readonly ILoadSceneInfo LEVEL_SCENE_INFO = new LoadSceneInfoName("Level");
+        private static readonly ILoadSceneInfo LEVEL_UI_SCENE_INFO = new LoadSceneInfoName("LevelUI");
+        private static readonly ILoadSceneInfo GRID_GENERATOR_SCENE_INFO = new LoadSceneInfoName("Grid_Generator");
+        private static readonly ILoadSceneInfo GRID_SANDBOX_SCENE_INFO = new LoadSceneInfoName("Grid_Sandbox");
 
-        private async void Start()
+        public static async void ReloadGame()
         {
-            DontDestroyOnLoad(this);
-
-            _sceneManager = new AdvancedSceneManager();
-            _sceneLoader = new SceneLoaderUniTask(_sceneManager);
-
-            _loadingSceneInfo = new LoadSceneInfoName(_loadingScene.Name);
-
-            await _sceneLoader.TransitionToSceneAsync(new LoadSceneInfoName(_mainMenuScene.Name), _loadingSceneInfo);
-
-            // Unload the boot
-            SceneManager.UnloadSceneAsync(0);
+            Debug.Log("[SCENE_LOADER] Reloading game ...");
+            await SCENE_LOADER.TransitionToSceneFromAllAsync(BOOT_SCENE_INFO, LOADING_SCREEN_SCENE_INFO);
+            Debug.Log("[SCENE_LOADER] Boot loaded !");
         }
-
-        public async void LoadLevel()
+        
+        public static async void LoadMainMenu()
         {
-            ILoadSceneInfo[] levelGroup =
+            Debug.Log("[SCENE_LOADER] Loading main menu ...");
+            await SCENE_LOADER.TransitionToSceneFromAllAsync(MAIN_MENU_SCENE_INFO, LOADING_SCREEN_SCENE_INFO);
+            Debug.Log("[SCENE_LOADER] Main menu loaded !");
+        }
+        
+        public static async void LoadLevel()
+        {
+            ILoadSceneInfo[] LEVEL_GROUP =
             {
-                new LoadSceneInfoName(_levelScene.Name),
-                new LoadSceneInfoName(_levelUIScene.Name),
+                LEVEL_SCENE_INFO,
+                LEVEL_UI_SCENE_INFO
             };
-
-            await _sceneLoader.TransitionToScenesAsync(levelGroup, 0, _loadingSceneInfo);
+            
+            Debug.Log("[SCENE_LOADER] Loading level ...");
+            await SCENE_LOADER.TransitionToScenesFromAllAsync(LEVEL_GROUP,0 ,LOADING_SCREEN_SCENE_INFO);
+            Debug.Log("[SCENE_LOADER] Level loaded !");
         }
 
-        public async void LoadSandbox()
+        public static async void LoadGridGenerator()
         {
-            await _sceneLoader.TransitionToSceneAsync(new LoadSceneInfoName(_sandBoxScene.Name), _loadingSceneInfo);
+            Debug.Log("[SCENE_LOADER] Loading grid generator ...");
+            await SCENE_LOADER.TransitionToSceneFromAllAsync(GRID_GENERATOR_SCENE_INFO, LOADING_SCREEN_SCENE_INFO);
+            Debug.Log("[SCENE_LOADER] Grid generator loaded !");
         }
 
-        public async void LoadMainMenu()
+        public static async void LoadSandbox()
         {
-            await _sceneLoader.TransitionToSceneFromAllAsync(new LoadSceneInfoName(_mainMenuScene.Name), _loadingSceneInfo);
-        }
-
-        public async void LoadGridGenerator()
-        {
-            await _sceneLoader.TransitionToSceneAsync(new LoadSceneInfoName(_gridGenerator.Name), _loadingSceneInfo);
+            Debug.Log("[SCENE_LOADER] Loading sandbox ...");
+            await SCENE_LOADER.TransitionToSceneFromAllAsync(GRID_SANDBOX_SCENE_INFO, LOADING_SCREEN_SCENE_INFO);
+            Debug.Log("[SCENE_LOADER] Sandbox loaded !");
         }
     }
 }
