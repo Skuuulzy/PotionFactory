@@ -14,13 +14,19 @@ namespace VTools.GameSettings
         [SerializeField] private Vector2Int[] _availableResolutions;
 
         private Resolution[] _resolutions;
+
+        // Prevent other instances of game settings to initialize the settings if already done.
+        private static bool _initialized;
         
         // ----------------------------------------- MONO -------------------------------------------------
 
         private void Start()
         {
             InitializeResolutions();
-            LoadSettings();
+            LoadSettings(!_initialized);
+            
+            // Prevent other instances of game settings to initialize the settings if already done.
+            _initialized = true;
         }
 
         // ----------------------------------------- PUBLIC METHODS -------------------------------------------------
@@ -28,6 +34,7 @@ namespace VTools.GameSettings
         /// Sets the music volume and saves it to PlayerPrefs.
         public void ToggleMusic(bool toggle)
         {
+            AudioListener.pause = !toggle;
             PlayerPrefs.SetInt("ToggleMusic", toggle ? 1 : 0);
             PlayerPrefs.Save();
         }
@@ -72,13 +79,22 @@ namespace VTools.GameSettings
 
         
         /// Loads saved settings and applies them.
-        private void LoadSettings()
+        private void LoadSettings(bool apply)
         {
             // Load and apply music volume
+            bool playMusic = PlayerPrefs.GetInt("ToggleMusic", 1) == 1;
+            _musicToggle.SetIsOnWithoutNotify(playMusic);
+            if (apply)
+            {
+                ToggleMusic(playMusic);
+            }
 
             // Load and apply full-screen setting
             bool isFullScreen = PlayerPrefs.GetInt("FullScreen", 1) == 1;
-            Screen.fullScreen = isFullScreen;
+            if (apply)
+            {
+                Screen.fullScreen = isFullScreen;
+            }
 
             // Load available resolutions and set the dropdown
             _resolutionDropdown.ClearOptions();
@@ -91,9 +107,12 @@ namespace VTools.GameSettings
                 _resolutionDropdown.options.Add(new TMP_Dropdown.OptionData($"{_resolutions[i].width} x {_resolutions[i].height}"));
             }
 
-            _resolutionDropdown.value = savedResolutionIndex;
+            _resolutionDropdown.SetValueWithoutNotify(savedResolutionIndex);
             _resolutionDropdown.RefreshShownValue();
-            SetResolution(savedResolutionIndex);
+            if (apply)
+            {
+                SetResolution(savedResolutionIndex);
+            }
         }
     }
 }
