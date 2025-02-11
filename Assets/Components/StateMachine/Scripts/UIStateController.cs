@@ -125,6 +125,6 @@ public class UIStateController : MonoBehaviour
 	// TODO: Is it supposed to be here ? 
 	public void ReturnToMainMenu()
 	{
-		SceneLoader.Instance.LoadMainMenu();
+		SceneLoader.LoadMainMenu();
 	}
 }
