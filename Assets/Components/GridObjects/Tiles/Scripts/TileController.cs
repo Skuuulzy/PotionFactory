@@ -11,6 +11,17 @@ namespace Components.Grid.Tile
         private TileTemplate TileTemplate => Template as TileTemplate;
 
         // ------------------------------------------------------------------------- INIT -------------------------------------------------------------------------		
+
+        protected override void InstantiatePreview(GridObjectTemplate template, float scale)
+        {
+            base.InstantiatePreview(template, scale);
+            
+            if (template is TileTemplate tileTemplate)
+            {
+                _tileType = tileTemplate.TileType;
+            }
+        }
+
         public void SetTileType(TileType tileType)
         {
             _tileType = tileType;

@@ -8,7 +8,10 @@ using UnityEngine;
 
 namespace Components.Grid
 {
-    public class GridPreviewController : MonoBehaviour
+    /// <summary>
+    /// Allow player to add <see cref="GridObject"/> to the grid.
+    /// </summary>
+    public class GridInstantiator : MonoBehaviour
     {
         [Header("Movement Parameters")]
         [SerializeField] private bool _snapping;
@@ -17,6 +20,7 @@ namespace Components.Grid
         [SerializeField] private GridController _gridController;
         [SerializeField] private MachineController _machineControllerPrefab;
         [SerializeField] private Transform _previewHolder;
+        [SerializeField] private Transform _gridObjectsHolder;
 
         [Header("Special Rotation Behaviour")]
         [SerializeField] private bool _useSubMachine;
@@ -55,6 +59,16 @@ namespace Components.Grid
             UIGrimoireController.OnEnableCleanMode += HandleCleanMode;
             GrimoireButton.OnGrimoireButtonDeselect += HandleGrimoireDeselect;
             Machine.OnMove += HandleMovingMachine;
+        }
+        
+        private void OnDestroy()
+        {
+            MachineManager.OnChangeSelectedMachine -= InstantiatePreview;
+            ResolutionFactoryState.OnResolutionFactoryStateStarted -= HandleResolutionFactoryState;
+            EndOfDayState.OnEndOfDayStateStarted -= HandleShopState;
+            UIGrimoireController.OnEnableCleanMode -= HandleCleanMode;
+            GrimoireButton.OnGrimoireButtonDeselect -= HandleGrimoireDeselect;
+            Machine.OnMove -= HandleMovingMachine;
         }
 
         private void Update()
@@ -110,25 +124,22 @@ namespace Components.Grid
             }
         }
 
-        private void OnDestroy()
-        {
-            MachineManager.OnChangeSelectedMachine -= InstantiatePreview;
-            ResolutionFactoryState.OnResolutionFactoryStateStarted -= HandleResolutionFactoryState;
-            EndOfDayState.OnEndOfDayStateStarted -= HandleShopState;
-            UIGrimoireController.OnEnableCleanMode -= HandleCleanMode;
-            GrimoireButton.OnGrimoireButtonDeselect -= HandleGrimoireDeselect;
-        }
-
+        // ------------------------------------------------------------------------- PREVIEW BEHAVIOUR -------------------------------------------------------------------------------- 
+        
         private MachineController InstantiateMachine(MachineTemplate template, int rotation)
         {
-            var machine = Instantiate(_machineControllerPrefab, _previewHolder);
-            machine.InstantiatePreview(template, Grid.GetCellSize(), true);
-            machine.RotatePreview(rotation);
+            var gridObjectController = GridObjectController.InstantiateFromTemplate(template, Grid.GetCellSize(), _previewHolder);
+            if (gridObjectController is MachineController machineController)
+            {
+                machineController.RotatePreview(rotation);
 
-            return machine;
+                return machineController;
+            }
+            
+            Debug.LogError("The preview instantiated is not of type MachineController.");
+            return null;
         }
-
-        // ------------------------------------------------------------------------- PREVIEW BEHAVIOUR -------------------------------------------------------------------------------- 
+        
         private void InstantiatePreview(MachineTemplate template)
         {
             OnPreview?.Invoke(false);
@@ -309,8 +320,9 @@ namespace Components.Grid
 
             if (_moveMode)
             {
-                Debug.Log($"Adding machine :{_currentMachinePreview.Machine.Controller.name} to grid");
-                _gridController.AddMachineToGrid(_currentMachinePreview, chosenCell, false);
+                Debug.Log($"Adding machine :{_currentMachinePreview.Machine.Controller.name} to grid from a movement.");
+                
+                _currentMachinePreview.AddToGrid(chosenCell, Grid, _gridObjectsHolder);
                 _currentMachinePreview.Machine.Select(false);
                 _currentMachinePreview = null;
                 _moveMode = false;
@@ -318,9 +330,12 @@ namespace Components.Grid
             }
             else
             {
-                Debug.Log($"Adding machine :{_currentMachinePreview.Machine.Controller.name} to grid");
+                Debug.Log($"Adding machine :{_currentMachinePreview.Machine.Controller.name} from inventory to grid");
+                
                 var machineToAdd = InstantiateMachine(Preview.Machine.Template, _currentMachineRotation);
-                _gridController.AddMachineToGrid(machineToAdd, chosenCell, true);
+                machineToAdd.AddToGrid(chosenCell, Grid, _gridObjectsHolder);
+                GrimoireController.Instance.DecreaseMachineToPlayerInventory(machineToAdd.Machine.Template, 1);
+                
                 _justPlaced = true;
                 
                 //Instantiate the same machine type if we have enough in the inventory.
@@ -351,6 +366,8 @@ namespace Components.Grid
 
             return true;
         }
+        
+        // ------------------------------------------------------------------------- MANIPULATE MACHINES -------------------------------------------------------------------------------- 
         
         private void TryMoveMachine()
         {

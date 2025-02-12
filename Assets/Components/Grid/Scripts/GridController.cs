@@ -12,7 +12,6 @@ using Components.Grid.Generator;
 using Components.Grid.Parcel;
 using Components.Ingredients;
 using Components.Inventory;
-using Components.Map;
 using Components.Bundle;
 using Components.Tick;
 using Components.Tools.ExtensionMethods;
@@ -22,6 +21,9 @@ using VComponent.Tools.Singletons;
 
 namespace Components.Grid
 {
+	/// <summary>
+	/// Responsible to instantiate the grid with tiles, obstacles and decorations. Also handle special machines like marchand or extractors.
+	/// </summary>
 	public class GridController : Singleton<GridController>
 	{
 		[Header("Generation Parameters")]
@@ -60,7 +62,6 @@ namespace Components.Grid
 		[SerializeField] private float _parcelAnimationUnlockTime = 2f;
 		
 		// Grid
-		private readonly List<MachineController> _machines = new();
 		private readonly Dictionary<Vector2Int, TileController> _tiles = new();
 		
 		//Sellers & Extractor
@@ -69,7 +70,6 @@ namespace Components.Grid
 		private readonly List<IngredientTemplate> _extractedIngredients = new();
 
 		public Grid Grid { get; private set; }
-		
 		public Vector3 OriginPosition => _originPosition;
 		public List<IngredientTemplate> ExtractedIngredients => _extractedIngredients;
 		
@@ -80,12 +80,8 @@ namespace Components.Grid
 		{
 			Machine.OnRetrieve += RetrieveMachine;
 			Machine.OnMove += ClearMachineGridData;
-
 			BundleChoiceGenerator.OnBundleChoiceConfirm += HandleMapChoiceConfirm;
-			UIOptionsController.OnClearGrid += ClearMachines;
-			
 			ResolutionFactoryState.OnResolutionFactoryStateStarted += HandleResolutionFactoryStarted;
-
 			GridParcelUnlocker.OnParcelUnlocked += HandleParcelUnlocked;
 		}
 
@@ -93,155 +89,9 @@ namespace Components.Grid
 		{
 			Machine.OnRetrieve += RetrieveMachine;
 			Machine.OnMove -= ClearMachineGridData;
-
 			BundleChoiceGenerator.OnBundleChoiceConfirm -= HandleMapChoiceConfirm;
-			UIOptionsController.OnClearGrid -= ClearMachines;
-
 			ResolutionFactoryState.OnResolutionFactoryStateStarted -= HandleResolutionFactoryStarted;
-		}
-
-		// ------------------------------------------------------------------------- ADD OBJECT ------------------------------------------------------------------------- 
-		public void AddMachineToGrid(MachineController machineController, Cell originCell, bool fetchFromInventory)
-		{
-			_machines.Add(machineController);
-
-			machineController.transform.position = Grid.GetWorldPosition(originCell.X, originCell.Y) + new Vector3(_cellSize / 2, 0, _cellSize / 2);
-			machineController.transform.name = $"{machineController.Machine.Template.Name}_{_machines.Count}";
-			machineController.transform.parent = _objectsHolder;
-
-			// Adding nodes to the cells.
-			foreach (var node in machineController.Machine.Nodes)
-			{
-				var nodeGridPosition = node.SetGridPosition(new Vector2Int(originCell.X, originCell.Y));
-
-				if (Grid.TryGetCellByCoordinates(nodeGridPosition.x, nodeGridPosition.y, out Cell overlapCell))
-				{
-					overlapCell.AddNodeToCell(node);
-					
-					// Add potential connected ports 
-					foreach (var port in node.Ports)
-					{
-						switch (port.Side)
-						{
-							case Side.DOWN:
-								TryConnectPort(port, new Vector2Int(nodeGridPosition.x, nodeGridPosition.y - 1));
-								break;
-							case Side.UP:
-								TryConnectPort(port, new Vector2Int(nodeGridPosition.x, nodeGridPosition.y + 1));
-								break;
-							case Side.RIGHT:
-								TryConnectPort(port, new Vector2Int(nodeGridPosition.x + 1, nodeGridPosition.y));
-								break;
-							case Side.LEFT:
-								TryConnectPort(port, new Vector2Int(nodeGridPosition.x - 1, nodeGridPosition.y));
-								break;
-							case Side.NONE:
-								break;
-							default:
-								throw new ArgumentOutOfRangeException();
-						}
-					}
-				}
-			}
-			
-			machineController.ConfirmPlacement();
-			
-			if (fetchFromInventory)
-			{
-				//Remove one machine from the inventory 
-				GrimoireController.Instance.DecreaseMachineToPlayerInventory(machineController.Machine.Template, 1);
-			}
-		}
-
-		// TODO: ALL OBJECT MUST USE THIS METHOD (OBSTACLES, TILES, MACHINES)
-		private GridObjectController AddObjectToGridFromTemplate(GridObjectTemplate template, Cell cell, float cellSize)
-		{
-			var gridObjectInstance = Instantiate(template.GridObject);
-			gridObjectInstance.InstantiateOnGrid(template, Grid.GetWorldPosition(cell.X, cell.Y), cellSize, _groundHolder);
-			
-			return gridObjectInstance;
-		}
-
-		private void TryConnectPort(Port port, Vector2Int neighbourPosition)
-		{
-			if (Grid.TryGetCellByCoordinates(neighbourPosition.x, neighbourPosition.y, out Cell neighbourCell))
-			{
-				if (neighbourCell.ContainsNode)
-				{
-					foreach (var potentialPort in neighbourCell.Node.Ports)
-					{
-						if (potentialPort.Side == port.Side.Opposite())
-						{
-							port.ConnectTo(potentialPort);
-						}
-					}
-				}
-				else
-				{
-					port.Disconnect();
-				}
-			}
-		}
-
-		public bool TryGetAllPotentialConnection(List<Node> machineNodes, Vector2Int gridPosition, out List<Port> potentialPorts)
-		{
-			potentialPorts = new List<Port>();
-			
-			foreach (var node in machineNodes)
-			{
-				foreach (var port in node.Ports)
-				{
-					var potentialNeighbourPosition = new Vector2Int();
-				
-					switch (port.Side)
-					{
-						case Side.DOWN:
-							potentialNeighbourPosition = new Vector2Int(gridPosition.x, gridPosition.y - 1);
-							break;
-						case Side.UP:
-							potentialNeighbourPosition = new Vector2Int(gridPosition.x, gridPosition.y + 1);
-							break;
-						case Side.RIGHT:
-							potentialNeighbourPosition = new Vector2Int(gridPosition.x + 1, gridPosition.y);
-							break;
-						case Side.LEFT:
-							potentialNeighbourPosition = new Vector2Int(gridPosition.x - 1, gridPosition.y);
-							break;
-						case Side.NONE:
-							break;
-						default:
-							throw new ArgumentOutOfRangeException();
-					}
-
-					if (TryGetPotentialConnection(port, potentialNeighbourPosition, out Port potentialPort))
-					{
-						potentialPorts.Add(potentialPort);
-					}
-				}
-			}
-
-			return potentialPorts.Count > 0;
-		}
-		
-		private bool TryGetPotentialConnection(Port port, Vector2Int neighbourPosition, out Port potentialPort)
-		{
-			if (Grid.TryGetCellByCoordinates(neighbourPosition.x, neighbourPosition.y, out Cell neighbourCell))
-			{
-				if (neighbourCell.ContainsNode)
-				{
-					foreach (var neighbourPort in neighbourCell.Node.Ports)
-					{
-						if (neighbourPort.Side == port.Side.Opposite())
-						{
-							potentialPort = neighbourPort;
-							return true;
-						}
-					}
-				}
-			}
-
-			potentialPort = null;
-			return false;
+			GridParcelUnlocker.OnParcelUnlocked -= HandleParcelUnlocked;
 		}
 		
 		// ------------------------------------------------------------------------- GRID METHODS ------------------------------------------------------------------------ 
@@ -283,11 +133,6 @@ namespace Components.Grid
 
 		private void ClearGrid()
 		{
-			foreach (var machineController in _machines)
-			{
-				Destroy(machineController.gameObject);
-			}
-
 			foreach (Transform groundTile in _groundHolder)
 			{
 				Destroy(groundTile.gameObject);
@@ -305,18 +150,6 @@ namespace Components.Grid
 
 			Grid.ClearNodes();
 			Grid.ClearObstacles();
-			_machines.Clear();
-		}
-
-		private void ClearMachines()
-		{
-			foreach (var machineController in _machines)
-			{
-				Destroy(machineController.gameObject);
-			}
-			
-			Grid.ClearNodes();
-			_machines.Clear();
 		}
 
 		public bool ScanForPotentialConnection(Vector2Int cellPosition, Side sideToScan, Way desiredWay)
@@ -355,8 +188,8 @@ namespace Components.Grid
 					
 					// TILES
 					var template = ScriptableObjectDatabase.GetTileTemplateByType(TileType.GRASS);
-					var gridController = AddObjectToGridFromTemplate(template, chosenCell, _cellSize);
-					if (gridController is TileController tileController)
+					var gridObjectController = GridObjectController.InstantiateAndAddToGridFromTemplate(template, chosenCell, Grid, _groundHolder);
+					if (gridObjectController is TileController tileController)
 					{
 						_tiles.Add(new Vector2Int(x, z), tileController);
 						tileController.SetLockedState(true);
@@ -384,13 +217,14 @@ namespace Components.Grid
 
 					// TILES
 					var template = ScriptableObjectDatabase.GetTileTemplateByType(serializedCell.TileType);
-					var gridController = AddObjectToGridFromTemplate(template, chosenCell, _cellSize);
-					if (gridController is TileController tileController)
+					var gridObjectController = GridObjectController.InstantiateAndAddToGridFromTemplate(template, chosenCell, Grid, _groundHolder);
+					if (gridObjectController is TileController tileController)
 					{
 						_tiles.Add(new Vector2Int(x, z), tileController);
 						tileController.SetLockedState(true);
 					}
 
+					// TODO: Add template instantiation for obstacles and decorations. Obstacle controller and decoration controller already are GridObjectController.
 					// OBSTACLES
 					if (serializedCell.ObstacleType != ObstacleType.NONE)
 					{
@@ -512,7 +346,6 @@ namespace Components.Grid
 			ClearMachineGridData(machineToSell);
 			
 			// Remove 3D objects
-			_machines.Remove(machineToSell.Controller);
 			Destroy(machineToSell.Controller.gameObject);
 
 			// Give back to the player
@@ -565,22 +398,21 @@ namespace Components.Grid
 				Grid.TryGetCellByCoordinates(randomCoordinates[i].x, randomCoordinates[i].y, out var chosenCell);
 					
 				var extractorTemplate = ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("Extractor");
+				var gridObjectController = GridObjectController.InstantiateAndAddToGridFromTemplate(extractorTemplate, chosenCell, Grid, _objectsHolder);
 
-				var machine = Instantiate(_machineGridControllerPrefab);
-				machine.InstantiatePreview(extractorTemplate, _cellSize);
-
-				// Make sure that the machine are correctly oriented. 
-				if (chosenCell.Y == 0)
+				if (gridObjectController is MachineController machineController)
 				{
-					machine.RotatePreview(270);
+					// Make sure that the machine are correctly oriented. 
+					if (chosenCell.Y == 0)
+					{
+						machineController.RotatePreview(270);
+					}
+					if (chosenCell.Y == Grid.GetHeight() - 1)
+					{
+						machineController.RotatePreview(90);
+					}
 				}
-				if (chosenCell.Y == Grid.GetHeight() - 1)
-				{
-					machine.RotatePreview(90);
-				}
-
-				AddMachineToGrid(machine, chosenCell, false);
-
+				
 				if (chosenCell.Node.Machine.Behavior is ExtractorMachineBehaviour extractorMachineBehaviour)
 				{
 					_extractorBehaviours.Add(extractorMachineBehaviour);
@@ -626,11 +458,7 @@ namespace Components.Grid
 				}
 				
 				var destructorTemplate = ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("Marchand");
-
-				var machine = Instantiate(_machineGridControllerPrefab);
-				machine.InstantiatePreview(destructorTemplate, _cellSize);
-				
-				AddMachineToGrid(machine, chosenCell, false);
+				var gridObjectController = GridObjectController.InstantiateAndAddToGridFromTemplate(destructorTemplate, chosenCell, Grid, _objectsHolder);
 
 				if (chosenCell.Node.Machine.Behavior is MarchandMachineBehaviour destructorMachineBehaviour)
 				{

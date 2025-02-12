@@ -13,6 +13,15 @@ namespace Components.Grid.Obstacle
 
 		// ------------------------------------------------------------------------- INIT -------------------------------------------------------------------------
 
+		protected override void InstantiatePreview(GridObjectTemplate template, float scale)
+		{
+			base.InstantiatePreview(template, scale);
+			if (template is ObstacleTemplate obstacleTemplate)
+			{
+				_obstacleType = obstacleTemplate.ObstacleType;
+			}
+		}
+
 		public void SetObstacleType(ObstacleType obstacleType)
 		{
 			_obstacleType = obstacleType;

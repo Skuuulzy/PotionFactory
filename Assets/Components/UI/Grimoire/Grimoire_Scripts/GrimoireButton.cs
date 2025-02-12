@@ -20,13 +20,13 @@ public class GrimoireButton : MonoBehaviour
     private void Start()
     {
         OnSelected += HandleOnSelected;
-        GridPreviewController.OnPreview += HandleOnDeselected;
+        GridInstantiator.OnPreview += HandleOnDeselected;
     }
 
     private void OnDestroy()
     {
         OnSelected -= HandleOnSelected;
-        GridPreviewController.OnPreview -= HandleOnDeselected;
+        GridInstantiator.OnPreview -= HandleOnDeselected;
     }
 
     public void OnHover()

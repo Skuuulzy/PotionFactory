@@ -36,14 +36,14 @@ public class GrimoireInventoryButton : MonoBehaviour, IPointerClickHandler
     private void Start()
     {
         OnSelected += HandleOnSelected;
-        GridPreviewController.OnPreview += HandleOnDeselected;
+        GridInstantiator.OnPreview += HandleOnDeselected;
 
     }
 
     private void OnDestroy()
     {
         OnSelected -= HandleOnSelected;
-        GridPreviewController.OnPreview -= HandleOnDeselected;
+        GridInstantiator.OnPreview -= HandleOnDeselected;
     }
 
     //-------------- INFO BUTTON --------------//

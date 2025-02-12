@@ -1,14 +1,12 @@
 using System;
 using System.Collections.Generic;
+using Components.Grid;
 using UnityEngine;
 
 namespace Components.Machines
 {
-    public class MachineController : MonoBehaviour
+    public class MachineController : GridObjectController
     {
-        [Header("Holders")]
-        [SerializeField] private Transform _3dViewHolder;
-        
         [Header("Arrow Preview")]
         [SerializeField] private GameObject _inPreview;
         [SerializeField] private GameObject _outPreview;
@@ -30,8 +28,7 @@ namespace Components.Machines
         private Outline _outline;
         private List<GameObject> _directionalArrows;
         
-        private GameObject _view;
-        private List<MachineGridComponent> _gridComponents = new();
+        private readonly List<MachineGridComponent> _gridComponents = new();
         
         private bool _initialized;
         private bool _selected;
@@ -39,18 +36,23 @@ namespace Components.Machines
         public Machine Machine => _machine;
         
         // ------------------------------------------------------------------------- INIT -----------------------------------------------------------------------------
-        public void InstantiatePreview(MachineTemplate machineTemplate, float scale, bool showOutlines = false)
+        protected override void InstantiatePreview(GridObjectTemplate template, float scale)
         {
-            _view = Instantiate(machineTemplate.GridView, _3dViewHolder);
-            _animator = _view.GetComponentInChildren<Animator>();
-            _machine = new Machine(machineTemplate, this);
-            _view.transform.localScale = new Vector3(scale, scale, scale);
-
-            SetupDirectionalArrows(machineTemplate);
-
-            _outline = _view.AddComponent<Outline>();
+            base.InstantiatePreview(template, scale);
+            
+            _animator = View.GetComponentInChildren<Animator>();
+            if (Template is MachineTemplate machineTemplate)
+            {
+                _machine = new Machine(machineTemplate, this);
+                SetupDirectionalArrows(machineTemplate);
+            }
+            else
+            {
+                Debug.LogError("Please give a machine template to instantiate a machine preview.");
+            }
+            
+            _outline = View.AddComponent<Outline>();
             _outline.OutlineWidth = 8;
-            ToggleOutlines(showOutlines, _placableColor);
             
             // Instantiate grid components
             for (int i = 0; i < _machine.Template.GridComponents.Count; i++)
@@ -73,7 +75,7 @@ namespace Components.Machines
 
 		public void RotatePreview(int angle)
         {
-            _view.transform.rotation = Quaternion.Euler(new Vector3(0, angle, 0));
+            View.transform.rotation = Quaternion.Euler(new Vector3(0, angle, 0));
             _machine.UpdateNodesRotation(angle);
 
             for (int i = 0; i < _gridComponents.Count; i++)
@@ -94,6 +96,48 @@ namespace Components.Machines
             
             ToggleDirectionalArrows(false);
             ToggleOutlines(false);
+        }
+
+        public override void AddToGrid(Cell originCell, Grid.Grid grid, Transform holder)
+        {
+            base.AddToGrid(originCell, grid, holder);
+            
+            // Adding nodes to the cells.
+            foreach (var node in Machine.Nodes)
+            {
+                var nodeGridPosition = node.SetGridPosition(new Vector2Int(originCell.X, originCell.Y));
+
+                if (grid.TryGetCellByCoordinates(nodeGridPosition.x, nodeGridPosition.y, out Cell overlapCell))
+                {
+                    overlapCell.AddNodeToCell(node);
+					
+                    // Add potential connected ports 
+                    foreach (var port in node.Ports)
+                    {
+                        switch (port.Side)
+                        {
+                            case Side.DOWN:
+                                port.TryConnectPort(new Vector2Int(nodeGridPosition.x, nodeGridPosition.y - 1), grid);
+                                break;
+                            case Side.UP:
+                                port.TryConnectPort(new Vector2Int(nodeGridPosition.x, nodeGridPosition.y + 1), grid);
+                                break;
+                            case Side.RIGHT:
+                                port.TryConnectPort(new Vector2Int(nodeGridPosition.x + 1, nodeGridPosition.y), grid);
+                                break;
+                            case Side.LEFT:
+                                port.TryConnectPort(new Vector2Int(nodeGridPosition.x - 1, nodeGridPosition.y), grid);
+                                break;
+                            case Side.NONE:
+                                break;
+                            default:
+                                throw new ArgumentOutOfRangeException();
+                        }
+                    }
+                }
+            }
+			
+            ConfirmPlacement();
         }
 
         // ------------------------------------------------------------------------- DESTROY --------------------------------------------------------------------------
@@ -165,7 +209,7 @@ namespace Components.Machines
             {
                 foreach (var port in node.Ports)
                 {
-                    var previewArrow = Instantiate(port.Way == Way.IN ? _inPreview : _outPreview, _view.transform);
+                    var previewArrow = Instantiate(port.Way == Way.IN ? _inPreview : _outPreview, View.transform);
                     
                     previewArrow.transform.localPosition = new Vector3(node.LocalPosition.x, previewArrow.transform.position.y, node.LocalPosition.y);
                     

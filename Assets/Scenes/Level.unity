@@ -706,6 +706,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &677092723
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 677092724}
+  m_Layer: 0
+  m_Name: Decorations
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &677092724
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 677092723}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8261476641170269733}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &695262850
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -774,51 +805,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 355b0818489c6a54188ac1fc02d30b6a, type: 3}
---- !u!1 &727886039
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 727886041}
-  - component: {fileID: 727886040}
-  m_Layer: 0
-  m_Name: GridSelector
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &727886040
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 727886039}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 31f9182ef7eb4024593d145241c3d1b3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _gridController: {fileID: 2922091601145771554}
---- !u!4 &727886041
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 727886039}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &793797317
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -971,7 +957,7 @@ GameObject:
   - component: {fileID: 943281390}
   - component: {fileID: 943281389}
   m_Layer: 0
-  m_Name: GridPreviewController
+  m_Name: GridInstanciator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -994,6 +980,7 @@ MonoBehaviour:
   _machineControllerPrefab: {fileID: 2567407675386972328, guid: 859503caaa5f96242b5ba83dccd721c9,
     type: 3}
   _previewHolder: {fileID: 250993072}
+  _gridObjectsHolder: {fileID: 1262894017}
   _useSubMachine: 1
   _subMachineRotation:
     m_Dictionnary:
@@ -1017,6 +1004,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 250993072}
+  - {fileID: 1262894017}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1037106455
@@ -1221,6 +1209,37 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1262894016
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1262894017}
+  m_Layer: 0
+  m_Name: GridObjects
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1262894017
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1262894016}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 943281390}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1365169978
 PrefabInstance:
@@ -21083,7 +21102,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5446604651615496447}
   m_Layer: 0
-  m_Name: Objects
+  m_Name: GridObjects
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -21100,7 +21119,7 @@ GameObject:
   - component: {fileID: 8261476641170269733}
   - component: {fileID: 2922091601145771554}
   m_Layer: 0
-  m_Name: Grid
+  m_Name: GridController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -21134,7 +21153,7 @@ MonoBehaviour:
   _groundHolder: {fileID: 3378976111680872031}
   _objectsHolder: {fileID: 5446604651615496447}
   _obstacleHolder: {fileID: 6655841398030108305}
-  _decorationHolder: {fileID: 0}
+  _decorationHolder: {fileID: 677092724}
   _tileController: {fileID: 11400000, guid: 98fb794df76978f4b994523c8c857b41, type: 2}
   _obstacleController: {fileID: 11400000, guid: 4e515b2a00523b04699a5b6777c492a2,
     type: 2}
@@ -21245,6 +21264,7 @@ Transform:
   - {fileID: 3378976111680872031}
   - {fileID: 5446604651615496447}
   - {fileID: 6655841398030108305}
+  - {fileID: 677092724}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
@@ -21257,7 +21277,6 @@ SceneRoots:
   - {fileID: 1247665283}
   - {fileID: 8261476641170269733}
   - {fileID: 943281390}
-  - {fileID: 727886041}
   - {fileID: 1037106455}
   - {fileID: 835958548}
   - {fileID: 8072547}

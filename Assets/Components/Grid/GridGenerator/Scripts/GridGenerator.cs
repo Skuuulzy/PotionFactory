@@ -22,9 +22,6 @@ namespace Components.Grid.Generator
 		[SerializeField] private Vector3 _startPosition = new(0, 0);
 
 		[Header("Prefabs")]
-		[SerializeField] private TileController _tilePrefab;
-		[SerializeField] private ObstacleController _obstaclePrefab;
-		[SerializeField] private DecorationController _decorationPrefab;
 		[SerializeField] private GameObject _waterPlanePrefab;
 
 		[Header("Holders")]
@@ -170,9 +167,8 @@ namespace Components.Grid.Generator
 				Destroy(_currentDecorationController.gameObject);
 			}
 
-			_currentTileController = Instantiate(_tilePrefab);
-			_currentTileController.SetTileType(tileTemplate.TileType);
-			_currentTileController.InstantiatePreview(tileTemplate, _cellSize);
+			_currentTileController = GridObjectController.InstantiateFromTemplate(tileTemplate, _cellSize, _groundHolder) as TileController;
+			_currentTileController?.SetTileType(tileTemplate.TileType);
 		}
 
 		private void UpdateObstacleSelection(ObstacleTemplate obstacleTemplate)
@@ -192,10 +188,7 @@ namespace Components.Grid.Generator
 				Destroy(_currentDecorationController.gameObject);
 			}
 
-			_currentObstacleController = Instantiate(_obstaclePrefab);
-
-			_currentObstacleController.SetObstacleType(obstacleTemplate.ObstacleType);
-			_currentObstacleController.InstantiatePreview(obstacleTemplate, _cellSize);
+			_currentObstacleController = GridObjectController.InstantiateFromTemplate(obstacleTemplate, _cellSize, _groundHolder) as ObstacleController;
 		}
 
 		private void UpdateDecorationSelection(DecorationTemplate decorationTemplate)
@@ -215,10 +208,7 @@ namespace Components.Grid.Generator
 				Destroy(_currentDecorationController.gameObject);
 			}
 
-			_currentDecorationController = Instantiate(_decorationPrefab);
-
-			_currentDecorationController.SetDecorationType(decorationTemplate.DecorationType);
-			_currentDecorationController.InstantiatePreview(decorationTemplate, _cellSize);
+			_currentDecorationController = GridObjectController.InstantiateFromTemplate(decorationTemplate, _cellSize, _groundHolder) as DecorationController;
 		}
 
 		private void MoveSelection()
