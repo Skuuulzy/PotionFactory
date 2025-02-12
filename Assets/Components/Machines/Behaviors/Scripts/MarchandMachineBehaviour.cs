@@ -10,7 +10,8 @@ namespace Components.Machines.Behaviors
         public Action<IngredientTemplate> OnSpecialIngredientChanged;
         
         public MarchandMachineBehaviour(Machine machine) : base(machine) { }
-        
+
+        public static Action<IngredientTemplate> OnIngredientSold;
         public void SetFavoriteIngredient(IngredientTemplate specialIngredient)
         {
             //Clear it for now 
@@ -43,6 +44,7 @@ namespace Components.Machines.Behaviors
                 {
 					sellPrice += ingredientTemplate.Price;
 				}
+				OnIngredientSold?.Invoke(ingredientTemplate);
             }
             
             EconomyController.Instance.AddScore(sellPrice);

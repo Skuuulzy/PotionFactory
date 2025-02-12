@@ -17,7 +17,7 @@ namespace Components.Economy
 		public static Action<int> OnPlayerMoneyUpdated;
 		public static Action<int> OnStatePlayerScoreUpdated;
 		public static Action<int> OnScoreStateObjectiveUpdated;
-		public static Action OnGameOver;
+		public static Action<int,int, int> OnGameOver;
 		public static Action<int, int, int, int ,int> OnEndRoundGoldValuesCalculated;
 
 		private int _totalGoldAmountPerRound;
@@ -70,7 +70,7 @@ namespace Components.Economy
 		{
 			if(_statePlayerScore < _stateScoreObjective)
 			{
-				OnGameOver?.Invoke();
+				OnGameOver?.Invoke(_statePlayerScore, _stateScoreObjective, state.StateIndex);
 			}
 		}
 
