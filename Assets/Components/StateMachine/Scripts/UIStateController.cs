@@ -18,22 +18,17 @@ public class UIStateController : MonoBehaviour
 	[Header("EndGame")]
 	[SerializeField] private GameObject _endGameGO;
 
-	[Header("GameOver")]
-	[SerializeField] private GameObject _gameOverGO;
-
 	private static readonly int DISPLAY_STATE = Animator.StringToHash("DisplayState");
 	private BaseState _currentState;
 
 	private void Awake()
 	{
-		EconomyController.OnGameOver += HandleGameOver;
 		StateController.OnCountdown += SetCountdownTime;
 		StateController.OnStateStarted += HandleStateStarted;
 	}
 
 	private void OnDestroy()
 	{
-		EconomyController.OnGameOver -= HandleGameOver;
 		StateController.OnCountdown -= SetCountdownTime;
 		StateController.OnStateStarted -= HandleStateStarted;
 		
@@ -107,10 +102,6 @@ public class UIStateController : MonoBehaviour
 		//_finishStateButtonText.text = 
 	}
 
-	private void HandleGameOver()
-	{
-		_gameOverGO.SetActive(true);
-	}
 
 	public void OnEndCurrentState()
 	{
