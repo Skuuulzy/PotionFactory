@@ -20,7 +20,7 @@ using VComponent.Tools.Singletons;
 
 namespace Components.Grid
 {
-	/// Responsible to instantiate the grid with tiles, obstacles and decorations. Also handle special machines like marchand or extractors.
+	/// Responsible to instantiate the grid with tiles, obstacles and decorations. Handle special machines like marchand or extractors. Handle parcels.
 	public class GridController : Singleton<GridController>
 	{
 		[Header("Generation Parameters")]
@@ -82,8 +82,8 @@ namespace Components.Grid
 			GridParcelUnlocker.OnParcelUnlocked -= HandleParcelUnlocked;
 		}
 		
-		// ------------------------------------------------------------------------- GRID METHODS ------------------------------------------------------------------------ 
-		[PropertySpace, Button(ButtonSizes.Medium)]
+		// ------------------------------------------------------------------------- GRID METHODS ------------------------------------------------------------------------
+		
 		private void GenerateGrid()
 		{
 			if (Grid != null)
@@ -95,7 +95,7 @@ namespace Components.Grid
 			{
 				if (GridGenerator.TryLoadMapAt(_mapToLoadIndex, out var cells))
 				{
-					GenerateGridFromTemplate(cells);
+					GenerateGridFromSerializedCells(cells);
 					AddWaterPlane();
 				}
 				else
@@ -108,7 +108,7 @@ namespace Components.Grid
 			
 			if (GridGenerator.TryLoadRandomMap(out var serializedCells))
 			{
-				GenerateGridFromTemplate(serializedCells);
+				GenerateGridFromSerializedCells(serializedCells);
 				AddWaterPlane();
 			}
 			else
@@ -165,7 +165,7 @@ namespace Components.Grid
 			}
 		}
 		
-		private void GenerateGridFromTemplate(SerializedCell[] serializedCells)
+		private void GenerateGridFromSerializedCells(SerializedCell[] serializedCells)
 		{
 			Grid = new Grid(_gridXValue, _gridYValue, _cellSize, _originPosition, _showDebug, serializedCells);
 
@@ -264,50 +264,9 @@ namespace Components.Grid
 				Debug.LogError("No water prefab found.");
 			}
 		}
-
-		private async void UnlockParcel(GridParcel parcel)
-		{
-			var parcelCoordinates = parcel.Coordinates();
-			var tilesToUnlock = new List<TileController>();
-			
-			// Set the data
-			for (int i = 0; i < parcelCoordinates.Count; i++)
-			{
-				if (Grid.TryGetCellByCoordinates(parcelCoordinates[i], out var cell))
-				{
-					cell.Unlock();
-					tilesToUnlock.Add(_tiles[parcelCoordinates[i]]);
-				}
-				else
-				{
-					Debug.LogError($"No cell to unlock fond on {parcelCoordinates[i]}");
-				}
-			}
-
-			// Animate unlock in parallel (to avoid frame rate issues)
-			var tasks = new List<UniTask>();
-			for (int i = 0; i < tilesToUnlock.Count; i++)
-			{
-				float delay = i * (_parcelAnimationUnlockTime / tilesToUnlock.Count);
-				tasks.Add(AnimateUnlock(tilesToUnlock[i], delay));
-			}
-			
-			await UniTask.WhenAll(tasks);
-		}
 		
-		private async UniTask AnimateUnlock(TileController tile, float delay)
-		{
-			await UniTask.WaitForSeconds(delay);
-			tile.SetLockedState(false);
-		}
-
-		[Button(ButtonSizes.Medium)]
-		private void UpdateDebug()
-		{
-			Grid.DrawGridDebug();
-		}
+		// ------------------------------------------------------------------------ MACHINE METHODS ----------------------------------------------------------------------
 		
-		// ------------------------------------------------------------------------ MACHINE METHODS ---------------------------------------------------------------------- 
 		private void ClearMachineGridData(Machine machineToClear)
 		{
 			//Reset all cell linked to the machine. 
@@ -342,7 +301,8 @@ namespace Components.Grid
 			machineToSell = null;
 		}
 
-		// -------------------------------------------------------------------------- EXTRACTOR & MARCHANDS -------------------------------------------------------------------------- 
+		// -------------------------------------------------------------------------- EXTRACTOR & MARCHANDS --------------------------------------------------------------------------
+		
 		private List<Vector2Int> GetExtractorRandomCoordinates(int extractorCount)
 		{
 			var extractorPotentialCoordinates = new List<Vector2Int>();
@@ -483,8 +443,47 @@ namespace Components.Grid
 				behavior.SetFavoriteIngredient(ingredient);
 			}
 		}
+		
+		// ------------------------------------------------------------------------- PARCELS ------------------------------------------------------------------------ 
 
-		// -------------------------------------------------------------------------- EVENT HANDLERS -------------------------------------------------------------------------- 
+		private async void UnlockParcel(GridParcel parcel)
+		{
+			var parcelCoordinates = parcel.Coordinates();
+			var tilesToUnlock = new List<TileController>();
+			
+			// Set the data
+			for (int i = 0; i < parcelCoordinates.Count; i++)
+			{
+				if (Grid.TryGetCellByCoordinates(parcelCoordinates[i], out var cell))
+				{
+					cell.Unlock();
+					tilesToUnlock.Add(_tiles[parcelCoordinates[i]]);
+				}
+				else
+				{
+					Debug.LogError($"No cell to unlock fond on {parcelCoordinates[i]}");
+				}
+			}
+
+			// Animate unlock in parallel (to avoid frame rate issues)
+			var tasks = new List<UniTask>();
+			for (int i = 0; i < tilesToUnlock.Count; i++)
+			{
+				float delay = i * (_parcelAnimationUnlockTime / tilesToUnlock.Count);
+				tasks.Add(AnimateUnlock(tilesToUnlock[i], delay));
+			}
+			
+			await UniTask.WhenAll(tasks);
+		}
+		
+		private async UniTask AnimateUnlock(TileController tile, float delay)
+		{
+			await UniTask.WaitForSeconds(delay);
+			tile.SetLockedState(false);
+		}
+
+		// -------------------------------------------------------------------------- EVENT HANDLERS --------------------------------------------------------------------------
+		
 		private void HandleMapChoiceConfirm(IngredientsBundle bundle, bool isFirstGameChoice)
 		{
 			if (isFirstGameChoice)
@@ -507,6 +506,14 @@ namespace Components.Grid
 		private void HandleParcelUnlocked(GridParcel parcel)
 		{
 			UnlockParcel(parcel);
+		}
+		
+		// -------------------------------------------------------------------------- DEBUG -------------------------------------------------------------------------- 
+		
+		[Button(ButtonSizes.Medium)]
+		private void UpdateDebug()
+		{
+			Grid.DrawGridDebug();
 		}
 	}
 }

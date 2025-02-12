@@ -8,9 +8,7 @@ using UnityEngine;
 
 namespace Components.Grid
 {
-    /// <summary>
     /// Allow player to add <see cref="GridObjectController"/> to the grid.
-    /// </summary>
     public class GridObjectInstantiator : MonoBehaviour
     {
         [Header("Movement Parameters")]
@@ -42,12 +40,11 @@ namespace Components.Grid
         private bool _justRemoved;
         private Machine _hoveredMachine;
 
-        public static Action<bool> OnPreview;
-
         private Grid Grid => _gridController.Grid;
-
         private MachineController Preview => _currentMachinePreview.gameObject.activeSelf ? _currentMachinePreview : _currentSubMachinePreview;
 
+        public static Action<bool> OnPreview;
+        
         // ------------------------------------------------------------------------- MONO -------------------------------------------------------------------------------- 
         private void Start()
         {
@@ -506,7 +503,6 @@ namespace Components.Grid
             DestroyPreview();
         }
         
-        // For now to move a machine we first destroy it and the reinstancing it.
         private void HandleMovingMachine(Machine machine)
         {
             _currentMachinePreview = machine.Controller;
