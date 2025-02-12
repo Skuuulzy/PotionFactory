@@ -13,9 +13,9 @@ namespace Components.Grid.Obstacle
 
 		// ------------------------------------------------------------------------- INIT -------------------------------------------------------------------------
 
-		protected override void InstantiatePreview(GridObjectTemplate template, float scale)
+		protected override void InstantiateView(GridObjectTemplate template, Quaternion localRotation, Vector3 localScale)
 		{
-			base.InstantiatePreview(template, scale);
+			base.InstantiateView(template, localRotation, localScale);
 			if (template is ObstacleTemplate obstacleTemplate)
 			{
 				_obstacleType = obstacleTemplate.ObstacleType;
@@ -115,7 +115,5 @@ namespace Components.Grid.Obstacle
 		Tomb_06,
 		Tomb_Soil,
 		Wall_Fence,
-
-
 	}
 }

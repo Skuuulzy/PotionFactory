@@ -36,9 +36,9 @@ namespace Components.Machines
         public Machine Machine => _machine;
         
         // ------------------------------------------------------------------------- INIT -----------------------------------------------------------------------------
-        protected override void InstantiatePreview(GridObjectTemplate template, float scale)
+        protected override void InstantiateView(GridObjectTemplate template, Quaternion localRotation, Vector3 localScale)
         {
-            base.InstantiatePreview(template, scale);
+            base.InstantiateView(template, localRotation, localScale);
             
             _animator = View.GetComponentInChildren<Animator>();
             if (Template is MachineTemplate machineTemplate)

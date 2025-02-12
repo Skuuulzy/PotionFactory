@@ -85,7 +85,7 @@ namespace Database
             return result;
         }
         
-        // ----------------------------------------- RECIPE DATA BASE ------------------------------------------
+        // ----------------------------------------- RECIPES ------------------------------------------
         
         /// With a precise list of ingredients and a machine, check if a recipe can be made.
         public static bool TryFindRecipeMachine(MachineTemplate machineTemplate, List<IngredientTemplate> inputsIngredients, out RecipeTemplate recipe)
@@ -220,6 +220,7 @@ namespace Database
         }
         
         // ----------------------------------------- TILES ------------------------------------------
+       
         public static TileTemplate GetTileTemplateByType(TileType type)
         {
             switch (type)
@@ -235,6 +236,56 @@ namespace Database
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }
+        }
+        
+        // ----------------------------------------- OBSTACLES ------------------------------------------
+
+        public static ObstacleTemplate GetObstacleTemplateByType(ObstacleType type)
+        {
+            var obstaclesTemplates = GetAllScriptableObjectOfType<ObstacleTemplate>();
+
+            if (obstaclesTemplates.Count == 0)
+            {
+                Debug.LogError("No obstacles templates found in data base.");
+                return null;
+            }
+
+            for (int i = 0; i < obstaclesTemplates.Count; i++)
+            {
+                var obstacleTemplate = obstaclesTemplates[i];
+                if (obstacleTemplate.ObstacleType == type)
+                {
+                    return obstacleTemplate;
+                }
+            }
+            
+            Debug.LogError($"Unable to find obstacle of type {type} in the database. Returning first found.");
+            return obstaclesTemplates[0];
+        }
+        
+        // ----------------------------------------- DECORATIONS ------------------------------------------
+
+        public static DecorationTemplate GetDecorationTemplateByType(DecorationType type)
+        {
+            var decorationTemplates = GetAllScriptableObjectOfType<DecorationTemplate>();
+
+            if (decorationTemplates.Count == 0)
+            {
+                Debug.LogError("No obstacles templates found in data base.");
+                return null;
+            }
+
+            for (int i = 0; i < decorationTemplates.Count; i++)
+            {
+                var decorationTemplate = decorationTemplates[i];
+                if (decorationTemplate.DecorationType == type)
+                {
+                    return decorationTemplate;
+                }
+            }
+            
+            Debug.LogError($"Unable to find decoration of type {type} in the database. Returning first found.");
+            return decorationTemplates[0];
         }
     }
 }

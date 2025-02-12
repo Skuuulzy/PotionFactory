@@ -12,9 +12,9 @@ namespace Components.Grid.Tile
 
         // ------------------------------------------------------------------------- INIT -------------------------------------------------------------------------		
 
-        protected override void InstantiatePreview(GridObjectTemplate template, float scale)
+        protected override void InstantiateView(GridObjectTemplate template, Quaternion localRotation, Vector3 localScale)
         {
-            base.InstantiatePreview(template, scale);
+            base.InstantiateView(template, localRotation, localScale);
             
             if (template is TileTemplate tileTemplate)
             {

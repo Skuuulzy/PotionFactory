@@ -10,10 +10,15 @@ namespace Components.Grid
 		protected GameObject View;
 		protected GridObjectTemplate Template;
 		
+		// ----------------------------------------- STATIC METHODS ------------------------------------------
+		
 		public static GridObjectController InstantiateFromTemplate(GridObjectTemplate template, float scale, Transform parent)
 		{
 			var gridObjectController = Instantiate(template.GridObjectControllerPrefab, parent);
-			gridObjectController.InstantiatePreview(template, scale);
+			
+			// Instantiating View
+			Vector3 localScale = new Vector3(scale, scale, scale);
+			gridObjectController.InstantiateView(template, Quaternion.identity, localScale);
 			
 			return gridObjectController;
 		}
@@ -21,18 +26,35 @@ namespace Components.Grid
 		public static GridObjectController InstantiateAndAddToGridFromTemplate(GridObjectTemplate template, Cell cell, Grid grid, Transform parent)
 		{
 			var gridObjectController = Instantiate(template.GridObjectControllerPrefab, parent);
-			gridObjectController.InstantiatePreview(template, grid.GetCellSize());
+
+			// Instantiating View
+			Vector3 localScale = new Vector3(grid.GetCellSize(), grid.GetCellSize(), grid.GetCellSize());
+			gridObjectController.InstantiateView(template, Quaternion.identity, localScale);
+			
+			// Place view on grid
+			gridObjectController.AddToGrid(cell, grid, parent);
+			
+			return gridObjectController;
+		}
+
+		public static GridObjectController InstantiateAndAddToGridFromTemplate(GridObjectTemplate template, Cell cell, Grid grid,Transform parent, Quaternion localRotation, Vector3 localScale)
+		{
+			var gridObjectController = Instantiate(template.GridObjectControllerPrefab, parent);
+			gridObjectController.InstantiateView(template, localRotation, localScale);
 			gridObjectController.AddToGrid(cell, grid, parent);
 			
 			return gridObjectController;
 		}
 		
-		protected virtual void InstantiatePreview(GridObjectTemplate template, float scale)
+		// ----------------------------------------- VIRTUAL METHODS ------------------------------------------
+		
+		protected virtual void InstantiateView(GridObjectTemplate template, Quaternion localRotation, Vector3 localScale)
 		{
 			View = Instantiate(template.GridView, _3dViewHolder);
 			Template = template;
 
-			transform.localScale = new Vector3(scale, scale, scale);
+			transform.localScale = localScale;
+			transform.localRotation = localRotation;
 
 			Instanced = true;
 		}

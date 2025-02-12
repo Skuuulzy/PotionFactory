@@ -9,9 +9,9 @@ using UnityEngine;
 namespace Components.Grid
 {
     /// <summary>
-    /// Allow player to add <see cref="GridObject"/> to the grid.
+    /// Allow player to add <see cref="GridObjectController"/> to the grid.
     /// </summary>
-    public class GridInstantiator : MonoBehaviour
+    public class GridObjectInstantiator : MonoBehaviour
     {
         [Header("Movement Parameters")]
         [SerializeField] private bool _snapping;
@@ -273,7 +273,7 @@ namespace Components.Grid
             var leftLocalAngle = (_currentInputRotation - 90).NormalizeAngle();
             var rightLocalAngle = (_currentInputRotation + 90).NormalizeAngle();
 
-            if (_gridController.ScanForPotentialConnection(cell.Position, leftLocalAngle.SideFromAngle(), Way.OUT))
+            if (ScanForPotentialConnection(cell.Position, leftLocalAngle.SideFromAngle(), Way.OUT))
             {
                 InstantiateSubPreview(ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("ConveyorLeftToUp"), rightLocalAngle);
                 ShowPreview(false);
@@ -281,7 +281,7 @@ namespace Components.Grid
                 return;
             }
 
-            if (_gridController.ScanForPotentialConnection(cell.Position, rightLocalAngle.SideFromAngle(), Way.OUT))
+            if (ScanForPotentialConnection(cell.Position, rightLocalAngle.SideFromAngle(), Way.OUT))
             {
                 InstantiateSubPreview(ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("ConveyorLeftToDown"), leftLocalAngle);
                 ShowPreview(false);
@@ -290,6 +290,27 @@ namespace Components.Grid
             }
 
             ShowPreview(true);
+        }
+        
+        private bool ScanForPotentialConnection(Vector2Int cellPosition, Side sideToScan, Way desiredWay)
+        {
+            var neighbourPosition = sideToScan.GetNeighbourPosition(cellPosition);
+			
+            if (Grid.TryGetCellByCoordinates(neighbourPosition.x, neighbourPosition.y, out var cell))
+            {
+                if (cell.ContainsNode)
+                {
+                    foreach (var port in cell.Node.Ports)
+                    {
+                        if (port.Side == sideToScan.Opposite() && port.Way == desiredWay)
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
         }
 
         // ------------------------------------------------------------------------- GRID COMMUNICATION -------------------------------------------------------------------------------- 
