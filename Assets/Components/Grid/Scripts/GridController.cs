@@ -30,7 +30,7 @@ namespace Components.Grid
 		[SerializeField] private Vector3 _originPosition = new(0, 0);
 		[SerializeField] private bool _showDebug;
 		[SerializeField] private bool _loadRandomMap;
-		[SerializeField] private int _mapToLoadIndex;
+		[SerializeField] private string _mapToLoadName;
 
 		[Header("Prefabs")]
 		[SerializeField] private GameObject _waterPlanePrefab;
@@ -93,7 +93,7 @@ namespace Components.Grid
 
 			if (!_loadRandomMap)
 			{
-				if (GridGenerator.TryLoadMapAt(_mapToLoadIndex, out var cells))
+				if (GridGenerator.TryLoadMapByName(_mapToLoadName, out var cells))
 				{
 					GenerateGridFromSerializedCells(cells);
 					AddWaterPlane();
@@ -102,6 +102,8 @@ namespace Components.Grid
 				{
 					GenerateEmptyGrid();
 				}
+				
+				UnlockParcel(_startParcel);
 				
 				return;
 			}
@@ -203,6 +205,7 @@ namespace Components.Grid
 			if (gridObjectController is TileController tileController)
 			{
 				_tiles.Add(new Vector2Int(chosenCell.X, chosenCell.Y), tileController);
+				chosenCell.AddTileToCell(tileController);
 				tileController.SetLockedState(true);
 			}
 		}
@@ -221,6 +224,10 @@ namespace Components.Grid
 						
 			var template = ScriptableObjectDatabase.GetObstacleTemplateByType(serializedCell.ObstacleType);
 			var gridObjectController = GridObjectController.InstantiateAndAddToGridFromTemplate(template, chosenCell, Grid, _groundHolder, obstacleRotation, obstacleScale);
+			if (gridObjectController is ObstacleController obstacleController)
+			{
+				chosenCell.AddObstacleToCell(obstacleController);
+			}
 		}
 		
 		private void AddDecorationsFromSerializedCell(SerializedCell serializedCell, Cell chosenCell)
@@ -247,6 +254,7 @@ namespace Components.Grid
 				if (gridObjectController is DecorationController decorationController)
 				{
 					decorationController.OverrideGridPosition(decorationPosition);
+					chosenCell.AddDecorationToCell(decorationController);
 				}
 			}
 		}

@@ -229,12 +229,16 @@ namespace Database
                     return GetScriptableObject<TileTemplate>("GrassTile");
                 case TileType.WATER:
                     return GetScriptableObject<TileTemplate>("WaterTile");
-                case TileType.NONE:
                 case TileType.SAND:
+                    return GetScriptableObject<TileTemplate>("SandTile");
                 case TileType.STONE:
+                    return GetScriptableObject<TileTemplate>("StoneTile");
                 case TileType.DIRT:
+                    return GetScriptableObject<TileTemplate>("DirtTile");
+                case TileType.NONE:
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+                    Debug.LogError($"Unknown tile type: {type}, returning GRASS.");
+                    return GetScriptableObject<TileTemplate>("GrassTile");
             }
         }
         
