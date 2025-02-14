@@ -1,5 +1,6 @@
 using System;
 using Components.Bundle;
+using Components.Economy;
 using Components.Map;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -33,6 +34,7 @@ public class StateController : MonoBehaviour
 		ResolutionFactoryState.OnResolutionFactoryStateStarted += HandleResolutionFactoryState;
 		EndOfDayState.OnEndOfDayStateStarted += HandleShopState;
 		EndGameState.OnEndGameStateStarted += HandleEndGameState;
+		GameOverState.OnGameOverStarted += HandleGameOverState;
 
 		//State Machine 
 		_stateMachine = new StateMachine();
@@ -41,16 +43,17 @@ public class StateController : MonoBehaviour
 		BundleChoiceState bundleChoiceState = new BundleChoiceState();
 		PlanningFactoryState planningFactoryState = new PlanningFactoryState();
 		ResolutionFactoryState resolutionFactoryState = new ResolutionFactoryState();
-		EndOfDayState shopState = new EndOfDayState();
+		EndOfDayState endOfDayState = new EndOfDayState();
 		EndGameState endGameState = new EndGameState();
+		GameOverState gameOverState = new GameOverState();
 
 		//Define transitions  
 		At(bundleChoiceState, resolutionFactoryState, new FuncPredicate(() => bundleChoiceState.IsFinished));
-		//At(planningFactoryState, resolutionFactoryState, new FuncPredicate(() => planningFactoryState.IsFinished));
-		At(resolutionFactoryState, shopState, new FuncPredicate(() => resolutionFactoryState.IsFinished && resolutionFactoryState.StateIndex < _runConfiguration.RunStateList.Count));
-		At(resolutionFactoryState, endGameState, new FuncPredicate(() => resolutionFactoryState.IsFinished && resolutionFactoryState.StateIndex >= _runConfiguration.RunStateList.Count));
-		At(shopState, resolutionFactoryState, new FuncPredicate(() => shopState.IsFinished && shopState.StateIndex % 4 != 0));
-		At(shopState, bundleChoiceState, new FuncPredicate(() => shopState.IsFinished && shopState.StateIndex % 4 == 0));
+		At(resolutionFactoryState, gameOverState, new FuncPredicate(() => resolutionFactoryState.IsFinished && EconomyController.Instance.CheckGameOver(resolutionFactoryState.StateIndex)));
+		At(resolutionFactoryState, endOfDayState, new FuncPredicate(() => resolutionFactoryState.IsFinished && !EconomyController.Instance.CheckGameOver(resolutionFactoryState.StateIndex) && resolutionFactoryState.StateIndex < _runConfiguration.RunStateList.Count));
+		At(resolutionFactoryState, endGameState, new FuncPredicate(() => resolutionFactoryState.IsFinished && !EconomyController.Instance.CheckGameOver(resolutionFactoryState.StateIndex) && resolutionFactoryState.StateIndex >= _runConfiguration.RunStateList.Count));
+		At(endOfDayState, resolutionFactoryState, new FuncPredicate(() => endOfDayState.IsFinished && endOfDayState.StateIndex % 4 != 0));
+		At(endOfDayState, bundleChoiceState, new FuncPredicate(() => endOfDayState.IsFinished && endOfDayState.StateIndex % 4 == 0));
 
 		StartStateMachine(bundleChoiceState);
 	}
@@ -69,10 +72,7 @@ public class StateController : MonoBehaviour
 		ResolutionFactoryState.OnResolutionFactoryStateStarted -= HandleResolutionFactoryState;
 		EndOfDayState.OnEndOfDayStateStarted -= HandleShopState;
 		EndGameState.OnEndGameStateStarted -= HandleEndGameState;
-
 		BundleChoiceState.OnBundleStateStarted -= HandleBundleChoiceState;
-
-
 	}
 
 	private void Update()
@@ -139,6 +139,13 @@ public class StateController : MonoBehaviour
 	private void HandleEndGameState(EndGameState state)
 	{
 		CurrentDebugStateName = "END GAME";
+		_countdownTimer = null;
+		OnStateStarted?.Invoke(state);
+	}
+
+	private void HandleGameOverState(GameOverState state)
+	{
+		CurrentDebugStateName = "GAME OVER";
 		_countdownTimer = null;
 		OnStateStarted?.Invoke(state);
 	}

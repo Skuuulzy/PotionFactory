@@ -28,15 +28,12 @@ namespace Components.Economy
 		{
 			ResolutionFactoryState.OnResolutionFactoryStateStarted += HandleResolutionFactoryStateStarted;
 			EndOfDayState.OnEndOfDayStateStarted += HandleEndOfDayState;
-			ResolutionFactoryState.OnResolutionFactoryStateEnded += HandleResolutionFactoryStateEnded;
 		}
 		
 		private void OnDestroy()
 		{
 			ResolutionFactoryState.OnResolutionFactoryStateStarted -= HandleResolutionFactoryStateStarted;
 			EndOfDayState.OnEndOfDayStateStarted -= HandleEndOfDayState;
-			ResolutionFactoryState.OnResolutionFactoryStateEnded -= HandleResolutionFactoryStateEnded;
-
 		}
 
 		public void AddMoney(int amount)
@@ -66,11 +63,16 @@ namespace Components.Economy
 
 		}
 
-		private void HandleResolutionFactoryStateEnded(ResolutionFactoryState state)
+		public bool CheckGameOver(int stateIndex)
 		{
-			if(_statePlayerScore < _stateScoreObjective)
+			if (_statePlayerScore < _stateScoreObjective)
 			{
-				OnGameOver?.Invoke(_statePlayerScore, _stateScoreObjective, state.StateIndex);
+				OnGameOver?.Invoke(_statePlayerScore, _stateScoreObjective, stateIndex);
+				return true;
+			}
+			else
+			{
+				return false;
 			}
 		}
 

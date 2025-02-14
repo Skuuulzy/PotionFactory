@@ -36,19 +36,20 @@ namespace Components.Tick
             _currentTickDuration = _initialTickDuration;
             PlanningFactoryState.OnPlanningFactoryStateStarted += HandlePlanningFactoryState;
             ResolutionFactoryState.OnResolutionFactoryStateStarted += HandleResolutionFactoryState;
-            EndOfDayState.OnEndOfDayStateStarted += HandleShopState;
+            EndOfDayState.OnEndOfDayStateStarted += HandleEndOfDayState;
             UIOptionsController.OnTickSpeedUpdated += ChangeTimeSpeed;
+            GameOverState.OnGameOverStarted += HandleGameOverState;
         }
 
 		private void OnDestroy()
         {
             PlanningFactoryState.OnPlanningFactoryStateStarted -= HandlePlanningFactoryState;
             ResolutionFactoryState.OnResolutionFactoryStateStarted -= HandleResolutionFactoryState;
-            EndOfDayState.OnEndOfDayStateStarted -= HandleShopState;
-        
+            EndOfDayState.OnEndOfDayStateStarted -= HandleEndOfDayState;
+            GameOverState.OnGameOverStarted -= HandleGameOverState;
         }
 
-		private void Update()
+        private void Update()
         {
             if(_isPause)
 			{
@@ -124,7 +125,7 @@ namespace Components.Tick
 
         // ------------------------------------------------------------------------- STATE METHODS -------------------------------------------------------------------------
 
-        private void HandleShopState(EndOfDayState obj)
+        private void HandleEndOfDayState(EndOfDayState obj)
         {
             ChangeTimeSpeed(0);
         }
@@ -133,6 +134,11 @@ namespace Components.Tick
         {
             ChangeTimeSpeed(0);
         }
+
+        private void HandleGameOverState(GameOverState obj)
+		{
+            ChangeTimeSpeed(0);
+		}
 
         private void HandleResolutionFactoryState(ResolutionFactoryState obj)
         {

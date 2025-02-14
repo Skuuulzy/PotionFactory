@@ -10,11 +10,13 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using VComponent.Tools.SceneLoader;
 
 public class UIGameOverController : MonoBehaviour
 {
 	[SerializeField] private GameObject _view;
+	[SerializeField] private Toggle _showViewToggle;
 
     [Header("Defeat")]
     [SerializeField] private TextMeshProUGUI _defeatExplicationText;
@@ -61,6 +63,7 @@ public class UIGameOverController : MonoBehaviour
 		EconomyController.OnGameOver -= HandleGameOver;
 
 		_view.SetActive(true);
+		_showViewToggle.gameObject.SetActive(true);
 		_defeatExplicationText.text = $"Defeat at Day {day}. You needed to do {scoreObjective} golds and you did {playerScore}.";
 
 		SetUpStartingBundle();
@@ -72,6 +75,11 @@ public class UIGameOverController : MonoBehaviour
 	public void ReturnToMainMenu()
 	{
 		SceneLoader.LoadMainMenu();
+	}
+
+	public void DisplayGameOver(bool value)
+	{
+		_view.SetActive(value);
 	}
 
 	//------------------------------------------------------------ SetUp ------------------------------------------------------------------------------------
