@@ -11,7 +11,6 @@ public class UIStateController : MonoBehaviour
 	[SerializeField] private Animator _stateUITitleAnimator;
 	[SerializeField] private TextMeshProUGUI _stateNameText;
 	[SerializeField] private TextMeshProUGUI _stateCountdownText;
-	[SerializeField] private Image _stateCountdownImage;
 	[SerializeField] private Button _finishStateButton;
 	[SerializeField] private TMP_Text _finishStateButtonText;
 
@@ -41,7 +40,7 @@ public class UIStateController : MonoBehaviour
 
 		switch (state)
 		{
-			case EndOfDayState shopState:
+			case EndOfDayState endOfDayState:
 				HideCountdown();
 				_finishStateButton.gameObject.SetActive(false);
 				break;
@@ -54,8 +53,12 @@ public class UIStateController : MonoBehaviour
 				_finishStateButton.gameObject.SetActive(false);
 				break;
 			case EndGameState endGameState:
+				HideCountdown();
 				DisplayEndGameState();
 				_finishStateButton.gameObject.SetActive(false);
+				break;
+			case GameOverState gameOverState:
+				HideCountdown();
 				break;
 		}
 	}
@@ -77,22 +80,12 @@ public class UIStateController : MonoBehaviour
 
 	private void SetCountdownTime(float currentTime, float duration)
 	{
-		//Check if the timer is display 
-		/*
-		if (_stateCountdownImage.gameObject.activeSelf == false)
-		{
-			_stateCountdownImage.gameObject.SetActive(true);
-		}
-
-        _stateCountdownImage.fillAmount = currentTime / duration;
-		*/
-
 		_stateCountdownText.text = $"{ currentTime}";
 	}
 
 	private void HideCountdown()
 	{
-		_stateCountdownImage.gameObject.SetActive(false);
+		_stateCountdownText.text = $"--";
 	}
 
 	private void DisplayFinishStateButton(BaseState state)

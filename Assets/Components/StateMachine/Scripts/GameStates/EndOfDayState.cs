@@ -10,7 +10,7 @@ public class EndOfDayState : BaseState
 
 	public override void SetName()
 	{
-		_stateName = "Shop state";
+		_stateName = "End of day state";
 	}
 
 	public override void OnEnter()
