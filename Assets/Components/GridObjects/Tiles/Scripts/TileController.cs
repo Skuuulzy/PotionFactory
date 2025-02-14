@@ -19,7 +19,6 @@ namespace Components.Grid.Tile
             if (template is TileTemplate tileTemplate)
             {
                 _tileType = tileTemplate.TileType;
-                Debug.Log($"Setting tile type to: {tileTemplate.TileType}");
             }
         }
 
