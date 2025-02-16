@@ -1,6 +1,7 @@
 using Components.Bundle;
 using Components.Machines;
 using Components.Map;
+using Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -51,6 +52,11 @@ namespace Components.Inventory
 
 		public void AddMachineToPlayerInventory(MachineTemplate machineTemplate, int numberOfMachine, bool inform = true)
 		{
+			if(machineTemplate.Type == MachineType.CONVEYOR)
+			{
+				machineTemplate = ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("ConveyorLeftToRight");
+			}
+
 			if (!_playerMachinesDictionary.TryAdd(machineTemplate, numberOfMachine))
 			{
                 _playerMachinesDictionary[machineTemplate] += numberOfMachine;
