@@ -8,11 +8,11 @@ namespace Components.Grid
 		[SerializeField] protected string _name;
 		[SerializeField] protected GameObject _gridView;
 		[SerializeField] protected Sprite _uiView;
-		[SerializeField] protected GridObjectController _gridObject;
+		[SerializeField] protected GridObjectController _gridObjectControllerPrefab;
 
 		public string Name => _name;
 		public GameObject GridView => _gridView;
 		public Sprite UIView => _uiView;
-		public GridObjectController GridObject => _gridObject;
+		public GridObjectController GridObjectControllerPrefab => _gridObjectControllerPrefab;
 	}
 }
