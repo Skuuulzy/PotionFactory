@@ -1,12 +1,9 @@
 using Components.Bundle;
 using Components.Economy;
 using Components.Ingredients;
-using Components.Inventory;
 using Components.Machines;
 using Components.Machines.Behaviors;
 using Components.Shop.ShopItems;
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -16,29 +13,23 @@ using VComponent.Tools.SceneLoader;
 public class UIGameOverController : MonoBehaviour
 {
 	[SerializeField] private GameObject _view;
+	[SerializeField] private List<GameObject> _objectsToHide;
 	[SerializeField] private Toggle _showViewToggle;
 
     [Header("Defeat")]
     [SerializeField] private TextMeshProUGUI _defeatExplicationText;
-
 	[SerializeField] private UIBundleView _bundleViewPrefab;
 
-	[Header("StartingBundle")]
+	[Header("Holders")]
     [SerializeField] private Transform _startingBundleTransform;
-
-	[Header("OtherIngredients")]
 	[SerializeField] private Transform _otherIngredientTransform;
-
-	[Header("MachinesPurchased")]
 	[SerializeField] private Transform _machinesPurchasedTransform;
-
-	[Header("RecipesCreated")]
 	[SerializeField] private Transform _recipesSoldTransform;
 
 	private IngredientsBundle _startingIngredientBundle;
-	private List<IngredientsBundle> _otherIngredientsList = new List<IngredientsBundle>();
-	private Dictionary<MachineTemplate, int> _machinesPossedByPlayer = new Dictionary<MachineTemplate, int>();
-	private Dictionary<IngredientTemplate, int> _recipesSold = new Dictionary<IngredientTemplate, int>();
+	private readonly List<IngredientsBundle> _otherIngredientsList = new();
+	private readonly Dictionary<MachineTemplate, int> _machinesPossessedByPlayer = new();
+	private readonly Dictionary<IngredientTemplate, int> _recipesSold = new();
 
 	private void Start()
 	{
@@ -51,20 +42,19 @@ public class UIGameOverController : MonoBehaviour
 	private void OnDestroy()
 	{
 		EconomyController.OnGameOver -= HandleGameOver;
-
 		BundleChoiceGenerator.OnBundleChoiceConfirm -= HandleBundleChoice;
 		MarchandMachineBehaviour.OnIngredientSold -= HandleIngredientSold;
 		UIMachineShopItemViewController.OnMachineBuyed -= HandleMachineAdded;
 
 	}
 
-	public void HandleGameOver(int playerScore, int scoreObjective, int day)
+	private void HandleGameOver(int playerScore, int scoreObjective, int day)
 	{
 		EconomyController.OnGameOver -= HandleGameOver;
 
 		_view.SetActive(true);
 		_showViewToggle.gameObject.SetActive(true);
-		_defeatExplicationText.text = $"Defeat at Day {day}. You needed to do {scoreObjective} golds and you did {playerScore}.";
+		_defeatExplicationText.text = $"Defeated at Day {day}.\nYour goal was to reach {scoreObjective} gold, and you’ve achieved only {playerScore}...";
 
 		SetUpStartingBundle();
 		SetUpOtherIngredients();
@@ -79,7 +69,10 @@ public class UIGameOverController : MonoBehaviour
 
 	public void DisplayGameOver(bool value)
 	{
-		_view.SetActive(value);
+		for (int i = 0; i < _objectsToHide.Count; i++)
+		{
+			_objectsToHide[i].SetActive(value);
+		}
 	}
 
 	//------------------------------------------------------------ SetUp ------------------------------------------------------------------------------------
@@ -113,7 +106,7 @@ public class UIGameOverController : MonoBehaviour
 
 	private void SetUpMachinesPurchased()
 	{
-		foreach(var kvp in _machinesPossedByPlayer)
+		foreach(var kvp in _machinesPossessedByPlayer)
 		{
 			UIBundleView bundleView = Instantiate(_bundleViewPrefab, _machinesPurchasedTransform);
 			bundleView.SetInfos(kvp.Key.UIView, $"{kvp.Key.Name} x{kvp.Value}");
@@ -150,9 +143,7 @@ public class UIGameOverController : MonoBehaviour
 
 	private void HandleMachineAdded(MachineTemplate template)
 	{
-		_machinesPossedByPlayer.TryAdd(template, 0);
-		_machinesPossedByPlayer[template]++;
+		_machinesPossessedByPlayer.TryAdd(template, 0);
+		_machinesPossessedByPlayer[template]++;
 	}
-
-
 }

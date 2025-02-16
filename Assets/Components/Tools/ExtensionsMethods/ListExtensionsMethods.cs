@@ -1,5 +1,6 @@
-using System;
 using System.Collections.Generic;
+using UnityEngine;
+using Random = System.Random;
 
 namespace Components.Tools.ExtensionMethods
 {
@@ -12,7 +13,10 @@ namespace Components.Tools.ExtensionMethods
         
             // Ensure we don't select more indexes than available elements in the list
             if (numberOfIndexes > listCount)
-                throw new ArgumentException("Number of indexes exceeds the list count.");
+            {
+                Debug.LogError("Number of indexes exceeds the list count.");
+                return new List<int>();
+            }
         
             while (selectedIndexes.Count < numberOfIndexes)
             {

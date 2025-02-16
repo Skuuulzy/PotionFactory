@@ -12,11 +12,25 @@ namespace Components.Grid.Decorations
 
 		// ------------------------------------------------------------------------- INIT -------------------------------------------------------------------------
 
+		protected override void InstantiateView(GridObjectTemplate template, Quaternion localRotation, Vector3 localScale)
+		{
+			base.InstantiateView(template, localRotation, localScale);
+			if (template is DecorationTemplate obstacleTemplate)
+			{
+				_decorationType = obstacleTemplate.DecorationType;
+			}
+		}
+		
 		public void SetDecorationType(DecorationType obstacleType)
 		{
 			_decorationType = obstacleType;
 		}
-	}
+
+		public void OverrideGridPosition(Vector3 decorationPosition)
+		{
+			View.transform.position = decorationPosition;
+		}
+    }
 
 	public enum DecorationType
 	{

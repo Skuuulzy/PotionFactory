@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
+using Components.Grid;
 using UnityEngine;
 
 namespace Components.Machines
 {
     public static class MachineExtensionsMethods
     {
-        // ------------------------------------------------------------------------- NODE ROTATION -------------------------------------------------------------------------
+        // ------------------------------------------------------------------------- NODE ROTATION ---------------------------------------------------
         public static List<Node> RotateNodes(this List<Node> nodes, int angle)
         {
             var rotationMapping = GetRotationMapping(angle);
@@ -83,7 +84,7 @@ namespace Components.Machines
             return mapping;
         }
         
-        // ------------------------------------------------------------------------- SIDE -------------------------------------------------------------------------
+        // ------------------------------------------------------------------------- SIDE -------------------------------------------------------------
         public static Side Opposite(this Side side)
         {
             switch (side)
@@ -124,8 +125,6 @@ namespace Components.Machines
                     return -1;
             }
         }
-        
-        
 
         public static Side SideFromAngle(this int angle)
         {
@@ -168,6 +167,134 @@ namespace Components.Machines
             angle %= 360;
             if (angle < 0) angle += 360;
             return angle;
+        }
+        
+        // ----------------------------------------------------------------------- GRID -------------------------------------------------------------
+        
+        public static void AddToGrid(this MachineController machineController, Cell originCell, Grid.Grid grid, Transform holder)
+        {
+            machineController.transform.position = grid.GetWorldPosition(originCell.X, originCell.Y) + new Vector3(grid.GetCellSize() / 2, 0, grid.GetCellSize() / 2);
+            machineController.transform.name = $"{machineController.Machine.Template.Name}_{holder.childCount}";
+            machineController.transform.parent = holder;
+
+            // Adding nodes to the cells.
+            foreach (var node in machineController.Machine.Nodes)
+            {
+                var nodeGridPosition = node.SetGridPosition(new Vector2Int(originCell.X, originCell.Y));
+
+                if (grid.TryGetCellByCoordinates(nodeGridPosition.x, nodeGridPosition.y, out Cell overlapCell))
+                {
+                    overlapCell.AddNodeToCell(node);
+					
+                    // Add potential connected ports 
+                    foreach (var port in node.Ports)
+                    {
+                        switch (port.Side)
+                        {
+                            case Side.DOWN:
+                                port.TryConnectPort(new Vector2Int(nodeGridPosition.x, nodeGridPosition.y - 1), grid);
+                                break;
+                            case Side.UP:
+                                port.TryConnectPort(new Vector2Int(nodeGridPosition.x, nodeGridPosition.y + 1), grid);
+                                break;
+                            case Side.RIGHT:
+                                port.TryConnectPort(new Vector2Int(nodeGridPosition.x + 1, nodeGridPosition.y), grid);
+                                break;
+                            case Side.LEFT:
+                                port.TryConnectPort(new Vector2Int(nodeGridPosition.x - 1, nodeGridPosition.y), grid);
+                                break;
+                            case Side.NONE:
+                                break;
+                            default:
+                                throw new ArgumentOutOfRangeException();
+                        }
+                    }
+                }
+            }
+			
+            machineController.ConfirmPlacement();
+        }
+        
+        public static void TryConnectPort(this Port port, Vector2Int neighbourPosition, Grid.Grid grid)
+        {
+            if (grid.TryGetCellByCoordinates(neighbourPosition.x, neighbourPosition.y, out Cell neighbourCell))
+            {
+                if (neighbourCell.ContainsNode)
+                {
+                    foreach (var potentialPort in neighbourCell.Node.Ports)
+                    {
+                        if (potentialPort.Side == port.Side.Opposite())
+                        {
+                            port.ConnectTo(potentialPort);
+                        }
+                    }
+                }
+                else
+                {
+                    port.Disconnect();
+                }
+            }
+        }
+        
+        public static bool TryGetAllPotentialConnection(List<Node> machineNodes, Vector2Int gridPosition, Grid.Grid grid, out List<Port> potentialPorts)
+        {
+            potentialPorts = new List<Port>();
+			
+            foreach (var node in machineNodes)
+            {
+                foreach (var port in node.Ports)
+                {
+                    var potentialNeighbourPosition = new Vector2Int();
+				
+                    switch (port.Side)
+                    {
+                        case Side.DOWN:
+                            potentialNeighbourPosition = new Vector2Int(gridPosition.x, gridPosition.y - 1);
+                            break;
+                        case Side.UP:
+                            potentialNeighbourPosition = new Vector2Int(gridPosition.x, gridPosition.y + 1);
+                            break;
+                        case Side.RIGHT:
+                            potentialNeighbourPosition = new Vector2Int(gridPosition.x + 1, gridPosition.y);
+                            break;
+                        case Side.LEFT:
+                            potentialNeighbourPosition = new Vector2Int(gridPosition.x - 1, gridPosition.y);
+                            break;
+                        case Side.NONE:
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+
+                    if (TryGetPotentialConnection(port, potentialNeighbourPosition, grid, out Port potentialPort))
+                    {
+                        potentialPorts.Add(potentialPort);
+                    }
+                }
+            }
+
+            return potentialPorts.Count > 0;
+        }
+        
+        private static bool TryGetPotentialConnection(Port port, Vector2Int neighbourPosition, Grid.Grid grid, out Port potentialPort)
+        {
+            if (grid.TryGetCellByCoordinates(neighbourPosition.x, neighbourPosition.y, out Cell neighbourCell))
+            {
+                if (neighbourCell.ContainsNode)
+                {
+                    foreach (var neighbourPort in neighbourCell.Node.Ports)
+                    {
+                        if (neighbourPort.Side == port.Side.Opposite())
+                        {
+                            potentialPort = neighbourPort;
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            potentialPort = null;
+            return false;
         }
     }
 }

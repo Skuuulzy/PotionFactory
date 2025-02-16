@@ -1,20 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Components.Grid;
 using Components.Machines.UIView;
 using UnityEngine;
 
 namespace Components.Machines
 {
     [CreateAssetMenu(fileName = "New Machine Template", menuName = "Component/Machines/Machine Template")]
-    public class MachineTemplate : ScriptableObject
+    public class MachineTemplate : GridObjectTemplate
     {
         [Header("Definition")]
-        [SerializeField] private string _name;
         [SerializeField] private MachineType _type;
-        [SerializeField] private Sprite _uiView;
 
-        [Header("Grid view")] // TODO: Merge those two prefabs ?
-        [SerializeField] private GameObject _gridView;
+        [Header("Components")]
         [SerializeField] private List<MachineGridComponent> _gridComponents;
         
         [Header("Structure")] 
@@ -44,11 +42,8 @@ namespace Components.Machines
         [SerializeField] private bool _canMove = true;
         [SerializeField] private bool _canConfigure = true;
         
-        public string Name => _name;
         public MachineType Type => _type;
-        public Sprite UIView => _uiView;
 
-        public GameObject GridView => _gridView;
         public List<MachineGridComponent> GridComponents => _gridComponents;
 
         public List<Node> Nodes => GetNodeInstance();
