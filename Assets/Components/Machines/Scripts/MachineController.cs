@@ -1,77 +1,148 @@
+using System;
 using System.Collections.Generic;
-using Components.Ingredients;
-using Components.Tick;
+using Components.Grid;
 using UnityEngine;
-using Components.Machines.Behaviors;
 
 namespace Components.Machines
 {
-    public partial class MachineController : MonoBehaviour
+    public class MachineController : GridObjectController
     {
-        [SerializeField] private Transform _3dViewHolder;
-        [SerializeField] private Machine _machine;
-        [SerializeField] private IngredientController _ingredientController;
+        [Header("Arrow Preview")]
+        [SerializeField] private GameObject _inPreview;
+        [SerializeField] private GameObject _outPreview;
         
-        private GameObject _view;
+        [Header("Outline")]
+        [SerializeField] private Color _placableColor = Color.green;
+        [SerializeField] private Color _unPlacableColor = Color.red;
+        [SerializeField] private Color _selectedColor = Color.blue;
+        [SerializeField] private Color _hoveredColor = Color.white;
+
+        [Header("DEBUG")]
+        [SerializeField] private Machine _machine;
+
+        [Header("Animator")]
+        [SerializeField] private Animator _animator;
+
+        private const string PLAY_MACHINE_ANIM = "MachineProcessing";
+
+        private Outline _outline;
+        private List<GameObject> _directionalArrows;
+        
+        private readonly List<MachineGridComponent> _gridComponents = new();
         
         private bool _initialized;
         private bool _selected;
-
-        private int _outMachineTickCount;
         
         public Machine Machine => _machine;
         
         // ------------------------------------------------------------------------- INIT -----------------------------------------------------------------------------
-        public void InstantiatePreview(MachineTemplate machineTemplate, float scale, bool showOutlines = false)
+        protected override void InstantiateView(GridObjectTemplate template, Quaternion localRotation, Vector3 localScale)
         {
-            _view = Instantiate(machineTemplate.GridView, _3dViewHolder);
-            _machine = new Machine(machineTemplate, this);
-            _view.transform.localScale = new Vector3(scale, scale, scale);
-
-            SetupDirectionalArrows(machineTemplate);
-
-            _outline = _view.AddComponent<Outline>();
+            base.InstantiateView(template, localRotation, localScale);
+            
+            _animator = View.GetComponentInChildren<Animator>();
+            if (Template is MachineTemplate machineTemplate)
+            {
+                _machine = new Machine(machineTemplate, this);
+                SetupDirectionalArrows(machineTemplate);
+            }
+            else
+            {
+                Debug.LogError("Please give a machine template to instantiate a machine preview.");
+            }
+            
+            _outline = View.AddComponent<Outline>();
             _outline.OutlineWidth = 8;
-            ToggleOutlines(showOutlines, _placableColor);
+            
+            // Instantiate grid components
+            for (int i = 0; i < _machine.Template.GridComponents.Count; i++)
+            {
+                var gridComponent = Instantiate(_machine.Template.GridComponents[i], transform);
+                gridComponent.Initialize(_machine);
+                _gridComponents.Add(gridComponent);
+            }
+
+            Machine.OnProcess += HandleProcessMachine;
         }
-        
-        public void RotatePreview(int angle)
+
+		private void HandleProcessMachine(Machine machine, bool value)
+		{
+            if(machine == Machine && _animator != null)
+			{
+                _animator.SetBool(PLAY_MACHINE_ANIM, value);
+            }
+        }
+
+		public void RotatePreview(int angle)
         {
-            _view.transform.rotation = Quaternion.Euler(new Vector3(0, angle, 0));
+            View.transform.rotation = Quaternion.Euler(new Vector3(0, angle, 0));
             _machine.UpdateNodesRotation(angle);
+
+            for (int i = 0; i < _gridComponents.Count; i++)
+            {
+                _gridComponents[i].transform.rotation = Quaternion.Euler(new Vector3(0, angle, 0));
+            }
         }
         
         public void ConfirmPlacement()
         {
-            _machine.OnTick += Tick;
-            _machine.OnPropagateTick += PropagateTick;
-            _machine.OnItemAdded += ShowItem;
-            _machine.OnItemSell += ShowSellFeedback;
             Machine.OnSelected += HandleMachineSelected;
             Machine.OnHovered += HandleMachineHovered;
             
             _initialized = true;
-            _machine.Behavior.SetInitialProcessTime(_machine.Template.ProcessTime);
             _machine.LinkNodeData();
 
-            if(_machine.Behavior is DestructorMachineBehaviour destructor)
-            {
-                destructor.OnSpecialIngredientChanged += ShowItem;
-            }
-
-            AddMachineToChain();
+            _machine.AddMachineToChain();
             
             ToggleDirectionalArrows(false);
             ToggleOutlines(false);
         }
 
+        public override void AddToGrid(Cell originCell, Grid.Grid grid, Transform holder)
+        {
+            base.AddToGrid(originCell, grid, holder);
+            
+            // Adding nodes to the cells.
+            foreach (var node in Machine.Nodes)
+            {
+                var nodeGridPosition = node.SetGridPosition(new Vector2Int(originCell.X, originCell.Y));
+
+                if (grid.TryGetCellByCoordinates(nodeGridPosition.x, nodeGridPosition.y, out Cell overlapCell))
+                {
+                    overlapCell.AddNodeToCell(node);
+					
+                    // Add potential connected ports 
+                    foreach (var port in node.Ports)
+                    {
+                        switch (port.Side)
+                        {
+                            case Side.DOWN:
+                                port.TryConnectPort(new Vector2Int(nodeGridPosition.x, nodeGridPosition.y - 1), grid);
+                                break;
+                            case Side.UP:
+                                port.TryConnectPort(new Vector2Int(nodeGridPosition.x, nodeGridPosition.y + 1), grid);
+                                break;
+                            case Side.RIGHT:
+                                port.TryConnectPort(new Vector2Int(nodeGridPosition.x + 1, nodeGridPosition.y), grid);
+                                break;
+                            case Side.LEFT:
+                                port.TryConnectPort(new Vector2Int(nodeGridPosition.x - 1, nodeGridPosition.y), grid);
+                                break;
+                            case Side.NONE:
+                                break;
+                            default:
+                                throw new ArgumentOutOfRangeException();
+                        }
+                    }
+                }
+            }
+			
+            ConfirmPlacement();
+        }
+
         // ------------------------------------------------------------------------- DESTROY --------------------------------------------------------------------------
         private void OnDestroy()
         {
-            _machine.OnTick -= Tick;
-            _machine.OnPropagateTick -= PropagateTick;
-            _machine.OnItemAdded -= ShowItem;
-            _machine.OnItemSell -= ShowSellFeedback;
             Machine.OnSelected -= HandleMachineSelected;
             Machine.OnHovered -= HandleMachineHovered;
             
@@ -80,116 +151,7 @@ namespace Components.Machines
                 return;
             }
             
-            RemoveMachineFromChain();
-        }
-
-        // ------------------------------------------------------------------------- TICK -----------------------------------------------------------------------------
-        // Base tick called by the tick system.
-        private void Tick()
-        {
-            _machine.Behavior.Process(_machine);
-            _machine.Behavior.TryGiveOutIngredient(_machine);
-            
-            // Propagate tick
-            if (_machine.TryGetInMachine(out List<Machine> previousMachines))
-            {
-                foreach (var previousMachine in previousMachines)
-                {
-                    previousMachine.PropagateTick();
-                }
-            }
-        }
-
-        // Tick propagation called by the next machine.
-        private void PropagateTick()
-        {
-            _outMachineTickCount++;
-
-            if (!_machine.TryGetOutMachines(out var connectedMachines))
-            {
-                return;            
-            }
-
-            // The machine has not received the propagation of all his next machine.
-            if (_outMachineTickCount < connectedMachines.Count)
-            {
-                return;
-            }
-            
-            _machine.Behavior.Process(_machine);
-            _machine.Behavior.TryGiveOutIngredient(_machine);
-
-            // Propagate tick
-            if (!_machine.TryGetInMachine(out List<Machine> previousMachines))
-            {
-                return;
-            }
-            
-            foreach (var previousMachine in previousMachines)
-            {
-                previousMachine.PropagateTick();
-            }
-
-            _outMachineTickCount = 0;
-        }
-
-        // ------------------------------------------------------------------------- CHAIN ----------------------------------------------------------------------------
-        private void AddMachineToChain()
-        {
-            bool hasInMachine = _machine.TryGetInMachine(out List<Machine> inMachines);
-            bool hasOutMachine = _machine.TryGetOutMachines(out _);
-
-            // The machine is not connected to any chain, create a new one.
-            if (!hasInMachine && !hasOutMachine)
-            {
-                TickSystem.AddTickable(_machine);
-            }
-            // The machine only has an IN, it is now the end of the chain.
-            if (hasInMachine && !hasOutMachine)
-            {
-                foreach (var inMachine in inMachines)
-                {
-                    TickSystem.ReplaceTickable(inMachine, _machine);
-                }
-            }
-            // The machine has an IN and an OUT, it makes a link between two existing chains,
-            // remove the IN tickable since the out chain already has a tickable.
-            if (hasInMachine && hasOutMachine)
-            {
-                foreach (var inMachine in inMachines)
-                {
-                    TickSystem.RemoveTickable(inMachine);
-                }
-            }
-        }
-
-        private void RemoveMachineFromChain()
-        {
-            bool hasInMachine = _machine.TryGetInMachine(out List<Machine> inMachines);
-            bool hasOutMachine = _machine.TryGetOutMachines(out _);
-            
-            // The machine is not connected to any chain, create a new one.
-            if (!hasInMachine && !hasOutMachine)
-            {
-                TickSystem.RemoveTickable(_machine);
-            }
-            // The machine only has an IN, it is now the end of the chain.
-            if (hasInMachine && !hasOutMachine)
-            {
-                foreach (var inMachine in inMachines)
-                {
-                    TickSystem.ReplaceTickable(_machine, inMachine);
-                }
-            }
-            // The machine has an IN and an OUT, it makes a link between two existing chains,
-            // remove the IN tickable since the out chain already has a tickable.
-            if (hasInMachine && hasOutMachine)
-            {
-                foreach (var inMachine in inMachines)
-                {
-                    TickSystem.AddTickable(inMachine);
-                }
-            }
+            _machine.RemoveMachineFromChain();
         }
 
         // ------------------------------------------------------------------------- CONTEXTUAL ACTIONS ---------------------------------------------------------------
@@ -227,19 +189,71 @@ namespace Components.Machines
         
         private void HandleMachineHovered(Machine machine, bool hovered)
         {
-            if (_selected)
-            {
-                return;
-            }
-            
             if (Machine != machine)
             {
                 ToggleOutlines(false);
+                ToggleDirectionalArrows(false);
                 return;
             }
             
+            ToggleDirectionalArrows(hovered);
             ToggleOutlines(hovered, _hoveredColor);
-
+        }
+        
+        // ------------------------------------------------------------------------- DIRECTIONAL ARROWS ---------------------------------------------------------------
+        private void SetupDirectionalArrows(MachineTemplate machineTemplate)
+        {
+            _directionalArrows = new List<GameObject>();
+            
+            foreach (var node in machineTemplate.Nodes)
+            {
+                foreach (var port in node.Ports)
+                {
+                    var previewArrow = Instantiate(port.Way == Way.IN ? _inPreview : _outPreview, View.transform);
+                    
+                    previewArrow.transform.localPosition = new Vector3(node.LocalPosition.x, previewArrow.transform.position.y, node.LocalPosition.y);
+                    
+                    // TODO: Find why we need to invert the angle when the machine is only 1x1 (especially with curved conveyor).
+                    previewArrow.transform.Rotate(Vector3.up, port.Side.AngleFromSide(machineTemplate.Nodes.Count == 1));
+                    
+                    _directionalArrows.Add(previewArrow);
+                }
+            }
+        }
+        
+        private void ToggleDirectionalArrows(bool toggle)
+        {
+            if (!this)
+            {
+                return;
+            }
+            
+            for (int i = 0; i < _directionalArrows.Count; i++)
+            {
+                _directionalArrows[i].SetActive(toggle);
+            }
+        }
+        
+        // ------------------------------------------------------------------------- OUTLINES -------------------------------------------------------------------------
+        private void ToggleOutlines(bool toggle, Color outlineColor = default)
+        {
+            if (!_outline)
+            {
+                return;
+            }
+            
+            _outline.enabled = toggle;
+            _outline.OutlineColor = outlineColor;
+        }
+        
+        public void UpdateOutlineState(bool placable)
+        {
+            if (!_outline)
+            {
+                return;
+            }
+            
+            _outline.OutlineColor = placable ? _placableColor : _unPlacableColor;
         }
     }
 }

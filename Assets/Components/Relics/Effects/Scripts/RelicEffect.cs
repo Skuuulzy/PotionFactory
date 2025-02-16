@@ -7,6 +7,7 @@ public class RelicEffect : ScriptableObject
 	public RelicEffectType Type;
 	public virtual void ApplyEffect(MachineBehavior behavior)
 	{
+		behavior.AddRelicEffect(this);
 	}
 }
 
@@ -17,11 +18,6 @@ public class IncreaseMachineProcessTimeEffect : RelicEffect
 	public override void ApplyEffect(MachineBehavior behavior)
 	{
 		base.ApplyEffect(behavior);
-		if (!behavior.RelicEffects.Contains(this))
-		{
-			behavior.RelicEffectBonusProcessTime = Mathf.Clamp(behavior.RelicEffectBonusProcessTime + behavior.RelicEffectBonusProcessTime * _bonusProcessTime, 0, 1);
-			behavior.RelicEffects.Add(this);
-		}
 	}
 }
 

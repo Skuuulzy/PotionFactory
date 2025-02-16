@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Components.Grid;
@@ -31,6 +32,21 @@ namespace Components.Recipes.Grimoire
             }
         }
 
+        private void Start()
+        {
+            ResolutionFactoryState.OnResolutionFactoryStateStarted += HandleStartResolution;
+        }
+
+        private void OnDestroy()
+        {
+            ResolutionFactoryState.OnResolutionFactoryStateStarted -= HandleStartResolution;
+        }
+
+        private void HandleStartResolution(ResolutionFactoryState obj)
+        {
+            DisplayPotentialRecipes(true);
+        }
+
         public void DisplayPotentialRecipes(bool display)
         {
             // Handle all entries (disable if we want to only show the potential recipes)
@@ -43,7 +59,12 @@ namespace Components.Recipes.Grimoire
             {
                 return;
             }
-            
+
+            if (GrimoireController.Instance.PlayerMachinesDictionary.Count == 0)
+            {
+                return;
+            }
+
             // Get player machines
             var playerMachines = GrimoireController.Instance.PlayerMachinesDictionary.Keys.ToList();
 

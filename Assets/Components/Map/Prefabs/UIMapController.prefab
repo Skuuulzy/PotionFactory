@@ -92,6 +92,26 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!224 &8005136995844648434
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 692571171460417231}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 357904759636030057}
+  m_Father: {fileID: 1169480767023980785}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 466, y: -175}
+  m_SizeDelta: {x: 150, y: 150}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &709991161594751236
 GameObject:
   m_ObjectHideFlags: 0
@@ -980,12 +1000,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 1920, y: 1080}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!224 &8976890166867279564 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 3384692875907092504, guid: cfc212ce04c9625428dadfcfce9b3bd8,
-    type: 3}
-  m_PrefabInstance: {fileID: 5939273978797289172}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &3459205052098035578
 GameObject:
   m_ObjectHideFlags: 0
@@ -2717,26 +2731,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b72eeeb6ae196f4d84b3186ed1e065c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!224 &8005136995844648434
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 692571171460417231}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 357904759636030057}
-  m_Father: {fileID: 1169480767023980785}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 466, y: -175}
-  m_SizeDelta: {x: 150, y: 150}
-  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1001 &5939273978797289172
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2867,6 +2861,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ece7c0ffed01d2d40b106cf1b9d4546b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!224 &8976890166867279564 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 3384692875907092504, guid: cfc212ce04c9625428dadfcfce9b3bd8,
+    type: 3}
+  m_PrefabInstance: {fileID: 5939273978797289172}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &8500138924548079256
 PrefabInstance:
   m_ObjectHideFlags: 0

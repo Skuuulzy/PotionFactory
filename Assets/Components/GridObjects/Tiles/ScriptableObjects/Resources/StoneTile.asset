@@ -13,7 +13,11 @@ MonoBehaviour:
   m_Name: StoneTile
   m_EditorClassIdentifier: 
   _name: Stone
-  _tileType: 3
   _gridView: {fileID: 4762144622729139892, guid: 7910dd0bfdbd5184cbdfdb4f83f3b626,
     type: 3}
   _uiView: {fileID: 21300000, guid: 30fbf5f4fb87a5a47bab576b001d6231, type: 3}
+  _gridObjectControllerPrefab: {fileID: 8980534838031880519, guid: 763f6990e5d7f74418e2a1161ea2cfeb,
+    type: 3}
+  _tileType: 3
+  _lockedMaterial: {fileID: 0}
+  _unlockedMaterial: {fileID: 0}

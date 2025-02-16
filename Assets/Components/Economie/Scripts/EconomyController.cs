@@ -17,24 +17,23 @@ namespace Components.Economy
 		public static Action<int> OnPlayerMoneyUpdated;
 		public static Action<int> OnStatePlayerScoreUpdated;
 		public static Action<int> OnScoreStateObjectiveUpdated;
-		public static Action OnGameOver;
+		public static Action<int,int, int> OnGameOver;
 		public static Action<int, int, int, int ,int> OnEndRoundGoldValuesCalculated;
 
 		private int _totalGoldAmountPerRound;
-		
+
+		public int StateScoreObjective => _stateScoreObjective;
+
 		private void Start()
 		{
-			PlanningFactoryState.OnPlanningFactoryStateStarted += HandlePlanningFactoryState;
-			ShopState.OnShopStateStarted += HandleStartShopState;
-			ResolutionFactoryState.OnResolutionFactoryStateEnded += HandleResolutionFactoryStateEnded;
+			ResolutionFactoryState.OnResolutionFactoryStateStarted += HandleResolutionFactoryStateStarted;
+			EndOfDayState.OnEndOfDayStateStarted += HandleEndOfDayState;
 		}
 		
 		private void OnDestroy()
 		{
-			PlanningFactoryState.OnPlanningFactoryStateStarted -= HandlePlanningFactoryState;
-			ShopState.OnShopStateStarted -= HandleStartShopState;
-			ResolutionFactoryState.OnResolutionFactoryStateEnded -= HandleResolutionFactoryStateEnded;
-
+			ResolutionFactoryState.OnResolutionFactoryStateStarted -= HandleResolutionFactoryStateStarted;
+			EndOfDayState.OnEndOfDayStateStarted -= HandleEndOfDayState;
 		}
 
 		public void AddMoney(int amount)
@@ -55,7 +54,7 @@ namespace Components.Economy
 			OnPlayerMoneyUpdated?.Invoke(_playerMoney);
 		}
 
-		private void HandlePlanningFactoryState(PlanningFactoryState state)
+		private void HandleResolutionFactoryStateStarted(ResolutionFactoryState state)
 		{
 			_statePlayerScore = 0;
 			_stateScoreObjective = _runConfiguration.RunStateList.Find(x => x.StateNumber == state.StateIndex).MoneyObjective;
@@ -64,18 +63,23 @@ namespace Components.Economy
 
 		}
 
-		private void HandleResolutionFactoryStateEnded(ResolutionFactoryState state)
+		public bool CheckGameOver(int stateIndex)
 		{
-			if(_statePlayerScore < _stateScoreObjective)
+			if (_statePlayerScore < _stateScoreObjective)
 			{
-				OnGameOver?.Invoke();
+				OnGameOver?.Invoke(_statePlayerScore, _stateScoreObjective, stateIndex);
+				return true;
+			}
+			else
+			{
+				return false;
 			}
 		}
 
 		/// <summary>
 		/// Calcultate the gold amount to give to the player at the start of the payoff State
 		/// </summary>
-		private void HandleStartShopState(ShopState shopState)
+		private void HandleEndOfDayState(EndOfDayState shopState)
 		{
 			int interest = (_playerMoney / _runConfiguration.GuildTicketInterestValue) * _runConfiguration.GuildTicketInterestAmountPerRound;
 			_totalGoldAmountPerRound = _runConfiguration.GuildTicketAmountPerRound + interest;

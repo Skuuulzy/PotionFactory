@@ -7,13 +7,13 @@ namespace Components.Ingredients
 	{
 		[SerializeField] private SpriteRenderer _spriteRenderer;
 		[SerializeField] private SpriteRenderer _favoriteSellerSpriteRenderer;
-		[SerializeField] private Animator _animator;
-		
-		public void CreateRepresentationFromTemplate(List<IngredientTemplate> ingredientTemplate)
+
+		public SpriteRenderer IngredientView => _spriteRenderer;
+
+		public void CreateRepresentationFromTemplate(IngredientTemplate ingredientTemplate, Vector3 startPosition)
 		{
-			// TODO: See how we handle multiple items inside the machine ?
-			_spriteRenderer.sprite = ingredientTemplate[0].Icon;
-			_animator.SetTrigger("AddItem");
+			_spriteRenderer.transform.position = startPosition;
+			_spriteRenderer.sprite = ingredientTemplate.Icon;
 		}
 
 		public void CreateFavoriteSellerItemRepresentationFromTemplate(IngredientTemplate ingredientTemplate)

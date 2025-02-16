@@ -13,11 +13,14 @@ MonoBehaviour:
   m_Name: Press
   m_EditorClassIdentifier: 
   _name: Press
-  _type: 7
   _gridView: {fileID: 4070157535812024309, guid: af3c7da050a971a4a884c83d2436cc6e,
     type: 3}
   _uiView: {fileID: 21300000, guid: d2c60d08339a9194eab23b7cb54ba23c, type: 3}
-  _behavior: {fileID: 11400000, guid: 150ba0f5943b5cf478cf810bb3648a20, type: 2}
+  _gridObjectControllerPrefab: {fileID: 2567407675386972328, guid: 859503caaa5f96242b5ba83dccd721c9,
+    type: 3}
+  _type: 6
+  _gridComponents:
+  - {fileID: 1085624917457900550, guid: cff6497d14e847e43888d93eee477349, type: 3}
   _nodes:
   - _localPosition: {x: 0, y: 0}
     _gridPosition: {x: 0, y: 0}
@@ -26,6 +29,7 @@ MonoBehaviour:
       _way: 0
     - _side: 2
       _way: 1
+  _showItem: 0
   _canTakeInfiniteIngredients: 0
   _inSlotIngredientCount: 3
   _outSlotIngredientCount: 1
@@ -34,12 +38,13 @@ MonoBehaviour:
   _shopSpawnProbability: 0.8
   _shopPrice: 7
   _cannotBeSell: 0
+  _cannotBeBuy: 0
   _sellPrice: 7
   _contextualComponents:
   - {fileID: -7985585081776399288, guid: 587b9316180125b4597d80cce119472f, type: 3}
   _uiGameplayDescription: 
   _uiLoreDescription: 
   _contextMenuHeight: 4
-  _canSell: 1
+  _canRetrieve: 1
   _canMove: 1
   _canConfigure: 1

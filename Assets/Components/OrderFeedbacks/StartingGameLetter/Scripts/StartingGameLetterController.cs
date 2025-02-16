@@ -6,15 +6,15 @@ public class StartingGameLetterController : MonoBehaviour
 
 	private void Awake()
 	{
-		MapState.OnMapStateStarted += Init;
+		BundleChoiceState.OnBundleStateStarted += Init;
 	}
 
 	private void OnDestroy()
 	{
-		MapState.OnMapStateStarted -= Init;
+		BundleChoiceState.OnBundleStateStarted -= Init;
 	}
 
-	private void Init(MapState state)
+	private void Init(BundleChoiceState state)
 	{
 		
 		if (state.StateIndex == 1)

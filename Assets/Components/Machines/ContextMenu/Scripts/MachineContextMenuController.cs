@@ -53,6 +53,8 @@ namespace Components.Machines.ContextMenu
         
         private void HandleMachineSelected(Machine machine, bool selected)
         {
+            return;
+            
             if (machine != _controller.Machine)
             {
                 _window.SetActive(false);

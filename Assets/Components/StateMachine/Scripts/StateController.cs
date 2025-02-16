@@ -1,4 +1,6 @@
 using System;
+using Components.Bundle;
+using Components.Economy;
 using Components.Map;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -27,30 +29,33 @@ public class StateController : MonoBehaviour
 		}
 
 		MapState.OnMapStateStarted += HandleMapState;
+		BundleChoiceState.OnBundleStateStarted += HandleBundleChoiceState;
 		PlanningFactoryState.OnPlanningFactoryStateStarted += HandlePlanningFactoryState;
 		ResolutionFactoryState.OnResolutionFactoryStateStarted += HandleResolutionFactoryState;
-		ShopState.OnShopStateStarted += HandleShopState;
+		EndOfDayState.OnEndOfDayStateStarted += HandleShopState;
 		EndGameState.OnEndGameStateStarted += HandleEndGameState;
+		GameOverState.OnGameOverStarted += HandleGameOverState;
 
 		//State Machine 
 		_stateMachine = new StateMachine();
 
 		//Declare state 
-		MapState mapState = new MapState();
+		BundleChoiceState bundleChoiceState = new BundleChoiceState();
 		PlanningFactoryState planningFactoryState = new PlanningFactoryState();
 		ResolutionFactoryState resolutionFactoryState = new ResolutionFactoryState();
-		ShopState shopState = new ShopState();
+		EndOfDayState endOfDayState = new EndOfDayState();
 		EndGameState endGameState = new EndGameState();
+		GameOverState gameOverState = new GameOverState();
 
 		//Define transitions  
-		At(mapState, planningFactoryState, new FuncPredicate(() => mapState.IsFinished));
-		At(planningFactoryState, resolutionFactoryState, new FuncPredicate(() => planningFactoryState.IsFinished));
-		At(resolutionFactoryState, shopState, new FuncPredicate(() => resolutionFactoryState.IsFinished && resolutionFactoryState.StateIndex < _runConfiguration.RunStateList.Count));
-		At(resolutionFactoryState, endGameState, new FuncPredicate(() => resolutionFactoryState.IsFinished && resolutionFactoryState.StateIndex >= _runConfiguration.RunStateList.Count));
-		At(shopState, planningFactoryState, new FuncPredicate(() => shopState.IsFinished && shopState.StateIndex % 4 != 0));
-		At(shopState, mapState, new FuncPredicate(() => shopState.IsFinished && shopState.StateIndex % 4 == 0));
+		At(bundleChoiceState, resolutionFactoryState, new FuncPredicate(() => bundleChoiceState.IsFinished));
+		At(resolutionFactoryState, gameOverState, new FuncPredicate(() => resolutionFactoryState.IsFinished && EconomyController.Instance.CheckGameOver(resolutionFactoryState.StateIndex)));
+		At(resolutionFactoryState, endOfDayState, new FuncPredicate(() => resolutionFactoryState.IsFinished && !EconomyController.Instance.CheckGameOver(resolutionFactoryState.StateIndex) && resolutionFactoryState.StateIndex < _runConfiguration.RunStateList.Count));
+		At(resolutionFactoryState, endGameState, new FuncPredicate(() => resolutionFactoryState.IsFinished && !EconomyController.Instance.CheckGameOver(resolutionFactoryState.StateIndex) && resolutionFactoryState.StateIndex >= _runConfiguration.RunStateList.Count));
+		At(endOfDayState, resolutionFactoryState, new FuncPredicate(() => endOfDayState.IsFinished && endOfDayState.StateIndex % 4 != 0));
+		At(endOfDayState, bundleChoiceState, new FuncPredicate(() => endOfDayState.IsFinished && endOfDayState.StateIndex % 4 == 0));
 
-		StartStateMachine(mapState);
+		StartStateMachine(bundleChoiceState);
 	}
 	
 	private async void StartStateMachine(IState stateToStart)
@@ -65,9 +70,9 @@ public class StateController : MonoBehaviour
 	{
 		PlanningFactoryState.OnPlanningFactoryStateStarted -= HandlePlanningFactoryState;
 		ResolutionFactoryState.OnResolutionFactoryStateStarted -= HandleResolutionFactoryState;
-		ShopState.OnShopStateStarted -= HandleShopState;
+		EndOfDayState.OnEndOfDayStateStarted -= HandleShopState;
 		EndGameState.OnEndGameStateStarted -= HandleEndGameState;
-
+		BundleChoiceState.OnBundleStateStarted -= HandleBundleChoiceState;
 	}
 
 	private void Update()
@@ -93,7 +98,14 @@ public class StateController : MonoBehaviour
 		MapGenerator.OnMapChoiceConfirm += state.MapChoiceConfirmed;
 	}
 
-	private void HandleShopState(ShopState state)
+	private void HandleBundleChoiceState(BundleChoiceState state)
+	{
+		CurrentDebugStateName = "BUNDLE CHOICE";
+
+		BundleChoiceGenerator.OnBundleChoiceConfirm += state.BundleChoiceConfirmed;
+	}
+
+	private void HandleShopState(EndOfDayState state)
 	{
 		CurrentDebugStateName = "SHOP";
 		_countdownTimer = null;
@@ -116,7 +128,7 @@ public class StateController : MonoBehaviour
 	{
 		CurrentDebugStateName = "RESOLUTION";
 		
-		_countdownTimer = new CountdownTimer(_runConfiguration.ResolutionFactoryStateTime);
+		_countdownTimer = new TickableCountdownTimer(_runConfiguration.GetStateTime(state.StateIndex));
 		BaseState.OnStateEnded += _countdownTimer.Stop;
 		_countdownTimer.OnTimerStop += state.SetStateFinished;
 		_countdownTimer.Start();
@@ -127,6 +139,13 @@ public class StateController : MonoBehaviour
 	private void HandleEndGameState(EndGameState state)
 	{
 		CurrentDebugStateName = "END GAME";
+		_countdownTimer = null;
+		OnStateStarted?.Invoke(state);
+	}
+
+	private void HandleGameOverState(GameOverState state)
+	{
+		CurrentDebugStateName = "GAME OVER";
 		_countdownTimer = null;
 		OnStateStarted?.Invoke(state);
 	}

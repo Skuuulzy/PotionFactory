@@ -19,6 +19,8 @@ namespace Components.Grid
         public bool ContainsTile { get; private set; }
         public bool Unlocked { get; private set; }
 
+        
+        // TODO: Remove all sub controllers to use only the GridObjectController and cast
         private GridObjectController _gridObjectController;
 		private ObstacleController _obstacleController; 
 		private TileController _tileController; 
@@ -134,9 +136,9 @@ namespace Components.Grid
 		        return false;
 	        }
 
-	        if (_gridObjectController is TileController tileController)
+	        if (_tileController) 
 	        {
-		        if (tileController.GetTileType() == TileType.WATER)
+		        if (_tileController.GetTileType() == TileType.WATER)
 		        {
 			        return false;
 		        }

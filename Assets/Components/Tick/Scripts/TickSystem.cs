@@ -15,7 +15,10 @@ namespace Components.Tick
         private float _currentTickDuration;
 		private bool _isPause;
 
-		// ------------------------------------------------------------------------- MONO -------------------------------------------------------------------------
+        public float InitialTickDuration => _initialTickDuration;
+        public float CurrentTickDuration => _currentTickDuration;
+
+        // ------------------------------------------------------------------------- MONO -------------------------------------------------------------------------
 		protected override void Awake()
         {
             base.Awake();
@@ -33,19 +36,20 @@ namespace Components.Tick
             _currentTickDuration = _initialTickDuration;
             PlanningFactoryState.OnPlanningFactoryStateStarted += HandlePlanningFactoryState;
             ResolutionFactoryState.OnResolutionFactoryStateStarted += HandleResolutionFactoryState;
-            ShopState.OnShopStateStarted += HandleShopState;
+            EndOfDayState.OnEndOfDayStateStarted += HandleEndOfDayState;
             UIOptionsController.OnTickSpeedUpdated += ChangeTimeSpeed;
+            GameOverState.OnGameOverStarted += HandleGameOverState;
         }
 
 		private void OnDestroy()
         {
             PlanningFactoryState.OnPlanningFactoryStateStarted -= HandlePlanningFactoryState;
             ResolutionFactoryState.OnResolutionFactoryStateStarted -= HandleResolutionFactoryState;
-            ShopState.OnShopStateStarted -= HandleShopState;
-        
+            EndOfDayState.OnEndOfDayStateStarted -= HandleEndOfDayState;
+            GameOverState.OnGameOverStarted -= HandleGameOverState;
         }
 
-		private void Update()
+        private void Update()
         {
             if(_isPause)
 			{
@@ -121,7 +125,7 @@ namespace Components.Tick
 
         // ------------------------------------------------------------------------- STATE METHODS -------------------------------------------------------------------------
 
-        private void HandleShopState(ShopState obj)
+        private void HandleEndOfDayState(EndOfDayState obj)
         {
             ChangeTimeSpeed(0);
         }
@@ -130,6 +134,11 @@ namespace Components.Tick
         {
             ChangeTimeSpeed(0);
         }
+
+        private void HandleGameOverState(GameOverState obj)
+		{
+            ChangeTimeSpeed(0);
+		}
 
         private void HandleResolutionFactoryState(ResolutionFactoryState obj)
         {

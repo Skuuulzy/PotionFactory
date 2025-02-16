@@ -44,7 +44,7 @@ namespace Components.Economy
 
 		private void UpdateScoreStateObjective(int money)
 		{
-			_scoreStateObjectiveText.text = $"{money}";
+			_scoreStateObjectiveText.text = $"<b>Objectif</b> {money}";
 		}
 
         private IEnumerator AnimateValueCoroutine(TextMeshProUGUI text, int startValue, int endValue, float duration)

@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Database;
 using UnityEditor;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -22,24 +23,12 @@ namespace Components.Grid.Generator
 		[SerializeField] private Vector3 _startPosition = new(0, 0);
 
 		[Header("Prefabs")]
-		[SerializeField] private TileController _tilePrefab;
-		[SerializeField] private ObstacleController _obstaclePrefab;
-		[SerializeField] private DecorationController _decorationPrefab;
 		[SerializeField] private GameObject _waterPlanePrefab;
 
 		[Header("Holders")]
 		[SerializeField] private Transform _groundHolder;
 		[SerializeField] private Transform _obstacleHolder;
 		[SerializeField] private Transform _decorationHolder;
-
-		[Header("Tiles")]
-		[SerializeField] private AllTilesController _allTilesController;
-
-		[Header("Obstacles")]
-		[SerializeField] private AllObstaclesController _allObstacleController;
-
-		[Header("Decorations")]
-		[SerializeField] private AllDecorationsController _allDecorationController;
 
 		[Header("Options")]
 		[SerializeField] private float _rotationSpeed = 300f;
@@ -64,7 +53,7 @@ namespace Components.Grid.Generator
 		public bool CleanMode => _cleanMode;
 		public float CleanRadius => _cleanRadius;
 
-		public static string MapsPath => Path.Combine(Application.dataPath, "JsonData/Maps/");
+		public static string MapsPath => Path.Combine(Application.streamingAssetsPath, "Maps");
 
 		// ------------------------------------------------------------------------- MONO -------------------------------------------------------------------------
 		private void Start()
@@ -170,9 +159,7 @@ namespace Components.Grid.Generator
 				Destroy(_currentDecorationController.gameObject);
 			}
 
-			_currentTileController = Instantiate(_tilePrefab);
-			_currentTileController.SetTileType(tileTemplate.TileType);
-			_currentTileController.InstantiatePreview(tileTemplate, _cellSize);
+			_currentTileController = GridObjectController.InstantiateFromTemplate(tileTemplate, _cellSize, _groundHolder) as TileController;
 		}
 
 		private void UpdateObstacleSelection(ObstacleTemplate obstacleTemplate)
@@ -192,10 +179,7 @@ namespace Components.Grid.Generator
 				Destroy(_currentDecorationController.gameObject);
 			}
 
-			_currentObstacleController = Instantiate(_obstaclePrefab);
-
-			_currentObstacleController.SetObstacleType(obstacleTemplate.ObstacleType);
-			_currentObstacleController.InstantiatePreview(obstacleTemplate, _cellSize);
+			_currentObstacleController = GridObjectController.InstantiateFromTemplate(obstacleTemplate, _cellSize, _groundHolder) as ObstacleController;
 		}
 
 		private void UpdateDecorationSelection(DecorationTemplate decorationTemplate)
@@ -215,10 +199,7 @@ namespace Components.Grid.Generator
 				Destroy(_currentDecorationController.gameObject);
 			}
 
-			_currentDecorationController = Instantiate(_decorationPrefab);
-
-			_currentDecorationController.SetDecorationType(decorationTemplate.DecorationType);
-			_currentDecorationController.InstantiatePreview(decorationTemplate, _cellSize);
+			_currentDecorationController = GridObjectController.InstantiateFromTemplate(decorationTemplate, _cellSize, _groundHolder) as DecorationController;
 		}
 
 		private void MoveSelection()
@@ -346,8 +327,13 @@ namespace Components.Grid.Generator
 				{
 					Destroy(chosenCell.TileController.gameObject);
 				}
-				TileController tileInstantiate = _allTilesController.GenerateTileFromPrefab(chosenCell, _grid, _groundHolder, _cellSize, _currentTileController);
-				chosenCell.AddTileToCell(tileInstantiate);
+				
+				var template = ScriptableObjectDatabase.GetTileTemplateByType(_currentTileController.TileType);
+				var gridObjectController = GridObjectController.InstantiateAndAddToGridFromTemplate(template, chosenCell, _grid, _groundHolder);
+				if (gridObjectController is TileController tileController)
+				{
+					chosenCell.AddTileToCell(tileController);
+				}
 
 				return;
 			}
@@ -358,8 +344,12 @@ namespace Components.Grid.Generator
 				{
 					Destroy(chosenCell.ObstacleController.gameObject);
 				}
-				ObstacleController obstacleController = _allObstacleController.GenerateObstacleFromPrefab(_grid, chosenCell, _obstacleHolder, _cellSize, _currentObstacleController);
-				chosenCell.AddObstacleToCell(obstacleController);
+				var template = ScriptableObjectDatabase.GetObstacleTemplateByType(_currentObstacleController.ObstacleType);
+				var gridObjectController = GridObjectController.InstantiateAndAddToGridFromTemplate(template, chosenCell, _grid, _groundHolder);
+				if (gridObjectController is ObstacleController obstacleController)
+				{
+					chosenCell.AddObstacleToCell(obstacleController);
+				}
 			}
 			else if (_currentDecorationController != null)
 			{
@@ -367,9 +357,18 @@ namespace Components.Grid.Generator
 				{
 					return;
 				}
-
-				DecorationController decorationController = _allDecorationController.GenerateDecorationFromPrefab(_grid, chosenCell, _decorationHolder, _cellSize, _currentDecorationController, _freePlacement, worldMousePosition);
-				chosenCell.AddDecorationToCell(decorationController);
+				
+				var template = ScriptableObjectDatabase.GetDecorationTemplateByType(_currentDecorationController.DecorationType);
+				var gridObjectController = GridObjectController.InstantiateAndAddToGridFromTemplate(template, chosenCell, _grid, _groundHolder);
+				if (gridObjectController is DecorationController decorationController)
+				{
+					chosenCell.AddDecorationToCell(decorationController);
+					
+					if (_freePlacement)
+					{
+						decorationController.OverrideGridPosition(worldMousePosition);
+					}
+				}
 			}
 		}
 
@@ -460,7 +459,6 @@ namespace Components.Grid.Generator
 
 			_grid = new Grid(_gridXValue, _gridYValue, _cellSize, _startPosition, false);
 			_cellList = new List<Cell>();
-			_allTilesController.SelectATileType();
 
 			// Instantiate ground blocks
 			for (int x = 0; x < _grid.GetWidth(); x++)
@@ -468,19 +466,24 @@ namespace Components.Grid.Generator
 				for (int z = 0; z < _grid.GetHeight(); z++)
 				{
 					_grid.TryGetCellByCoordinates(x, z, out var chosenCell);
-					TileController tile = _allTilesController.GenerateTile(chosenCell, _grid, _groundHolder, _cellSize);
-					if (tile.TileType != TileType.WATER)
+					
+					// TILES
+					var template = ScriptableObjectDatabase.GetTileTemplateByType(TileType.GRASS);
+					var gridObjectController = GridObjectController.InstantiateAndAddToGridFromTemplate(template, chosenCell, _grid, _groundHolder);
+					if (gridObjectController is TileController tileController)
 					{
-						if (x != 1 && x != _grid.GetWidth() - 2 && z != 1 && z != _grid.GetHeight() - 2)
-						{
-							_allObstacleController.GenerateObstacle(_grid, chosenCell, _obstacleHolder, _cellSize);
-						}
+						chosenCell.AddTileToCell(tileController);
 					}
+					
 					_cellList.Add(chosenCell);
 				}
 			}
 			
-			// Instantiate water plane
+			AddWaterPlane();
+		}
+        
+		private void AddWaterPlane()
+		{
 			if (_waterPlanePrefab)
 			{
 				var waterPlane = Instantiate(_waterPlanePrefab, transform);
@@ -499,8 +502,10 @@ namespace Components.Grid.Generator
 			{
 				ClearGrid();
 			}
+			
 			_grid = new Grid(_gridXValue, _gridYValue, _cellSize, _startPosition, false, serializedCellList.ToArray());
 			_cellList = new List<Cell>();
+			
 			// Instantiate ground blocks
 			for (int x = 0; x < _grid.GetWidth(); x++)
 			{
@@ -508,48 +513,79 @@ namespace Components.Grid.Generator
 				{
 					_grid.TryGetCellByCoordinates(x, z, out var chosenCell);
 					SerializedCell serializedCell = serializedCellList.Find(cell => cell.X == x && cell.Y == z);
-
-					if (serializedCell.TileType != TileType.NONE)
-					{
-						_allTilesController.GenerateTileFromType(chosenCell, _grid, _groundHolder, _cellSize, serializedCell.TileType);
-					}
+					
+					AddTileFromSerializedCell(serializedCell, chosenCell);
 
 					if (serializedCell.ObstacleType != ObstacleType.NONE)
 					{
-						// Lire la rotation de l'obstacle
-						float[] rotationArray = serializedCell.ObstacleRotation;
-						Quaternion obstacleRotation = new Quaternion(rotationArray[0], rotationArray[1], rotationArray[2], rotationArray[3]);
-
-						// Lire l'échelle locale de l'obstacle
-						float[] scaleArray = serializedCell.ObstacleScale;
-						Vector3 obstacleScale = new Vector3(scaleArray[0], scaleArray[1], scaleArray[2]);
-
-						// Générer l'obstacle avec la rotation et l'échelle récupérées
-						_allObstacleController.GenerateObstacleFromType(chosenCell, _grid, _obstacleHolder, _cellSize, serializedCell.ObstacleType, obstacleRotation,	obstacleScale);
+						AddObstacleFromSerializedCell(serializedCell, chosenCell);
 					}
 
 					if (serializedCell.DecorationPositions != null && serializedCell.DecorationPositions.Count > 0)
 					{
-						for (int i = 0; i < serializedCell.DecorationPositions.Count; i++)
-						{
-							// Lire les coordonnées de la décoration
-							float[] positionArray = serializedCell.DecorationPositions[i];
-							Vector3 decorationPosition = new Vector3(positionArray[0], positionArray[1], positionArray[2]);
-
-							// Lire la rotation de la décoration
-							float[] rotationArray = serializedCell.DecorationRotations[i];
-							Quaternion decorationRotation = new Quaternion(rotationArray[0], rotationArray[1], rotationArray[2], rotationArray[3]);
-
-							// Lire l'échelle locale de la décoration
-							float[] scaleArray = serializedCell.DecorationScales[i];
-							Vector3 decorationScale = new Vector3(scaleArray[0], scaleArray[1], scaleArray[2]);
-
-							// Générer la décoration avec la position, la rotation, et l'échelle récupérées
-							_allDecorationController.GenerateDecorationFromType(chosenCell,	_decorationHolder, serializedCell.DecorationTypes[i], decorationPosition, decorationRotation, decorationScale);
-						}
+						AddDecorationsFromSerializedCell(serializedCell, chosenCell);
 					}
 
 					_cellList.Add(chosenCell);
+				}
+			}
+		}
+		
+		private void AddTileFromSerializedCell(SerializedCell serializedCell, Cell chosenCell)
+		{
+			var template = ScriptableObjectDatabase.GetTileTemplateByType(serializedCell.TileType);
+			var gridObjectController = GridObjectController.InstantiateAndAddToGridFromTemplate(template, chosenCell, _grid, _groundHolder);
+			if (gridObjectController is TileController tileController)
+			{
+				chosenCell.AddTileToCell(tileController);
+			}
+		}
+		
+		private void AddObstacleFromSerializedCell(SerializedCell serializedCell, Cell chosenCell)
+		{
+			// Read obstacle rotation
+			// TODO: Add auto getter in serialized class to do this operation
+			float[] rotationArray = serializedCell.ObstacleRotation;
+			Quaternion obstacleRotation = new Quaternion(rotationArray[0], rotationArray[1], rotationArray[2], rotationArray[3]);
+
+			// Read obstacle scale
+			// TODO: Add auto getter in serialized class to do this operation
+			float[] scaleArray = serializedCell.ObstacleScale;
+			Vector3 obstacleScale = new Vector3(scaleArray[0], scaleArray[1], scaleArray[2]);
+						
+			var template = ScriptableObjectDatabase.GetObstacleTemplateByType(serializedCell.ObstacleType);
+			var gridObjectController = GridObjectController.InstantiateAndAddToGridFromTemplate(template, chosenCell, _grid, _groundHolder, obstacleRotation, obstacleScale);
+			if (gridObjectController is ObstacleController obstacleController)
+			{
+				chosenCell.AddObstacleToCell(obstacleController);
+			}
+		}
+		
+		private void AddDecorationsFromSerializedCell(SerializedCell serializedCell, Cell chosenCell)
+		{
+			for (int i = 0; i < serializedCell.DecorationPositions.Count; i++)
+			{
+				// Decoration coordinates.
+				// TODO: Add auto getter in serialized class to do this operation
+				float[] positionArray = serializedCell.DecorationPositions[i];
+				Vector3 decorationPosition = new Vector3(positionArray[0], positionArray[1], positionArray[2]);
+
+				// Decoration rotation.
+				// TODO: Add auto getter in serialized class to do this operation
+				float[] rotationArray = serializedCell.DecorationRotations[i];
+				Quaternion decorationRotation = new Quaternion(rotationArray[0], rotationArray[1], rotationArray[2], rotationArray[3]);
+
+				// Decoration local scale.
+				// TODO: Add auto getter in serialized class to do this operation
+				float[] scaleArray = serializedCell.DecorationScales[i];
+				Vector3 decorationScale = new Vector3(scaleArray[0], scaleArray[1], scaleArray[2]);
+
+				var template = ScriptableObjectDatabase.GetDecorationTemplateByType(serializedCell.DecorationTypes[i]);
+				var gridObjectController = GridObjectController.InstantiateAndAddToGridFromTemplate(template, chosenCell, _grid, _groundHolder, decorationRotation, decorationScale);
+				if (gridObjectController is DecorationController decorationController)
+				{
+					decorationController.OverrideGridPosition(decorationPosition);
+					chosenCell.AddDecorationToCell(decorationController);
 				}
 			}
 		}
@@ -647,14 +683,37 @@ namespace Components.Grid.Generator
 			return false;
 		}
 
+		public static bool TryLoadMapByName(string name, out SerializedCell[] serializedCells)
+		{
+			// Get all potential maps.
+			var mapFileNames = GetAllMapFileNames();
+
+			for (int i = 0; i < mapFileNames.Count; i++)
+			{
+				if (mapFileNames[i] == name)
+				{
+					if (TryLoadMapAt(i, out var cells))
+					{
+						serializedCells = cells;
+						return true;
+					}
+				}
+			}
+
+			Debug.LogError($"No map with name: {name} found.");
+			serializedCells = Array.Empty<SerializedCell>();
+			return false;
+		}
+
 		public static bool TryLoadMapAt(int index, out SerializedCell[] serializedCells)
 		{
 			// Get all potential maps.
 			var mapFileNames = GetAllMapFileNames();
-			
-			if (mapFileNames.Count == 0 || index > mapFileNames.Count - 1)
+
+			// Ensure index is within valid range
+			if (mapFileNames.Count == 0 || index < 0 || index >= mapFileNames.Count)
 			{
-				Debug.LogError($"No map files were found at index: {index}.");
+				Debug.LogError($"[TryLoadMapAt] Invalid index: {index}. Total maps: {mapFileNames.Count}.");
 				serializedCells = null;
 				return false;
 			}

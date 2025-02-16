@@ -1,22 +1,20 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Components.Machines.Behaviors;
+using Components.Grid;
 using Components.Machines.UIView;
 using UnityEngine;
 
 namespace Components.Machines
 {
     [CreateAssetMenu(fileName = "New Machine Template", menuName = "Component/Machines/Machine Template")]
-    public class MachineTemplate : ScriptableObject
+    public class MachineTemplate : GridObjectTemplate
     {
         [Header("Definition")]
-        [SerializeField] private string _name;
         [SerializeField] private MachineType _type;
 
-        [SerializeField] private GameObject _gridView;
-        [SerializeField] private Sprite _uiView;
-        [SerializeField] private MachineBehavior _behavior;
-
+        [Header("Components")]
+        [SerializeField] private List<MachineGridComponent> _gridComponents;
+        
         [Header("Structure")] 
         [SerializeField] private List<Node> _nodes;
 
@@ -43,18 +41,14 @@ namespace Components.Machines
         [SerializeField] private bool _canRetrieve = true;
         [SerializeField] private bool _canMove = true;
         [SerializeField] private bool _canConfigure = true;
-
         
-        public string Name => _name;
         public MachineType Type => _type;
 
-        public GameObject GridView => _gridView;
-        public Sprite UIView => _uiView;
+        public List<MachineGridComponent> GridComponents => _gridComponents;
 
         public List<Node> Nodes => GetNodeInstance();
 
         public bool ShowItem => _showItem;
-        public bool CanTakeInfiniteIngredients => _canTakeInfiniteIngredients;
         public int InSlotIngredientCount => _inSlotIngredientCount;
         public int OutSlotIngredientCount => _outSlotIngredientCount;
         public int IngredientsPerSlotCount => _ingredientsPerSlotCount;
@@ -86,11 +80,6 @@ namespace Components.Machines
             }
 
             return result;
-        }
-        
-        public MachineBehavior GetBehaviorClone()
-        {
-            return _behavior.Clone();
         }
         
         /// Return the size of the machine based on his nodes.
