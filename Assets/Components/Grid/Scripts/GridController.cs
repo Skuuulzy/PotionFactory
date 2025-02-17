@@ -204,7 +204,7 @@ namespace Components.Grid
 			var gridObjectController = GridObjectController.InstantiateAndAddToGridFromTemplate(template, chosenCell, Grid, _groundHolder);
 			if (gridObjectController is TileController tileController)
 			{
-				_tiles.Add(new Vector2Int(chosenCell.X, chosenCell.Y), tileController);
+				_tiles.Add(chosenCell.Coordinates, tileController);
 				chosenCell.AddTileToCell(tileController);
 				tileController.SetLockedState(true);
 			}
@@ -355,11 +355,11 @@ namespace Components.Grid
 				if (gridObjectController is MachineController machineController)
 				{
 					// Make sure that the machine are correctly oriented. 
-					if (chosenCell.Y == 0)
+					if (chosenCell.Coordinates.y == 0)
 					{
 						machineController.RotatePreview(270);
 					}
-					if (chosenCell.Y == Grid.GetHeight() - 1)
+					if (chosenCell.Coordinates.y == Grid.GetHeight() - 1)
 					{
 						machineController.RotatePreview(90);
 					}

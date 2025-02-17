@@ -171,50 +171,6 @@ namespace Components.Machines
         
         // ----------------------------------------------------------------------- GRID -------------------------------------------------------------
         
-        public static void AddToGrid(this MachineController machineController, Cell originCell, Grid.Grid grid, Transform holder)
-        {
-            machineController.transform.position = grid.GetWorldPosition(originCell.X, originCell.Y) + new Vector3(grid.GetCellSize() / 2, 0, grid.GetCellSize() / 2);
-            machineController.transform.name = $"{machineController.Machine.Template.Name}_{holder.childCount}";
-            machineController.transform.parent = holder;
-
-            // Adding nodes to the cells.
-            foreach (var node in machineController.Machine.Nodes)
-            {
-                var nodeGridPosition = node.SetGridPosition(new Vector2Int(originCell.X, originCell.Y));
-
-                if (grid.TryGetCellByCoordinates(nodeGridPosition.x, nodeGridPosition.y, out Cell overlapCell))
-                {
-                    overlapCell.AddNodeToCell(node);
-					
-                    // Add potential connected ports 
-                    foreach (var port in node.Ports)
-                    {
-                        switch (port.Side)
-                        {
-                            case Side.DOWN:
-                                port.TryConnectPort(new Vector2Int(nodeGridPosition.x, nodeGridPosition.y - 1), grid);
-                                break;
-                            case Side.UP:
-                                port.TryConnectPort(new Vector2Int(nodeGridPosition.x, nodeGridPosition.y + 1), grid);
-                                break;
-                            case Side.RIGHT:
-                                port.TryConnectPort(new Vector2Int(nodeGridPosition.x + 1, nodeGridPosition.y), grid);
-                                break;
-                            case Side.LEFT:
-                                port.TryConnectPort(new Vector2Int(nodeGridPosition.x - 1, nodeGridPosition.y), grid);
-                                break;
-                            case Side.NONE:
-                                break;
-                            default:
-                                throw new ArgumentOutOfRangeException();
-                        }
-                    }
-                }
-            }
-			
-            machineController.ConfirmPlacement();
-        }
-        
         public static void TryConnectPort(this Port port, Vector2Int neighbourPosition, Grid.Grid grid)
         {
             if (grid.TryGetCellByCoordinates(neighbourPosition.x, neighbourPosition.y, out Cell neighbourCell))

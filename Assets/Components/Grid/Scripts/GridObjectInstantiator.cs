@@ -270,7 +270,7 @@ namespace Components.Grid
             var leftLocalAngle = (_currentInputRotation - 90).NormalizeAngle();
             var rightLocalAngle = (_currentInputRotation + 90).NormalizeAngle();
 
-            if (ScanForPotentialConnection(cell.Position, leftLocalAngle.SideFromAngle(), Way.OUT))
+            if (ScanForPotentialConnection(cell.Coordinates, leftLocalAngle.SideFromAngle(), Way.OUT))
             {
                 InstantiateSubPreview(ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("ConveyorLeftToUp"), rightLocalAngle);
                 ShowPreview(false);
@@ -278,7 +278,7 @@ namespace Components.Grid
                 return;
             }
 
-            if (ScanForPotentialConnection(cell.Position, rightLocalAngle.SideFromAngle(), Way.OUT))
+            if (ScanForPotentialConnection(cell.Coordinates, rightLocalAngle.SideFromAngle(), Way.OUT))
             {
                 InstantiateSubPreview(ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("ConveyorLeftToDown"), leftLocalAngle);
                 ShowPreview(false);
@@ -368,7 +368,7 @@ namespace Components.Grid
         {
             foreach (var node in Preview.Machine.Nodes)
             {
-                var nodeGridPosition = node.SetGridPosition(new Vector2Int(originCell.X, originCell.Y));
+                var nodeGridPosition = node.SetGridPosition(originCell.Coordinates);
 
                 // One node does not overlap a constructable cell. 
                 if (!Grid.TryGetCellByCoordinates(nodeGridPosition.x, nodeGridPosition.y, out Cell overlapCell))

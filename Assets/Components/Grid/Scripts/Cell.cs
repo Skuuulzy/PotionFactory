@@ -10,8 +10,7 @@ namespace Components.Grid
 {
     public class Cell
     {
-        public int X { get; }
-        public int Y { get; }
+        public Vector2Int Coordinates { get; }
         public float Size { get; }
         public bool ContainsObject { get; private set; }
         public bool ContainsNode { get; private set; }
@@ -26,9 +25,7 @@ namespace Components.Grid
 		private TileController _tileController; 
 		private Node _node; 
 		private IngredientTemplate _ingredient;
-
-		private List<RelicEffect> _relicEffects; 
-        private List<DecorationController> _decorationControllers;
+		private List<DecorationController> _decorationControllers;
        
         public ObstacleController ObstacleController => _obstacleController;  
         public TileController TileController => _tileController;
@@ -37,11 +34,9 @@ namespace Components.Grid
 
         public Cell(int x, int y, float size, bool containsObject)
         {
-            X = x;
-            Y = y;
+            Coordinates = new Vector2Int(x, y);
             Size = size;
             ContainsObject = containsObject;
-            _relicEffects = new List<RelicEffect>();
         }
 
         public void AddObstacleToCell(ObstacleController obstacle)
@@ -83,15 +78,6 @@ namespace Components.Grid
 	        Unlocked = true;
         }
 
-        public void AddRelicEffectToCell(RelicEffect effect)
-        {
-            _relicEffects.Add(effect);
-            if(_node != null)
-			{
-                effect.ApplyEffect(_node.Machine.Behavior);
-			}
-        }
-
         public void AddDecorationToCell(DecorationController decoration)
         {
             if(_decorationControllers == null)
@@ -124,10 +110,8 @@ namespace Components.Grid
         
         public Vector3 GetCenterPosition(Vector3 originPosition)
         {
-	        return new Vector3(X + Size / 2, 0, Y + Size / 2) * Size + originPosition;
+	        return new Vector3(Coordinates.x + Size / 2, 0, Coordinates.y + Size / 2) * Size + originPosition;
         }
-
-        public Vector2Int Position => new(X, Y);
 
         public bool IsConstructable()
         {
@@ -138,7 +122,7 @@ namespace Components.Grid
 
 	        if (_tileController) 
 	        {
-		        if (_tileController.GetTileType() == TileType.WATER)
+		        if (_tileController.TileType == TileType.WATER)
 		        {
 			        return false;
 		        }

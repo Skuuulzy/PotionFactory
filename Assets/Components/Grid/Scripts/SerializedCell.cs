@@ -57,8 +57,8 @@ namespace Components.Grid
 
         public SerializedCell(Cell cell)
         {
-            X = cell.X;
-            Y = cell.Y;
+            X = cell.Coordinates.x;
+            Y = cell.Coordinates.y;
             Size = cell.Size;
             ContainsObject = cell.ContainsObject;
             ContainsObstacle = cell.ContainsObstacle;

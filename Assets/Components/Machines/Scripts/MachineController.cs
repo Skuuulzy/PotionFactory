@@ -105,7 +105,7 @@ namespace Components.Machines
             // Adding nodes to the cells.
             foreach (var node in Machine.Nodes)
             {
-                var nodeGridPosition = node.SetGridPosition(new Vector2Int(originCell.X, originCell.Y));
+                var nodeGridPosition = node.SetGridPosition(originCell.Coordinates);
 
                 if (grid.TryGetCellByCoordinates(nodeGridPosition.x, nodeGridPosition.y, out Cell overlapCell))
                 {
