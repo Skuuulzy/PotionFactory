@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Components.Grid.Decorations
@@ -19,11 +17,6 @@ namespace Components.Grid.Decorations
 			{
 				_decorationType = obstacleTemplate.DecorationType;
 			}
-		}
-		
-		public void SetDecorationType(DecorationType obstacleType)
-		{
-			_decorationType = obstacleType;
 		}
 
 		public void OverrideGridPosition(Vector3 decorationPosition)
@@ -130,7 +123,5 @@ namespace Components.Grid.Decorations
 		Reeds,
 		Reeds_Group,
 		Reeds_Bush,
-
-
 	}
 }

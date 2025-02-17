@@ -60,7 +60,7 @@ namespace Components.Grid
             X = cell.Coordinates.x;
             Y = cell.Coordinates.y;
             Size = cell.Size;
-            ContainsObject = cell.ContainsObject;
+            ContainsObject = cell.ContainsGridObject;
             ContainsObstacle = cell.ContainsObstacle;
             ContainsTile = cell.ContainsTile;
             TileType = cell.TileController == null ? TileType.NONE : cell.TileController.TileType;

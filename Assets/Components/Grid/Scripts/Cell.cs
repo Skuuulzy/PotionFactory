@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using Components.Grid.Decorations;
 using Components.Grid.Obstacle;
 using Components.Grid.Tile;
-using Components.Ingredients;
 using Components.Machines;
 using UnityEngine;
 
@@ -12,44 +11,69 @@ namespace Components.Grid
     {
         public Vector2Int Coordinates { get; }
         public float Size { get; }
-        public bool ContainsObject { get; private set; }
+        public bool ContainsGridObject { get; private set; }
         public bool ContainsNode { get; private set; }
         public bool ContainsObstacle { get; private set; }
         public bool ContainsTile { get; private set; }
         public bool Unlocked { get; private set; }
 
-        
-        // TODO: Remove all sub controllers to use only the GridObjectController and cast
+        // TODO: Should all grid object use nodes ?
+		private Node _node;
         private GridObjectController _gridObjectController;
-		private ObstacleController _obstacleController; 
-		private TileController _tileController; 
-		private Node _node; 
-		private IngredientTemplate _ingredient;
+		
+        public Node Node => _node;
+
+        // TODO: Remove all sub controllers to use only the GridObjectController and cast
+		private ObstacleController _obstacleController;
+		private TileController _tileController;
 		private List<DecorationController> _decorationControllers;
        
         public ObstacleController ObstacleController => _obstacleController;  
         public TileController TileController => _tileController;
         public List<DecorationController> DecorationControllers => _decorationControllers;
-        public Node Node => _node;
 
-        public Cell(int x, int y, float size, bool containsObject)
+        public Cell(int x, int y, float size)
         {
             Coordinates = new Vector2Int(x, y);
             Size = size;
-            ContainsObject = containsObject;
+        }
+
+        public void AddGridObject(GridObjectController gridObjectController)
+        {
+	        ContainsGridObject = true;
+	        _gridObjectController = gridObjectController;
+        }
+
+        public void RemoveGridObject()
+        {
+	        if (!ContainsGridObject)
+	        {
+		        Debug.LogWarning($"You try to remove a grid object from cell {Coordinates}, but none was found.");
+		        return;
+	        }
+	        
+	        ContainsGridObject = false;
+	        _gridObjectController = null;
+        }
+        
+        public void AddNodeToCell(Node node)
+        {
+	        ContainsNode = true;
+	        ContainsGridObject = true;
+	        _node = node;
         }
 
         public void AddObstacleToCell(ObstacleController obstacle)
         {
             _obstacleController = obstacle;
-            ContainsObject = true;
+            ContainsGridObject = true;
             ContainsObstacle = true;
         }
 
         public void RemoveObstacleFromCell()
         {
             _obstacleController = null;
-            ContainsObject = false;
+            ContainsGridObject = false;
             ContainsObstacle = false;
         }
 
@@ -59,17 +83,12 @@ namespace Components.Grid
 			ContainsTile = true;
 		}
 		
-		public void AddNodeToCell(Node node)
-        {
-            ContainsNode = true;
-            ContainsObject = true;
-            _node = node;
-        }
+
 
         public void RemoveNodeFromCell()
         {
 	        ContainsNode = false;
-            ContainsObject = false;
+            ContainsGridObject = false;
             _node = null;
         }
         
@@ -115,7 +134,7 @@ namespace Components.Grid
 
         public bool IsConstructable()
         {
-	        if (!Unlocked || ContainsObject)
+	        if (!Unlocked || ContainsGridObject)
 	        {
 		        return false;
 	        }

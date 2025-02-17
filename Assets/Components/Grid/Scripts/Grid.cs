@@ -29,7 +29,7 @@ namespace Components.Grid
                 for (int y = 0; y < _gridArray.GetLength(1); y++)
                 {
                     //Create a new cell and add it to cell list
-                    Cell cell = new Cell(x, y, cellSize, false);
+                    Cell cell = new Cell(x, y, cellSize);
                     _cells.Add(cell);
                 }
             }
@@ -55,7 +55,7 @@ namespace Components.Grid
                 SerializedCell serializedCell = serializedCellList[i];
                 
                 //Create a new cell and add it to cell list
-                Cell cell = new Cell(serializedCell.X, serializedCell.Y, cellSize, serializedCell.ContainsObject);
+                Cell cell = new Cell(serializedCell.X, serializedCell.Y, cellSize);
                 _cells.Add(cell);
             }
 
