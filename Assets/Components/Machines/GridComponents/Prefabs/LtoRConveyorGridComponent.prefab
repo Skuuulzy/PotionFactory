@@ -73,6 +73,7 @@ GameObject:
   - component: {fileID: 2652423927148802697}
   - component: {fileID: 3253429406140143044}
   - component: {fileID: 2629808728814777733}
+  - component: {fileID: 1331746161246910259}
   m_Layer: 0
   m_Name: LtoRConveyorGridComponent
   m_TagString: Untagged
@@ -133,6 +134,19 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1331746161246910259
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5488635875282986484}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7ddcc69c07de9b41bc434491b1eea3d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _animator: {fileID: 2629808728814777733}
 --- !u!1 &6811401348564870929
 GameObject:
   m_ObjectHideFlags: 0
