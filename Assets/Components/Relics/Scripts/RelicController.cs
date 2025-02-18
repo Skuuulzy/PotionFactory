@@ -64,7 +64,7 @@ namespace Components.Relics
 							_zone = GetZone(_chosenCell, _radius, _mapWidth, _mapHeight, _grid);
 							foreach(Cell cell in _zone)
 							{
-								cell.AddRelicEffectToCell(effect);
+								//cell.AddRelicEffectToCell(effect);
 							}
 						}
 						break;
@@ -84,11 +84,11 @@ namespace Components.Relics
 		{
 			List<Cell> zoneCells = new List<Cell>();
 
-			for (int x = Mathf.Max(0, origineCell.X - radius); x <= Mathf.Min(mapWidth - 1, origineCell.X + radius); x++)
+			for (int x = Mathf.Max(0, origineCell.Coordinates.x - radius); x <= Mathf.Min(mapWidth - 1, origineCell.Coordinates.x + radius); x++)
 			{
-				for (int y = Mathf.Max(0, origineCell.Y - radius); y <= Mathf.Min(mapHeight - 1, origineCell.Y + radius); y++)
+				for (int y = Mathf.Max(0, origineCell.Coordinates.y - radius); y <= Mathf.Min(mapHeight - 1, origineCell.Coordinates.y + radius); y++)
 				{
-					float distance = Mathf.Sqrt(Mathf.Pow(x - origineCell.X, 2) + Mathf.Pow(y - origineCell.Y, 2));
+					float distance = Mathf.Sqrt(Mathf.Pow(x - origineCell.Coordinates.x, 2) + Mathf.Pow(y - origineCell.Coordinates.y, 2));
 					if (distance <= radius)
 					{
 						if (!grid.TryGetCellByCoordinates(x, y, out Cell overlapCell))
@@ -131,7 +131,7 @@ namespace Components.Relics
 
 			foreach (Cell cell in _zone)
 			{
-				Vector3 cellPosition = new Vector3(cell.X + cell.Size / 2, 0 , cell.Y + cell.Size / 2);
+				Vector3 cellPosition = new Vector3(cell.Coordinates.x + cell.Size / 2, 0 , cell.Coordinates.y + cell.Size / 2);
 				Gizmos.DrawCube(cellPosition, new Vector3(1,0.1f,1));; // Draw a cube for each cell in the zone
 			}
 		}

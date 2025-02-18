@@ -57,10 +57,10 @@ namespace Components.Grid
 
         public SerializedCell(Cell cell)
         {
-            X = cell.X;
-            Y = cell.Y;
+            X = cell.Coordinates.x;
+            Y = cell.Coordinates.y;
             Size = cell.Size;
-            ContainsObject = cell.ContainsObject;
+            ContainsObject = cell.ContainsGridObject;
             ContainsObstacle = cell.ContainsObstacle;
             ContainsTile = cell.ContainsTile;
             TileType = cell.TileController == null ? TileType.NONE : cell.TileController.TileType;

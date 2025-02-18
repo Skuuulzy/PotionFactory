@@ -29,7 +29,7 @@ namespace Components.Grid
                 for (int y = 0; y < _gridArray.GetLength(1); y++)
                 {
                     //Create a new cell and add it to cell list
-                    Cell cell = new Cell(x, y, cellSize, false);
+                    Cell cell = new Cell(x, y, cellSize);
                     _cells.Add(cell);
                 }
             }
@@ -55,7 +55,7 @@ namespace Components.Grid
                 SerializedCell serializedCell = serializedCellList[i];
                 
                 //Create a new cell and add it to cell list
-                Cell cell = new Cell(serializedCell.X, serializedCell.Y, cellSize, serializedCell.ContainsObject);
+                Cell cell = new Cell(serializedCell.X, serializedCell.Y, cellSize);
                 _cells.Add(cell);
             }
 
@@ -85,6 +85,11 @@ namespace Components.Grid
         {
             return new Vector3(x, 0, y) * _cellSize + _originPosition;
         }
+        
+        public Vector3 GetWorldPosition(Vector2Int coordinates)
+        {
+            return new Vector3(coordinates.x, 0, coordinates.y) * _cellSize + _originPosition;
+        }
 
         private void GetCellCoordinates(Vector3 worldPosition, out int x, out int y)
         {
@@ -104,7 +109,7 @@ namespace Components.Grid
         {
             foreach (Cell cell in _cells)
             {
-                if (cell.X == x && cell.Y == y)
+                if (cell.Coordinates.x == x && cell.Coordinates.y == y)
                 {
                     foundCell = cell;
                     return true;
@@ -156,7 +161,7 @@ namespace Components.Grid
 			foreach (Cell cell in _cells)
 			{
 				// Calculate the world position of the center of the cell.
-				Vector3 cellWorldPosition = GetWorldPosition(cell.X, cell.Y) + new Vector3(_cellSize / 2, 0, _cellSize / 2);
+                Vector3 cellWorldPosition = GetWorldPosition(cell.Coordinates.x, cell.Coordinates.y) + new Vector3(_cellSize / 2, 0, _cellSize / 2);
 
 				// Calculate the distance between the circle center and the cell center.
 				float distance = Vector3.Distance(center, cellWorldPosition);
