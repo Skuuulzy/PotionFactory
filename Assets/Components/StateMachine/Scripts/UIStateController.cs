@@ -1,8 +1,6 @@
-using System;
 using Components.Economy;
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using VComponent.Tools.SceneLoader;
 
@@ -12,7 +10,6 @@ public class UIStateController : MonoBehaviour
 	[SerializeField] private TextMeshProUGUI _stateNameText;
 	[SerializeField] private TextMeshProUGUI _stateCountdownText;
 	[SerializeField] private Button _finishStateButton;
-	[SerializeField] private TMP_Text _finishStateButtonText;
 
 	[Header("EndGame")]
 	[SerializeField] private GameObject _endGameGO;

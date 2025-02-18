@@ -22,6 +22,11 @@ namespace Components.Grid.Parcel
 
         public GridParcel Parcel => _parcel;
 
+        private void Start()
+        {
+            EconomyController.OnPlayerMoneyUpdated += CheckBuyingEligibility;
+        }
+
         public void Initialize(GridParcel parcel, int cellSize, bool unlocked, int index)
         {
             _rectTransform.anchoredPosition = new Vector2(parcel.OriginPosition.x * cellSize, parcel.OriginPosition.y * cellSize);
@@ -34,7 +39,6 @@ namespace Components.Grid.Parcel
             _parcelPriceTxt.text = _price.ToString();
             _background.color = ExtensionMethods.GenerateRandomColorWithAlpha(0.1f);
             
-            EconomyController.OnPlayerMoneyUpdated += CheckBuyingEligibility;
             CheckBuyingEligibility(EconomyController.Instance.PlayerMoney);
         }
 

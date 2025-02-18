@@ -1665,13 +1665,13 @@ PrefabInstance:
     - target: {fileID: 4786692480659429081, guid: 18d70a7069f6de743b09b40c795c545c,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
-      value: 3
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4786692480659429081, guid: 18d70a7069f6de743b09b40c795c545c,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 11400000, guid: f2d2cfd574e284447ba6cd62ef47026d,
+      objectReference: {fileID: 11400000, guid: 93c014fa518c8c74b970522c3b62c76e,
         type: 2}
     - target: {fileID: 4786692480659429081, guid: 18d70a7069f6de743b09b40c795c545c,
         type: 3}
@@ -1681,12 +1681,12 @@ PrefabInstance:
     - target: {fileID: 4786692480659429081, guid: 18d70a7069f6de743b09b40c795c545c,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: Invoke
+      value: Raise
       objectReference: {fileID: 0}
     - target: {fileID: 4786692480659429081, guid: 18d70a7069f6de743b09b40c795c545c,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: VComponent.Tools.EventSystem.EventChannel`1[[System.Int32, mscorlib
+      value: VTools.SoWorkflow.EventSystem.GameEvent, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 4786692480659429081, guid: 18d70a7069f6de743b09b40c795c545c,
         type: 3}

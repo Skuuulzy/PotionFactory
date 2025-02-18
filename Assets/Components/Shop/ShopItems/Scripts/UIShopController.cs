@@ -1,7 +1,5 @@
 using Components.Machines;
 using Components.Shop.ShopItems;
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -30,7 +28,7 @@ namespace Components.Shop
 			ShopController.OnShopGenerated -= SetInfos;
 		}
 
-		public void SetInfos(List<ShopItem> shopItems)
+		private void SetInfos(List<ShopItem> shopItems)
 		{
 
 			//Destroying all child before instantiate new ones
@@ -38,7 +36,6 @@ namespace Components.Shop
 			{
 				Destroy(child.gameObject);
 			}
-
 
 			//Instantiate all shop items
 			foreach (ShopItem shopItem in shopItems)
@@ -51,6 +48,17 @@ namespace Components.Shop
 				}
 			}
 
+		}
+		
+		public void OpenShop(bool open)
+		{
+			_shopUIView.SetActive(open);
+			
+			//Destroying all child before instantiate new ones
+			foreach (Transform child in _itemsBuyedParent)
+			{
+				Destroy(child.gameObject);
+			}
 		}
 
 		public void OnOpenShop()
@@ -68,5 +76,4 @@ namespace Components.Shop
 			newItem.SetInfos(template);
 		}
 	}
-
 }

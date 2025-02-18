@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3b8ab629a6dc4599a6b7ad946827b788, type: 3}
-  m_Name: New Float Event
+  m_Script: {fileID: 11500000, guid: 0c5cbde8ab8518b45847a428ef15d2f5, type: 3}
+  m_Name: OnEndOfDay
   m_EditorClassIdentifier: 
-  _description: 
+  _description: Raised when the timer of day reach 0 or the player press next day.

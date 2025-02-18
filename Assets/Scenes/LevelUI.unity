@@ -344,11 +344,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7380831730878773858, guid: e8d67f03b504188429e99dc61f647996,
-        type: 3}
-      propertyPath: m_hasFontAssetChanged
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -702,6 +697,27 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1637442227}
     m_Modifications:
+    - target: {fileID: 373246787823488658, guid: 097c10899650c7b4bb6da91ba66e79ca,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 373246787823488658, guid: 097c10899650c7b4bb6da91ba66e79ca,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 373246787823488658, guid: 097c10899650c7b4bb6da91ba66e79ca,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 11400000, guid: 93c014fa518c8c74b970522c3b62c76e,
+        type: 2}
+    - target: {fileID: 373246787823488658, guid: 097c10899650c7b4bb6da91ba66e79ca,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 3109478775115317884, guid: 097c10899650c7b4bb6da91ba66e79ca,
         type: 3}
       propertyPath: m_AnchorMax.x
