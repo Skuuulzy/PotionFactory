@@ -10,6 +10,7 @@ using System.Linq;
 using Database;
 using UnityEditor;
 using UnityEngine;
+using VComponent.InputSystem;
 using Random = UnityEngine.Random;
 
 namespace Components.Grid.Generator
@@ -502,6 +503,8 @@ namespace Components.Grid.Generator
 			{
 				ClearGrid();
 			}
+			
+			InputManager.Instance.gameObject.SetActive(false);
 			
 			_grid = new Grid(_gridXValue, _gridYValue, _cellSize, _startPosition, false, serializedCellList.ToArray());
 			_cellList = new List<Cell>();
