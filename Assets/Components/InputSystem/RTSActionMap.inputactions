@@ -1,0 +1,317 @@
+{
+    "name": "RTSActionMap",
+    "maps": [
+        {
+            "name": "Player",
+            "id": "f62a4b92-ef5e-4175-8f4c-c9075429d32c",
+            "actions": [
+                {
+                    "name": "MovementCamera",
+                    "type": "Value",
+                    "id": "ed4f5284-86c4-4f2d-8fdb-a786e4e1914d",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "FastMovementCamera",
+                    "type": "Button",
+                    "id": "caa8cca8-410b-4ab9-9adf-b5b61f82fe10",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "ClockRotationCamera",
+                    "type": "Button",
+                    "id": "4e288167-cd46-4e0d-8c5e-55bfc374f83c",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "AntiClockRotationCamera",
+                    "type": "Button",
+                    "id": "9e2d6a49-7fc4-4ea7-87a7-86089c55f72a",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "ZoomCamera",
+                    "type": "PassThrough",
+                    "id": "67dcdf9f-5863-4cb0-b630-cb6e50b3f891",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "DragMovementCamera",
+                    "type": "Button",
+                    "id": "c001e9ee-34fc-4bd2-b19a-e9aac5c551ba",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "DragRotationCamera",
+                    "type": "Button",
+                    "id": "f79a9b69-0124-4503-b537-766171e520b1",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Interact",
+                    "type": "Button",
+                    "id": "bcc10847-2739-478f-8bea-35be3fe33159",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "??1",
+                    "type": "Button",
+                    "id": "8c524f46-63c3-43da-8a2b-145b2003ef77",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "??",
+                    "type": "Button",
+                    "id": "52081eeb-02f2-4370-98e0-0a9bfabb60c7",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "2D Vector",
+                    "id": "2f65fd17-879c-45ba-96ab-7f5c151f0d56",
+                    "path": "2DVector",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "MovementCamera",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "up",
+                    "id": "43288ab7-8f45-4560-a1df-9726662d3b7b",
+                    "path": "<Keyboard>/w",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "MovementCamera",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "down",
+                    "id": "6037e015-683a-4c50-8e85-50634014f9bd",
+                    "path": "<Keyboard>/s",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "MovementCamera",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "left",
+                    "id": "fb271941-9733-48f2-8fd2-9c9fd6d43ca4",
+                    "path": "<Keyboard>/a",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "MovementCamera",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "right",
+                    "id": "efca8f89-b3ba-409a-a3b3-278c61c25f42",
+                    "path": "<Keyboard>/d",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "MovementCamera",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "1cbbd261-8f41-4661-bd04-193c2762264e",
+                    "path": "<Keyboard>/shift",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "FastMovementCamera",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b654cd63-4204-4bb0-8dc4-71af6f06e2a4",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ClockRotationCamera",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b018553a-373b-4739-bc30-079969ec9293",
+                    "path": "<Keyboard>/q",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "AntiClockRotationCamera",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "1D Axis",
+                    "id": "7e7351a9-5771-4bb1-a2b1-ad7f80052584",
+                    "path": "1DAxis",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ZoomCamera",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "negative",
+                    "id": "6f9db1de-9571-48b5-9ff6-20c07dbb7f88",
+                    "path": "<Mouse>/scroll/down",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ZoomCamera",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "positive",
+                    "id": "d4e89af8-4823-4f4b-8774-9f657c264b08",
+                    "path": "<Mouse>/scroll/up",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ZoomCamera",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "7c30d801-6730-41a7-b76b-6876710f0a8f",
+                    "path": "<Mouse>/middleButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "DragMovementCamera",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "18786dbb-0a84-46f5-9458-b3f37dbdcdd4",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Interact",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "265ad396-d5a0-4f3d-90d4-5613904b8e80",
+                    "path": "<Keyboard>/tab",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "??1",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "48a60db5-14cf-438f-a90f-f12861422cc3",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "??",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": [
+        {
+            "name": "KeyboardMouse",
+            "bindingGroup": "KeyboardMouse",
+            "devices": [
+                {
+                    "devicePath": "<Keyboard>",
+                    "isOptional": false,
+                    "isOR": false
+                },
+                {
+                    "devicePath": "<Mouse>",
+                    "isOptional": false,
+                    "isOR": false
+                }
+            ]
+        },
+        {
+            "name": "Gamepad",
+            "bindingGroup": "Gamepad",
+            "devices": [
+                {
+                    "devicePath": "<Gamepad>",
+                    "isOptional": true,
+                    "isOR": false
+                },
+                {
+                    "devicePath": "<XInputController>",
+                    "isOptional": true,
+                    "isOR": false
+                },
+                {
+                    "devicePath": "<DualShockGamepad>",
+                    "isOptional": true,
+                    "isOR": false
+                }
+            ]
+        },
+        {
+            "name": "Xbox Controller",
+            "bindingGroup": "Xbox Controller",
+            "devices": []
+        },
+        {
+            "name": "PS4 Controller",
+            "bindingGroup": "PS4 Controller",
+            "devices": []
+        }
+    ]
+}

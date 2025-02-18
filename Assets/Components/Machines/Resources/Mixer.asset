@@ -1,0 +1,78 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 581ab5ce2c92484d9bd63e4e972996c1, type: 3}
+  m_Name: Mixer
+  m_EditorClassIdentifier: 
+  _name: Mixer
+  _gridView: {fileID: 2546896531206445068, guid: 89e05b4f498d132489b85cdc0c8eaf33,
+    type: 3}
+  _uiView: {fileID: 21300000, guid: 594e3d775749e4e408f130f73e565ac9, type: 3}
+  _gridObjectControllerPrefab: {fileID: 2567407675386972328, guid: 859503caaa5f96242b5ba83dccd721c9,
+    type: 3}
+  _type: 5
+  _gridComponents:
+  - {fileID: 1085624917457900550, guid: cff6497d14e847e43888d93eee477349, type: 3}
+  _nodes:
+  - _localPosition: {x: 0, y: 0}
+    _gridPosition: {x: 0, y: 0}
+    _ports: []
+  - _localPosition: {x: 0, y: -1}
+    _gridPosition: {x: 0, y: 0}
+    _ports:
+    - _side: 3
+      _way: 0
+  - _localPosition: {x: 0, y: -2}
+    _gridPosition: {x: 0, y: 0}
+    _ports: []
+  - _localPosition: {x: 1, y: 0}
+    _gridPosition: {x: 0, y: 0}
+    _ports:
+    - _side: 1
+      _way: 0
+  - _localPosition: {x: 1, y: -1}
+    _gridPosition: {x: 0, y: 0}
+    _ports: []
+  - _localPosition: {x: 1, y: -2}
+    _gridPosition: {x: 0, y: 0}
+    _ports:
+    - _side: 0
+      _way: 0
+  - _localPosition: {x: 2, y: 0}
+    _gridPosition: {x: 0, y: 0}
+    _ports: []
+  - _localPosition: {x: 2, y: -1}
+    _gridPosition: {x: 0, y: 0}
+    _ports:
+    - _side: 2
+      _way: 1
+  - _localPosition: {x: 2, y: -2}
+    _gridPosition: {x: 0, y: 0}
+    _ports: []
+  _showItem: 0
+  _canTakeInfiniteIngredients: 0
+  _inSlotIngredientCount: 3
+  _outSlotIngredientCount: 1
+  _ingredientsPerSlotCount: 5
+  _processTime: 6
+  _shopSpawnProbability: 0.6
+  _shopPrice: 10
+  _cannotBeSell: 0
+  _cannotBeBuy: 0
+  _sellPrice: 10
+  _contextualComponents:
+  - {fileID: -7985585081776399288, guid: 587b9316180125b4597d80cce119472f, type: 3}
+  _uiGameplayDescription: 
+  _uiLoreDescription: 
+  _contextMenuHeight: 4
+  _canRetrieve: 1
+  _canMove: 1
+  _canConfigure: 1

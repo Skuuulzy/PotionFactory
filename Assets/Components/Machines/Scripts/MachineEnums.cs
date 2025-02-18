@@ -2,14 +2,30 @@
 {
     public enum Side
     {
-        SOUTH,
-        NORTH,
-        EAST,
-        WEST,
-        NORTH_WEST,
-        NORTH_EAST,
-        SOUTH_WEST,
-        SOUTH_EAST,
+        DOWN,
+        UP,
+        RIGHT,
+        LEFT,
         NONE
+    }
+    
+    public enum Way
+    {
+        IN,
+        OUT,
+        NONE
+    }
+    
+    public enum MachineType
+    {
+        CAULDRON,
+        CONVEYOR,
+        MARCHAND,
+        DISTILLER,
+        EXTRACTOR,
+        MIXER,
+        PRESS,
+        MERGER,
+        SPLITTER
     }
 }

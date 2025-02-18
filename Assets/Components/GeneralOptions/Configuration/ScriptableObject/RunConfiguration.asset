@@ -1,0 +1,100 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ad7e4d41b9a7554fa7c656c9474a655, type: 3}
+  m_Name: RunConfiguration
+  m_EditorClassIdentifier: 
+  _runStateList:
+  - StateNumber: 1
+    NumberOfTransformationAsked: 2
+    TypeOfNumberTransformation: 1
+    MoneyObjective: 150
+    CustomTime: 240
+  - StateNumber: 2
+    NumberOfTransformationAsked: 2
+    TypeOfNumberTransformation: 1
+    MoneyObjective: 200
+    CustomTime: 190
+  - StateNumber: 3
+    NumberOfTransformationAsked: 2
+    TypeOfNumberTransformation: 1
+    MoneyObjective: 250
+    CustomTime: 190
+  - StateNumber: 4
+    NumberOfTransformationAsked: 3
+    TypeOfNumberTransformation: 0
+    MoneyObjective: 400
+    CustomTime: 0
+  - StateNumber: 5
+    NumberOfTransformationAsked: 4
+    TypeOfNumberTransformation: 0
+    MoneyObjective: 500
+    CustomTime: 0
+  - StateNumber: 6
+    NumberOfTransformationAsked: 5
+    TypeOfNumberTransformation: 0
+    MoneyObjective: 600
+    CustomTime: 0
+  - StateNumber: 7
+    NumberOfTransformationAsked: 6
+    TypeOfNumberTransformation: 0
+    MoneyObjective: 700
+    CustomTime: 0
+  - StateNumber: 8
+    NumberOfTransformationAsked: 6
+    TypeOfNumberTransformation: 0
+    MoneyObjective: 800
+    CustomTime: 0
+  - StateNumber: 9
+    NumberOfTransformationAsked: 7
+    TypeOfNumberTransformation: 0
+    MoneyObjective: 1000
+    CustomTime: 0
+  - StateNumber: 10
+    NumberOfTransformationAsked: 9
+    TypeOfNumberTransformation: 0
+    MoneyObjective: 1100
+    CustomTime: 0
+  - StateNumber: 11
+    NumberOfTransformationAsked: 11
+    TypeOfNumberTransformation: 0
+    MoneyObjective: 1200
+    CustomTime: 0
+  - StateNumber: 12
+    NumberOfTransformationAsked: 11
+    TypeOfNumberTransformation: 0
+    MoneyObjective: 1500
+    CustomTime: 0
+  - StateNumber: 13
+    NumberOfTransformationAsked: 15
+    TypeOfNumberTransformation: 0
+    MoneyObjective: 2000
+    CustomTime: 0
+  - StateNumber: 14
+    NumberOfTransformationAsked: 18
+    TypeOfNumberTransformation: 0
+    MoneyObjective: 4000
+    CustomTime: 0
+  - StateNumber: 15
+    NumberOfTransformationAsked: 4
+    TypeOfNumberTransformation: 0
+    MoneyObjective: 8000
+    CustomTime: 0
+  - StateNumber: 16
+    NumberOfTransformationAsked: 22
+    TypeOfNumberTransformation: 0
+    MoneyObjective: 10000
+    CustomTime: 0
+  _guildTicketAmountPerRound: 5
+  _guildTicketInterestValue: 5
+  _guildTicketInterestAmountPerRound: 1
+  _planningFactoryStateTime: 120
+  _resolutionFactoryStateTime: 180

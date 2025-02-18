@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9cd67c4c33928f34894964bb28cabb66, type: 3}
+  m_Name: Granny's soup
+  m_EditorClassIdentifier: 
+  _machine: {fileID: 11400000, guid: fc8c02c62d1eb67419125081badddd8e, type: 2}
+  _ingredients:
+    m_Dictionnary:
+    - m_key: {fileID: 11400000, guid: 62042d47bb3f9684884da3dfde21c363, type: 2}
+      m_value: 4
+    - m_key: {fileID: 11400000, guid: 71819d4caa179bc499bcc82111980456, type: 2}
+      m_value: 2
+  _outIngredient: {fileID: 11400000, guid: ef49855e2f8a8a14c8c998962cb5eb8d, type: 2}
+  _processTimeModifier: 1.3

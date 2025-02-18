@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9cd67c4c33928f34894964bb28cabb66, type: 3}
+  m_Name: Mood elixir
+  m_EditorClassIdentifier: 
+  _machine: {fileID: 11400000, guid: fc8c02c62d1eb67419125081badddd8e, type: 2}
+  _ingredients:
+    m_Dictionnary:
+    - m_key: {fileID: 11400000, guid: 3acd71395c1e6ad468f4f24de81aca75, type: 2}
+      m_value: 1
+    - m_key: {fileID: 11400000, guid: 6d5905a968316924fa41dd4ccb03aaae, type: 2}
+      m_value: 1
+    - m_key: {fileID: 11400000, guid: 7a0cd7086903d9f4a8608ee0d7ccde25, type: 2}
+      m_value: 1
+  _outIngredient: {fileID: 11400000, guid: dd90b2a31d858bd47860bab31bcd2847, type: 2}
+  _processTimeModifier: 6.5

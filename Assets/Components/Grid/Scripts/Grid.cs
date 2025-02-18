@@ -1,8 +1,6 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using CodeMonkey.Utils;
 using System.Collections.Generic;
-using Components.Machines;
 
 namespace Components.Grid
 {
@@ -13,9 +11,10 @@ namespace Components.Grid
         private readonly float _cellSize;
         private readonly Vector3 _originPosition;
         private readonly int[,] _gridArray;
-        private readonly List<Cell> _cellsList;
-
-        public Grid(int width, int height, float cellSize, Vector3 originPosition, Transform parentTransform, bool showDebug)
+        private readonly List<Cell> _cells;
+        
+        // ------------------------------------------------------------------------- CONSTRUCTOR -------------------------------------------------------------------------
+        public Grid(int width, int height, float cellSize, Vector3 originPosition, bool showDebug)
         {
             _width = width;
             _height = height;
@@ -23,7 +22,7 @@ namespace Components.Grid
             _originPosition = originPosition;
 
             _gridArray = new int[width, height];
-            _cellsList = new List<Cell>();
+            _cells = new List<Cell>();
 
             for (int x = 0; x < _gridArray.GetLength(0); x++)
             {
@@ -31,18 +30,42 @@ namespace Components.Grid
                 {
                     //Create a new cell and add it to cell list
                     Cell cell = new Cell(x, y, cellSize, false);
-                    _cellsList.Add(cell);
+                    _cells.Add(cell);
                 }
             }
 
             if (showDebug)
             {
-                DrawGridDebug(width, height, cellSize, parentTransform);
+                DrawGridDebug();
             }
         }
 
-        #region HELPERS
+        public Grid(int width, int height, float cellSize, Vector3 originPosition, bool showDebug, SerializedCell[] serializedCellList)
+		{
+            _width = width;
+            _height = height;
+            _cellSize = cellSize;
+            _originPosition = originPosition;
 
+            _gridArray = new int[width, height];
+            _cells = new List<Cell>();
+
+            for (int i = 0; i < serializedCellList.Length; i++)
+			{
+                SerializedCell serializedCell = serializedCellList[i];
+                
+                //Create a new cell and add it to cell list
+                Cell cell = new Cell(serializedCell.X, serializedCell.Y, cellSize, serializedCell.ContainsObject);
+                _cells.Add(cell);
+            }
+
+            if (showDebug)
+            {
+                DrawGridDebug();
+            }
+        }
+
+        // ------------------------------------------------------------------------- GRID INFOS -------------------------------------------------------------------------
         public int GetWidth()
         {
             return _width;
@@ -68,60 +91,8 @@ namespace Components.Grid
             x = Mathf.FloorToInt((worldPosition - _originPosition).x / _cellSize);
             y = Mathf.FloorToInt((worldPosition - _originPosition).z / _cellSize);
         }
-
-        #endregion HELPERS
-
-        #region VALUES
-
-        public void SetValue(int x, int y, int value)
-        {
-            if (x >= 0 && y >= 0 && x < _width && y < _height)
-            {
-                _gridArray[x, y] = value;
-            }
-        }
-
-        public void SetValue(Vector3 worldPosition, int value)
-        {
-            int x, y;
-            GetCellCoordinates(worldPosition, out x, out y);
-            SetValue(x, y, value);
-        }
-
-        public void ResetAllValue()
-        {
-            for (int x = 0; x < _gridArray.GetLength(0); x++)
-            {
-                for (int y = 0; y < _gridArray.GetLength(1); y++)
-                {
-                    SetValue(x, y, 0);
-                }
-            }
-        }
-
-        public int GetValue(int x, int y)
-        {
-            if (x >= 0 && y >= 0 && x < _width && y < _height)
-            {
-                return _gridArray[x, y];
-            }
-            else
-            {
-                return 0;
-            }
-        }
-
-        public int GetValue(Vector3 worldPosition)
-        {
-            int x, y;
-            GetCellCoordinates(worldPosition, out x, out y);
-            return GetValue(x, y);
-        }
-
-        #endregion VALUES
-
-        #region GET CELLS
-
+        
+        // ------------------------------------------------------------------------- CELLS -------------------------------------------------------------------------
         /// <summary>
         /// From a set of coordinates return a cell if one is found.
         /// </summary>
@@ -131,7 +102,7 @@ namespace Components.Grid
         /// <returns>True if a cell is found, otherwise false.</returns>
         public bool TryGetCellByCoordinates(int x, int y, out Cell foundCell)
         {
-            foreach (Cell cell in _cellsList)
+            foreach (Cell cell in _cells)
             {
                 if (cell.X == x && cell.Y == y)
                 {
@@ -142,6 +113,14 @@ namespace Components.Grid
 
             foundCell = null;
             return false;
+        }
+
+        public bool TryGetCellByCoordinates(Vector2Int coordinates, out Cell foundCell)
+        {
+            var cellFound = TryGetCellByCoordinates(coordinates.x, coordinates.y, out Cell cell);
+            foundCell = cell;
+
+            return cellFound;
         }
 
         /// <summary>
@@ -164,94 +143,91 @@ namespace Components.Grid
             return false;
         }
 
+		/// <summary>
+		/// Retrieves all cells within a circle defined by a center position and radius.
+		/// </summary>
+		/// <param name="center">Center position in world coordinates.</param>
+		/// <param name="radius">Radius of the circle.</param>
+		/// <returns>List of cells within the circle.</returns>
+		public List<Cell> GetCellsInCircle(Vector3 center, float radius)
+		{
+			List<Cell> cellsInCircle = new List<Cell>();
 
-        /// <summary>
-        /// From a world position return all the potential neighbours of the cell.
-        /// </summary>
-        /// <param name="worldPosition">The position of the cell.</param>
-        /// <param name="includeDiagonalNeighbours">Should the diagonal neighbours need to be included.</param>
-        /// <returns>The list of neighbours.</returns>
-        public Dictionary<Side, Cell> GetNeighboursByPosition(Vector3 worldPosition, bool includeDiagonalNeighbours = false)
+			foreach (Cell cell in _cells)
+			{
+				// Calculate the world position of the center of the cell.
+				Vector3 cellWorldPosition = GetWorldPosition(cell.X, cell.Y) + new Vector3(_cellSize / 2, 0, _cellSize / 2);
+
+				// Calculate the distance between the circle center and the cell center.
+				float distance = Vector3.Distance(center, cellWorldPosition);
+
+				// Add the cell to the list if it is within the radius.
+				if (distance <= radius)
+				{
+					cellsInCircle.Add(cell);
+				}
+			}
+
+			return cellsInCircle;
+		}
+        
+		public void ClearNodes()
         {
-            GetCellCoordinates(worldPosition, out var x, out var y);
-            return GetNeighboursByCoordinates(x, y, includeDiagonalNeighbours);
+            foreach (var cell in _cells)
+            {
+                cell.RemoveNodeFromCell();
+                cell.RemoveObstacleFromCell();
+            }
+        }
+
+        public void ClearObstacles()
+        {
+            foreach (var cell in _cells)
+            {
+                cell.RemoveObstacleFromCell();
+            }
         }
         
-        public Dictionary<Side, Cell> GetNeighboursByCoordinates(int x, int y, bool includeDiagonalNeighbours = false)
+        // ------------------------------------------------------------------------- DEBUG -------------------------------------------------------------------------
+        public void DrawGridDebug()
         {
-            Dictionary<Side, Cell> neighbours = new Dictionary<Side, Cell>();
-
-            // Get the relative positions of the desired neighbours
-            var directions = includeDiagonalNeighbours ? FULL_NEIGHBOURS_COORDINATES : NEIGHBOURS_COORDINATES;
-
-            // Iterate through all the possible neighbors
-            foreach (var direction in directions)
+            var oldDebug = GameObject.Find("GRID_TEXT_DEBUG");
+            if (oldDebug)
             {
-                int newX = x + direction.Value.Item1;
-                int newY = y + direction.Value.Item2;
-
-                if (newX >= 0 && newY >= 0 && newX < _width && newY < _height)
-                {
-                    if (TryGetCellByCoordinates(newX, newY, out var neighborCell))
-                    {
-                        neighbours[direction.Key] = neighborCell;
-                    }
-                }
+                Object.Destroy(oldDebug);
+            }
+            
+            var debugTextArray = new TextMesh[_width][];
+            for (int index = 0; index < _width; index++)
+            {
+                debugTextArray[index] = new TextMesh[_height];
             }
 
-            return neighbours;
-        }
-
-        #endregion GET CELLS
-
-        #region DATA
-        
-        private static readonly Dictionary<Side, (int, int)> NEIGHBOURS_COORDINATES = new()
-        {
-            { Side.NORTH,  (  0,  1 ) },
-            { Side.SOUTH,  (  0, -1 ) },
-            { Side.WEST, ( -1,  0 ) },
-            { Side.EAST, (  1,  0 ) }
-        };
-        
-        private static readonly Dictionary<Side, (int, int)> FULL_NEIGHBOURS_COORDINATES = new()
-        {
-            { Side.NORTH,  (  0,  1 ) },
-            { Side.SOUTH,  (  0, -1 ) },
-            { Side.WEST, ( -1,  0 ) },
-            { Side.EAST, (  1,  0 ) },
-            { Side.NORTH_WEST, ( -1, 1 ) },
-            { Side.NORTH_EAST, ( 1,  1 ) },
-            { Side.SOUTH_WEST, (  -1, -1 ) },
-            { Side.SOUTH_EAST, (  1,  -1 ) }
-        };
-
-        #endregion
-
-        private void DrawGridDebug(int width, int height, float cellSize, Transform parentTransform)
-        {
-            TextMesh[][] debugTextArray = new TextMesh[width][];
-            for (int index = 0; index < width; index++)
-            {
-                debugTextArray[index] = new TextMesh[height];
-            }
-
+            GameObject parent = new GameObject("GRID_TEXT_DEBUG");
+            
             for (int x = 0; x < _gridArray.GetLength(0); x++)
             {
                 for (int y = 0; y < _gridArray.GetLength(1); y++)
                 {
-                    //Create a new cell and add it to cellLList
-                    Cell cell = new Cell(x, y, cellSize, false);
-                    _cellsList.Add(cell);
+                    if (!TryGetCellByCoordinates(x,y, out var cell))
+                    {
+                        continue;
+                    }
 
-                    debugTextArray[x][y] = UtilsClass.CreateWorldText($"({x},{y})", parentTransform, GetWorldPosition(x, y) + new Vector3(cellSize, cellSize) * .5f, 30, Color.white, TextAnchor.MiddleCenter);
+                    var worldPosition = GetWorldPosition(x, y) + new Vector3(_cellSize / 2, 0, _cellSize / 2);
+
+                    var color = cell.Unlocked ? Color.white : Color.red;
+                    
+                    debugTextArray[x][y] = UtilsClass.CreateWorldText($"({x},{y})", parent.transform, worldPosition, 16, color, TextAnchor.MiddleCenter);
+                    debugTextArray[x][y].transform.rotation = Quaternion.Euler(90, 0, 0);
+                    
                     Debug.DrawLine(GetWorldPosition(x, y), GetWorldPosition(x, y + 1), Color.white, float.PositiveInfinity);
                     Debug.DrawLine(GetWorldPosition(x, y), GetWorldPosition(x + 1, y), Color.white, float.PositiveInfinity);
                 }
             }
 
-            Debug.DrawLine(GetWorldPosition(0, height), GetWorldPosition(width, height), Color.white, float.PositiveInfinity);
-            Debug.DrawLine(GetWorldPosition(width, 0), GetWorldPosition(width, height), Color.white, float.PositiveInfinity);
+            Debug.DrawLine(GetWorldPosition(0, _height), GetWorldPosition(_width, _height), Color.white, float.PositiveInfinity);
+            Debug.DrawLine(GetWorldPosition(_width, 0), GetWorldPosition(_width, _height), Color.white, float.PositiveInfinity);
         }
     }
 }

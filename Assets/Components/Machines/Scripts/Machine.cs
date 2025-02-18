@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using Components.Grid;
+using System.Linq;
+using Components.Ingredients;
 using Components.Machines.Behaviors;
 using Components.Tick;
 using Sirenix.OdinInspector;
@@ -11,125 +12,393 @@ namespace Components.Machines
     [Serializable]
     public class Machine : ITickable
     {
-        // ------------------------------------------------------------------------- PRIVATE FIELDS -------------------------------------------------------------------------
+        // ----------------------------------------------------------------------- PRIVATE FIELDS -------------------------------------------------------------------------
+        // TODO: Should be a dictionary ?
+        [SerializeField] private List<IngredientTemplate> _inIngredients;
+        [SerializeField] private List<IngredientTemplate> _outIngredients;
+        [SerializeField] private List<Node> _nodes;
+        
+        [SerializeField, ReadOnly] private MachineController _controller;
+        [SerializeField] private MachineBehavior _behavior;
         
         private readonly MachineTemplate _template;
+        private int _outMachineTickCount;
         
-        [ShowInInspector] private Dictionary<Side, Cell> _neighbours;
-        [SerializeField] private List<int> _items;
-        [SerializeField] private List<Side> _inPorts;
-        [SerializeField] private List<Side> _outPorts;
-        [SerializeField] private MachineController _controller;
-        [SerializeField] private MachineBehavior _behavior;
-
-        // ------------------------------------------------------------------------- PUBLIC FIELDS -------------------------------------------------------------------------
-        
+        // ----------------------------------------------------------------------- PUBLIC FIELDS -------------------------------------------------------------------------
         public MachineTemplate Template => _template;
         public MachineController Controller => _controller;
         public MachineBehavior Behavior => _behavior;
-        public List<int> Items => _items;
+        public List<IngredientTemplate> InIngredients => _inIngredients;
+        public List<IngredientTemplate> OutIngredients => _outIngredients;
+        public List<IngredientTemplate> AllIngredients => _inIngredients.Concat(_outIngredients).ToList();
+        public virtual List<Node> Nodes => _nodes;
 
-        public virtual List<Side> InPorts => _inPorts;
-        public virtual List<Side> OutPorts => _outPorts;
-        
+        // ------------------------------------------------------------------------- ACTIONS -------------------------------------------------------------------------
         public Action OnTick;
-        public Action<bool> OnItemAdded;
+        public Action OnPropagateTick;
+        public Action OnSlotUpdated;
+        public static Action<Machine, bool> OnSelected;
+        public static Action<Machine, bool> OnHovered;
+        public static Action<Machine, bool> OnRetrieve;
+        public static Action<Machine> OnMove;
+        public static Action<Machine> OnConfigure;
+        public static Action<Machine, bool> OnProcess;
+
+        // TODO: This should not be here, some machine have specific event linked with specifics views.
+        public Action OnItemSell;
         
-        // ------------------------------------------------------------------------- CONSTRUCTORS -------------------------------------------------------------------------
+        // --------------------------------------------------------------------- INITIALISATION -------------------------------------------------------------------------
         
-        public Machine(MachineTemplate template, Dictionary<Side, Cell> neighbours, int rotation, MachineController controller)
+        public Machine(MachineTemplate template, MachineController controller)
         {
             _template = template;
-            _behavior = template.GetBehaviorClone();
-            _neighbours = neighbours;
+            _behavior = GetBehavior(template.Type);
             _controller = controller;
 
-            CalculatePortsViaRotation(rotation, false);
+            UpdateNodesRotation(0);
             
-            _items = new List<int>();
+            _inIngredients = new List<IngredientTemplate>();
+            _outIngredients = new List<IngredientTemplate>();
+        }
+
+        private MachineBehavior GetBehavior(MachineType type)
+        {
+            switch (type)
+            {
+                case MachineType.CAULDRON:
+                case MachineType.DISTILLER:
+                case MachineType.MIXER:
+                case MachineType.PRESS:
+                    return new RecipeCreationBehavior(this);
+                case MachineType.CONVEYOR:
+                    return new ConveyorMachineBehavior(this);
+                case MachineType.MARCHAND:
+                    return new MarchandMachineBehaviour(this);
+                case MachineType.EXTRACTOR:
+                    return new ExtractorMachineBehaviour(this);
+                case MachineType.MERGER:
+                    return new MergerMachineBehavior(this);
+                case MachineType.SPLITTER:
+                    return new SplitterMachineBehavior(this);
+                default:
+                    Debug.LogError($"Unknown behaviour linked to type: {type}. Default behaviour used.");
+                    return new MachineBehavior(this);
+            }
+        }
+
+        public void UpdateNodesRotation(int rotation)
+        {
+            ReplaceNodesViaRotation(rotation, true);
         }
         
-        // ------------------------------------------------------------------------- NEIGHBOURS -------------------------------------------------------------------------
+        // ------------------------------------------------------------------------- NODES -------------------------------------------------------------------------
         
-        public bool TryGetOutMachine(out Machine connectedMachine)
+        public void LinkNodeData()
         {
-            if (_neighbours.ContainsKey(OutPorts[0]) && _neighbours[OutPorts[0]].MachineController != null)
+            foreach (var node in Nodes)
             {
-                connectedMachine = _neighbours[OutPorts[0]].MachineController.Machine;
-                
-                // The machines are not aligned.
-                if (connectedMachine.InPorts[0] != GetOppositeConnectionSide(OutPorts[0]))
+                node.SetMachine(this);
+            }
+        }
+        
+        public bool TryGetOutMachines(out List<Machine> connectedMachines)
+        {
+            connectedMachines = new List<Machine>();
+            
+            foreach (var node in Nodes)
+            {
+                foreach (var port in node.Ports)
                 {
-                    return false;
+                    if (port.Way != Way.OUT || port.ConnectedPort == null)
+                    {
+                        continue;
+                    }
+
+                    if (port.ConnectedPort.Node.Machine.Controller == null)
+                    {
+                        continue;
+                    }
+                    
+                    // Get the other machine by the connected port.
+                    connectedMachines.Add(port.ConnectedPort.Node.Machine);
                 }
-                
+            }
+
+            if (connectedMachines.Count > 0)
+            {
                 return true;
             }
 
-            connectedMachine = null;
+            connectedMachines = null;
             return false;
         }
         
-        public bool TryGetInMachine(out Machine connectedMachine)
+        public bool TryGetInMachine(out List<Machine> connectedMachines)
         {
-            if (_neighbours.ContainsKey(InPorts[0]) && _neighbours[InPorts[0]].MachineController != null)
+            connectedMachines = new List<Machine>();
+            
+            foreach (var node in Nodes)
             {
-                connectedMachine = _neighbours[InPorts[0]].MachineController.Machine;
-                
-                // The machines are not aligned.
-                if (connectedMachine.OutPorts[0] != GetOppositeConnectionSide(InPorts[0]))
+                foreach (var port in node.Ports)
                 {
-                    return false;
+                    if (port.Way != Way.IN || port.ConnectedPort == null)
+                    {
+                        continue;
+                    }
+                    
+                    if (port.ConnectedPort.Node.Machine.Controller == null)
+                    {
+                        continue;
+                    }
+                    
+                    // Get the other machine by the connected port.
+                    connectedMachines.Add(port.ConnectedPort.Node.Machine);
                 }
-                
+            }
+            
+            if (connectedMachines.Count > 0)
+            {
                 return true;
             }
 
-            connectedMachine = null;
+            connectedMachines = null;
             return false;
         }
 
-        // ------------------------------------------------------------------------- ITEMS -------------------------------------------------------------------------
-        
-        public void AddItem()
+        // ------------------------------------------------------------------------- TICK CHAIN ----------------------------------------------------------------------------
+        public void AddMachineToChain()
         {
-            OnItemAdded?.Invoke(true);
-            Items.Add(66);
+            bool hasInMachine = TryGetInMachine(out List<Machine> inMachines);
+            bool hasOutMachine = TryGetOutMachines(out _);
+
+            // The machine is not connected to any chain, create a new one.
+            if (!hasInMachine && !hasOutMachine)
+            {
+                TickSystem.AddTickable(this);
+            }
+            // The machine only has an IN, it is now the end of the chain.
+            if (hasInMachine && !hasOutMachine)
+            {
+                foreach (var inMachine in inMachines)
+                {
+                    TickSystem.ReplaceTickable(inMachine, this);
+                }
+            }
+            // The machine has an IN and an OUT, it makes a link between two existing chains,
+            // remove the IN tickable since the out chain already has a tickable.
+            if (hasInMachine && hasOutMachine)
+            {
+                foreach (var inMachine in inMachines)
+                {
+                    TickSystem.RemoveTickable(inMachine);
+                }
+            }
+        }
+
+        public void RemoveMachineFromChain()
+        {
+            bool hasInMachine = TryGetInMachine(out List<Machine> inMachines);
+            bool hasOutMachine = TryGetOutMachines(out _);
+            
+            // The machine is not connected to any chain, create a new one.
+            if (!hasInMachine && !hasOutMachine)
+            {
+                TickSystem.RemoveTickable(this);
+            }
+            // The machine only has an IN, it is now the end of the chain.
+            if (hasInMachine && !hasOutMachine)
+            {
+                foreach (var inMachine in inMachines)
+                {
+                    TickSystem.ReplaceTickable(this, inMachine);
+                }
+            }
+            // The machine has an IN and an OUT, it breaks a chain in two.
+            // Add the IN tickable since to create the second chain.
+            if (hasInMachine && hasOutMachine)
+            {
+                foreach (var inMachine in inMachines)
+                {
+                    // If the machine has multiple out machines it is already part of a tick chain.
+                    if (inMachine.TryGetOutMachines(out var outMachines))
+                    {
+                        if (outMachines.Count > 1)
+                        {
+                            continue;
+                        }
+                    }
+                    
+                    TickSystem.AddTickable(inMachine);
+                }
+            }
         }
         
-        public bool TryGiveItemItem(int item)
+        // ------------------------------------------------------------------------- INGREDIENTS -------------------------------------------------------------------------
+        
+        public void AddIngredient(IngredientTemplate ingredient , Way way)
         {
-            // There is already too many items in the machine
-            if (Template.MaxItemCount != -1 && Items.Count >= Template.MaxItemCount)
+            switch (way)
+            {
+                case Way.IN:
+                    _inIngredients.Add(ingredient);
+                    break;
+                case Way.OUT:
+                    _outIngredients.Add(ingredient);
+                    break;
+                case Way.NONE:
+                    Debug.LogError("Way of adding item not handle.");
+                    return;
+            }
+            
+            OnSlotUpdated?.Invoke();
+        }
+        
+        public void RemoveIngredient(IngredientTemplate ingredientToRemove, Way slotType)
+        {
+            switch (slotType)
+            {
+                case Way.IN:
+                    if (_inIngredients.Contains(ingredientToRemove))
+                    {
+                        _inIngredients.Remove(ingredientToRemove);
+                    }
+                    else
+                    {
+                        Debug.LogError($"Cannot remove ingredient: {ingredientToRemove.Name} from out slot of {_controller.name} because it cannot be found."); 
+                    }
+                    break;
+                case Way.OUT:
+                    if (_outIngredients.Contains(ingredientToRemove))
+                    {
+                        _outIngredients.Remove(ingredientToRemove);
+                    }
+                    else
+                    {
+                        Debug.LogError($"Cannot remove ingredient: {ingredientToRemove.Name} from out slot of {_controller.name} because it cannot be found."); 
+                    }
+                    break;
+                case Way.NONE:
+                    Debug.LogError("Cannot remove an ingredient if the slot type is not defined."); 
+                    return;
+            }
+            
+            OnSlotUpdated?.Invoke();
+        }
+
+        public void ClearSlot(Way slotType)
+        {
+            if (slotType == Way.IN)
+            {
+                _inIngredients.Clear();
+            }
+            else
+            {
+                _outIngredients.Clear();
+            }
+            
+            OnSlotUpdated?.Invoke();
+        }
+        
+        public bool CanTakeIngredientInSlot(IngredientTemplate ingredient, Way way)
+        {
+            if (!ingredient)
+            {
                 return false;
+            }
+
+            if (way == Way.OUT)
+            {
+                if (_outIngredients.Count == 0)
+                {
+                    return true;
+                }
+                if (_outIngredients.Count >= Template.IngredientsPerSlotCount)
+                {
+                    return false;
+                }
+                
+                return _outIngredients[0].Name == ingredient.Name;
+            }
             
-            Items.Add(item);
-            OnItemAdded?.Invoke(true);
-            return true;
-        }
+            var groupedIngredients = _inIngredients.GroupedByTypeAndCount();
 
-        public void RemoveAllItems()
-        {
-            Items.Clear();
-            OnItemAdded?.Invoke(false);
+            // If the ingredient is not stored in any slot we check if there is an empty in slot.
+            if (!groupedIngredients.TryGetValue(ingredient, out var groupedIngredientCount))
+            {
+                return EmptyInSlotCount() > 0;
+            }
+            
+            // If the ingredient is already stored we check if the slot is not full yet.
+            return groupedIngredientCount < Template.IngredientsPerSlotCount;
         }
-
-        public void RemoveItem(int index)
+        
+        public IngredientTemplate OlderOutIngredient()
         {
-            Items.RemoveAt(index);
-            OnItemAdded?.Invoke(false);
+            if (_outIngredients.Count == 0)
+            {
+                return null;
+            }
+
+            var ingredient = _outIngredients.First();
+            return ingredient;
+        }
+        
+        public int EmptyInSlotCount()
+        {
+            int remainingSlot = Template.InSlotIngredientCount - _inIngredients.GroupedByTypeAndCount().Count;
+            return remainingSlot < 0 ? 0 : remainingSlot;
         }
 
         // ------------------------------------------------------------------------- TICK -------------------------------------------------------------------------
         
         public void Tick()
         {
-            OnTick?.Invoke();
+            Behavior.Execute();
+            
+            // Propagate tick
+            if (TryGetInMachine(out List<Machine> previousMachines))
+            {
+                foreach (var previousMachine in previousMachines)
+                {
+                    previousMachine.PropagateTick();
+                }
+            }
         }
         
-        // ------------------------------------------------------------------------- PORTS & ROTATIONS -------------------------------------------------------------------------
+        public void PropagateTick()
+        {
+            if (!TryGetOutMachines(out var connectedMachines))
+            {
+                return;            
+            }
+
+            _outMachineTickCount++;
+            
+            // The machine has not received the propagation of all his next machine.
+            if (_outMachineTickCount < connectedMachines.Count)
+            {
+                return;
+            }
+            
+            _outMachineTickCount = 0;
+            
+            Behavior.Execute();
+
+            // Propagate tick
+            if (!TryGetInMachine(out List<Machine> previousMachines))
+            {
+                return;
+            }
+            
+            foreach (var previousMachine in previousMachines)
+            {
+                previousMachine.PropagateTick();
+            }
+        }
         
-        public void CalculatePortsViaRotation(int angle, bool clockwise)
+        // ------------------------------------------------------------------- PORTS & ROTATIONS -------------------------------------------------------------------------
+        
+        public void ReplaceNodesViaRotation(int angle, bool clockwise)
         {
             if (!clockwise)
             {
@@ -141,81 +410,24 @@ namespace Components.Machines
             // The machine has no rotation so the ports are the base one.
             if (angle == 0)
             {
-                _inPorts = _template.BaseInPorts;
-                _outPorts = _template.BaseOutPorts;
+                _nodes = _template.Nodes;
                 
                 return;
             }
-            
-            var rotationMapping = GetRotationMapping(angle);
-            
-            _inPorts = GetPortFromRotation(_template.BaseInPorts, rotationMapping);
-            _outPorts = GetPortFromRotation(_template.BaseOutPorts, rotationMapping);
-        }
 
-        private List<Side> GetPortFromRotation(List<Side> ports, Dictionary<Side, Side> rotationMapping)
-        {
-            var rotatedPorts = new List<Side>();
-
-            foreach (var port in ports)
-            {
-                rotatedPorts.Add(rotationMapping[port]);
-            }
-
-            return rotatedPorts;
-        }
-
-        private static Dictionary<Side, Side> GetRotationMapping(int angle)
-        {
-            var mapping = new Dictionary<Side, Side>();
-
-            switch (angle)
-            {
-                case 90:
-                    mapping[Side.NORTH] = Side.EAST;
-                    mapping[Side.EAST] = Side.SOUTH;
-                    mapping[Side.SOUTH] = Side.WEST;
-                    mapping[Side.WEST] = Side.NORTH;
-                    mapping[Side.NONE] = Side.NONE;
-                    break;
-                case 180:
-                    mapping[Side.NORTH] = Side.SOUTH;
-                    mapping[Side.EAST] = Side.WEST;
-                    mapping[Side.SOUTH] = Side.NORTH;
-                    mapping[Side.WEST] = Side.EAST;
-                    mapping[Side.NONE] = Side.NONE;
-                    break;
-                case 270:
-                    mapping[Side.NORTH] = Side.WEST;
-                    mapping[Side.EAST] = Side.NORTH;
-                    mapping[Side.SOUTH] = Side.EAST;
-                    mapping[Side.WEST] = Side.SOUTH;
-                    mapping[Side.NONE] = Side.NONE;
-                    break;
-                default:
-                    throw new ArgumentException("Invalid rotation angle. Only 90, 180, and 270 degrees are allowed.");
-            }
-
-            return mapping;
+            _nodes = Template.Nodes.RotateNodes(angle);
         }
         
-        public Side GetOppositeConnectionSide(Side side)
+        // ------------------------------------------------------------------------- SELECT BEHAVIOUR -------------------------------------------------------------------------
+        
+        public void Select(bool select)
         {
-            switch (side)
-            {
-                case Side.SOUTH:
-                    return Side.NORTH;
-                case Side.NORTH:
-                    return Side.SOUTH;
-                case Side.EAST:
-                    return Side.WEST;
-                case Side.WEST:
-                    return Side.EAST;
-                case Side.NONE:
-                    return Side.NONE;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            OnSelected?.Invoke(this, select);
+        }
+
+        public void Hover(bool hovered)
+        {
+            OnHovered?.Invoke(this, hovered);
         }
     }
 }

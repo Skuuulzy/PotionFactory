@@ -1,29 +1,28 @@
-using UnityEngine;
+using Components.Ingredients;
 
 namespace Components.Machines.Behaviors
 {
-    [CreateAssetMenu(fileName = "New Machine Behaviour", menuName = "Machines/Behavior/Extractor")]
     public class ExtractorMachineBehaviour : MachineBehavior
     {
-        public override void Process(Machine machine)
-        {
-            CurrentTick++;
+        public ExtractorMachineBehaviour(Machine machine) : base(machine) { }
 
-            if (!CanProcess(CurrentTick))
+        public IngredientTemplate IngredientToExtract { get; private set; }
+
+        public void SetExtractedIngredient(IngredientTemplate ingredientTemplate)
+		{
+            IngredientToExtract = ingredientTemplate;
+		}
+        
+		protected override void ProcessAction()
+        {
+            // Extract ingredients if any room left
+            if (Machine.CanTakeIngredientInSlot(IngredientToExtract, Way.IN))
             {
-                return;
+                Machine.AddIngredient(IngredientToExtract, Way.IN);
             }
             
-            if (machine.TryGetOutMachine(out Machine outMachine))
-            {
-                // Detect if the port in is connected to the out .
-                if (machine.GetOppositeConnectionSide(machine.OutPorts[0]) != outMachine.InPorts[0])
-                {
-                    return;
-                }
-
-                outMachine.TryGiveItemItem(66);
-            }
+            // Apply the base transfer ingredient sub process
+            base.ProcessAction();
         }
     }
 }

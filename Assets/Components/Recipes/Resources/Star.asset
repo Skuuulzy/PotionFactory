@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9cd67c4c33928f34894964bb28cabb66, type: 3}
+  m_Name: Star
+  m_EditorClassIdentifier: 
+  _machine: {fileID: 11400000, guid: 2e90757fd7d3d10459a62e29b5335f12, type: 2}
+  _ingredients:
+    m_Dictionnary:
+    - m_key: {fileID: 11400000, guid: 0704ad4f4abd5104d8a07fc4d439fe43, type: 2}
+      m_value: 2
+    - m_key: {fileID: 11400000, guid: 5d28dfac9987c7f4a9b0e6efca960ea0, type: 2}
+      m_value: 5
+    - m_key: {fileID: 11400000, guid: a07c518e6f926304cb403f51f0b5cb14, type: 2}
+      m_value: 1
+  _outIngredient: {fileID: 11400000, guid: 415cf18f47e1af047b0c0363007f4abe, type: 2}
+  _processTimeModifier: 3.3

@@ -1,6 +1,6 @@
+using System;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
-using TMPro;
 using UnityEngine;
 using VComponent.Tools.Singletons;
 
@@ -8,28 +8,66 @@ namespace Components.Tick
 {
     public class TickSystem : Singleton<TickSystem>
     {
-        private float _tickTimer;
-        private int _tick;
-        [SerializeField] private float _tickDuration = 0.2f;
+        [SerializeField] private float _initialTickDuration = 0.2f;
+        [ShowInInspector] private static readonly List<ITickable> TICKABLES = new();
         
-        [ShowInInspector]
-        private static readonly List<ITickable> TICKABLES = new();
+        private float _tickTimer;
+        private float _currentTickDuration;
+		private bool _isPause;
 
-        public float TickDuration => _tickDuration;
+        public float InitialTickDuration => _initialTickDuration;
+        public float CurrentTickDuration => _currentTickDuration;
+
+        // ------------------------------------------------------------------------- MONO -------------------------------------------------------------------------
+		protected override void Awake()
+        {
+            base.Awake();
+            
+            if (TICKABLES.Count == 0)
+            {
+                return;
+            }
+            
+            TICKABLES.Clear();
+        }
+
+		private void Start()
+		{
+            _currentTickDuration = _initialTickDuration;
+            PlanningFactoryState.OnPlanningFactoryStateStarted += HandlePlanningFactoryState;
+            ResolutionFactoryState.OnResolutionFactoryStateStarted += HandleResolutionFactoryState;
+            EndOfDayState.OnEndOfDayStateStarted += HandleEndOfDayState;
+            UIOptionsController.OnTickSpeedUpdated += ChangeTimeSpeed;
+            GameOverState.OnGameOverStarted += HandleGameOverState;
+        }
+
+		private void OnDestroy()
+        {
+            PlanningFactoryState.OnPlanningFactoryStateStarted -= HandlePlanningFactoryState;
+            ResolutionFactoryState.OnResolutionFactoryStateStarted -= HandleResolutionFactoryState;
+            EndOfDayState.OnEndOfDayStateStarted -= HandleEndOfDayState;
+            GameOverState.OnGameOverStarted -= HandleGameOverState;
+        }
 
         private void Update()
         {
+            if(_isPause)
+			{
+                return;
+			}
+
             _tickTimer += Time.deltaTime;
             
-            while (_tickTimer >= _tickDuration)
+            while (_tickTimer >= _currentTickDuration)
             {
-                _tickTimer -= _tickDuration;
-                _tick++;
+                _tickTimer -= _currentTickDuration;
                 
                 TickAll();
             }
         }
-        
+
+        // ------------------------------------------------------------------------- TICK METHODS -------------------------------------------------------------------------
+
         private void TickAll()
         {
             foreach (var tickable in TICKABLES)
@@ -40,14 +78,22 @@ namespace Components.Tick
         
         public static void AddTickable(ITickable tickable)
         {
+            if (TICKABLES.Contains(tickable))
+            {
+                Debug.LogError($"You try to add a tickable but it was already found in the tickable list.");
+                return;
+            }
+            
             TICKABLES.Add(tickable);
         }
         
         public static void ReplaceTickable(ITickable previousTickable, ITickable newTickable)
         {
+            // This happens when a machine has multiple outputs, it replaced when his first out is connected.
+            // But then his next outputs need to be also added has a new partial chain.
             if (!TICKABLES.Contains(previousTickable))
             {
-                Debug.LogError($"You try to replace a tickable but it was not found in the tickable list.");
+                AddTickable(newTickable);
                 return;
             }
 
@@ -59,7 +105,6 @@ namespace Components.Tick
         {
             if (!TICKABLES.Contains(tickableToRemove))
             {
-                Debug.LogError($"You try to remove a tickable but it was not found in the tickable list.");
                 return;
             }
 
@@ -68,7 +113,36 @@ namespace Components.Tick
 
         public void ChangeTimeSpeed(int value)
         {
-            Time.timeScale = value;
+            if(value == 0)
+			{
+                _isPause = true;
+                return;
+			}
+
+            _currentTickDuration =  _initialTickDuration / value;
+            _isPause = false;
+        }
+
+        // ------------------------------------------------------------------------- STATE METHODS -------------------------------------------------------------------------
+
+        private void HandleEndOfDayState(EndOfDayState obj)
+        {
+            ChangeTimeSpeed(0);
+        }
+
+        private void HandlePlanningFactoryState(PlanningFactoryState obj)
+        {
+            ChangeTimeSpeed(0);
+        }
+
+        private void HandleGameOverState(GameOverState obj)
+		{
+            ChangeTimeSpeed(0);
+		}
+
+        private void HandleResolutionFactoryState(ResolutionFactoryState obj)
+        {
+            ChangeTimeSpeed(1);
         }
     }
 }

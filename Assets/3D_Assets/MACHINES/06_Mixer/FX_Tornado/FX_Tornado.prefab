@@ -1,0 +1,384 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3951974221039344829
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3710145938962304924}
+  - component: {fileID: 8342663517434907253}
+  - component: {fileID: 6217175592684303673}
+  m_Layer: 0
+  m_Name: FX_Tornado
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3710145938962304924
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3951974221039344829}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.34, z: 0}
+  m_LocalScale: {x: 0.9, y: 1, z: 0.9}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!2083052967 &8342663517434907253
+VisualEffect:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3951974221039344829}
+  m_Enabled: 1
+  m_Asset: {fileID: 8926484042661614526, guid: 49963793fb38f0949ac334d3fb1d56ea, type: 3}
+  m_InitialEventName: OnPlay
+  m_InitialEventNameOverriden: 0
+  m_StartSeed: 0
+  m_ResetSeedOnPlay: 0
+  m_AllowInstancing: 1
+  m_ResourceVersion: 1
+  m_PropertySheet:
+    m_Float:
+      m_Array:
+      - m_Value: 10
+        m_Name: Duration
+        m_Overridden: 1
+      - m_Value: 0.8
+        m_Name: TornadoCore_Dissolve
+        m_Overridden: 1
+      - m_Value: 0.91
+        m_Name: TornadoLayer02_Dissolve
+        m_Overridden: 1
+      - m_Value: 0.89
+        m_Name: TornadoLayer01_Dissolve
+        m_Overridden: 1
+      - m_Value: 2
+        m_Name: Wobble_Intensity
+        m_Overridden: 1
+      - m_Value: 1.5
+        m_Name: Wobble_Frequency
+        m_Overridden: 1
+      - m_Value: 5
+        m_Name: Wobble_Speed
+        m_Overridden: 1
+      - m_Value: 0.03
+        m_Name: Wobble_Amount
+        m_Overridden: 1
+      - m_Value: 15
+        m_Name: Delay
+        m_Overridden: 1
+    m_Vector2f:
+      m_Array: []
+    m_Vector3f:
+      m_Array:
+      - m_Value: {x: 1, y: 0.8, z: 1}
+        m_Name: Scale
+        m_Overridden: 1
+      - m_Value: {x: 0, y: 1.8, z: 0}
+        m_Name: Top_Ring_Position
+        m_Overridden: 1
+    m_Vector4f:
+      m_Array:
+      - m_Value: {x: 0, y: 10.259052, z: 23.968626, w: 0}
+        m_Name: TornadoLayer01_Color
+        m_Overridden: 1
+      - m_Value: {x: 0.00048949925, y: 0.020191101, z: 0.103773594, w: 0}
+        m_Name: TornadoCore_Color
+        m_Overridden: 1
+      - m_Value: {x: 0, y: 4.0533233, z: 9.207547, w: 0}
+        m_Name: TornadoLayer02_Color
+        m_Overridden: 1
+    m_Uint:
+      m_Array: []
+    m_Int:
+      m_Array: []
+    m_Matrix4x4f:
+      m_Array: []
+    m_AnimationCurve:
+      m_Array:
+      - m_Value:
+          serializedVersion: 2
+          m_Curve:
+          - serializedVersion: 3
+            time: 0
+            value: 1
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 34
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 0.9029851
+            value: 1
+            inSlope: 0
+            outSlope: -0.017298497
+            tangentMode: 5
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 1.0008016
+            value: 1.5918332
+            inSlope: 8.89333
+            outSlope: 8.89333
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        m_Name: DissolveCurve
+        m_Overridden: 0
+      - m_Value:
+          serializedVersion: 2
+          m_Curve:
+          - serializedVersion: 3
+            time: -0.005596161
+            value: 0.0100746155
+            inSlope: 12.012947
+            outSlope: 12.012947
+            tangentMode: 34
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 0.08017167
+            value: 1.040399
+            inSlope: 0.13947727
+            outSlope: 0.13947727
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 0.21181987
+            value: 0.97305286
+            inSlope: 0.08381473
+            outSlope: 0.08381473
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 0.34750855
+            value: 1.0109404
+            inSlope: 0.09710645
+            outSlope: 0.09710645
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 0.49809325
+            value: 1.0001507
+            inSlope: -0.031878423
+            outSlope: -0.031878423
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 1
+            value: 1
+            inSlope: -0.0003002162
+            outSlope: -0.0003002162
+            tangentMode: 34
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        m_Name: ScaleOver_LifeX
+        m_Overridden: 0
+      - m_Value:
+          serializedVersion: 2
+          m_Curve:
+          - serializedVersion: 3
+            time: -0.005596161
+            value: 0.0100746155
+            inSlope: 12.012947
+            outSlope: 12.012947
+            tangentMode: 34
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 0.08017167
+            value: 1.040399
+            inSlope: 0.13947727
+            outSlope: 0.13947727
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 0.21181987
+            value: 0.97305286
+            inSlope: 0.08381473
+            outSlope: 0.08381473
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 0.34750855
+            value: 1.0109404
+            inSlope: 0.09710645
+            outSlope: 0.09710645
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 0.49809325
+            value: 1.0001507
+            inSlope: -0.031878423
+            outSlope: -0.031878423
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 1
+            value: 1
+            inSlope: -0.0003002162
+            outSlope: -0.0003002162
+            tangentMode: 34
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        m_Name: ScaleOver_LifeY
+        m_Overridden: 0
+      - m_Value:
+          serializedVersion: 2
+          m_Curve:
+          - serializedVersion: 3
+            time: -0.005596161
+            value: 0.0100746155
+            inSlope: 12.012947
+            outSlope: 12.012947
+            tangentMode: 34
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 0.08017167
+            value: 1.040399
+            inSlope: 0.13947727
+            outSlope: 0.13947727
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 0.21181987
+            value: 0.97305286
+            inSlope: 0.08381473
+            outSlope: 0.08381473
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 0.34750855
+            value: 1.0109404
+            inSlope: 0.09710645
+            outSlope: 0.09710645
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 0.49809325
+            value: 1.0001507
+            inSlope: -0.031878423
+            outSlope: -0.031878423
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 1
+            value: 1
+            inSlope: -0.0003002162
+            outSlope: -0.0003002162
+            tangentMode: 34
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        m_Name: ScaleOver_LifeZ
+        m_Overridden: 0
+    m_Gradient:
+      m_Array: []
+    m_NamedObject:
+      m_Array:
+      - m_Value: {fileID: -2659388346764715610, guid: 628770e9e0d25e946a7bd2cfd78eea77,
+          type: 3}
+        m_Name: Mesh_Shape
+        m_Overridden: 1
+      - m_Value: {fileID: -686066098366304034, guid: 628770e9e0d25e946a7bd2cfd78eea77,
+          type: 3}
+        m_Name: Mesh_Ring
+        m_Overridden: 1
+    m_Bool:
+      m_Array: []
+--- !u!73398921 &6217175592684303673
+VFXRenderer:
+  serializedVersion: 1
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3951974221039344829}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 0
+  m_LightProbeUsage: 0
+  m_ReflectionProbeUsage: 0
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0

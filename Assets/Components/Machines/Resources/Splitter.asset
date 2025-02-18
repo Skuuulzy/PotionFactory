@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 581ab5ce2c92484d9bd63e4e972996c1, type: 3}
+  m_Name: Splitter
+  m_EditorClassIdentifier: 
+  _name: Splitter
+  _gridView: {fileID: 4377708450514837446, guid: a28a45fa4642bb04fb4e721059560c15,
+    type: 3}
+  _uiView: {fileID: 21300000, guid: 29113fd48aea94a8da6bffefdb2d5bfa, type: 3}
+  _gridObjectControllerPrefab: {fileID: 2567407675386972328, guid: 859503caaa5f96242b5ba83dccd721c9,
+    type: 3}
+  _type: 8
+  _gridComponents:
+  - {fileID: 1085624917457900550, guid: cff6497d14e847e43888d93eee477349, type: 3}
+  _nodes:
+  - _localPosition: {x: 0, y: 0}
+    _gridPosition: {x: 0, y: 0}
+    _ports:
+    - _side: 3
+      _way: 0
+    - _side: 1
+      _way: 1
+    - _side: 0
+      _way: 1
+    - _side: 2
+      _way: 1
+  _showItem: 0
+  _canTakeInfiniteIngredients: 0
+  _inSlotIngredientCount: 1
+  _outSlotIngredientCount: 1
+  _ingredientsPerSlotCount: 5
+  _processTime: 1
+  _shopSpawnProbability: 0
+  _shopPrice: 3
+  _cannotBeSell: 0
+  _cannotBeBuy: 0
+  _sellPrice: 100
+  _contextualComponents: []
+  _uiGameplayDescription: 
+  _uiLoreDescription: 
+  _contextMenuHeight: 2
+  _canRetrieve: 1
+  _canMove: 1
+  _canConfigure: 1

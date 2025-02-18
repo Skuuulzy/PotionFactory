@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9cd67c4c33928f34894964bb28cabb66, type: 3}
+  m_Name: Shiny slime
+  m_EditorClassIdentifier: 
+  _machine: {fileID: 11400000, guid: 2e90757fd7d3d10459a62e29b5335f12, type: 2}
+  _ingredients:
+    m_Dictionnary:
+    - m_key: {fileID: 11400000, guid: 9db1f3dbc4d38c944a15fdcc01f7d857, type: 2}
+      m_value: 1
+    - m_key: {fileID: 11400000, guid: 415cf18f47e1af047b0c0363007f4abe, type: 2}
+      m_value: 5
+    - m_key: {fileID: 11400000, guid: d2a1bbd1d4df5ce49827bfc5c21fd18f, type: 2}
+      m_value: 2
+  _outIngredient: {fileID: 11400000, guid: 9517197ac12ae5943aade74f08b10f0e, type: 2}
+  _processTimeModifier: 5.6000004

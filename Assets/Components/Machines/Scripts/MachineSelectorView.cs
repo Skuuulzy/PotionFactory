@@ -1,30 +1,42 @@
+using Components.Inventory;
 using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace Components.Machines
 {
     public class MachineSelectorView : MonoBehaviour
     {
-        [SerializeField] private TMP_Text _name;
-        [SerializeField] private Image _background;
+        [SerializeField] private GrimoireInventoryButton _grimoireInventoryButton;
 
-        public Action<MachineTemplate> OnSelected;
+        public static Action<MachineTemplate> OnSelected;
         
         private MachineTemplate _machine;
 
-        public void Init(MachineTemplate machine)
+        public MachineTemplate Machine => _machine;
+
+        public void Init(MachineTemplate machine, int value = 1)
         {
             _machine = machine;
 
-            _name.text = machine.Name.ToString();
-            _background.sprite = machine.UIView;
+            _grimoireInventoryButton.InitMachine(machine, value);
         }
 
+        
+        //Call by machine in player inventory
         public void Select()
         {
-            OnSelected?.Invoke(_machine);
+            if(GrimoireController.Instance.PlayerMachinesDictionary[_machine] > 0)
+			{
+                OnSelected?.Invoke(_machine);
+            }
         }
-    }
+
+		public void UpdateNumberOfAvailableMachine(int number)
+		{
+            _grimoireInventoryButton.UpdateNumberOfAvailableMachine(number);
+		}
+	}
 }

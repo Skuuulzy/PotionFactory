@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7bbe3f1315ddf444aa8a2d56882c1e90, type: 3}
+  m_Name: BenEnergyBar
+  m_EditorClassIdentifier: 
+  _consumableName: Ben Energy Bar
+  _shopPrice: 15000
+  _gridView: {fileID: 8624497292090748910, guid: 1cf5a37f319c6ec40b3291232955266b,
+    type: 3}
+  _uiView: {fileID: 21300000, guid: 272642b0cb3200141a7de26d9d383ccc, type: 3}
+  _spawnProbability: 0.25

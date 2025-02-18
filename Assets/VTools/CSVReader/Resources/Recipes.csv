@@ -1,0 +1,53 @@
+Name,isLiquide - Ingredient 0,Price,Machine,Nb1,Ingredient 1,isLiquide - Ingredient 1,Nb2,Ingredient 2,isLiquide - Ingredient 2,Nb3,Ingredient 3,isLiquide - Ingredient 3,Number of transformation,Execution time modifier,Unique recipe,Check OUT condition,Check IN condition
+Tear,TRUE,2,Distiller,1,Ice Tear,FALSE,,,,,,,1,"0,3",DistillerIce Tear,1,TRUE
+Orange juice,TRUE,2,Press,2,Orange,FALSE,,,,,,,1,"-0,3",PressOrange,1,TRUE
+Mashed pumpkin,FALSE,2,Press,1,Pumpkin,FALSE,,,,,,,1,"0,3",PressPumpkin,1,TRUE
+Smashed avocado,FALSE,3,Press,3,Avocado,FALSE,,,,,,,1,"-0,2",PressAvocado,1,TRUE
+Applesauce,FALSE,5,Press,5,Apple,FALSE,,,,,,,1,"-0,4",PressApple,1,TRUE
+Cherry juice,TRUE,5,Press,5,Cherry,FALSE,,,,,,,1,"-0,3",PressCherry,1,TRUE
+Crystal cherry,FALSE,7,Mixer,1,Cherry,FALSE,1,Sapphire,FALSE,,,,1,"1,7",MixerCherrySapphire,1,TRUE
+Fruit salad,FALSE,10,Mixer,2,Apple,FALSE,5,Cherry,FALSE,3,Orange,FALSE,1,-1,MixerAppleCherryOrange,1,TRUE
+Enchantment,TRUE,10,Press,5,Enchanted moss,FALSE,,,,,,,1,0,PressEnchanted moss,1,TRUE
+Fiber mixture,FALSE,12,Mixer,4,Avocado,FALSE,1,Enchanted moss,FALSE,3,Mashed pumpkin,FALSE,2,"0,1",MixerAvocadoEnchanted mossMashed pumpkin,1,TRUE
+Granny's soup,TRUE,14,Cauldron,4,Mashed pumpkin,FALSE,2,Oak sap,TRUE,,,,2,"1,3",CauldronMashed pumpkinOak sap,1,TRUE
+Poisoned apple,FALSE,16,Mixer,1,Apple,FALSE,3,Basilisk venom,TRUE,,,,1,"0,2",MixerAppleBasilisk venom,1,TRUE
+Ice cream,FALSE,17,Mixer,3,Cherry,FALSE,5,Ice Tear,FALSE,2,Chimera Dust,FALSE,1,"0,3",MixerCherryChimera DustIce Tear,1,TRUE
+Sapphire dust,FALSE,18,Press,3,Sapphire,FALSE,,,,,,,1,2,PressSapphire,1,TRUE
+Golden powder,FALSE,21,Press,3,Golden blossom,FALSE,,,,,,,1,4,PressGolden blossom,1,TRUE
+Treant sap,FALSE,21,Distiller,2,Enchanted moss,FALSE,5,Oak sap,TRUE,1,Tear,TRUE,2,"1,3",DistillerEnchanted mossOak sapTear,1,TRUE
+Fruit juice,TRUE,23,Distiller,3,Cherry juice,TRUE,2,Orange juice,TRUE,2,Ice Tear,FALSE,3,"-0,3",DistillerCherry juiceIce TearOrange juice,1,TRUE
+Bugs,FALSE,25,Mixer,5,Chimera Dust,FALSE,5,Firefly,FALSE,,,,1,"0,8",MixerChimera DustFirefly,1,TRUE
+Corrupted moss,FALSE,26,Distiller,4,Basilisk venom,TRUE,3,Enchanted moss,FALSE,,,,1,"0,6",DistillerBasilisk venomEnchanted moss,1,TRUE
+Slime,FALSE,36,Distiller,3,Chimera Dust,FALSE,3,Nymph blood,TRUE,5,Oak sap,TRUE,1,"2,5",DistillerChimera DustNymph bloodOak sap,1,TRUE
+Lycoris,FALSE,37,Distiller,2,Basilisk venom,TRUE,1,Golden blossom,FALSE,4,Nymph blood,TRUE,1,"5,8",DistillerBasilisk venomGolden blossomNymph blood,1,TRUE
+Mixed drooling,FALSE,37,Distiller,4,Yeti drool,TRUE,2,Applesauce,FALSE,3,Cherry juice,TRUE,3,0,DistillerApplesauceCherry juiceYeti drool,1,TRUE
+Monster dough,FALSE,38,Mixer,2,Bat wing,FALSE,4,Goblin Ear,FALSE,5,Wyrm Claw,FALSE,1,"2,2",MixerBat wingGoblin EarWyrm Claw,1,TRUE
+Angel feather,FALSE,42,Distiller,1,Phoenix feather,FALSE,3,Enchantment,TRUE,4,Tear,TRUE,3,"0,8",DistillerEnchantmentPhoenix featherTear,1,TRUE
+Golden apple,FALSE,43,Mixer,1,Apple,FALSE,2,Golden powder,FALSE,,,,2,"3,6",MixerAppleGolden powder,1,TRUE
+Fairy,FALSE,47,Distiller,5,Firefly,FALSE,1,Orange juice,TRUE,3,Enchantment,TRUE,3,"0,2",DistillerEnchantmentFireflyOrange juice,1,TRUE
+Star,FALSE,49,Mixer,2,Firefly,FALSE,5,Ghost dust,FALSE,1,Sapphire dust,FALSE,2,"3,3",MixerFireflyGhost dustSapphire dust,1,TRUE
+Golden cream,FALSE,65,Mixer,2,Golden powder,FALSE,1,Ice cream,FALSE,2,Yeti drool,TRUE,3,5,MixerGolden powderIce creamYeti drool,1,TRUE
+Molasses,TRUE,71,Cauldron,5,Smashed avocado,FALSE,2,Corrupted moss,FALSE,2,Pumpkin,FALSE,3,"0,7",CauldronCorrupted mossPumpkinSmashed avocado,1,TRUE
+3 spices,FALSE,75,Mixer,3,Ghost dust,FALSE,3,Chimera Dust,FALSE,3,Sapphire dust,FALSE,2,"3,1",MixerChimera DustGhost dustSapphire dust,1,TRUE
+Hairy mixture,FALSE,120,Mixer,2,Monster dough,FALSE,1,Chimera Dust,FALSE,2,Treant sap,FALSE,4,"3,8",MixerChimera DustMonster doughTreant sap,1,TRUE
+Unicorn shit,FALSE,128,Mixer,1,Golden cream,FALSE,3,Sapphire dust,FALSE,3,Firefly,FALSE,5,"7,5",MixerFireflyGolden creamSapphire dust,1,TRUE
+Sweet infusion,TRUE,135,Distiller,5,Fruit juice,TRUE,2,Applesauce,FALSE,1,Enchantment,TRUE,6,"-0,7",DistillerApplesauceEnchantmentFruit juice,1,TRUE
+Tar,FALSE,145,Mixer,1,Monster dough,FALSE,1,Molasses,TRUE,1,Slime,FALSE,6,"5,4",MixerMolassesMonster doughSlime,1,TRUE
+Ember fruit,FALSE,167,Mixer,1,Avocado,FALSE,4,Phoenix feather,FALSE,2,3 spices,FALSE,3,"3,4",Mixer3 spicesAvocadoPhoenix feather,1,TRUE
+Protein Bar,FALSE,171,Mixer,5,Fiber mixture,FALSE,1,Lycoris,FALSE,2,Mixed drooling,FALSE,7,"5,9",MixerFiber mixtureLycorisMixed drooling,1,TRUE
+Mood elixir,TRUE,175,Cauldron,1,Unicorn shit,FALSE,1,Mixed drooling,FALSE,1,Fruit salad,FALSE,10,"6,5",CauldronFruit saladMixed droolingUnicorn shit,1,TRUE
+Feast,FALSE,176,Mixer,3,Golden apple,FALSE,5,Sapphire,FALSE,1,Ice cream,FALSE,4,"5,9",MixerGolden appleIce creamSapphire,1,TRUE
+Deadly Bouquet,FALSE,185,Mixer,5,Lycoris,Lycoris,,,Lycoris,,,,2,"5,8",MixerLycoris,1,TRUE
+Magma slime,FALSE,209,Mixer,1,Slime,FALSE,1,Ember fruit,FALSE,3,Orange juice,TRUE,6,"5,6",MixerEmber fruitOrange juiceSlime,1,TRUE
+Flying slime,FALSE,210,Mixer,1,Slime,FALSE,2,Bat wing,FALSE,4,Angel feather,FALSE,5,"3,7",MixerAngel featherBat wingSlime,1,TRUE
+Foul brew,FALSE,235,Mixer,1,Tar,FALSE,3,Bugs,FALSE,5,Goblin Ear,FALSE,8,"6,7",MixerBugsGoblin EarTar,1,TRUE
+Infected mud,TRUE,245,Cauldron,3,Corrupted moss,FALSE,1,Bugs,FALSE,2,Molasses,TRUE,6,"2,1",CauldronBugsCorrupted mossMolasses,1,TRUE
+Shiny slime,FALSE,287,Mixer,1,Slime,FALSE,5,Star,FALSE,2,Smashed avocado,FALSE,5,"5,6",MixerSlimeSmashed avocadoStar,1,TRUE
+Spicy cocktail,TRUE,318,Cauldron,4,3 spices,FALSE,1,Fruit salad,FALSE,2,Phoenix feather,FALSE,4,"2,6",Cauldron3 spicesFruit saladPhoenix feather,1,TRUE
+Pure source,TRUE,360,Cauldron,3,Crystal cherry,FALSE,2,Fairy,FALSE,5,Star,FALSE,7,"5,2",CauldronCrystal cherryFairyStar,1,TRUE
+Mother slime,FALSE,706,Mixer,1,Magma slime,FALSE,1,Flying slime,FALSE,1,Shiny slime,FALSE,17,"14,9",MixerFlying slimeMagma slimeShiny slime,1,TRUE
+Vitality potion,TRUE,740,Distiller,3,Cherry juice,TRUE,1,Applesauce,FALSE,2,Pure source,TRUE,10,"4,5",DistillerApplesauceCherry juicePure source,1,TRUE
+Chaos potion,TRUE,802,Cauldron,2,Infected mud,TRUE,1,Tar,FALSE,1,Ember fruit,FALSE,16,"10,9",CauldronEmber fruitInfected mudTar,1,TRUE
+Love potion,TRUE,810,Cauldron,2,Fairy,FALSE,2,Cherry juice,TRUE,1,Mother slime,FALSE,22,"14,8",CauldronCherry juiceFairyMother slime,1,TRUE
+Enchanted golden apple,FALSE,813,Distiller,1,Golden apple,FALSE,5,Enchantment,TRUE,2,Pure source,TRUE,11,"8,8",DistillerEnchantmentGolden applePure source,1,TRUE
+Garnished basket,FALSE,850,Mixer,1,Enchanted golden apple,FALSE,2,Poisoned apple,FALSE,5,Orange,FALSE,13,"8,7",MixerEnchanted golden appleOrangePoisoned apple,1,TRUE
