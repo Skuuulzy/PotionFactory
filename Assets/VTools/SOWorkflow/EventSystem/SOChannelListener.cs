@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
 
-namespace SOWorkflow.EventSystem
+namespace SoWorkflow.EventSystem
 {
     /// <summary>
     /// A MonoBehaviour component that listens to a specific `SOChannel` and invokes Unity events in response.

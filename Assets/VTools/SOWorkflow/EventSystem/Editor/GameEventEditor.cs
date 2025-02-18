@@ -1,63 +1,93 @@
-﻿using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using Object = UnityEngine.Object;
 
-namespace SoWorkflow.EventSystem
+namespace VTools.SoWorkflow.EventSystem
 {
-    [CustomEditor(typeof(SOChannel))]
-    public class SOChannelEditor : Editor
+    [CustomEditor(typeof(GameEvent<>), true)]
+    public class GameEventEditor : Editor
     {
         private List<Object> _eventObservers = new();
         private List<Object> _eventInvokers = new();
+        private Type _eventType;
+        private MethodInfo _raiseMethod;
+        private object _defaultValue;
+
+        private void OnEnable()
+        {
+            _eventType = target.GetType();
+
+            // Get the `Raise(T)` method from GameEvent<T>
+            _raiseMethod = _eventType.GetMethod("Raise");
+
+            // Try to determine the default value for T (if possible)
+            Type genericType = _eventType.BaseType?.GetGenericArguments()[0];
+            if (genericType != null)
+            {
+                _defaultValue = genericType.IsValueType ? Activator.CreateInstance(genericType) : null;
+            }
+        }
 
         public override void OnInspectorGUI()
         {
-            base.OnInspectorGUI();
+            base.OnInspectorGUI(); // Draw default inspector
 
-            // Get the SOChannel target
-            var eventChannel = (SOChannel)target;
+            if (_raiseMethod == null)
+            {
+                Debug.LogError($"[GameEventEditor] Could not find Raise() method on {_eventType}.");
+                return;
+            }
 
             EditorGUILayout.Space();
-
-            // Display observers
             EditorGUILayout.LabelField("Observers", EditorStyles.boldLabel);
             DisplayObjectsAsSelectable(_eventObservers);
 
             if (GUILayout.Button("Refresh Observers"))
             {
-                _eventObservers = new List<Object>(FindListeners(eventChannel));
+                _eventObservers = FindListeners(target);
             }
 
             EditorGUILayout.Space();
-
-            // Display Invokers
             EditorGUILayout.LabelField("Invokers", EditorStyles.boldLabel);
             DisplayObjectsAsSelectable(_eventInvokers);
 
             if (GUILayout.Button("Refresh Invokers"))
             {
-                _eventInvokers = new List<Object>(FindInvokers(eventChannel));
+                _eventInvokers = FindInvokers(target);
+            }
+
+            if (!Application.isPlaying)
+            {
+                return;
             }
 
             EditorGUILayout.Space();
-            
-            // Button to invoke the event
-            if (GUILayout.Button("Raise"))
+
+            if (GUILayout.Button("Invoke with default"))
             {
-                eventChannel.Raise();
+                if (_raiseMethod != null)
+                {
+                    _raiseMethod.Invoke(target, new[] { _defaultValue });
+                }
             }
         }
 
-        private static List<Object> FindListeners(SOChannel soChannel)
+        /// <summary>
+        /// Finds all GameEventListeners in the loaded scene that reference this event.
+        /// </summary>
+        private static List<Object> FindListeners(object so)
         {
             var listeners = new List<Object>();
 
-            // Find all EventListenerBase instances in the loaded scene
-            var allListeners = FindObjectsByType<SOChannelListener>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            // Find all GameEventListener instances in the loaded scene
+            var allListeners = FindObjectsByType<GameEventListener>(FindObjectsInactive.Include, FindObjectsSortMode.None);
 
             foreach (var listener in allListeners)
             {
-                if (listener.SOChannel == soChannel && !listeners.Contains(listener))
+                if (listener.GameEvent == (GameEvent<Empty>)so && !listeners.Contains(listener))
                 {
                     listeners.Add(listener);
                 }
@@ -66,7 +96,10 @@ namespace SoWorkflow.EventSystem
             return listeners;
         }
 
-        private static List<Object> FindInvokers(SOChannel soChannel)
+        /// <summary>
+        /// Finds all scene GameObjects with MonoBehaviours that reference this event.
+        /// </summary>
+        private static List<Object> FindInvokers(object so)
         {
             var invokers = new List<Object>();
             var allObjects = Resources.FindObjectsOfTypeAll<GameObject>();
@@ -80,7 +113,7 @@ namespace SoWorkflow.EventSystem
 
                 foreach (var component in components)
                 {
-                    if (component == null || component.GetType() == typeof(SOChannelListener))
+                    if (component == null || component.GetType() == typeof(GameEventListener))
                         continue;
 
                     // Use SerializedObject to check for references
@@ -89,7 +122,7 @@ namespace SoWorkflow.EventSystem
 
                     while (property.Next(true))
                     {
-                        if (property.propertyType == SerializedPropertyType.ObjectReference && property.objectReferenceValue == soChannel)
+                        if (property.propertyType == SerializedPropertyType.ObjectReference && property.objectReferenceValue == (Object)so)
                         {
                             invokers.Add(component);
                         }
@@ -100,6 +133,9 @@ namespace SoWorkflow.EventSystem
             return invokers;
         }
 
+        /// <summary>
+        /// Displays a list of objects in the inspector, making them selectable.
+        /// </summary>
         private static void DisplayObjectsAsSelectable(List<Object> objects)
         {
             if (objects.Count == 0)

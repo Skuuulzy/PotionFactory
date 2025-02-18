@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SOWorkflow.EventSystem
+namespace SoWorkflow.EventSystem
 {
     /// <summary>
     /// Represents an event channel that enables decoupled communication between systems using the observer pattern.

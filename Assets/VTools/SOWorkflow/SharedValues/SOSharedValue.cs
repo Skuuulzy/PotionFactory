@@ -2,7 +2,7 @@ using System;
 using UnityEditor;
 using UnityEngine;
 
-namespace SOWorkflow.SharedValues
+namespace SoWorkflow.SharedValues
 {
     public class SOSharedValue<T> : ScriptableObject
     {

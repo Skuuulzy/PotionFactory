@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SOWorkflow.SharedValues
+namespace SoWorkflow.SharedValues
 {
     [CreateAssetMenu(menuName = "Shared Value/Float")]
     public class SOSharedFloat : SOSharedValue<float>
