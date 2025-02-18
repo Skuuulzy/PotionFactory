@@ -72,6 +72,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2652423927148802697}
   - component: {fileID: 3253429406140143044}
+  - component: {fileID: 2629808728814777733}
   m_Layer: 0
   m_Name: LtoRConveyorGridComponent
   m_TagString: Untagged
@@ -108,11 +109,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 696550a8d31846c3a36381b852003b37, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _animator: {fileID: 2629808728814777733}
   _ingredientController: {fileID: 6873847992688000341}
-  _translationPositions:
-  - {fileID: 5742713297710406073}
-  - {fileID: 2551140212758564933}
-  - {fileID: 4980573867103841125}
+  _translationPositions: []
+--- !u!95 &2629808728814777733
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5488635875282986484}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 4088c0270d7a57840afddcfc7b1e3157, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &6811401348564870929
 GameObject:
   m_ObjectHideFlags: 0
@@ -128,7 +148,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &7294569716528831954
 Transform:
   m_ObjectHideFlags: 0

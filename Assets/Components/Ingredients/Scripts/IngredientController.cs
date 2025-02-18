@@ -10,9 +10,8 @@ namespace Components.Ingredients
 
 		public SpriteRenderer IngredientView => _spriteRenderer;
 
-		public void CreateRepresentationFromTemplate(IngredientTemplate ingredientTemplate, Vector3 startPosition)
+		public void CreateRepresentationFromTemplate(IngredientTemplate ingredientTemplate)
 		{
-			_spriteRenderer.transform.position = startPosition;
 			_spriteRenderer.sprite = ingredientTemplate.Icon;
 		}
 
