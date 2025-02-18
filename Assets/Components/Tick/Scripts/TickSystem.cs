@@ -19,6 +19,7 @@ namespace Components.Tick
         public float InitialTickDuration => _initialTickDuration;
         public float CurrentTickDuration => _currentTickDuration;
 
+        public static Action<int> OnTickMultiplierChanged;
         // ------------------------------------------------------------------------- MONO -------------------------------------------------------------------------
 		protected override void Awake()
         {
@@ -114,7 +115,8 @@ namespace Components.Tick
 
         public void ChangeTimeSpeed(int value)
         {
-            if(value == 0)
+            OnTickMultiplierChanged?.Invoke(value);
+            if (value == 0)
 			{
                 _isPause = true;
                 return;
