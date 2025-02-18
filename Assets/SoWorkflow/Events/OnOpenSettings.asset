@@ -9,8 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 672da7b7a48fe3347950e491d1f8d96e, type: 3}
-  m_Name: OnDisableParcelUnlock
+  m_Script: {fileID: 11500000, guid: 9654d702c7f64debbe060570fbc30de1, type: 3}
+  m_Name: OnOpenSettings
   m_EditorClassIdentifier: 
-  _description: Raised when the player wants to leave parcel unlock mode.
-  _logTraffic: 0
+  _description: Raised when the player wants to open/close the settings.

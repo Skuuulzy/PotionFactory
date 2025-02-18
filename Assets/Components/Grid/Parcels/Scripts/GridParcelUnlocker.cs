@@ -52,16 +52,10 @@ namespace Components.Grid.Parcel
             Destroy(parcelView.gameObject);
         }
 
-        public void ShowInterface()
+        public void Open(bool open)
         {
-            _parcelViewHolder.gameObject.SetActive(true);
-            CameraSelector.Instance.SwitchToCamera(CameraType.TOP_VIEW);
-        }
-
-        public void HideInterface()
-        {
-            _parcelViewHolder.gameObject.SetActive(false);
-            CameraSelector.Instance.SwitchToCamera(CameraType.GAMEPLAY);
+            _parcelViewHolder.gameObject.SetActive(open);
+            CameraSelector.Instance.SwitchToCamera(open ? CameraType.TOP_VIEW : CameraType.GAMEPLAY);
         }
         
         // ----------------------------------------- Generate Parcels -------------------------------------------------

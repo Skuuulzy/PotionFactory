@@ -9,6 +9,8 @@ namespace VTools.GameSettings
     {
         // ----------------------------------------- SERIALIZED FIELDS -------------------------------------------------
 
+        [SerializeField] private GameObject _view;
+        
         [SerializeField] private Toggle _musicToggle;
         [SerializeField] private TMP_Dropdown _resolutionDropdown;
         [SerializeField] private Vector2Int[] _availableResolutions;
@@ -30,6 +32,11 @@ namespace VTools.GameSettings
         }
 
         // ----------------------------------------- PUBLIC METHODS -------------------------------------------------
+
+        public void Open(bool open)
+        {
+            _view.SetActive(open);
+        }
         
         /// Sets the music volume and saves it to PlayerPrefs.
         public void ToggleMusic(bool toggle)
