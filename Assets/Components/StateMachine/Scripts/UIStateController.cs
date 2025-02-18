@@ -1,5 +1,6 @@
 using System;
 using Components.Economy;
+using Components.Tick;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -80,7 +81,7 @@ public class UIStateController : MonoBehaviour
 
 	private void SetCountdownTime(float currentTime, float duration)
 	{
-		_stateCountdownText.text = $"{ currentTime}";
+		_stateCountdownText.text = $"{TickSystem.GetSecondValueFromTicks((int)currentTime)}";
 	}
 
 	private void HideCountdown()

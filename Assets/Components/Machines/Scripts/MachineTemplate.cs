@@ -2,6 +2,7 @@
 using System.Linq;
 using Components.Grid;
 using Components.Machines.UIView;
+using Components.Tick;
 using UnityEngine;
 
 namespace Components.Machines
@@ -53,7 +54,7 @@ namespace Components.Machines
         public int OutSlotIngredientCount => _outSlotIngredientCount;
         public int IngredientsPerSlotCount => _ingredientsPerSlotCount;
 
-        public int ProcessTime => _processTime;
+        public int ProcessTime => TickSystem.GetTickValueFromSeconds(_processTime);
 
         public float ShopSpawnProbability => _shopSpawnProbability;
 

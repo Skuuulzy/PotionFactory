@@ -44,6 +44,7 @@ namespace Components.Machines
 
         private void TranslateItem()
         {
+
             if (_translating)
             {
                 return;
@@ -51,50 +52,51 @@ namespace Components.Machines
             
             if (Machine.InIngredients.Count == 0)
             {
+                _ingredientController.DestroyRepresentation();
                 return;
             }
 
             ShowItem(true, Machine.InIngredients[0]);
-            
-            // We reduce the translation time by a small offset to make sure that the target has reach is target at the next tick.
-            var translationTime = TickSystem.Instance.CurrentTickDuration - 0.08f;
-            StartCoroutine(MoveThroughTransforms(_ingredientController.IngredientView.transform, _translationPositions, translationTime));
+
+            //StartCoroutine(MoveThroughTransforms(_ingredientController.IngredientView.transform, _translationPositions,TickSystem.Instance.CurrentTickDuration, Machine.Template.ProcessTime));
         }
-        
-        /// Coroutine to move the transform through multiple positions over a given total duration.
-        private IEnumerator MoveThroughTransforms(Transform objectToMove, List<Transform> targets, float duration)
+
+        /// Coroutine to move the transform through multiple positions over a given total duration (based on tick system).
+        private IEnumerator MoveThroughTransforms(Transform objectToMove, List<Transform> targets, float tickDuration, int tickCount)
         {
             _translating = true;
-            
-            // Making sure the object always have a Y world rotation of 0.
+
+            // Making sure the object always has a Y world rotation of 0.
             Vector3 fixedRotation = objectToMove.eulerAngles;
             fixedRotation.y = 0f;
             objectToMove.rotation = Quaternion.Euler(fixedRotation);
-            
-            var segmentDuration = duration / (targets.Count - 1);
-            
+
+            var totalDuration = tickDuration * tickCount; // Example: 0.1s * 10 = 1s
+            var segmentDuration = totalDuration / (targets.Count - 1);
+            var ticksPerSegment = Mathf.CeilToInt(segmentDuration / tickDuration);
+
             for (int i = 0; i < targets.Count - 1; i++)
             {
                 var startPosition = targets[i].position;
                 var targetPosition = targets[i + 1].position;
-                var elapsedTime = 0f;
 
-                while (elapsedTime < segmentDuration)
+                for (int tick = 0; tick < ticksPerSegment; tick++)
                 {
-                    elapsedTime += Time.deltaTime;
-                    var t = elapsedTime / segmentDuration;
+                    if (Machine.InIngredients.Count == 0)
+                    {
+                        ShowItem(false, null);
+                    }
+
+                    float t = (float)(tick + 1) / ticksPerSegment;
                     objectToMove.position = Vector3.Lerp(startPosition, targetPosition, t);
-                    yield return null;
+                    yield return new WaitForSeconds(tickDuration); // Wait for the tick duration
                 }
 
-                objectToMove.position = targetPosition; // Ensure it reaches exact target position at the end of segment
+                objectToMove.position = targetPosition; // Ensure it reaches the exact target position at the end of segment
             }
-            
-            if (Machine.InIngredients.Count == 0)
-            {
-                ShowItem(false, null);
-            }
-            
+
+
+
             _translating = false;
         }
     }

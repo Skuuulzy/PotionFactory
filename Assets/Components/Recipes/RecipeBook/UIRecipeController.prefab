@@ -89,6 +89,7 @@ MonoBehaviour:
   _entriesHolder: {fileID: 7216731438784007705}
   _entryViewPrefab: {fileID: 249894291934348760, guid: e57326a165cc28d47a79df30d392f216,
     type: 3}
+  _recipeBookPanel: {fileID: 6608438589894439986}
 --- !u!1 &1447943618077049721
 GameObject:
   m_ObjectHideFlags: 0
@@ -769,9 +770,10 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 6608438589894439986}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
+      - m_Target: {fileID: 8039710749792862277}
+        m_TargetAssemblyTypeName: Components.Recipes.Grimoire.UIRecipeController,
+          Assembly-CSharp
+        m_MethodName: DisplayRecipeBook
         m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1587,11 +1589,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 6608438589894439986}
+      objectReference: {fileID: 8039710749792862277}
     - target: {fileID: 2111217500130285657, guid: 72564793ff007c746bcee44ddb9a972e,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: SetActive
+      value: DisplayRecipeBook
+      objectReference: {fileID: 0}
+    - target: {fileID: 2111217500130285657, guid: 72564793ff007c746bcee44ddb9a972e,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: Components.Recipes.Grimoire.UIRecipeController, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 3084535281051610946, guid: 72564793ff007c746bcee44ddb9a972e,
         type: 3}
