@@ -33,9 +33,11 @@ namespace Components.Shop
         private void OnDestroy()
 		{
 			ShopController.OnShopGenerated -= SetInfos;
-		}
+            ResolutionFactoryState.OnResolutionFactoryStateStarted -= HandleResolutionState;
+			UIMachineShopItemViewController.OnMachineBuyed -= AddMachineToBuyedItems;
+        }
 
-		private void SetInfos(List<ShopItem> shopItems)
+        private void SetInfos(List<ShopItem> shopItems)
 		{
 
 			//Destroying all child before instantiate new ones
