@@ -17,7 +17,6 @@ using Components.Tools.ExtensionMethods;
 using Cysharp.Threading.Tasks;
 using Database;
 using VComponent.Tools.Singletons;
-using Sirenix.Utilities;
 using Components.Shop.ShopItems;
 
 namespace Components.Grid
