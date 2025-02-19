@@ -17,7 +17,7 @@ namespace Components.Recipes.Grimoire
         [SerializeField] private RecipeEntryView _entryViewPrefab;
         [SerializeField] private GameObject _recipeBookPanel;
         
-        private readonly List<RecipeEntryView> _allEntryViews = new();
+        private List<RecipeEntryView> _allEntryViews = new();
         private List<RecipeTemplate> _allRecipes;
         private void Awake()
         {
@@ -29,6 +29,7 @@ namespace Components.Recipes.Grimoire
         {
             var potentialRecipes = GetPotentialRecipes();
             _allRecipes = _allRecipes.OrderByDescending(template => potentialRecipes.Contains(template)).ThenBy(template => template.OutIngredient.Price).ThenBy(template => template.OutIngredient.Name).ToList();
+            _allEntryViews = new();
 
             foreach (Transform child in _entriesHolder)
             {

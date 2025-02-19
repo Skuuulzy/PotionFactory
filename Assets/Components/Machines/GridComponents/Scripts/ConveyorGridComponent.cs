@@ -15,11 +15,6 @@ namespace Components.Machines
         [Header("Ingredient")]
         [SerializeField] private IngredientController _ingredientController;
         
-        [SerializeField] private List<Transform> _translationPositions;
-
-        private int _currentTick;
-        private bool _isTranslating;
-        private Transform _currentIngredientTransform;
         private IngredientTemplate _currentIngredient;
 
         protected override void SetUp()
@@ -57,8 +52,6 @@ namespace Components.Machines
             if (Machine.InIngredients.Count == 0)
             {
                 _ingredientController.DestroyRepresentation();
-                _isTranslating = false;
-                _currentIngredientTransform = null;
                 _currentIngredient = null;
                 return;
             }
