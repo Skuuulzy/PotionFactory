@@ -24,9 +24,12 @@ namespace Components.Grid
         [SerializeField] private bool _useSubMachine;
         [SerializeField] private SerializableDictionary<MachineTemplate, List<RotationSubMachine>> _subMachineRotation;
 
+        [Header("Debug")]
+        [SerializeField] private InputState _inputState = InputState.SELECTION;
+        [SerializeField] private MachineController _currentMachinePreview;
+        
         private Camera _camera;
 
-        private MachineController _currentMachinePreview;
         private MachineController _currentSubMachinePreview;
 
         private int _currentInputRotation;
@@ -39,6 +42,12 @@ namespace Components.Grid
         private bool _justPlaced;
         private bool _justRemoved;
         private Machine _hoveredMachine;
+        
+        private enum InputState
+        {
+            SELECTION,
+            PLACEMENT
+        }
 
         private Grid Grid => _gridController.Grid;
         private MachineController Preview => _currentMachinePreview.gameObject.activeSelf ? _currentMachinePreview : _currentSubMachinePreview;
@@ -51,21 +60,23 @@ namespace Components.Grid
             _camera = Camera.main;
 
             MachineManager.OnChangeSelectedMachine += InstantiatePreview;
+            GrimoireButton.OnGrimoireButtonDeselect += HandleGrimoireDeselect;
+            
+            Machine.OnMove += HandleMovingMachine;
+            
             ResolutionFactoryState.OnResolutionFactoryStateStarted += HandleResolutionFactoryState;
             EndOfDayState.OnEndOfDayStateStarted += HandleShopState;
-            UIGrimoireController.OnEnableCleanMode += HandleCleanMode;
-            GrimoireButton.OnGrimoireButtonDeselect += HandleGrimoireDeselect;
-            Machine.OnMove += HandleMovingMachine;
         }
         
         private void OnDestroy()
         {
             MachineManager.OnChangeSelectedMachine -= InstantiatePreview;
+            GrimoireButton.OnGrimoireButtonDeselect -= HandleGrimoireDeselect;
+            
+            Machine.OnMove -= HandleMovingMachine;
+            
             ResolutionFactoryState.OnResolutionFactoryStateStarted -= HandleResolutionFactoryState;
             EndOfDayState.OnEndOfDayStateStarted -= HandleShopState;
-            UIGrimoireController.OnEnableCleanMode -= HandleCleanMode;
-            GrimoireButton.OnGrimoireButtonDeselect -= HandleGrimoireDeselect;
-            Machine.OnMove -= HandleMovingMachine;
         }
 
         private void Update()
@@ -76,37 +87,36 @@ namespace Components.Grid
                 return;
             }
 
-            // Selection mode
-            if (!_currentMachinePreview)
+            switch (_inputState)
             {
-                TryHoverMachine();   
-                
-                if (Input.GetMouseButtonUp(0))
-                {
-                    if (_justPlaced)
-                    {
-                        _justPlaced = false;
-                        return;
-                    }
-                    
-                    TryMoveMachine();
-                }
-                if (Input.GetMouseButton(1))
-                {
-					if (_justRemoved)
-					{
-                        _justRemoved = false;
-                        return;
-					}
-
-                    TryRetrieveMachine();
-                }
-                
-                return;
+                case InputState.SELECTION:
+                    HandleSelectionMode();
+                    break;
+            
+                case InputState.PLACEMENT:
+                    HandlePlacementMode();
+                    break;
             }
-            
+        }
+        
+        private void HandleSelectionMode()
+        {
+            TryHoverMachine();   
+
+            if (Input.GetMouseButtonUp(0))
+            {
+                TryMoveMachine();
+            }
+            if (Input.GetMouseButton(1))
+            {
+                TryRetrieveMachine();
+            }
+        }
+        
+        private void HandlePlacementMode()
+        {
             MovePreview();
-            
+    
             if (Input.GetMouseButton(0))
             {
                 AddSelectedMachineToGrid();
@@ -114,6 +124,7 @@ namespace Components.Grid
             if (Input.GetMouseButtonDown(1))
             {
                 DestroyPreview();
+                SwitchInputState(InputState.SELECTION);
             }
             if (Input.GetKeyDown(KeyCode.R))
             {
@@ -121,27 +132,20 @@ namespace Components.Grid
             }
         }
 
-        // ------------------------------------------------------------------------- PREVIEW BEHAVIOUR -------------------------------------------------------------------------------- 
-        
-        private MachineController InstantiateMachine(MachineTemplate template, int rotation)
+        private void SwitchInputState(InputState newState)
         {
-            var gridObjectController = GridObjectController.InstantiateFromTemplate(template, Grid.GetCellSize(), _previewHolder);
-            if (gridObjectController is MachineController machineController)
-            {
-                machineController.RotatePreview(rotation);
-
-                return machineController;
-            }
-            
-            Debug.LogError("The preview instantiated is not of type MachineController.");
-            return null;
+            _inputState = newState;
         }
+
+        // ------------------------------------------------------------------------- PREVIEW BEHAVIOUR -------------------------------------------------------------------------------- 
         
         private void InstantiatePreview(MachineTemplate template)
         {
             OnPreview?.Invoke(false);
             DestroyPreview();
             _currentMachinePreview = InstantiateMachine(template, _currentInputRotation);
+            SwitchInputState(InputState.PLACEMENT);
+            
             Debug.Log($"Selecting {_currentMachinePreview.name}");
         }
 
@@ -345,6 +349,7 @@ namespace Components.Grid
                 _currentMachinePreview = null;
                 _moveMode = false;
                 _justPlaced = true;
+                SwitchInputState(InputState.SELECTION);
             }
             else
             {
@@ -389,6 +394,13 @@ namespace Components.Grid
         
         private void TryMoveMachine()
         {
+            // Prevent placing a machine and then directly move it.
+            if (_justPlaced)
+            {
+                _justPlaced = false;
+                return;
+            }
+            
             // TODO: This click workflow really need to be centralized (maybe in the input sys)
             // Try to get the position on the grid. 
             if (!UtilsClass.ScreenToWorldPositionIgnoringUI(Input.mousePosition, _camera, out var worldMousePosition))
@@ -414,11 +426,18 @@ namespace Components.Grid
                 Debug.Log($"Move machine {machine.Controller.name}");
                 machine.Controller.Move();
                 machine.Select(true);
+                SwitchInputState(InputState.PLACEMENT);
             }
         }
         
         private void TryRetrieveMachine()
         {
+            if (_justRemoved)
+            {
+                _justRemoved = false;
+                return;
+            }
+            
             // TODO: This click workflow really need to be centralized (maybe in the input sys)
             // Try to get the position on the grid. 
             if (!UtilsClass.ScreenToWorldPositionIgnoringUI(Input.mousePosition, _camera, out var worldMousePosition))
@@ -489,15 +508,6 @@ namespace Components.Grid
             _isFactoryState = false;
         }
 
-        private void HandleCleanMode(bool cleanMode)
-        {
-            // Hide the preview
-            if (_currentMachinePreview)
-            {
-                _currentMachinePreview.gameObject.SetActive(!cleanMode);
-            }
-        }
-
         private void HandleGrimoireDeselect()
         {
             DestroyPreview();
@@ -512,6 +522,22 @@ namespace Components.Grid
             machine.Controller.transform.localPosition = Vector3.zero;
 
             _moveMode = true;
+        }
+        
+        // ------------------------------------------------------------------------- HELPERS -------------------------------------------------------------------------------- 
+
+        private MachineController InstantiateMachine(MachineTemplate template, int rotation)
+        {
+            var gridObjectController = GridObjectController.InstantiateFromTemplate(template, Grid.GetCellSize(), _previewHolder);
+            if (gridObjectController is MachineController machineController)
+            {
+                machineController.RotatePreview(rotation);
+
+                return machineController;
+            }
+            
+            Debug.LogError("The preview instantiated is not of type MachineController.");
+            return null;
         }
     }
 
