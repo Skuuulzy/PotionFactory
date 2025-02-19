@@ -120,6 +120,10 @@ namespace Components.Grid
             {
                 DestroyPreview();
                 SwitchInputState(InputState.SELECTION);
+                
+                // Reset rotations.
+                _currentInputRotation = 0;
+                _currentPreviewRotation = 0;
             }
             if (Input.GetKeyDown(KeyCode.R))
             {
@@ -141,6 +145,12 @@ namespace Components.Grid
         
         private void InstantiatePreview(MachineTemplate template, int rotation)
         {
+            // Prevent instantiation of the same type.
+            if (_currentMachinePreview && _currentMachinePreview.Machine.Template == template)
+            {
+                return;
+            }
+            
             OnPreview?.Invoke(false);
             
             DestroyPreview();
