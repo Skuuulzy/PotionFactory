@@ -80,7 +80,7 @@ namespace VComponent.Tools.Timer
 
         public TickableCountdownTimer(float value) : base (value)
 		{
-            Time = value / TickSystem.Instance.InitialTickDuration ; 
+            Time = TickSystem.GetTickValueFromSeconds(value); 
             InitialTime = Time;
             TickSystem.AddTickable(this);
 		}

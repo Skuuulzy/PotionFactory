@@ -15,36 +15,42 @@ namespace Components.Recipes.Grimoire
     {
         [SerializeField] private Transform _entriesHolder;
         [SerializeField] private RecipeEntryView _entryViewPrefab;
+        [SerializeField] private GameObject _recipeBookPanel;
         
-        private readonly List<RecipeEntryView> _allEntryViews = new();
-        
+        private List<RecipeEntryView> _allEntryViews = new();
+        private List<RecipeTemplate> _allRecipes;
         private void Awake()
         {
-            var allRecipe = ScriptableObjectDatabase.GetAllScriptableObjectOfType<RecipeTemplate>();
-            allRecipe = allRecipe.OrderBy(template => template.Ingredients.Count).ThenBy(template => template.OutIngredient.Name).ToList();
-            
-            foreach (var recipeTemplate in allRecipe)
+            _allRecipes = ScriptableObjectDatabase.GetAllScriptableObjectOfType<RecipeTemplate>();
+        }
+
+
+        private void SetRecipesOrder()
+        {
+            var potentialRecipes = GetPotentialRecipes();
+            _allRecipes = _allRecipes.OrderByDescending(template => potentialRecipes.Contains(template)).ThenBy(template => template.OutIngredient.Price).ThenBy(template => template.OutIngredient.Name).ToList();
+            _allEntryViews = new();
+
+            foreach (Transform child in _entriesHolder)
+            {
+                Destroy(child.gameObject);
+            }
+
+            foreach (var recipeTemplate in _allRecipes)
             {
                 var entryView = Instantiate(_entryViewPrefab, _entriesHolder);
                 entryView.Initialize(recipeTemplate);
-                
+                entryView.SetState(potentialRecipes.Contains(recipeTemplate));
                 _allEntryViews.Add(entryView);
             }
         }
-
-        private void Start()
+        public void DisplayRecipeBook(bool value)
         {
-            ResolutionFactoryState.OnResolutionFactoryStateStarted += HandleStartResolution;
-        }
-
-        private void OnDestroy()
-        {
-            ResolutionFactoryState.OnResolutionFactoryStateStarted -= HandleStartResolution;
-        }
-
-        private void HandleStartResolution(ResolutionFactoryState obj)
-        {
-            DisplayPotentialRecipes(true);
+            _recipeBookPanel.SetActive(value);
+            if (value)
+            {
+                SetRecipesOrder();
+            }
         }
 
         public void DisplayPotentialRecipes(bool display)
@@ -65,13 +71,8 @@ namespace Components.Recipes.Grimoire
                 return;
             }
 
-            // Get player machines
-            var playerMachines = GrimoireController.Instance.PlayerMachinesDictionary.Keys.ToList();
+            var potentialRecipes = GetPotentialRecipes();
 
-            // Get extracted resources
-            var playerResources = GridController.Instance.ExtractedIngredients;
-
-            var potentialRecipes = ScriptableObjectDatabase.FindAllPotentialRecipes(playerMachines, playerResources);
             for (int i = 0; i < potentialRecipes.Count; i++)
             {
                 // Activate the corresponding entry view for this recipe.
@@ -81,6 +82,18 @@ namespace Components.Recipes.Grimoire
                     entryView.gameObject.SetActive(true);
                 }
             }
+        }
+
+        private List<RecipeTemplate> GetPotentialRecipes()
+        {
+            // Get player machines
+            var playerMachines = GrimoireController.Instance.PlayerMachinesDictionary.Keys.ToList();
+
+            // Get extracted resources
+            var playerResources = GridController.Instance.ExtractedIngredients;
+
+            var potentialRecipes = ScriptableObjectDatabase.FindAllPotentialRecipes(playerMachines, playerResources);
+            return potentialRecipes;
         }
     }
 }

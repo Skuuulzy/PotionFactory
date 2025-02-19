@@ -43,7 +43,7 @@ namespace VComponent.Tools.CSVReader
                 var price = int.Parse(csvDataLine[i][1]);
                 var nbOfTransformation = int.Parse(csvDataLine[i][2]);
                 var isLiquid = csvDataLine[i][3] != "FALSE";
-                var executionTimeModifier = float.Parse(csvDataLine[i][6]);
+                var executionTimeModifier = float.Parse(csvDataLine[i][4]);
 
                 var ingredientTemplate = GetIngredient(name);
                 
