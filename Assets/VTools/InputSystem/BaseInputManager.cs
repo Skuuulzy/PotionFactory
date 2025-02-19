@@ -13,7 +13,9 @@ namespace VComponents.InputSystem
         [SerializeField] protected PlayerInput _playerInput;
 
         protected bool IsMouseOverUI;
-
+        
+        private Dictionary<string, Action<InputAction.CallbackContext>> _actionDelegates = new();
+        
         public string GetCurrentControlScheme() => _playerInput.currentControlScheme;
         public bool IsUsingGamepad() => _playerInput.currentControlScheme == "Gamepad";
         public bool IsUsingKeyboard() => _playerInput.currentControlScheme == "Keyboard&Mouse";
@@ -157,7 +159,7 @@ namespace VComponents.InputSystem
                 Debug.LogError($"[INPUT MANAGER] Action '{actionName}' not found. Cannot subscribe to it.");
             }
         }
-
+        
         protected void UnsubscribeFromAction(string actionName, Action<InputAction.CallbackContext> callback)
         {
             var action = _playerInput.actions[actionName];

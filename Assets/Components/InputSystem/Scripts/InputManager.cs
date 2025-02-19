@@ -15,10 +15,9 @@ namespace VComponent.InputSystem
             SubscribeToAction(MOVE_ACTION_NAME, OnMoveWrapper);
         }
 
-        // TODO: See to make this wrapper generic.
-        private void OnMoveWrapper(InputAction.CallbackContext obj)
+        private void OnMoveWrapper(InputAction.CallbackContext callback)
         {
-            OnMove?.Invoke(obj.ReadValue<Vector2>());
+            OnMove?.Invoke(callback.ReadValue<Vector2>());
         }
     }
 }
