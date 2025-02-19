@@ -28,15 +28,14 @@ namespace Components.Grid
         [SerializeField] private MachineController _currentMachinePreview;
         [SerializeField] private int _currentInputRotation;
         [SerializeField] private int _currentPreviewRotation;
+        [SerializeField] private bool _moveMode;
+        [SerializeField] private bool _justPlaced;
+        [SerializeField] private bool _justRemoved;
         
         private Camera _camera;
 
         private bool _isFactoryState = true;
         private Vector3 _lastCellPosition = new(-1, -1, -1);
-
-        private bool _moveMode;
-        private bool _justPlaced;
-        private bool _justRemoved;
         private Machine _hoveredMachine;
         
         private enum InputState
@@ -120,10 +119,6 @@ namespace Components.Grid
             {
                 DestroyPreview();
                 SwitchInputState(InputState.SELECTION);
-                
-                // Reset rotations.
-                _currentInputRotation = 0;
-                _currentPreviewRotation = 0;
             }
             if (Input.GetKeyDown(KeyCode.R))
             {
@@ -133,7 +128,18 @@ namespace Components.Grid
 
         private void SwitchInputState(InputState newState)
         {
+            if (_inputState == newState)
+            {
+                return;
+            }
+            
             _inputState = newState;
+            
+            // Reset flags when switching input states
+            _currentInputRotation = 0;
+            _currentPreviewRotation = 0;
+            _justPlaced = false;
+            _justRemoved = false;
         }
 
         // ------------------------------------------------------------------------- PREVIEW BEHAVIOUR -------------------------------------------------------------------------------- 
@@ -380,6 +386,7 @@ namespace Components.Grid
             if (_justPlaced)
             {
                 _justPlaced = false;
+                Debug.Log("Just placed return");
                 return;
             }
             
