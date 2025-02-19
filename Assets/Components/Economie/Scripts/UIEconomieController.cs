@@ -13,61 +13,71 @@ namespace Components.Economy
 
         private int _currentPlayerMoney = 0;
         private int _currentPlayerScore = 0;
+        private Coroutine _moneyCoroutine;
+        private Coroutine _scoreCoroutine;
+
         private void Start()
         {
-	        _playerMoneyText.text = "0";
+            _playerMoneyText.text = "0";
             EconomyController.OnPlayerMoneyUpdated += UpdateUIPlayerMoney;
             EconomyController.OnStatePlayerScoreUpdated += UpdateUIStatePlayerScore;
             EconomyController.OnScoreStateObjectiveUpdated += UpdateScoreStateObjective;
-		}
+        }
 
-		private void OnDestroy()
-		{
+        private void OnDestroy()
+        {
             EconomyController.OnPlayerMoneyUpdated -= UpdateUIPlayerMoney;
             EconomyController.OnStatePlayerScoreUpdated -= UpdateUIStatePlayerScore;
             EconomyController.OnScoreStateObjectiveUpdated -= UpdateScoreStateObjective;
-		}
+        }
 
-		private void UpdateUIPlayerMoney(int playerMoney)
-		{
-            StopAllCoroutines();
-            StartCoroutine(AnimateValueCoroutine(_playerMoneyText,_currentPlayerMoney, playerMoney, _animDuration));
+        /// <summary>
+        /// Updates the player's money display with an animated transition.
+        /// </summary>
+        private void UpdateUIPlayerMoney(int playerMoney)
+        {
+            if (_moneyCoroutine != null)
+                StopCoroutine(_moneyCoroutine);
+
+            _moneyCoroutine = StartCoroutine(AnimateValueCoroutine(_playerMoneyText, _currentPlayerMoney, playerMoney, _animDuration));
             _currentPlayerMoney = playerMoney;
-		}
+        }
 
-		private void UpdateUIStatePlayerScore(int playerStateMoney)
-		{
-            StopAllCoroutines();
-            StartCoroutine(AnimateValueCoroutine(_playerStateScoreText, _currentPlayerScore, playerStateMoney, _animDuration));
+        /// <summary>
+        /// Updates the player's score in the state display with an animated transition.
+        /// </summary>
+        private void UpdateUIStatePlayerScore(int playerStateMoney)
+        {
+            if (_scoreCoroutine != null)
+                StopCoroutine(_scoreCoroutine);
+
+            _scoreCoroutine = StartCoroutine(AnimateValueCoroutine(_playerStateScoreText, _currentPlayerScore, playerStateMoney, _animDuration));
             _currentPlayerScore = playerStateMoney;
-		}
+        }
 
-		private void UpdateScoreStateObjective(int money)
-		{
-			_scoreStateObjectiveText.text = $"<b>Objectif</b> {money}";
-		}
+        /// <summary>
+        /// Updates the score objective display instantly.
+        /// </summary>
+        private void UpdateScoreStateObjective(int money)
+        {
+            _scoreStateObjectiveText.text = $"<b>Objectif</b> {money}";
+        }
 
+        /// <summary>
+        /// Animates the transition of a numerical value over time.
+        /// </summary>
         private IEnumerator AnimateValueCoroutine(TextMeshProUGUI text, int startValue, int endValue, float duration)
         {
-            int currentValue = startValue;
             float elapsedTime = 0f;
-
             while (elapsedTime < duration)
             {
                 elapsedTime += Time.deltaTime;
                 float progress = Mathf.Clamp01(elapsedTime / duration);
-                currentValue = Mathf.RoundToInt(Mathf.Lerp(startValue, endValue, progress));
-                UpdateText(text, currentValue);
+                int currentValue = Mathf.RoundToInt(Mathf.Lerp(startValue, endValue, progress));
+                text.text = currentValue.ToString();
                 yield return null;
             }
-
-            currentValue = endValue;
-            UpdateText(text, currentValue);
-        }
-
-        private void UpdateText(TextMeshProUGUI text, int currentValue)
-        {
-            text.text = $"{currentValue}";
+            text.text = endValue.ToString();
         }
 
         public void DebugAddScore()

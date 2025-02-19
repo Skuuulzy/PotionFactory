@@ -190,7 +190,7 @@ PrefabInstance:
         type: 3}
       propertyPath: _runConfiguration
       value: 
-      objectReference: {fileID: 11400000, guid: da80af7889f90f442a52ec167f8abb86,
+      objectReference: {fileID: 11400000, guid: 776bff987b37333419b93da1abacd97d,
         type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -886,6 +886,12 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 6163826407555121162, guid: bc2c6f6d7f401c0478445e371db8a800,
+        type: 3}
+      propertyPath: _runConfiguration
+      value: 
+      objectReference: {fileID: 11400000, guid: 776bff987b37333419b93da1abacd97d,
+        type: 2}
     - target: {fileID: 7103282266571822665, guid: bc2c6f6d7f401c0478445e371db8a800,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1078,7 +1084,7 @@ PrefabInstance:
     - target: {fileID: 8041915659534501184, guid: b6effa0f4cd55ee4ca7390038f8dd238,
         type: 3}
       propertyPath: _initialTickDuration
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8041915659534501184, guid: b6effa0f4cd55ee4ca7390038f8dd238,
         type: 3}
@@ -21121,7 +21127,7 @@ MonoBehaviour:
   _objectsHolder: {fileID: 5446604651615496447}
   _obstacleHolder: {fileID: 6655841398030108305}
   _decorationHolder: {fileID: 677092724}
-  _runConfiguration: {fileID: 11400000, guid: da80af7889f90f442a52ec167f8abb86, type: 2}
+  _runConfiguration: {fileID: 11400000, guid: 776bff987b37333419b93da1abacd97d, type: 2}
   _sellersCoordinates:
   - {x: 39, y: 4}
   - {x: 39, y: 14}

@@ -354,7 +354,7 @@ namespace Components.Machines
         public void Tick()
         {
             Behavior.Execute();
-            
+            OnTick?.Invoke();
             // Propagate tick
             if (TryGetInMachine(out List<Machine> previousMachines))
             {

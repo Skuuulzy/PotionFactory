@@ -1,6 +1,11 @@
+using Components.Bundle;
+using Components.Ingredients;
 using Components.Machines;
 using Components.Shop.ShopItems;
+using Database;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Components.Shop
@@ -11,19 +16,21 @@ namespace Components.Shop
 		[Header("Shop")]
 		[SerializeField] private GameObject _shopUIView;
 		[SerializeField] private UIMachineShopItemViewController _machineShopUIViewController;
+		[SerializeField] private UIIngredientShopItemViewController _ingredientShopUIViewController;
 		[SerializeField] private UIBuyedItemController _buyedItemController;
 
 		[SerializeField] private Transform _machineShopUIParent;
+		[SerializeField] private Transform _ingredientShopUIParent;
 		[SerializeField] private Transform _itemsBuyedParent;
 
 		private void Awake()
 		{
 			ShopController.OnShopGenerated += SetInfos;
 			UIMachineShopItemViewController.OnMachineBuyed += AddMachineToBuyedItems;
+            ResolutionFactoryState.OnResolutionFactoryStateStarted += HandleResolutionState;
 		}
 
-
-		private void OnDestroy()
+        private void OnDestroy()
 		{
 			ShopController.OnShopGenerated -= SetInfos;
 		}
@@ -49,8 +56,28 @@ namespace Components.Shop
 			}
 
 		}
-		
-		public void OpenShop(bool open)
+
+        private void HandleResolutionState(ResolutionFactoryState state)
+        {
+            var startingRoundIngredientsBundles = ScriptableObjectDatabase.GetAllScriptableObjectOfType<IngredientTemplate>().Where(ingredient => ingredient.NumberOfTransformation == 0).ToList();
+			startingRoundIngredientsBundles = startingRoundIngredientsBundles.OrderBy(_ => UnityEngine.Random.value).ToList();
+
+            //Destroying all child before instantiate new ones
+            foreach (Transform child in _ingredientShopUIParent)
+            {
+                Destroy(child.gameObject);
+            }
+
+			for(int i = 0; i < 3; i++)
+			{
+				ShopItem shopItem = new ShopItem(startingRoundIngredientsBundles[i]);
+                UIIngredientShopItemViewController ingredient = Instantiate(_ingredientShopUIViewController, _ingredientShopUIParent);
+                ingredient.Init(shopItem);
+            }
+
+        }
+
+        public void OpenShop(bool open)
 		{
 			_shopUIView.SetActive(open);
 			

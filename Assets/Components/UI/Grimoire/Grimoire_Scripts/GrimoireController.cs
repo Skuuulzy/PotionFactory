@@ -40,12 +40,12 @@ namespace Components.Inventory
 			
 
 
-			BundleChoiceGenerator.OnBundleChoiceConfirm += HandleMapChoiceConfirm;
+			BundleChoiceGenerator.OnBundleChoiceConfirm += HandleBundleChoice;
 		}
 
 		private void OnDestroy()
 		{
-			BundleChoiceGenerator.OnBundleChoiceConfirm -= HandleMapChoiceConfirm;
+			BundleChoiceGenerator.OnBundleChoiceConfirm -= HandleBundleChoice;
 		}
 		
 		//--------------------------------------------------------- ADDING AND REMOVING MACHINES CONSUMABLE AND RELICS --------------------------------------------------------------
@@ -124,7 +124,7 @@ namespace Components.Inventory
 
 		}
 
-		private void HandleMapChoiceConfirm(IngredientsBundle bundle, bool isFirstChoice)
+		private void HandleBundleChoice(IngredientsBundle bundle, bool isFirstChoice)
 		{
 			if(bundle.MachinesTemplateList.Count == 0)
 			{

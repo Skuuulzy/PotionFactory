@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using VComponent.Tools.Singletons;
+using static UnityEngine.Rendering.DebugUI;
 
 namespace Components.Tick
 {
@@ -18,6 +19,7 @@ namespace Components.Tick
         public float InitialTickDuration => _initialTickDuration;
         public float CurrentTickDuration => _currentTickDuration;
 
+        public static Action<int> OnTickMultiplierChanged;
         // ------------------------------------------------------------------------- MONO -------------------------------------------------------------------------
 		protected override void Awake()
         {
@@ -113,7 +115,8 @@ namespace Components.Tick
 
         public void ChangeTimeSpeed(int value)
         {
-            if(value == 0)
+            OnTickMultiplierChanged?.Invoke(value);
+            if (value == 0)
 			{
                 _isPause = true;
                 return;
@@ -143,6 +146,16 @@ namespace Components.Tick
         private void HandleResolutionFactoryState(ResolutionFactoryState obj)
         {
             ChangeTimeSpeed(1);
+        }
+
+        // ------------------------------------------------------------------------- CONVERT TIME IN TICK -------------------------------------------------------------------------
+        public static int GetTickValueFromSeconds(float value)
+        {
+            return Mathf.RoundToInt(value / TickSystem.Instance.InitialTickDuration);
+        }
+        public static int GetSecondValueFromTicks(int tick)
+        {
+            return Mathf.RoundToInt(tick * TickSystem.Instance.InitialTickDuration);
         }
     }
 }

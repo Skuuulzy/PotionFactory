@@ -53,7 +53,7 @@ public class StateController : MonoBehaviour
 		At(resolutionFactoryState, endOfDayState, new FuncPredicate(() => resolutionFactoryState.IsFinished && !EconomyController.Instance.CheckGameOver(resolutionFactoryState.StateIndex) && resolutionFactoryState.StateIndex < _runConfiguration.RunStateList.Count));
 		At(resolutionFactoryState, endGameState, new FuncPredicate(() => resolutionFactoryState.IsFinished && !EconomyController.Instance.CheckGameOver(resolutionFactoryState.StateIndex) && resolutionFactoryState.StateIndex >= _runConfiguration.RunStateList.Count));
 		At(endOfDayState, resolutionFactoryState, new FuncPredicate(() => endOfDayState.IsFinished && endOfDayState.StateIndex % 4 != 0));
-		At(endOfDayState, bundleChoiceState, new FuncPredicate(() => endOfDayState.IsFinished && endOfDayState.StateIndex % 4 == 0));
+		//At(endOfDayState, bundleChoiceState, new FuncPredicate(() => endOfDayState.IsFinished && endOfDayState.StateIndex % 4 == 0));
 
 		StartStateMachine(bundleChoiceState);
 	}

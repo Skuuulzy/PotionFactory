@@ -24,7 +24,18 @@ namespace Components.Shop.ShopItems
 
 		public virtual void BuyItem()
 		{
-			
-		}
-	}
+        }
+
+        protected void CheckBuyingEligibility(int playerMoney)
+        {
+            if (Price > playerMoney)
+            {
+                _itemPrice.color = Color.red;
+            }
+            else
+            {
+                _itemPrice.color = Color.white;
+            }
+        }
+    }
 }

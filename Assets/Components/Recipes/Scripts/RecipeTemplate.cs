@@ -11,12 +11,12 @@ namespace Components.Recipes
         [SerializeField] private MachineTemplate _machine;
         [SerializeField] private SerializableDictionary<IngredientTemplate, int> _ingredients;
         [SerializeField] private IngredientTemplate _outIngredient;
-        [SerializeField] private float _processTimeModifier;
+        [SerializeField] private int _processTimeModifier;
         
         public MachineTemplate Machine => _machine;
         public Dictionary<IngredientTemplate, int> Ingredients => _ingredients.ToDictionary();
         public IngredientTemplate OutIngredient => _outIngredient;
-        public float ProcessTimeModifier => _processTimeModifier;
+        public int ProcessTimeModifier => _processTimeModifier;
 
         public void CreateFromCSV(IngredientTemplate outIngredient, MachineTemplate machine, Dictionary<IngredientTemplate, int> ingredients)
         {
@@ -28,9 +28,9 @@ namespace Components.Recipes
             _processTimeModifier = ComputeProcessTimeModifier(ingredients);
         }
 
-        private float ComputeProcessTimeModifier(Dictionary<IngredientTemplate, int> ingredients)
+        private int ComputeProcessTimeModifier(Dictionary<IngredientTemplate, int> ingredients)
         {
-            var processTimeModifier = 0f;
+            var processTimeModifier = 0;
             foreach (var kvp in ingredients)
             {
                 processTimeModifier += kvp.Key.ExecutionTimeModifier;

@@ -63,9 +63,9 @@ public class RunConfiguration : ScriptableObject
 
 	public int GetStateTime(int stateNumber)
 	{
-		if(_runStateList[stateNumber].CustomTime != 0)
+		if(_runStateList[stateNumber - 1].CustomTime != 0)
 		{
-			return _runStateList[stateNumber].CustomTime;
+			return _runStateList[stateNumber - 1].CustomTime;
 		}
 		else
 		{

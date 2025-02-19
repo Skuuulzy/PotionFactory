@@ -1,3 +1,4 @@
+using Components.Tick;
 using System;
 using UnityEngine;
 
@@ -22,7 +23,7 @@ namespace Components.Ingredients
 		public string Name => _name;
 		public int NumberOfTransformation => _nbOfTransfo;
 		public bool IsLiquid => _isLiquid;
-		public float ExecutionTimeModifier => _executionTimeModifier;
+		public int ExecutionTimeModifier => TickSystem.GetTickValueFromSeconds(_executionTimeModifier);
 		public GameObject View => _3dView;
 		public Sprite Icon => _icon;
 
