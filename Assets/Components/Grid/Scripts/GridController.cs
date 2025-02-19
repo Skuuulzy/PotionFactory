@@ -17,6 +17,8 @@ using Components.Tools.ExtensionMethods;
 using Cysharp.Threading.Tasks;
 using Database;
 using VComponent.Tools.Singletons;
+using Sirenix.Utilities;
+using Components.Shop.ShopItems;
 
 namespace Components.Grid
 {
@@ -68,7 +70,8 @@ namespace Components.Grid
 		{
 			Machine.OnRetrieve += RetrieveMachine;
 			Machine.OnMove += ClearMachineGridData;
-			BundleChoiceGenerator.OnBundleChoiceConfirm += HandleMapChoiceConfirm;
+			BundleChoiceGenerator.OnBundleChoiceConfirm += HandleBundleChoiceConfirm;
+			UIIngredientShopItemViewController.OnIngredientBuyed += HandleIngredientBuyed;
 			ResolutionFactoryState.OnResolutionFactoryStateStarted += HandleResolutionFactoryStarted;
 			GridParcelUnlocker.OnParcelUnlocked += HandleParcelUnlocked;
 		}
@@ -77,8 +80,9 @@ namespace Components.Grid
 		{
 			Machine.OnRetrieve += RetrieveMachine;
 			Machine.OnMove -= ClearMachineGridData;
-			BundleChoiceGenerator.OnBundleChoiceConfirm -= HandleMapChoiceConfirm;
-			ResolutionFactoryState.OnResolutionFactoryStateStarted -= HandleResolutionFactoryStarted;
+			BundleChoiceGenerator.OnBundleChoiceConfirm -= HandleBundleChoiceConfirm;
+            UIIngredientShopItemViewController.OnIngredientBuyed -= HandleIngredientBuyed;
+            ResolutionFactoryState.OnResolutionFactoryStateStarted -= HandleResolutionFactoryStarted;
 			GridParcelUnlocker.OnParcelUnlocked -= HandleParcelUnlocked;
 		}
 		
@@ -492,7 +496,7 @@ namespace Components.Grid
 
 		// -------------------------------------------------------------------------- EVENT HANDLERS --------------------------------------------------------------------------
 		
-		private void HandleMapChoiceConfirm(IngredientsBundle bundle, bool isFirstGameChoice)
+		private void HandleBundleChoiceConfirm(IngredientsBundle bundle, bool isFirstGameChoice)
 		{
 			if (isFirstGameChoice)
 			{
@@ -505,6 +509,12 @@ namespace Components.Grid
 			_extractedIngredients.AddRange(bundle.IngredientsTemplatesList);
 			UpdateIngredientsToExtract(_extractedIngredients);
 		}
+
+		private void HandleIngredientBuyed(IngredientTemplate ingredient)
+		{
+            _extractedIngredients.Add(ingredient);
+            UpdateIngredientsToExtract(_extractedIngredients);
+        }
 		
 		private void HandleResolutionFactoryStarted(ResolutionFactoryState state)
 		{

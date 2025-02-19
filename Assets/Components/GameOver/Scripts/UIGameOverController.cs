@@ -4,6 +4,7 @@ using Components.Ingredients;
 using Components.Machines;
 using Components.Machines.Behaviors;
 using Components.Shop.ShopItems;
+using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -27,7 +28,7 @@ public class UIGameOverController : MonoBehaviour
 	[SerializeField] private Transform _recipesSoldTransform;
 
 	private IngredientsBundle _startingIngredientBundle;
-	private readonly List<IngredientsBundle> _otherIngredientsList = new();
+	private readonly List<IngredientTemplate> _otherIngredientsList = new();
 	private readonly Dictionary<MachineTemplate, int> _machinesPossessedByPlayer = new();
 	private readonly Dictionary<IngredientTemplate, int> _recipesSold = new();
 
@@ -35,6 +36,7 @@ public class UIGameOverController : MonoBehaviour
 	{
 		EconomyController.OnGameOver += HandleGameOver;
 		BundleChoiceGenerator.OnBundleChoiceConfirm += HandleBundleChoice;
+		UIIngredientShopItemViewController.OnIngredientBuyed += HandleIngredientBuyed;
 		MarchandMachineBehaviour.OnIngredientSold += HandleIngredientSold;
 		UIMachineShopItemViewController.OnMachineBuyed += HandleMachineAdded;
 	}
@@ -43,12 +45,15 @@ public class UIGameOverController : MonoBehaviour
 	{
 		EconomyController.OnGameOver -= HandleGameOver;
 		BundleChoiceGenerator.OnBundleChoiceConfirm -= HandleBundleChoice;
-		MarchandMachineBehaviour.OnIngredientSold -= HandleIngredientSold;
+        UIIngredientShopItemViewController.OnIngredientBuyed -= HandleIngredientBuyed;
+        MarchandMachineBehaviour.OnIngredientSold -= HandleIngredientSold;
 		UIMachineShopItemViewController.OnMachineBuyed -= HandleMachineAdded;
 
 	}
 
-	private void HandleGameOver(int playerScore, int scoreObjective, int day)
+
+
+    private void HandleGameOver(int playerScore, int scoreObjective, int day)
 	{
 		EconomyController.OnGameOver -= HandleGameOver;
 
@@ -94,13 +99,10 @@ public class UIGameOverController : MonoBehaviour
 
 	private void SetUpOtherIngredients()
 	{
-		foreach(IngredientsBundle bundle in _otherIngredientsList)
+		foreach(IngredientTemplate ingredient in _otherIngredientsList)
 		{
-			foreach (var ingredientsTemplate in bundle.IngredientsTemplatesList)
-			{
-				UIBundleView bundleView = Instantiate(_bundleViewPrefab, _otherIngredientTransform);
-				bundleView.SetInfos(ingredientsTemplate.Icon, ingredientsTemplate.Name);
-			}
+            UIBundleView bundleView = Instantiate(_bundleViewPrefab, _otherIngredientTransform);
+            bundleView.SetInfos(ingredient.Icon, ingredient.Name);
 		}
 	}
 
@@ -129,13 +131,13 @@ public class UIGameOverController : MonoBehaviour
 		{
 			_startingIngredientBundle = bundle;
 		}
-		else
-		{
-			_otherIngredientsList.Add(bundle);
-		}
 	}
+    private void HandleIngredientBuyed(IngredientTemplate template)
+    {
+		_otherIngredientsList.Add(template);
+    }
 
-	private void HandleIngredientSold(IngredientTemplate template)
+    private void HandleIngredientSold(IngredientTemplate template)
 	{
 		_recipesSold.TryAdd(template,0);
 		_recipesSold[template]++;
