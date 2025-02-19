@@ -78,7 +78,10 @@ public class UIStateController : MonoBehaviour
 
 	private void SetCountdownTime(float currentTime, float duration)
 	{
-		_stateCountdownText.text = $"{TickSystem.GetSecondValueFromTicks((int)currentTime)}";
+		int currentTimeInSeconds = TickSystem.GetSecondValueFromTicks((int)currentTime);
+        int seconds = (currentTimeInSeconds % 60);
+        int minutes = (currentTimeInSeconds / 60);
+        _stateCountdownText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
 	}
 
 	private void HideCountdown()
