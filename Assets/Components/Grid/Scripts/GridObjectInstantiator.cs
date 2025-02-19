@@ -21,19 +21,15 @@ namespace Components.Grid
         [SerializeField] private Transform _gridObjectsHolder;
 
         [Header("Special Rotation Behaviour")]
-        [SerializeField] private bool _useSubMachine;
         [SerializeField] private SerializableDictionary<MachineTemplate, List<RotationSubMachine>> _subMachineRotation;
 
         [Header("Debug")]
         [SerializeField] private InputState _inputState = InputState.SELECTION;
         [SerializeField] private MachineController _currentMachinePreview;
+        [SerializeField] private int _currentInputRotation;
+        [SerializeField] private int _currentPreviewRotation;
         
         private Camera _camera;
-
-        private MachineController _currentSubMachinePreview;
-
-        private int _currentInputRotation;
-        private int _currentMachineRotation;
 
         private bool _isFactoryState = true;
         private Vector3 _lastCellPosition = new(-1, -1, -1);
@@ -50,8 +46,7 @@ namespace Components.Grid
         }
 
         private Grid Grid => _gridController.Grid;
-        private MachineController Preview => _currentMachinePreview.gameObject.activeSelf ? _currentMachinePreview : _currentSubMachinePreview;
-
+        
         public static Action<bool> OnPreview;
         
         // ------------------------------------------------------------------------- MONO -------------------------------------------------------------------------------- 
@@ -138,29 +133,23 @@ namespace Components.Grid
         }
 
         // ------------------------------------------------------------------------- PREVIEW BEHAVIOUR -------------------------------------------------------------------------------- 
-        
+
         private void InstantiatePreview(MachineTemplate template)
         {
+            InstantiatePreview(template, 0);
+        }
+        
+        private void InstantiatePreview(MachineTemplate template, int rotation)
+        {
             OnPreview?.Invoke(false);
+            
             DestroyPreview();
-            _currentMachinePreview = InstantiateMachine(template, _currentInputRotation);
+            _currentMachinePreview = InstantiateMachine(template, rotation);
+            _currentPreviewRotation = rotation;
+            
             SwitchInputState(InputState.PLACEMENT);
             
             Debug.Log($"Selecting {_currentMachinePreview.name}");
-        }
-
-        private void ShowPreview(bool show)
-        {
-            _currentMachinePreview.gameObject.SetActive(show);
-            if (show)
-            {
-                _currentMachineRotation = _currentInputRotation;
-            }
-
-            if (_currentSubMachinePreview)
-            {
-                _currentSubMachinePreview.gameObject.SetActive(!show);
-            }
         }
 
         private void MovePreview()
@@ -188,7 +177,7 @@ namespace Components.Grid
 
                     if (_currentMachinePreview)
                     {
-                        Preview.UpdateOutlineState(IsMachinePlacable(cell));
+                        _currentMachinePreview.UpdateOutlineState(IsMachinePlacable(cell));
                     }
                 }
             }
@@ -196,12 +185,8 @@ namespace Components.Grid
             {
                 _previewHolder.transform.position = worldMousePosition;
             }
-
-            // Checking for special rotational behaviors.
-            if (_useSubMachine && _currentMachinePreview && _subMachineRotation.ContainsKey(_currentMachinePreview.Machine.Template))
-            {
-                CheckForSubPreview(worldMousePosition);
-            }
+            
+            CheckForSubPreview(worldMousePosition);
         }
 
         private void RotatePreview()
@@ -213,24 +198,19 @@ namespace Components.Grid
 
             _currentInputRotation += 90;
             _currentInputRotation %= 360;
-
-            _currentMachineRotation = _currentInputRotation;
-
+            
             if (_currentMachinePreview != null)
             {
                 _currentMachinePreview.RotatePreview(_currentInputRotation);
+                _currentPreviewRotation = _currentInputRotation;
             }
 
-            // Checking for special rotational behaviors.
-            if (_useSubMachine && _currentMachinePreview && _subMachineRotation.ContainsKey(_currentMachinePreview.Machine.Template))
+            if (!UtilsClass.ScreenToWorldPositionIgnoringUI(Input.mousePosition, _camera, out Vector3 worldMousePosition))
             {
-                if (!UtilsClass.ScreenToWorldPositionIgnoringUI(Input.mousePosition, _camera, out Vector3 worldMousePosition))
-                {
-                    return;
-                }
-
-                CheckForSubPreview(worldMousePosition);
+                return;
             }
+
+            CheckForSubPreview(worldMousePosition);
         }
 
         private void DestroyPreview()
@@ -242,31 +222,24 @@ namespace Components.Grid
                     return;
                 }
 
-                _justRemoved = true;
                 Debug.Log("Destroying preview");
+                
                 Destroy(_currentMachinePreview.gameObject);
+                _justRemoved = true;
+                
                 OnPreview?.Invoke(false);
             }
         }
 
         // ------------------------------------------------------------------------- SUB PREVIEW BEHAVIOUR -------------------------------------------------------------------------------- 
-        private void InstantiateSubPreview(MachineTemplate template, int rotation)
-        {
-            DestroySubPreview();
-            _currentSubMachinePreview = InstantiateMachine(template, rotation);
-            _currentMachineRotation = rotation;
-        }
-
-        private void DestroySubPreview()
-        {
-            if (_currentSubMachinePreview)
-            {
-                Destroy(_currentSubMachinePreview.gameObject);
-            }
-        }
 
         private void CheckForSubPreview(Vector3 worldMousePosition)
         {
+            if (_currentMachinePreview.Machine.Template.Type != MachineType.CONVEYOR)
+            {
+                return;
+            }
+            
             // Get the grid position
             if (!Grid.TryGetCellByPosition(worldMousePosition, out var cell))
                 return;
@@ -276,21 +249,19 @@ namespace Components.Grid
 
             if (ScanForPotentialConnection(cell.Coordinates, leftLocalAngle.SideFromAngle(), Way.OUT))
             {
-                InstantiateSubPreview(ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("ConveyorLeftToUp"), rightLocalAngle);
-                ShowPreview(false);
-
+                InstantiatePreview(ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("ConveyorLeftToUp"), rightLocalAngle);
+                
                 return;
             }
 
             if (ScanForPotentialConnection(cell.Coordinates, rightLocalAngle.SideFromAngle(), Way.OUT))
             {
-                InstantiateSubPreview(ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("ConveyorLeftToDown"), leftLocalAngle);
-                ShowPreview(false);
+                InstantiatePreview(ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("ConveyorLeftToDown"), leftLocalAngle);
 
                 return;
             }
 
-            ShowPreview(true);
+            InstantiatePreview(ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("ConveyorLeftToRight"), _currentInputRotation);
         }
         
         private bool ScanForPotentialConnection(Vector2Int cellPosition, Side sideToScan, Way desiredWay)
@@ -305,6 +276,7 @@ namespace Components.Grid
                     {
                         if (port.Side == sideToScan.Opposite() && port.Way == desiredWay)
                         {
+                            Debug.Log($"Found a potential connection on cell: {cell.Coordinates}");
                             return true;
                         }
                     }
@@ -355,14 +327,14 @@ namespace Components.Grid
             {
                 Debug.Log($"Adding machine :{_currentMachinePreview.Machine.Controller.name} from inventory to grid");
                 
-                var machineToAdd = InstantiateMachine(Preview.Machine.Template, _currentMachineRotation);
+                var machineToAdd = InstantiateMachine(_currentMachinePreview.Machine.Template, _currentPreviewRotation);
                 machineToAdd.AddToGrid(chosenCell, Grid, _gridObjectsHolder);
                 GrimoireController.Instance.DecreaseMachineToPlayerInventory(machineToAdd.Machine.Template, 1);
                 
                 _justPlaced = true;
                 
                 //Instantiate the same machine type if we have enough in the inventory.
-                if (GrimoireController.Instance.CountMachineOfType(Preview.Machine.Template.Type) <= 0)
+                if (GrimoireController.Instance.CountMachineOfType(_currentMachinePreview.Machine.Template.Type) <= 0)
                 {
                     DestroyPreview();
                 }
@@ -371,7 +343,7 @@ namespace Components.Grid
 
         private bool IsMachinePlacable(Cell originCell)
         {
-            foreach (var node in Preview.Machine.Nodes)
+            foreach (var node in _currentMachinePreview.Machine.Nodes)
             {
                 var nodeGridPosition = node.SetGridPosition(originCell.Coordinates);
 
@@ -516,7 +488,7 @@ namespace Components.Grid
         private void HandleMovingMachine(Machine machine)
         {
             _currentMachinePreview = machine.Controller;
-            _currentMachineRotation = (int)machine.Controller.transform.rotation.eulerAngles.y;
+            _currentInputRotation = (int)machine.Controller.transform.rotation.eulerAngles.y;
             
             machine.Controller.transform.parent = _previewHolder;
             machine.Controller.transform.localPosition = Vector3.zero;
