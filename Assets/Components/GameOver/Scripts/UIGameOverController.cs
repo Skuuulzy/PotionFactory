@@ -40,7 +40,7 @@ public class UIGameOverController : MonoBehaviour
 
 	private void Start()
 	{
-        EndGameState.OnEndGameStateStarted += HandleGameOver;
+        GameOverState.OnGameOverStarted += HandleGameOver;
         BundleChoiceGenerator.OnBundleChoiceConfirm += HandleBundleChoice;
 		UIIngredientShopItemViewController.OnIngredientBuyed += HandleIngredientBuyed;
 		MarchandMachineBehaviour.OnIngredientSold += HandleIngredientSold;
@@ -49,7 +49,7 @@ public class UIGameOverController : MonoBehaviour
 
 	private void OnDestroy()
 	{
-		EndGameState.OnEndGameStateStarted -= HandleGameOver;
+        GameOverState.OnGameOverStarted -= HandleGameOver;
         BundleChoiceGenerator.OnBundleChoiceConfirm -= HandleBundleChoice;
         UIIngredientShopItemViewController.OnIngredientBuyed -= HandleIngredientBuyed;
         MarchandMachineBehaviour.OnIngredientSold -= HandleIngredientSold;
@@ -59,9 +59,9 @@ public class UIGameOverController : MonoBehaviour
 
 
 
-    private void HandleGameOver(EndGameState state)
+    private void HandleGameOver(GameOverState state)
 	{
-        EndGameState.OnEndGameStateStarted -= HandleGameOver;
+        GameOverState.OnGameOverStarted -= HandleGameOver;
 
         _view.SetActive(true);
 		_showViewToggle.gameObject.SetActive(true);
