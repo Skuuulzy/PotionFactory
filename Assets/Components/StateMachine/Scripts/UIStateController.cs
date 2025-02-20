@@ -1,5 +1,6 @@
 using Components.Economy;
 using Components.Tick;
+using SoWorkflow.SharedValues;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -15,6 +16,10 @@ public class UIStateController : MonoBehaviour
 	[Header("EndGame")]
 	[SerializeField] private GameObject _endGameGO;
 
+	[Header("SharedValues")]
+	[SerializeField] private SOSharedInt _playerScore;
+	[SerializeField] private SOSharedInt _stateScoreObjective;
+
 	private static readonly int DISPLAY_STATE = Animator.StringToHash("DisplayState");
 	private BaseState _currentState;
 
@@ -28,8 +33,8 @@ public class UIStateController : MonoBehaviour
 	{
 		StateController.OnCountdown -= SetCountdownTime;
 		StateController.OnStateStarted -= HandleStateStarted;
-		
-		EconomyController.OnStatePlayerScoreUpdated -= HandleScoreUpdated;
+
+        _playerScore.OnValueUpdated -= HandleScoreUpdated;
 	}
 	
 	private void HandleStateStarted(BaseState state)
@@ -45,8 +50,8 @@ public class UIStateController : MonoBehaviour
 			case PlanningFactoryState planningFactoryState:
 				break;
 			case ResolutionFactoryState resolutionFactoryState:
-				EconomyController.OnStatePlayerScoreUpdated -= HandleScoreUpdated;
-				EconomyController.OnStatePlayerScoreUpdated += HandleScoreUpdated;
+                _playerScore.OnValueUpdated -= HandleScoreUpdated;
+                _playerScore.OnValueUpdated += HandleScoreUpdated;
 				DisplayNewState(resolutionFactoryState);
 				_finishStateButton.gameObject.SetActive(false);
 				break;
@@ -63,10 +68,10 @@ public class UIStateController : MonoBehaviour
 
 	private void HandleScoreUpdated(int score)
 	{
-		if (score >= EconomyController.Instance.StateScoreObjective)
-		{
+		if (score != 0 && score >= _stateScoreObjective.Value)
+        {
 			DisplayFinishStateButton(_currentState);
-			EconomyController.OnStatePlayerScoreUpdated -= HandleScoreUpdated;
+            _playerScore.OnValueUpdated -= HandleScoreUpdated;
 		}
 	}
 

@@ -1,5 +1,6 @@
 using System;
 using Components.Economy;
+using SoWorkflow.SharedValues;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,6 +15,9 @@ namespace Components.Grid.Parcel
         [SerializeField] private Image _background;
 
         public Action<GridParcelView> OnParcelBought;
+
+        [Header("SharedValues")]
+        [SerializeField] private SOSharedInt _playerGuildToken;
 
         private int _index;
         private GridParcel _parcel;
@@ -34,13 +38,17 @@ namespace Components.Grid.Parcel
             _parcelPriceTxt.text = _price.ToString();
             _background.color = ExtensionMethods.GenerateRandomColorWithAlpha(0.1f);
             
-            CheckBuyingEligibility(EconomyController.Instance.PlayerMoney);
-            EconomyController.OnPlayerMoneyUpdated += CheckBuyingEligibility;
         }
 
-        private void OnDestroy()
+        private void OnEnable()
         {
-            EconomyController.OnPlayerMoneyUpdated -= CheckBuyingEligibility;
+            CheckBuyingEligibility(_playerGuildToken.Value);
+            _playerGuildToken.OnValueUpdated += CheckBuyingEligibility;
+        }
+
+        private void OnDisable()
+        {
+            _playerGuildToken.OnValueUpdated -= CheckBuyingEligibility;
         }
 
         public void Buy()

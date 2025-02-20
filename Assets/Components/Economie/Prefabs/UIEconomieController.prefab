@@ -1329,7 +1329,7 @@ GameObject:
   - component: {fileID: 8915363372202467136}
   - component: {fileID: 2434755755040841602}
   m_Layer: 5
-  m_Name: PlayerMoneyText
+  m_Name: PlayerGuildTokenText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1542,7 +1542,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab6cac45fca88a247b610ed783e34f8d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _playerMoneyText: {fileID: 2434755755040841602}
+  _playerGuildTokenText: {fileID: 2434755755040841602}
   _playerStateScoreText: {fileID: 5165586171620502468}
   _scoreStateObjectiveText: {fileID: 4342761335674205815}
+  _playerGuildToken: {fileID: 11400000, guid: adb84c7425cf2aa449f59d336b02827f, type: 2}
+  _playerScore: {fileID: 11400000, guid: bbc41854e4b33f34e93c0ae9df411e40, type: 2}
+  _stateScoreObjective: {fileID: 11400000, guid: eef0c6b166b831b408bee7773e1841c2,
+    type: 2}
   _animDuration: 0.5

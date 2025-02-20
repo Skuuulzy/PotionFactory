@@ -18,13 +18,13 @@ namespace Components.Shop.ShopItems
 			_itemView.sprite = shopItem.ConsumableTemplate.UIView;
 			Price = shopItem.ConsumableTemplate.ShopPrice;
 			_numberOfItemToSellText.text = shopItem.NumberOfItemToSell == -1 ? "\u221E" : $"{shopItem.NumberOfItemToSell}";
-			CheckBuyingEligibility(EconomyController.Instance.PlayerMoney);
-			EconomyController.OnPlayerMoneyUpdated += CheckBuyingEligibility;
+			//CheckBuyingEligibility(EconomyController.Instance.PlayerMoney);
+			//EconomyController.OnPlayerMoneyUpdated += CheckBuyingEligibility;
 		}
 
 		private void OnDestroy()
 		{
-			EconomyController.OnPlayerMoneyUpdated -= CheckBuyingEligibility;
+			//EconomyController.OnPlayerMoneyUpdated -= CheckBuyingEligibility;
 
 		}
 		private void CheckBuyingEligibility(int playerMoney)
@@ -41,8 +41,8 @@ namespace Components.Shop.ShopItems
 
 		public override void BuyItem()
 		{
-			if (EconomyController.Instance.PlayerMoney < Price)
-				return;
+			//if (EconomyController.Instance.PlayerMoney < Price)
+			//	return;
 
 			EconomyController.Instance.DecreaseMoney(Price);
 			if (_shopItem.NumberOfItemToSell != -1)

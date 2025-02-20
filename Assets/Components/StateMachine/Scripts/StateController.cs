@@ -3,6 +3,7 @@ using Components.Bundle;
 using Components.Economy;
 using Components.Map;
 using Cysharp.Threading.Tasks;
+using SoWorkflow.SharedValues;
 using UnityEngine;
 using VComponent.Tools.Timer;
 
@@ -10,7 +11,7 @@ public class StateController : MonoBehaviour
 {
 	[SerializeField] private RunConfiguration _runConfiguration;
 	[SerializeField] private bool _disable;
-
+	[SerializeField] private SOSharedInt _dayIndex;
 
 	public string CurrentDebugStateName;
 	
@@ -68,12 +69,14 @@ public class StateController : MonoBehaviour
 
 	private void OnDestroy()
 	{
-		PlanningFactoryState.OnPlanningFactoryStateStarted -= HandlePlanningFactoryState;
-		ResolutionFactoryState.OnResolutionFactoryStateStarted -= HandleResolutionFactoryState;
-		EndOfDayState.OnEndOfDayStateStarted -= HandleShopState;
-		EndGameState.OnEndGameStateStarted -= HandleEndGameState;
-		BundleChoiceState.OnBundleStateStarted -= HandleBundleChoiceState;
-	}
+        MapState.OnMapStateStarted -= HandleMapState;
+        BundleChoiceState.OnBundleStateStarted -= HandleBundleChoiceState;
+        PlanningFactoryState.OnPlanningFactoryStateStarted -= HandlePlanningFactoryState;
+        ResolutionFactoryState.OnResolutionFactoryStateStarted -= HandleResolutionFactoryState;
+        EndOfDayState.OnEndOfDayStateStarted -= HandleShopState;
+        EndGameState.OnEndGameStateStarted -= HandleEndGameState;
+        GameOverState.OnGameOverStarted -= HandleGameOverState;
+    }
 
 	private void Update()
 	{
@@ -127,8 +130,8 @@ public class StateController : MonoBehaviour
 	private void HandleResolutionFactoryState(ResolutionFactoryState state)
 	{
 		CurrentDebugStateName = "RESOLUTION";
-		
-		_countdownTimer = new TickableCountdownTimer(_runConfiguration.GetStateTime(state.StateIndex));
+		_dayIndex.Set(state.StateIndex);
+        _countdownTimer = new TickableCountdownTimer(_runConfiguration.GetStateTime(state.StateIndex));
 		BaseState.OnStateEnded += _countdownTimer.Stop;
 		_countdownTimer.OnTimerStop += state.SetStateFinished;
 		_countdownTimer.Start();

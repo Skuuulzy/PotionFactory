@@ -1,6 +1,7 @@
 using Components.Economy;
 using Components.Ingredients;
 using Components.Inventory;
+using SoWorkflow.SharedValues;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,6 +12,7 @@ namespace Components.Shop.ShopItems
 {
     public class UIIngredientShopItemViewController : UIShopItemViewController
     {
+        [SerializeField] private SOSharedInt _playerGuildToken;
         public static Action<IngredientTemplate> OnIngredientBuyed;
         public override void Init(ShopItem shopItem)
         {
@@ -23,15 +25,20 @@ namespace Components.Shop.ShopItems
             Price = 5;
             _numberOfItemToSellText.text = shopItem.NumberOfItemToSell == -1 ? "\u221E" : $"{shopItem.NumberOfItemToSell}";
 
-            CheckBuyingEligibility(EconomyController.Instance.PlayerMoney);
-            EconomyController.OnPlayerMoneyUpdated += CheckBuyingEligibility;
+            CheckBuyingEligibility(_playerGuildToken.Value);
+            _playerGuildToken.OnValueUpdated += CheckBuyingEligibility;
+        }
+
+        private void OnDestroy()
+        {
+            _playerGuildToken.OnValueUpdated -= CheckBuyingEligibility;
+
         }
 
         public override void BuyItem()
         {
-            if (EconomyController.Instance.PlayerMoney < Price)
+            if (_playerGuildToken.Value < Price)
             {
-                Debug.LogError("Not enough money you bum.");
                 return;
             }
 
