@@ -120,11 +120,14 @@ namespace Components.Grid
             }
             if (Input.GetMouseButtonUp(1))
             {
-                DestroyPreview();
-                SwitchInputState(InputState.SELECTION);
+                // If we can destroy the preview we go to selection mode.
+                if (TryDestroyPreview())
+                {
+                    SwitchInputState(InputState.SELECTION);
                 
-                ResetFlags();
-                SetPlacementRotations(0);
+                    ResetFlags();
+                    SetPlacementRotations(0);
+                }
             }
             if (Input.GetKeyDown(KeyCode.R))
             {
@@ -144,7 +147,6 @@ namespace Components.Grid
 
         private void SetPlacementRotations(int value)
         {
-            Debug.Log($"Set rotation to: {value}");
             _currentInputRotation = value;
             _currentPreviewRotation = value;
         }
@@ -175,35 +177,35 @@ namespace Components.Grid
             {
                 return;
             }
+            
+            // Place the current preview on the grid.
+            _currentMachinePreview.AddToGrid(chosenCell, Grid, _gridObjectsHolder);
+            _currentMachinePreview.Machine.Select(false);
+            Debug.Log($"Adding machine: {_currentMachinePreview.name} to grid.");
 
-            if (_moveMode)
+            // If this is not a move mode take a machine from player inventory.
+            if (!_moveMode)
             {
-                Debug.Log($"Adding machine :{_currentMachinePreview.Machine.Controller.name} to grid from a movement.");
-                
-                _currentMachinePreview.AddToGrid(chosenCell, Grid, _gridObjectsHolder);
-                _currentMachinePreview.Machine.Select(false);
-                _currentMachinePreview = null;
-                _moveMode = false;
-                _skipFrame = true;
-                
-                SwitchInputState(InputState.SELECTION);
+                GrimoireController.Instance.DecreaseMachineToPlayerInventory(_currentMachinePreview.Machine.Template, 1);
+                Debug.Log($"Taking {_currentMachinePreview.Machine.Template.Type} from player inventory.");
             }
             else
             {
-                Debug.Log($"Adding machine :{_currentMachinePreview.Machine.Controller.name} from inventory to grid");
-                
-                var machineToAdd = InstantiateMachine(_currentMachinePreview.Machine.Template, _currentPreviewRotation);
-                machineToAdd.AddToGrid(chosenCell, Grid, _gridObjectsHolder);
-                GrimoireController.Instance.DecreaseMachineToPlayerInventory(machineToAdd.Machine.Template, 1);
-                
-                _skipFrame = true;
-                
-                //Instantiate the same machine type if we have enough in the inventory.
-                if (GrimoireController.Instance.CountMachineOfType(_currentMachinePreview.Machine.Template.Type) <= 0)
-                {
-                    DestroyPreview();
-                }
+                _moveMode = false;
             }
+            
+            // If there is no machine of this type in the inventory go back in selection mode.
+            if (GrimoireController.Instance.CountMachineOfType(_currentMachinePreview.Machine.Template.Type) <= 0)
+            {
+                Debug.Log($"No more machine of type {_currentMachinePreview.Machine.Template.Type} in player inventory.");
+                _currentMachinePreview = null;
+                _skipFrame = true;
+                SwitchInputState(InputState.SELECTION);
+                return;
+            }
+
+            //Instantiate the same machine type if we have enough in the inventory.
+            _currentMachinePreview = InstantiateMachine(_currentMachinePreview.Machine.Template, _currentInputRotation);
         }
 
         private void MovePreview()
@@ -267,22 +269,23 @@ namespace Components.Grid
             CheckForAutoConveyorOrientation(worldMousePosition);
         }
 
-        private void DestroyPreview()
+        private bool TryDestroyPreview()
         {
             if (_currentMachinePreview)
             {
                 if (!_currentMachinePreview.Machine.Template.CanRetrieve)
                 {
-                    return;
+                    return false;
                 }
-
-                Debug.Log("Destroying preview");
                 
                 Destroy(_currentMachinePreview.gameObject);
+                _currentMachinePreview = null;
                 _skipFrame = true;
                 
                 OnPreview?.Invoke(false);
             }
+
+            return true;
         }
         
         // ------------------------------------------------------------------------- SELECTION BEHAVIOUR -------------------------------------------------------------------------------- 
@@ -318,9 +321,18 @@ namespace Components.Grid
                     return;
                 }
                 
-                Debug.Log($"Move machine {machine.Controller.name}");
-                MoveMachine(machine);
+                Debug.Log($"Moving machine {machine.Controller.name}.");
+                
+                ClearMachineGridData(machine);
+            
+                _currentMachinePreview = machine.Controller;
+                _currentInputRotation = machine.Rotation;
+            
+                machine.Controller.transform.parent = _previewHolder;
+                machine.Controller.transform.localPosition = Vector3.zero;
                 machine.Select(true);
+
+                _moveMode = true;
                 SetPlacementRotations(machine.Rotation);
                 
                 SwitchInputState(InputState.PLACEMENT);
@@ -407,7 +419,7 @@ namespace Components.Grid
 
         private void HandleGrimoireDeselect()
         {
-            DestroyPreview();
+            TryDestroyPreview();
         }
         
         // ------------------------------------------------------------------------- HELPERS -------------------------------------------------------------------------------- 
@@ -428,7 +440,7 @@ namespace Components.Grid
             
             OnPreview?.Invoke(false);
             
-            DestroyPreview();
+            TryDestroyPreview();
             _currentMachinePreview = InstantiateMachine(template, rotation);
             _currentPreviewRotation = rotation;
             
@@ -557,20 +569,6 @@ namespace Components.Grid
             // For destroying the class instance, not sure if this a good way.
             machineToSell = null;
         }
-        
-        private void MoveMachine(Machine machine)
-        {
-            ClearMachineGridData(machine);
-            
-            _currentMachinePreview = machine.Controller;
-            _currentInputRotation = machine.Rotation;
-            
-            machine.Controller.transform.parent = _previewHolder;
-            machine.Controller.transform.localPosition = Vector3.zero;
-
-            _moveMode = true;
-        }
-
     }
 
     [Serializable]
