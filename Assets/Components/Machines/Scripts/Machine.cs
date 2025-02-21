@@ -19,8 +19,8 @@ namespace Components.Machines
         [SerializeField] private List<Node> _nodes;
         
         [SerializeField, ReadOnly] private MachineController _controller;
-        [SerializeField] private MachineBehavior _behavior;
         
+        private MachineBehavior _behavior;
         private readonly MachineTemplate _template;
         private int _outMachineTickCount;
         

@@ -116,7 +116,7 @@ namespace Components.Grid
             {
                 AddSelectedMachineToGrid();
             }
-            if (Input.GetMouseButtonDown(1))
+            if (Input.GetMouseButtonUp(1))
             {
                 DestroyPreview();
                 SwitchInputState(InputState.SELECTION);
