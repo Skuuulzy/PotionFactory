@@ -1,14 +1,26 @@
+using SoWorkflow.SharedValues;
+using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Components.Economy
 {
     public class UIEconomieController : MonoBehaviour
     {
-        [SerializeField] private TextMeshProUGUI _playerMoneyText;
+        [SerializeField] private TextMeshProUGUI _playerGuildTokenText;
         [SerializeField] private TextMeshProUGUI _playerStateScoreText;
         [SerializeField] private TextMeshProUGUI _scoreStateObjectiveText;
+        [SerializeField] private TextMeshProUGUI _interestTokenText;
+        [SerializeField] private Button _finishStateButton;
+
+        [Header("SharedValues")]
+        [SerializeField] private SOSharedInt _playerGuildToken;
+        [SerializeField] private SOSharedInt _playerScore;
+        [SerializeField] private SOSharedInt _stateScoreObjective;
+        [SerializeField] private SOSharedInt _guildTokenTimeInterest;
+            
         [SerializeField] private float _animDuration = 0.5f;
 
         private int _currentPlayerMoney = 0;
@@ -18,41 +30,48 @@ namespace Components.Economy
 
         private void Start()
         {
-            _playerMoneyText.text = "0";
-            EconomyController.OnPlayerMoneyUpdated += UpdateUIPlayerMoney;
-            EconomyController.OnStatePlayerScoreUpdated += UpdateUIStatePlayerScore;
-            EconomyController.OnScoreStateObjectiveUpdated += UpdateScoreStateObjective;
+            _playerGuildTokenText.text = "0";
+            _playerGuildToken.OnValueUpdated += UpdateUIPlayerGuildToken;
+            _playerScore.OnValueUpdated += UpdateUIStatePlayerScore;
+            _stateScoreObjective.OnValueUpdated += UpdateScoreStateObjective;
+            _guildTokenTimeInterest.OnValueUpdated += UpdateGuildTokenInterest;
         }
 
         private void OnDestroy()
         {
-            EconomyController.OnPlayerMoneyUpdated -= UpdateUIPlayerMoney;
-            EconomyController.OnStatePlayerScoreUpdated -= UpdateUIStatePlayerScore;
-            EconomyController.OnScoreStateObjectiveUpdated -= UpdateScoreStateObjective;
+            _playerGuildToken.OnValueUpdated -= UpdateUIPlayerGuildToken;
+            _playerScore.OnValueUpdated -= UpdateUIStatePlayerScore;
+            _stateScoreObjective.OnValueUpdated -= UpdateScoreStateObjective;
+            _guildTokenTimeInterest.OnValueUpdated -= UpdateGuildTokenInterest;
+
         }
+
+
 
         /// <summary>
         /// Updates the player's money display with an animated transition.
         /// </summary>
-        private void UpdateUIPlayerMoney(int playerMoney)
+        private void UpdateUIPlayerGuildToken(int playerMoney)
         {
             if (_moneyCoroutine != null)
                 StopCoroutine(_moneyCoroutine);
 
-            _moneyCoroutine = StartCoroutine(AnimateValueCoroutine(_playerMoneyText, _currentPlayerMoney, playerMoney, _animDuration));
+            _moneyCoroutine = StartCoroutine(AnimateValueCoroutine(_playerGuildTokenText, _currentPlayerMoney, playerMoney, _animDuration));
             _currentPlayerMoney = playerMoney;
         }
 
         /// <summary>
         /// Updates the player's score in the state display with an animated transition.
         /// </summary>
-        private void UpdateUIStatePlayerScore(int playerStateMoney)
+        private void UpdateUIStatePlayerScore(int score)
         {
             if (_scoreCoroutine != null)
                 StopCoroutine(_scoreCoroutine);
 
-            _scoreCoroutine = StartCoroutine(AnimateValueCoroutine(_playerStateScoreText, _currentPlayerScore, playerStateMoney, _animDuration));
-            _currentPlayerScore = playerStateMoney;
+            _scoreCoroutine = StartCoroutine(AnimateValueCoroutine(_playerStateScoreText, _currentPlayerScore, score, _animDuration));
+            _currentPlayerScore = score;
+
+            _finishStateButton.gameObject.SetActive(score != 0 && score >= _stateScoreObjective.Value);
         }
 
         /// <summary>
@@ -63,6 +82,10 @@ namespace Components.Economy
             _scoreStateObjectiveText.text = $"<b>Objectif</b> {money}";
         }
 
+        private void UpdateGuildTokenInterest(int value)
+        {
+            _interestTokenText.text = $"+{value}";
+        }
         /// <summary>
         /// Animates the transition of a numerical value over time.
         /// </summary>

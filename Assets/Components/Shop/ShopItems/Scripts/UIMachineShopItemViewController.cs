@@ -1,6 +1,7 @@
 using Components.Economy;
 using Components.Inventory;
 using Components.Machines;
+using SoWorkflow.SharedValues;
 using System;
 using UnityEngine;
 
@@ -8,7 +9,7 @@ namespace Components.Shop.ShopItems
 {
     public class UIMachineShopItemViewController : UIShopItemViewController
     {
-
+		[SerializeField] private SOSharedInt _playerGuildToken;
 		public static Action<MachineTemplate> OnMachineBuyed;
         public override void Init(ShopItem shopItem)
         {
@@ -21,21 +22,20 @@ namespace Components.Shop.ShopItems
             Price = shopItem.MachineTemplate.ShopPrice;
 			_numberOfItemToSellText.text = shopItem.NumberOfItemToSell == -1 ? "\u221E" :  $"{shopItem.NumberOfItemToSell}";
 
-			CheckBuyingEligibility(EconomyController.Instance.PlayerMoney);
-			EconomyController.OnPlayerMoneyUpdated += CheckBuyingEligibility;
+			CheckBuyingEligibility(_playerGuildToken.Value);
+            _playerGuildToken.OnValueUpdated += CheckBuyingEligibility;
 		}
 
 		private void OnDestroy()
 		{
-			EconomyController.OnPlayerMoneyUpdated -= CheckBuyingEligibility;
+            _playerGuildToken.OnValueUpdated -= CheckBuyingEligibility;
 
 		}
 
 		public override void BuyItem()
 		{
-			if (EconomyController.Instance.PlayerMoney < Price)
+			if (_playerGuildToken.Value < Price)
 			{
-				Debug.LogError("Not enough money you bum.");
 				return;
 			}
 

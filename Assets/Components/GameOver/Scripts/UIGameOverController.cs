@@ -4,6 +4,7 @@ using Components.Ingredients;
 using Components.Machines;
 using Components.Machines.Behaviors;
 using Components.Shop.ShopItems;
+using SoWorkflow.SharedValues;
 using System;
 using System.Collections.Generic;
 using TMPro;
@@ -27,6 +28,11 @@ public class UIGameOverController : MonoBehaviour
 	[SerializeField] private Transform _machinesPurchasedTransform;
 	[SerializeField] private Transform _recipesSoldTransform;
 
+	[Header("SharedValues")]
+	[SerializeField] private SOSharedInt _dayIndex; 
+	[SerializeField] private SOSharedInt _playerScore; 
+	[SerializeField] private SOSharedInt _playerObjective; 
+
 	private IngredientsBundle _startingIngredientBundle;
 	private readonly List<IngredientTemplate> _otherIngredientsList = new();
 	private readonly Dictionary<MachineTemplate, int> _machinesPossessedByPlayer = new();
@@ -34,8 +40,8 @@ public class UIGameOverController : MonoBehaviour
 
 	private void Start()
 	{
-		EconomyController.OnGameOver += HandleGameOver;
-		BundleChoiceGenerator.OnBundleChoiceConfirm += HandleBundleChoice;
+        GameOverState.OnGameOverStarted += HandleGameOver;
+        BundleChoiceGenerator.OnBundleChoiceConfirm += HandleBundleChoice;
 		UIIngredientShopItemViewController.OnIngredientBuyed += HandleIngredientBuyed;
 		MarchandMachineBehaviour.OnIngredientSold += HandleIngredientSold;
 		UIMachineShopItemViewController.OnMachineBuyed += HandleMachineAdded;
@@ -43,8 +49,8 @@ public class UIGameOverController : MonoBehaviour
 
 	private void OnDestroy()
 	{
-		EconomyController.OnGameOver -= HandleGameOver;
-		BundleChoiceGenerator.OnBundleChoiceConfirm -= HandleBundleChoice;
+        GameOverState.OnGameOverStarted -= HandleGameOver;
+        BundleChoiceGenerator.OnBundleChoiceConfirm -= HandleBundleChoice;
         UIIngredientShopItemViewController.OnIngredientBuyed -= HandleIngredientBuyed;
         MarchandMachineBehaviour.OnIngredientSold -= HandleIngredientSold;
 		UIMachineShopItemViewController.OnMachineBuyed -= HandleMachineAdded;
@@ -53,13 +59,13 @@ public class UIGameOverController : MonoBehaviour
 
 
 
-    private void HandleGameOver(int playerScore, int scoreObjective, int day)
+    private void HandleGameOver(GameOverState state)
 	{
-		EconomyController.OnGameOver -= HandleGameOver;
+        GameOverState.OnGameOverStarted -= HandleGameOver;
 
-		_view.SetActive(true);
+        _view.SetActive(true);
 		_showViewToggle.gameObject.SetActive(true);
-		_defeatExplicationText.text = $"Defeated at Day {day}.\nYour goal was to reach {scoreObjective} gold, and you’ve achieved only {playerScore}...";
+		_defeatExplicationText.text = $"Defeated at Day {_dayIndex.Value}.\nYour goal was to reach {_playerObjective.Value} gold, and you’ve achieved only {_playerScore.Value}...";
 
 		SetUpStartingBundle();
 		SetUpOtherIngredients();

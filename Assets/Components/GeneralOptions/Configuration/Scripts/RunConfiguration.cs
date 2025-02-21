@@ -17,6 +17,7 @@ public class RunConfiguration : ScriptableObject
 	[Tooltip("For every gold interest value give the GoldInterestAmountPerRound as bonus gold")]
 	[SerializeField] private int _guildTicketInterestValue = 5;
 	[SerializeField] private int _guildTicketInterestAmountPerRound = 1;
+	[SerializeField] private int _guildTicketTimeInterestMaxValue = 5;
 
 	[Header("StateTime")]
 	[SerializeField] private int _planningFactoryStateTime = 120;
@@ -26,6 +27,7 @@ public class RunConfiguration : ScriptableObject
 	public int GuildTicketAmountPerRound => _guildTicketAmountPerRound;
 	public int GuildTicketInterestValue => _guildTicketInterestValue;
 	public int GuildTicketInterestAmountPerRound => _guildTicketInterestAmountPerRound;
+	public int GuildTicketTimeInterestMaxValue => _guildTicketTimeInterestMaxValue;
 	public int PlanningFactoryStateTime => _planningFactoryStateTime;
 	public int ResolutionFactoryStateTime => _resolutionFactoryStateTime;
 

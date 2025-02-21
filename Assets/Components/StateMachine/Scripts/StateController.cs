@@ -3,6 +3,7 @@ using Components.Bundle;
 using Components.Economy;
 using Components.Map;
 using Cysharp.Threading.Tasks;
+using SoWorkflow.SharedValues;
 using UnityEngine;
 using VComponent.Tools.Timer;
 
@@ -10,14 +11,16 @@ public class StateController : MonoBehaviour
 {
 	[SerializeField] private RunConfiguration _runConfiguration;
 	[SerializeField] private bool _disable;
-
+	[SerializeField] private SOSharedInt _dayIndex;
 
 	public string CurrentDebugStateName;
 	
 	private CountdownTimer _countdownTimer;
 	private StateMachine _stateMachine;
 
-	public static Action<float, float> OnCountdown;
+	[SerializeField] private SOSharedFloat _initialTime;
+	[SerializeField] private SOSharedFloat _currentTime;
+
 	public static Action<BaseState> OnStateStarted;
 	
 	//------------------------------------------------------------------------ MONO -------------------------------------------------------------------------------------------- 
@@ -52,7 +55,7 @@ public class StateController : MonoBehaviour
 		At(resolutionFactoryState, gameOverState, new FuncPredicate(() => resolutionFactoryState.IsFinished && EconomyController.Instance.CheckGameOver(resolutionFactoryState.StateIndex)));
 		At(resolutionFactoryState, endOfDayState, new FuncPredicate(() => resolutionFactoryState.IsFinished && !EconomyController.Instance.CheckGameOver(resolutionFactoryState.StateIndex) && resolutionFactoryState.StateIndex < _runConfiguration.RunStateList.Count));
 		At(resolutionFactoryState, endGameState, new FuncPredicate(() => resolutionFactoryState.IsFinished && !EconomyController.Instance.CheckGameOver(resolutionFactoryState.StateIndex) && resolutionFactoryState.StateIndex >= _runConfiguration.RunStateList.Count));
-		At(endOfDayState, resolutionFactoryState, new FuncPredicate(() => endOfDayState.IsFinished && endOfDayState.StateIndex % 4 != 0));
+		At(endOfDayState, resolutionFactoryState, new FuncPredicate(() => endOfDayState.IsFinished));
 		//At(endOfDayState, bundleChoiceState, new FuncPredicate(() => endOfDayState.IsFinished && endOfDayState.StateIndex % 4 == 0));
 
 		StartStateMachine(bundleChoiceState);
@@ -68,12 +71,14 @@ public class StateController : MonoBehaviour
 
 	private void OnDestroy()
 	{
-		PlanningFactoryState.OnPlanningFactoryStateStarted -= HandlePlanningFactoryState;
-		ResolutionFactoryState.OnResolutionFactoryStateStarted -= HandleResolutionFactoryState;
-		EndOfDayState.OnEndOfDayStateStarted -= HandleShopState;
-		EndGameState.OnEndGameStateStarted -= HandleEndGameState;
-		BundleChoiceState.OnBundleStateStarted -= HandleBundleChoiceState;
-	}
+        MapState.OnMapStateStarted -= HandleMapState;
+        BundleChoiceState.OnBundleStateStarted -= HandleBundleChoiceState;
+        PlanningFactoryState.OnPlanningFactoryStateStarted -= HandlePlanningFactoryState;
+        ResolutionFactoryState.OnResolutionFactoryStateStarted -= HandleResolutionFactoryState;
+        EndOfDayState.OnEndOfDayStateStarted -= HandleShopState;
+        EndGameState.OnEndGameStateStarted -= HandleEndGameState;
+        GameOverState.OnGameOverStarted -= HandleGameOverState;
+    }
 
 	private void Update()
 	{
@@ -86,7 +91,8 @@ public class StateController : MonoBehaviour
 		if (_countdownTimer != null)
 		{
 			_countdownTimer.Tick(Time.deltaTime);
-			OnCountdown?.Invoke(_countdownTimer.Time, _countdownTimer.InitialTime);
+			_initialTime.Set(_countdownTimer.InitialTime);
+			_currentTime.Set(_countdownTimer.Time);
 		}
 	}
 
@@ -127,9 +133,10 @@ public class StateController : MonoBehaviour
 	private void HandleResolutionFactoryState(ResolutionFactoryState state)
 	{
 		CurrentDebugStateName = "RESOLUTION";
-		
-		_countdownTimer = new TickableCountdownTimer(_runConfiguration.GetStateTime(state.StateIndex));
-		BaseState.OnStateEnded += _countdownTimer.Stop;
+		_dayIndex.Set(state.StateIndex);
+        _countdownTimer = new TickableCountdownTimer(_runConfiguration.GetStateTime(state.StateIndex));
+        _initialTime.Set(_countdownTimer.InitialTime);
+        BaseState.OnStateEnded += _countdownTimer.Stop;
 		_countdownTimer.OnTimerStop += state.SetStateFinished;
 		_countdownTimer.Start();
 		

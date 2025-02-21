@@ -1,73 +1,90 @@
+using SoWorkflow.SharedValues;
 using System;
 using UnityEngine;
 using VComponent.Tools.Singletons;
+using VTools.SoWorkflow.EventSystem;
 
 namespace Components.Economy
 {
 	public class EconomyController : Singleton<EconomyController>
 	{
-		[SerializeField] private int _playerMoney;
+		[Header("Economy")]
+		[SerializeField] private SOSharedInt _playerGuildToken;
+        [SerializeField] private SOSharedInt _statePlayerScore; //Score that the player earn during resolution state, reset every round
+        [SerializeField] private SOSharedInt _stateScoreObjective;
+        [SerializeField] private SOSharedInt _totalGuildToken;
+        [SerializeField] private SOSharedInt _guildTokenTimeInterest;
+		[Header("Time")]
+        [SerializeField] private SOSharedFloat _stateCurrentTime;
+        [SerializeField] private SOSharedFloat _stateInitialTime;
+		[SerializeField] private GameEvent _onPlayerScoreSuccess;
+
 		[SerializeField] private RunConfiguration _runConfiguration;
 
-		private int _stateScoreObjective;
-		private int _statePlayerScore; //Money that the player earn during a current phase
 
-		public int PlayerMoney => _playerMoney;
-		
-		public static Action<int> OnPlayerMoneyUpdated;
-		public static Action<int> OnStatePlayerScoreUpdated;
-		public static Action<int> OnScoreStateObjectiveUpdated;
-		public static Action<int,int, int> OnGameOver;
-		public static Action<int, int, int, int ,int> OnEndRoundGoldValuesCalculated;
 
-		private int _totalGoldAmountPerRound;
-
-		public int StateScoreObjective => _stateScoreObjective;
 
 		private void Start()
 		{
 			ResolutionFactoryState.OnResolutionFactoryStateStarted += HandleResolutionFactoryStateStarted;
-			EndOfDayState.OnEndOfDayStateStarted += HandleEndOfDayState;
+			EndOfDayState.OnEndOfDayStateStarted += HandleEndOfDayStateStarted;
 		}
 		
 		private void OnDestroy()
 		{
 			ResolutionFactoryState.OnResolutionFactoryStateStarted -= HandleResolutionFactoryStateStarted;
-			EndOfDayState.OnEndOfDayStateStarted -= HandleEndOfDayState;
-		}
+			EndOfDayState.OnEndOfDayStateStarted -= HandleEndOfDayStateStarted;
+            _stateCurrentTime.OnValueUpdated -= CheckInterest;
+        }
 
 		public void AddMoney(int amount)
 		{
-			_playerMoney += amount;
-			OnPlayerMoneyUpdated?.Invoke(_playerMoney);
+			_playerGuildToken.Increment(amount);
+
 		}
 
 		public void AddScore(int amount)
 		{
-			_statePlayerScore += amount;
-			OnStatePlayerScoreUpdated?.Invoke(_statePlayerScore);
+			_statePlayerScore.Increment(amount);
+			if(_statePlayerScore.Value >= _stateScoreObjective.Value)
+			{
+				_onPlayerScoreSuccess?.Raise();
+				_stateCurrentTime.OnValueUpdated += CheckInterest;
+            }
 		}
-		
-		public void DecreaseMoney(int amount)
+
+        private void CheckInterest(float value)
+        {
+			_guildTokenTimeInterest.Set(Mathf.RoundToInt((value / _stateInitialTime.Value) * _runConfiguration.GuildTicketTimeInterestMaxValue));
+        }
+
+        public void DecreaseMoney(int amount)
 		{
-			_playerMoney -= amount;			
-			OnPlayerMoneyUpdated?.Invoke(_playerMoney);
+			_playerGuildToken.Increment(-amount);			
+
 		}
 
 		private void HandleResolutionFactoryStateStarted(ResolutionFactoryState state)
 		{
-			_statePlayerScore = 0;
-			_stateScoreObjective = _runConfiguration.RunStateList.Find(x => x.StateNumber == state.StateIndex).MoneyObjective;
-			OnScoreStateObjectiveUpdated?.Invoke(_stateScoreObjective);
-			OnStatePlayerScoreUpdated?.Invoke(_statePlayerScore);
-
+			if(state.StateIndex == 1)
+			{
+				ResetValues();
+			}
+			_statePlayerScore.Set(0);
+			_stateScoreObjective.Set(_runConfiguration.RunStateList.Find(x => x.StateNumber == state.StateIndex).MoneyObjective);
 		}
 
-		public bool CheckGameOver(int stateIndex)
+		private void ResetValues()
 		{
-			if (_statePlayerScore < _stateScoreObjective)
+			_statePlayerScore.Set(0);
+			_playerGuildToken.Set(0);
+			_totalGuildToken.Set(0);
+        }
+
+        public bool CheckGameOver(int stateIndex)
+		{
+			if (_statePlayerScore.Value < _stateScoreObjective.Value)
 			{
-				OnGameOver?.Invoke(_statePlayerScore, _stateScoreObjective, stateIndex);
 				return true;
 			}
 			else
@@ -79,12 +96,15 @@ namespace Components.Economy
 		/// <summary>
 		/// Calcultate the gold amount to give to the player at the start of the payoff State
 		/// </summary>
-		private void HandleEndOfDayState(EndOfDayState shopState)
+		private void HandleEndOfDayStateStarted(EndOfDayState shopState)
 		{
-			int interest = (_playerMoney / _runConfiguration.GuildTicketInterestValue) * _runConfiguration.GuildTicketInterestAmountPerRound;
-			_totalGoldAmountPerRound = _runConfiguration.GuildTicketAmountPerRound + interest;
-			OnEndRoundGoldValuesCalculated?.Invoke(_totalGoldAmountPerRound, _runConfiguration.GuildTicketAmountPerRound, interest, _stateScoreObjective, _statePlayerScore);
-			AddMoney(_totalGoldAmountPerRound);
+            _stateCurrentTime.OnValueUpdated -= CheckInterest;
+
+            int interest = (_playerGuildToken.Value / _runConfiguration.GuildTicketInterestValue) * _runConfiguration.GuildTicketInterestAmountPerRound;
+			interest += _guildTokenTimeInterest.Value;
+
+            _totalGuildToken.Set(_runConfiguration.GuildTicketAmountPerRound + interest);
+			AddMoney(_totalGuildToken.Value);
 		}
 
 	}
