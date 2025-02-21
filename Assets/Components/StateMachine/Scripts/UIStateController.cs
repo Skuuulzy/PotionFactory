@@ -8,6 +8,7 @@ public class UIStateController : MonoBehaviour
 {
 	[SerializeField] private Animator _stateUITitleAnimator;
 	[SerializeField] private TextMeshProUGUI _stateNameText;
+	[SerializeField] private TextMeshProUGUI _currentDayText;
 	[SerializeField] private TextMeshProUGUI _stateCountdownText;
 
 	[SerializeField] private SOSharedFloat _stateCountdownTime;
@@ -60,6 +61,7 @@ public class UIStateController : MonoBehaviour
 	private void DisplayNewState(BaseState state)
 	{
 		_stateNameText.text = $"Day {state.StateIndex}";
+		_currentDayText.text = $"Day {state.StateIndex}";
 		_stateUITitleAnimator.SetTrigger(DISPLAY_STATE);
 	}
 
