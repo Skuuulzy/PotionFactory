@@ -52,6 +52,7 @@ namespace Components.Grid
         private void Start()
         {
             _camera = Camera.main;
+            _inputState = InputState.SELECTION;
 
             MachineManager.OnChangeSelectedMachine += InstantiatePreview;
             GrimoireButton.OnGrimoireButtonDeselect += HandleGrimoireDeselect;
@@ -119,6 +120,7 @@ namespace Components.Grid
             {
                 DestroyPreview();
                 SwitchInputState(InputState.SELECTION);
+                ResetFlags();
             }
             if (Input.GetKeyDown(KeyCode.R))
             {
@@ -128,13 +130,11 @@ namespace Components.Grid
 
         private void SwitchInputState(InputState newState)
         {
-            if (_inputState == newState)
-            {
-                return;
-            }
-            
             _inputState = newState;
-            
+        }
+
+        private void ResetFlags()
+        {
             // Reset flags when switching input states
             _currentInputRotation = 0;
             _currentPreviewRotation = 0;
@@ -386,7 +386,6 @@ namespace Components.Grid
             if (_justPlaced)
             {
                 _justPlaced = false;
-                Debug.Log("Just placed return");
                 return;
             }
             
