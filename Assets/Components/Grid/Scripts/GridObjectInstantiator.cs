@@ -24,19 +24,22 @@ namespace Components.Grid
         [SerializeField] private SerializableDictionary<MachineTemplate, List<RotationSubMachine>> _subMachineRotation;
 
         [Header("Debug")]
+        [SerializeField] private bool _enabled = true;
         [SerializeField] private InputState _inputState = InputState.SELECTION;
         [SerializeField] private MachineController _currentMachinePreview;
         [SerializeField] private int _currentInputRotation;
         [SerializeField] private int _currentPreviewRotation;
         [SerializeField] private bool _moveMode;
-        [SerializeField] private bool _justPlaced;
-        [SerializeField] private bool _justRemoved;
+        [SerializeField] private bool _skipFrame;
+        
+        // ------------------------------------------------------------------------- PRIVATE FIELDS -------------------------------------------------------------------------------- 
         
         private Camera _camera;
 
-        private bool _isFactoryState = true;
         private Vector3 _lastCellPosition = new(-1, -1, -1);
         private Machine _hoveredMachine;
+        
+        private Grid Grid => _gridController.Grid;
         
         private enum InputState
         {
@@ -44,7 +47,7 @@ namespace Components.Grid
             PLACEMENT
         }
 
-        private Grid Grid => _gridController.Grid;
+        // ------------------------------------------------------------------------- PUBLIC FIELDS -------------------------------------------------------------------------------- 
         
         public static Action<bool> OnPreview;
         
@@ -77,7 +80,7 @@ namespace Components.Grid
         private void Update()
         {
             //Can't interact with anything if we are not in factory state 
-            if (!_isFactoryState || Grid == null)
+            if (!_enabled || Grid == null)
             {
                 return;
             }
@@ -93,6 +96,8 @@ namespace Components.Grid
                     break;
             }
         }
+        
+        // ------------------------------------------------------------------------- INPUT STATES -------------------------------------------------------------------------------- 
         
         private void HandleSelectionMode()
         {
@@ -114,7 +119,7 @@ namespace Components.Grid
     
             if (Input.GetMouseButton(0))
             {
-                AddSelectedMachineToGrid();
+                PlacePreview();
             }
             if (Input.GetMouseButtonUp(1))
             {
@@ -137,8 +142,7 @@ namespace Components.Grid
 
         private void ResetFlags()
         {
-            _justPlaced = false;
-            _justRemoved = false;
+            _skipFrame = false;
         }
 
         private void SetPlacementRotations(int value)
@@ -148,31 +152,61 @@ namespace Components.Grid
             _currentPreviewRotation = value;
         }
 
-        // ------------------------------------------------------------------------- PREVIEW BEHAVIOUR -------------------------------------------------------------------------------- 
-
-        private void InstantiatePreview(MachineTemplate template)
-        {
-            SetPlacementRotations(0);          
-            InstantiatePreview(template, 0);
-        }
+        // ------------------------------------------------------------------------- PLACEMENT BEHAVIOUR -------------------------------------------------------------------------------- 
         
-        private void InstantiatePreview(MachineTemplate template, int rotation)
+        private void PlacePreview()
         {
-            // Prevent instantiation of the same type.
-            if (_currentMachinePreview && _currentMachinePreview.Machine.Template == template)
+            if (!_currentMachinePreview)
             {
                 return;
             }
-            
-            OnPreview?.Invoke(false);
-            
-            DestroyPreview();
-            _currentMachinePreview = InstantiateMachine(template, rotation);
-            _currentPreviewRotation = rotation;
-            
-            SwitchInputState(InputState.PLACEMENT);
-            
-            Debug.Log($"Selecting {_currentMachinePreview.name} with rotation: {rotation}°.");
+
+            // Try to get the position on the grid. 
+            if (!UtilsClass.ScreenToWorldPositionIgnoringUI(Input.mousePosition, _camera, out Vector3 worldMousePosition))
+            {
+                return;
+            }
+
+            // Try getting the cell 
+            if (!Grid.TryGetCellByPosition(worldMousePosition, out Cell chosenCell))
+            {
+                return;
+            }
+
+            // Check if the machine can be placed on the grid. 
+            if (!IsMachinePlacable(chosenCell))
+            {
+                return;
+            }
+
+            if (_moveMode)
+            {
+                Debug.Log($"Adding machine :{_currentMachinePreview.Machine.Controller.name} to grid from a movement.");
+                
+                _currentMachinePreview.AddToGrid(chosenCell, Grid, _gridObjectsHolder);
+                _currentMachinePreview.Machine.Select(false);
+                _currentMachinePreview = null;
+                _moveMode = false;
+                _skipFrame = true;
+                
+                SwitchInputState(InputState.SELECTION);
+            }
+            else
+            {
+                Debug.Log($"Adding machine :{_currentMachinePreview.Machine.Controller.name} from inventory to grid");
+                
+                var machineToAdd = InstantiateMachine(_currentMachinePreview.Machine.Template, _currentPreviewRotation);
+                machineToAdd.AddToGrid(chosenCell, Grid, _gridObjectsHolder);
+                GrimoireController.Instance.DecreaseMachineToPlayerInventory(machineToAdd.Machine.Template, 1);
+                
+                _skipFrame = true;
+                
+                //Instantiate the same machine type if we have enough in the inventory.
+                if (GrimoireController.Instance.CountMachineOfType(_currentMachinePreview.Machine.Template.Type) <= 0)
+                {
+                    DestroyPreview();
+                }
+            }
         }
 
         private void MovePreview()
@@ -209,7 +243,7 @@ namespace Components.Grid
                 _previewHolder.transform.position = worldMousePosition;
             }
             
-            CheckForSubPreview(worldMousePosition);
+            CheckForAutoConveyorOrientation(worldMousePosition);
         }
 
         private void RotatePreview()
@@ -233,7 +267,7 @@ namespace Components.Grid
                 return;
             }
 
-            CheckForSubPreview(worldMousePosition);
+            CheckForAutoConveyorOrientation(worldMousePosition);
         }
 
         private void DestroyPreview()
@@ -248,151 +282,20 @@ namespace Components.Grid
                 Debug.Log("Destroying preview");
                 
                 Destroy(_currentMachinePreview.gameObject);
-                _justRemoved = true;
+                _skipFrame = true;
                 
                 OnPreview?.Invoke(false);
             }
         }
-
-        // ------------------------------------------------------------------------- SUB PREVIEW BEHAVIOUR -------------------------------------------------------------------------------- 
-
-        private void CheckForSubPreview(Vector3 worldMousePosition)
-        {
-            if (_currentMachinePreview.Machine.Template.Type != MachineType.CONVEYOR)
-            {
-                return;
-            }
-            
-            // Get the grid position
-            if (!Grid.TryGetCellByPosition(worldMousePosition, out var cell))
-                return;
-
-            var leftLocalAngle = (_currentInputRotation - 90).NormalizeAngle();
-            var rightLocalAngle = (_currentInputRotation + 90).NormalizeAngle();
-
-            if (ScanForPotentialConnection(cell.Coordinates, leftLocalAngle.SideFromAngle(), Way.OUT))
-            {
-                InstantiatePreview(ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("ConveyorLeftToUp"), rightLocalAngle);
-                
-                return;
-            }
-
-            if (ScanForPotentialConnection(cell.Coordinates, rightLocalAngle.SideFromAngle(), Way.OUT))
-            {
-                InstantiatePreview(ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("ConveyorLeftToDown"), leftLocalAngle);
-
-                return;
-            }
-
-            InstantiatePreview(ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("ConveyorLeftToRight"), _currentInputRotation);
-        }
         
-        private bool ScanForPotentialConnection(Vector2Int cellPosition, Side sideToScan, Way desiredWay)
-        {
-            var neighbourPosition = sideToScan.GetNeighbourPosition(cellPosition);
-			
-            if (Grid.TryGetCellByCoordinates(neighbourPosition.x, neighbourPosition.y, out var cell))
-            {
-                if (cell.ContainsNode)
-                {
-                    foreach (var port in cell.Node.Ports)
-                    {
-                        if (port.Side == sideToScan.Opposite() && port.Way == desiredWay)
-                        {
-                            Debug.Log($"Found a potential connection on cell: {cell.Coordinates}");
-                            return true;
-                        }
-                    }
-                }
-            }
-
-            return false;
-        }
-
-        // ------------------------------------------------------------------------- GRID COMMUNICATION -------------------------------------------------------------------------------- 
-        private void AddSelectedMachineToGrid()
-        {
-            if (!_currentMachinePreview)
-            {
-                return;
-            }
-
-            // Try to get the position on the grid. 
-            if (!UtilsClass.ScreenToWorldPositionIgnoringUI(Input.mousePosition, _camera, out Vector3 worldMousePosition))
-            {
-                return;
-            }
-
-            // Try getting the cell 
-            if (!Grid.TryGetCellByPosition(worldMousePosition, out Cell chosenCell))
-            {
-                return;
-            }
-
-            // Check if the machine can be placed on the grid. 
-            if (!IsMachinePlacable(chosenCell))
-            {
-                return;
-            }
-
-            if (_moveMode)
-            {
-                Debug.Log($"Adding machine :{_currentMachinePreview.Machine.Controller.name} to grid from a movement.");
-                
-                _currentMachinePreview.AddToGrid(chosenCell, Grid, _gridObjectsHolder);
-                _currentMachinePreview.Machine.Select(false);
-                _currentMachinePreview = null;
-                _moveMode = false;
-                _justPlaced = true;
-                SwitchInputState(InputState.SELECTION);
-            }
-            else
-            {
-                Debug.Log($"Adding machine :{_currentMachinePreview.Machine.Controller.name} from inventory to grid");
-                
-                var machineToAdd = InstantiateMachine(_currentMachinePreview.Machine.Template, _currentPreviewRotation);
-                machineToAdd.AddToGrid(chosenCell, Grid, _gridObjectsHolder);
-                GrimoireController.Instance.DecreaseMachineToPlayerInventory(machineToAdd.Machine.Template, 1);
-                
-                _justPlaced = true;
-                
-                //Instantiate the same machine type if we have enough in the inventory.
-                if (GrimoireController.Instance.CountMachineOfType(_currentMachinePreview.Machine.Template.Type) <= 0)
-                {
-                    DestroyPreview();
-                }
-            }
-        }
-
-        private bool IsMachinePlacable(Cell originCell)
-        {
-            foreach (var node in _currentMachinePreview.Machine.Nodes)
-            {
-                var nodeGridPosition = node.SetGridPosition(originCell.Coordinates);
-
-                // One node does not overlap a constructable cell. 
-                if (!Grid.TryGetCellByCoordinates(nodeGridPosition.x, nodeGridPosition.y, out Cell overlapCell))
-                {
-                    return false;
-                }
-                
-                if (!overlapCell.IsConstructable())
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-        
-        // ------------------------------------------------------------------------- MANIPULATE MACHINES -------------------------------------------------------------------------------- 
+        // ------------------------------------------------------------------------- SELECTION BEHAVIOUR -------------------------------------------------------------------------------- 
         
         private void TryMoveMachine()
         {
             // Prevent placing a machine and then directly move it.
-            if (_justPlaced)
+            if (_skipFrame)
             {
-                _justPlaced = false;
+                _skipFrame = false;
                 return;
             }
             
@@ -429,9 +332,9 @@ namespace Components.Grid
         
         private void TryRetrieveMachine()
         {
-            if (_justRemoved)
+            if (_skipFrame)
             {
-                _justRemoved = false;
+                _skipFrame = false;
                 return;
             }
             
@@ -497,12 +400,12 @@ namespace Components.Grid
         // ------------------------------------------------------------------------- EVENT HANDLERS -------------------------------------------------------------------------------- 
         private void HandleResolutionFactoryState(ResolutionFactoryState _)
         {
-            _isFactoryState = true;
+            _enabled = true;
         }
 
         private void HandleShopState(EndOfDayState _)
         {
-            _isFactoryState = false;
+            _enabled = false;
         }
 
         private void HandleGrimoireDeselect()
@@ -523,6 +426,31 @@ namespace Components.Grid
         
         // ------------------------------------------------------------------------- HELPERS -------------------------------------------------------------------------------- 
 
+        private void InstantiatePreview(MachineTemplate template)
+        {
+            SetPlacementRotations(0);          
+            InstantiatePreview(template, 0);
+        }
+        
+        private void InstantiatePreview(MachineTemplate template, int rotation)
+        {
+            // Prevent instantiation of the same type.
+            if (_currentMachinePreview && _currentMachinePreview.Machine.Template == template)
+            {
+                return;
+            }
+            
+            OnPreview?.Invoke(false);
+            
+            DestroyPreview();
+            _currentMachinePreview = InstantiateMachine(template, rotation);
+            _currentPreviewRotation = rotation;
+            
+            SwitchInputState(InputState.PLACEMENT);
+            
+            Debug.Log($"Selecting {_currentMachinePreview.name} with rotation: {rotation}°.");
+        }
+        
         private MachineController InstantiateMachine(MachineTemplate template, int rotation)
         {
             var gridObjectController = GridObjectController.InstantiateFromTemplate(template, Grid.GetCellSize(), _previewHolder);
@@ -535,6 +463,79 @@ namespace Components.Grid
             
             Debug.LogError("The preview instantiated is not of type MachineController.");
             return null;
+        }
+        
+        private void CheckForAutoConveyorOrientation(Vector3 worldMousePosition)
+        {
+            if (_currentMachinePreview.Machine.Template.Type != MachineType.CONVEYOR)
+            {
+                return;
+            }
+            
+            // Get the grid position
+            if (!Grid.TryGetCellByPosition(worldMousePosition, out var cell))
+                return;
+
+            var leftLocalAngle = (_currentInputRotation - 90).NormalizeAngle();
+            var rightLocalAngle = (_currentInputRotation + 90).NormalizeAngle();
+
+            if (ScanForPotentialConnection(cell.Coordinates, leftLocalAngle.SideFromAngle(), Way.OUT))
+            {
+                InstantiatePreview(ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("ConveyorLeftToUp"), rightLocalAngle);
+                
+                return;
+            }
+
+            if (ScanForPotentialConnection(cell.Coordinates, rightLocalAngle.SideFromAngle(), Way.OUT))
+            {
+                InstantiatePreview(ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("ConveyorLeftToDown"), leftLocalAngle);
+
+                return;
+            }
+
+            InstantiatePreview(ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("ConveyorLeftToRight"), _currentInputRotation);
+        }
+        
+        private bool ScanForPotentialConnection(Vector2Int cellPosition, Side sideToScan, Way desiredWay)
+        {
+            var neighbourPosition = sideToScan.GetNeighbourPosition(cellPosition);
+			
+            if (Grid.TryGetCellByCoordinates(neighbourPosition.x, neighbourPosition.y, out var cell))
+            {
+                if (cell.ContainsNode)
+                {
+                    foreach (var port in cell.Node.Ports)
+                    {
+                        if (port.Side == sideToScan.Opposite() && port.Way == desiredWay)
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+        
+        private bool IsMachinePlacable(Cell originCell)
+        {
+            foreach (var node in _currentMachinePreview.Machine.Nodes)
+            {
+                var nodeGridPosition = node.SetGridPosition(originCell.Coordinates);
+
+                // One node does not overlap a constructable cell. 
+                if (!Grid.TryGetCellByCoordinates(nodeGridPosition.x, nodeGridPosition.y, out Cell overlapCell))
+                {
+                    return false;
+                }
+                
+                if (!overlapCell.IsConstructable())
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 
