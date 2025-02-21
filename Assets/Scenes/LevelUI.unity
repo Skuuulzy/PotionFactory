@@ -854,18 +854,6 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 1250219418}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1250219420 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 373246787823488658, guid: 097c10899650c7b4bb6da91ba66e79ca,
-    type: 3}
-  m_PrefabInstance: {fileID: 1250219418}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!224 &1302151501 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 7104237232576065329, guid: c4143b45c0ba7da4cab9be15bdc49033,
@@ -2364,11 +2352,6 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 8891006847143582540, guid: 610a453a4b89c6848b363cb792b4894a,
-        type: 3}
-      propertyPath: _finishStateButton
-      value: 
-      objectReference: {fileID: 1250219420}
     - target: {fileID: 8990413995920251648, guid: 610a453a4b89c6848b363cb792b4894a,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -7573,6 +7556,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 634857378439713020, guid: 638628955c325cd47b56b79b6a0013eb,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0.0004272461
+      objectReference: {fileID: 0}
+    - target: {fileID: 634857378439713020, guid: 638628955c325cd47b56b79b6a0013eb,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -0.99279785
       objectReference: {fileID: 0}
     - target: {fileID: 654798024232923519, guid: 638628955c325cd47b56b79b6a0013eb,
         type: 3}

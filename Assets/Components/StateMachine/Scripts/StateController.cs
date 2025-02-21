@@ -18,7 +18,9 @@ public class StateController : MonoBehaviour
 	private CountdownTimer _countdownTimer;
 	private StateMachine _stateMachine;
 
-	public static Action<float, float> OnCountdown;
+	[SerializeField] private SOSharedFloat _initialTime;
+	[SerializeField] private SOSharedFloat _currentTime;
+
 	public static Action<BaseState> OnStateStarted;
 	
 	//------------------------------------------------------------------------ MONO -------------------------------------------------------------------------------------------- 
@@ -89,7 +91,8 @@ public class StateController : MonoBehaviour
 		if (_countdownTimer != null)
 		{
 			_countdownTimer.Tick(Time.deltaTime);
-			OnCountdown?.Invoke(_countdownTimer.Time, _countdownTimer.InitialTime);
+			_initialTime.Set(_countdownTimer.InitialTime);
+			_currentTime.Set(_countdownTimer.Time);
 		}
 	}
 
@@ -132,7 +135,8 @@ public class StateController : MonoBehaviour
 		CurrentDebugStateName = "RESOLUTION";
 		_dayIndex.Set(state.StateIndex);
         _countdownTimer = new TickableCountdownTimer(_runConfiguration.GetStateTime(state.StateIndex));
-		BaseState.OnStateEnded += _countdownTimer.Stop;
+        _initialTime.Set(_countdownTimer.InitialTime);
+        BaseState.OnStateEnded += _countdownTimer.Stop;
 		_countdownTimer.OnTimerStop += state.SetStateFinished;
 		_countdownTimer.Start();
 		
