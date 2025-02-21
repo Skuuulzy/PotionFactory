@@ -155,19 +155,10 @@ namespace Components.Machines
         }
 
         // ------------------------------------------------------------------------- CONTEXTUAL ACTIONS ---------------------------------------------------------------
-        public void Move()
-        {
-            Machine.OnMove?.Invoke(Machine);
-        }
 
         public void Configure()
         {
             Machine.OnConfigure?.Invoke(Machine);
-        }
-
-        public void Retrieve()
-        {
-            Machine.OnRetrieve?.Invoke(Machine, true);
         }
         
         // ------------------------------------------------------------------------- HANDLERS -------------------------------------------------------------------------

@@ -39,8 +39,6 @@ namespace Components.Machines
         public Action OnSlotUpdated;
         public static Action<Machine, bool> OnSelected;
         public static Action<Machine, bool> OnHovered;
-        public static Action<Machine, bool> OnRetrieve;
-        public static Action<Machine> OnMove;
         public static Action<Machine> OnConfigure;
         public static Action<Machine, bool> OnProcess;
 

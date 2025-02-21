@@ -68,21 +68,9 @@ namespace Components.Machines.ContextMenu
             _window.SetActive(selected);
         }
 
-        public void MoveMachine()
-        {
-            _controller.Move();
-            _window.SetActive(false);
-        }
-
         public void ConfigureMachine()
         {
             _controller.Configure();
-        }
-
-        public void RetrieveMachine()
-        {
-            _controller.Retrieve();
-            _window.SetActive(false);
         }
     }
 }

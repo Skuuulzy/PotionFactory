@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using CodeMonkey.Utils;
 using Components.Inventory;
 using Components.Machines;
+using Components.Tick;
 using Database;
 using UnityEngine;
 
@@ -60,8 +61,6 @@ namespace Components.Grid
             MachineManager.OnChangeSelectedMachine += InstantiatePreview;
             GrimoireButton.OnGrimoireButtonDeselect += HandleGrimoireDeselect;
             
-            Machine.OnMove += HandleMovingMachine;
-            
             ResolutionFactoryState.OnResolutionFactoryStateStarted += HandleResolutionFactoryState;
             EndOfDayState.OnEndOfDayStateStarted += HandleShopState;
         }
@@ -70,8 +69,6 @@ namespace Components.Grid
         {
             MachineManager.OnChangeSelectedMachine -= InstantiatePreview;
             GrimoireButton.OnGrimoireButtonDeselect -= HandleGrimoireDeselect;
-            
-            Machine.OnMove -= HandleMovingMachine;
             
             ResolutionFactoryState.OnResolutionFactoryStateStarted -= HandleResolutionFactoryState;
             EndOfDayState.OnEndOfDayStateStarted -= HandleShopState;
@@ -322,7 +319,7 @@ namespace Components.Grid
                 }
                 
                 Debug.Log($"Move machine {machine.Controller.name}");
-                machine.Controller.Move();
+                MoveMachine(machine);
                 machine.Select(true);
                 SetPlacementRotations(machine.Rotation);
                 
@@ -360,7 +357,7 @@ namespace Components.Grid
             }
             
             Debug.Log($"Retrieve machine { chosenCell.Node.Machine.Controller.name}");
-            chosenCell.Node.Machine.Controller.Retrieve();
+            RetrieveMachine(chosenCell.Node.Machine, true);
         }
         
         private void TryHoverMachine()
@@ -411,17 +408,6 @@ namespace Components.Grid
         private void HandleGrimoireDeselect()
         {
             DestroyPreview();
-        }
-        
-        private void HandleMovingMachine(Machine machine)
-        {
-            _currentMachinePreview = machine.Controller;
-            _currentInputRotation = (int)machine.Controller.transform.rotation.eulerAngles.y;
-            
-            machine.Controller.transform.parent = _previewHolder;
-            machine.Controller.transform.localPosition = Vector3.zero;
-
-            _moveMode = true;
         }
         
         // ------------------------------------------------------------------------- HELPERS -------------------------------------------------------------------------------- 
@@ -537,6 +523,54 @@ namespace Components.Grid
 
             return true;
         }
+        
+        private void ClearMachineGridData(Machine machineToClear)
+        {
+            //Reset all cell linked to the machine.
+            foreach (var node in machineToClear.Nodes)
+            {
+                if (!Grid.TryGetCellByCoordinates(node.GridPosition.x, node.GridPosition.y, out Cell linkedCell))
+                {
+                    continue;
+                }
+
+                linkedCell.RemoveNodeFromCell();
+            }
+			
+            // Potential remove from tickables
+            TickSystem.RemoveTickable(machineToClear);
+        }
+
+        private void RetrieveMachine(Machine machineToSell, bool giveBack)
+        {
+            ClearMachineGridData(machineToSell);
+			
+            // Remove 3D objects
+            Destroy(machineToSell.Controller.gameObject);
+
+            // Give back to the player
+            if (giveBack)
+            {
+                GrimoireController.Instance.AddMachineToPlayerInventory(machineToSell.Template, 1);
+            }
+			
+            // For destroying the class instance, not sure if this a good way.
+            machineToSell = null;
+        }
+        
+        private void MoveMachine(Machine machine)
+        {
+            ClearMachineGridData(machine);
+            
+            _currentMachinePreview = machine.Controller;
+            _currentInputRotation = machine.Rotation;
+            
+            machine.Controller.transform.parent = _previewHolder;
+            machine.Controller.transform.localPosition = Vector3.zero;
+
+            _moveMode = true;
+        }
+
     }
 
     [Serializable]

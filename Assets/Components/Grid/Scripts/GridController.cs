@@ -67,8 +67,6 @@ namespace Components.Grid
 		// ------------------------------------------------------------------------- MONO -------------------------------------------------------------------------------- 
 		private void Start()
 		{
-			Machine.OnRetrieve += RetrieveMachine;
-			Machine.OnMove += ClearMachineGridData;
 			BundleChoiceGenerator.OnBundleChoiceConfirm += HandleBundleChoiceConfirm;
 			UIIngredientShopItemViewController.OnIngredientBuyed += HandleIngredientBuyed;
 			ResolutionFactoryState.OnResolutionFactoryStateStarted += HandleResolutionFactoryStarted;
@@ -77,8 +75,6 @@ namespace Components.Grid
 
 		private void OnDestroy()
 		{
-			Machine.OnRetrieve += RetrieveMachine;
-			Machine.OnMove -= ClearMachineGridData;
 			BundleChoiceGenerator.OnBundleChoiceConfirm -= HandleBundleChoiceConfirm;
             UIIngredientShopItemViewController.OnIngredientBuyed -= HandleIngredientBuyed;
             ResolutionFactoryState.OnResolutionFactoryStateStarted -= HandleResolutionFactoryStarted;
@@ -276,42 +272,6 @@ namespace Components.Grid
 			}
 		}
 		
-		// ------------------------------------------------------------------------ MACHINE METHODS ----------------------------------------------------------------------
-		
-		private void ClearMachineGridData(Machine machineToClear)
-		{
-			//Reset all cell linked to the machine. 
-			foreach (var node in machineToClear.Nodes)
-			{
-				if (!Grid.TryGetCellByCoordinates(node.GridPosition.x, node.GridPosition.y, out Cell linkedCell))
-				{
-					continue;
-				}
-
-				linkedCell.RemoveNodeFromCell();
-			}
-			
-			// Potential remove from tickables
-			TickSystem.RemoveTickable(machineToClear);
-		}
-
-		private void RetrieveMachine(Machine machineToSell, bool giveBack)
-		{
-			ClearMachineGridData(machineToSell);
-			
-			// Remove 3D objects
-			Destroy(machineToSell.Controller.gameObject);
-
-			// Give back to the player
-			if (giveBack)
-			{
-				GrimoireController.Instance.AddMachineToPlayerInventory(machineToSell.Template, 1);
-			}
-			
-			// For destroying the class instance, not sure if this a good way.
-			machineToSell = null;
-		}
-
 		// -------------------------------------------------------------------------- EXTRACTOR & MARCHANDS --------------------------------------------------------------------------
 		
 		private List<Vector2Int> GetExtractorRandomCoordinates(int extractorCount)
