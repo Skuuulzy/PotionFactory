@@ -46,6 +46,7 @@ namespace Components.Machines
 
         // TODO: This should not be here, some machine have specific event linked with specifics views.
         public Action OnItemSell;
+        public int Rotation { get; private set; }
         
         // --------------------------------------------------------------------- INITIALISATION -------------------------------------------------------------------------
         
@@ -416,8 +417,8 @@ namespace Components.Machines
             }
 
             _nodes = Template.Nodes.RotateNodes(angle);
+            Rotation = angle;
         }
-        
         // ------------------------------------------------------------------------- SELECT BEHAVIOUR -------------------------------------------------------------------------
         
         public void Select(bool select)

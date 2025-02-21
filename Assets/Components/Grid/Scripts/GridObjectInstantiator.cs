@@ -120,7 +120,9 @@ namespace Components.Grid
             {
                 DestroyPreview();
                 SwitchInputState(InputState.SELECTION);
+                
                 ResetFlags();
+                SetPlacementRotations(0);
             }
             if (Input.GetKeyDown(KeyCode.R))
             {
@@ -135,17 +137,22 @@ namespace Components.Grid
 
         private void ResetFlags()
         {
-            // Reset flags when switching input states
-            _currentInputRotation = 0;
-            _currentPreviewRotation = 0;
             _justPlaced = false;
             _justRemoved = false;
+        }
+
+        private void SetPlacementRotations(int value)
+        {
+            Debug.Log($"Set rotation to: {value}");
+            _currentInputRotation = value;
+            _currentPreviewRotation = value;
         }
 
         // ------------------------------------------------------------------------- PREVIEW BEHAVIOUR -------------------------------------------------------------------------------- 
 
         private void InstantiatePreview(MachineTemplate template)
         {
+            SetPlacementRotations(0);          
             InstantiatePreview(template, 0);
         }
         
@@ -165,7 +172,7 @@ namespace Components.Grid
             
             SwitchInputState(InputState.PLACEMENT);
             
-            Debug.Log($"Selecting {_currentMachinePreview.name}");
+            Debug.Log($"Selecting {_currentMachinePreview.name} with rotation: {rotation}°.");
         }
 
         private void MovePreview()
@@ -414,6 +421,8 @@ namespace Components.Grid
                 Debug.Log($"Move machine {machine.Controller.name}");
                 machine.Controller.Move();
                 machine.Select(true);
+                SetPlacementRotations(machine.Rotation);
+                
                 SwitchInputState(InputState.PLACEMENT);
             }
         }
