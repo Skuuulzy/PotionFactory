@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Components.Grid;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Components.Machines
@@ -17,21 +19,25 @@ namespace Components.Machines
         [SerializeField] private Color _selectedColor = Color.blue;
         [SerializeField] private Color _hoveredColor = Color.white;
 
-        [Header("DEBUG")]
-        [SerializeField] private Machine _machine;
-
         [Header("Animator")]
         [SerializeField] private Animator _animator;
+        
+        [Header("Blueprint")]
+        [SerializeField] private Material _bluePrintMaterial;
 
+        [Header("DEBUG")]
+        [SerializeField] private Machine _machine;
+        
         private const string PLAY_MACHINE_ANIM = "MachineProcessing";
 
-        private Outline _outline;
         private List<GameObject> _directionalArrows;
         
-        private readonly List<MachineGridComponent> _gridComponents = new();
+        private Outline _outline;
         
-        private bool _initialized;
-        private bool _selected;
+        private Dictionary<Renderer, List<Material>> _originalMaterials;
+        private readonly List<Renderer> _machineRenderers = new();
+        
+        private readonly List<MachineGridComponent> _gridComponents = new();
         
         public Machine Machine => _machine;
         
@@ -51,6 +57,8 @@ namespace Components.Machines
                 Debug.LogError("Please give a machine template to instantiate a machine preview.");
             }
             
+            SetupBlueprintRenderers();
+            
             _outline = View.AddComponent<Outline>();
             _outline.OutlineWidth = 8;
             
@@ -65,7 +73,7 @@ namespace Components.Machines
             Machine.OnProcess += HandleProcessMachine;
         }
 
-		private void HandleProcessMachine(Machine machine, bool value)
+        private void HandleProcessMachine(Machine machine, bool value)
 		{
             if(machine == Machine && _animator != null)
 			{
@@ -83,13 +91,12 @@ namespace Components.Machines
                 _gridComponents[i].transform.rotation = Quaternion.Euler(new Vector3(0, angle, 0));
             }
         }
-        
-        public void ConfirmPlacement()
+
+        private void ConfirmPlacement()
         {
             Machine.OnSelected += HandleMachineSelected;
             Machine.OnHovered += HandleMachineHovered;
             
-            _initialized = true;
             _machine.LinkNodeData();
 
             _machine.AddMachineToChain();
@@ -161,12 +168,10 @@ namespace Components.Machines
             {
                 ToggleDirectionalArrows(false);
                 ToggleOutlines(false);
-                _selected = false;
                 
                 return;
             }
 
-            _selected = true;
             ToggleDirectionalArrows(selected);
             ToggleOutlines(selected, _selectedColor);
         }
@@ -238,6 +243,45 @@ namespace Components.Machines
             }
             
             _outline.OutlineColor = placable ? _placableColor : _unPlacableColor;
+        }
+        
+        // ------------------------------------------------------------------------- BLUEPRINT -------------------------------------------------------------------------
+
+        private void SetupBlueprintRenderers()
+        {
+            // Cache renderers
+            var foundRenderers = GetComponentsInChildren<Renderer>();
+        
+            for (int i = 0; i < foundRenderers.Length; i++)
+            {
+                if (foundRenderers[i].CompareTag("Outlined"))
+                {
+                    _machineRenderers.Add(foundRenderers[i]);
+                }
+            }
+
+            if (_machineRenderers.Count == 0)
+            {
+                return;
+            }
+
+            // Save associated renderers materials
+            _originalMaterials = new Dictionary<Renderer, List<Material>>();
+            
+            for (int i = 0; i < _machineRenderers.Count; i++)
+            {
+                _originalMaterials.Add(_machineRenderers[i], _machineRenderers[i].materials.ToList());
+            }
+        }
+
+        [Button]
+        public void ToggleBlueprintMaterials(bool toggle)
+        {
+            foreach (var machineRenderer in _machineRenderers)
+            {
+                List<Material> materialsToApply = toggle ? new List<Material> {_bluePrintMaterial} : _originalMaterials[machineRenderer];
+                machineRenderer.SetMaterials(materialsToApply);
+            }
         }
     }
 }
