@@ -264,7 +264,7 @@ namespace Components.Machines
             }
 
             var machineToOverwrite = cellToOverwrite.Node.Machine;
-
+            
             // Check if the machine to overwrite can be retrieved and the machine to place can overwrite.
             if (!machineToOverwrite.Template.CanRetrieve || !machineThatOverwrite.Template.CanOverwriteOnPlacement)
             {

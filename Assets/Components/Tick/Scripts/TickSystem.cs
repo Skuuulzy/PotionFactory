@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Components.Machines;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using VComponent.Tools.Singletons;
@@ -15,6 +16,8 @@ namespace Components.Tick
         private float _tickTimer;
         private float _currentTickDuration;
 		private bool _isPause;
+
+        private static bool _log;
 
         public float InitialTickDuration => _initialTickDuration;
         public float CurrentTickDuration => _currentTickDuration;
@@ -84,6 +87,11 @@ namespace Components.Tick
             {
                 return;
             }
+
+            if (_log && tickable is Machine m1)
+            {
+                Debug.Log($"[TICK SYSTEM] Adding : {m1.Controller.name} to tickables");
+            }
             
             TICKABLES.Add(tickable);
         }
@@ -97,6 +105,11 @@ namespace Components.Tick
                 AddTickable(newTickable);
                 return;
             }
+            
+            if (_log && previousTickable is Machine m1 && newTickable is Machine m2)
+            {
+                Debug.Log($"[TICK SYSTEM] Replacing : {m1.Controller.name} by {m2.Controller.name} from tickables");
+            }
 
             int previousTickableIndex = TICKABLES.IndexOf(previousTickable);
             TICKABLES[previousTickableIndex] = newTickable;
@@ -109,6 +122,11 @@ namespace Components.Tick
                 return;
             }
 
+            if (_log && tickableToRemove is Machine machine)
+            {
+                Debug.Log($"[TICK SYSTEM] Removing : {machine.Controller.name} from tickables");
+            }
+            
             TICKABLES.Remove(tickableToRemove);
         }
 
@@ -152,9 +170,18 @@ namespace Components.Tick
         {
             return Mathf.RoundToInt(value / TickSystem.Instance.InitialTickDuration);
         }
+        
         public static int GetSecondValueFromTicks(int tick)
         {
             return Mathf.RoundToInt(tick * TickSystem.Instance.InitialTickDuration);
+        }
+        
+        // ------------------------------------------------------------------------- DEBUG -------------------------------------------------------------------------
+
+        [Button]
+        public void ToggleLogs()
+        {
+            _log = !_log;
         }
     }
 }

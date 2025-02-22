@@ -145,13 +145,6 @@ namespace Components.Machines
         {
             Machine.OnSelected -= HandleMachineSelected;
             Machine.OnHovered -= HandleMachineHovered;
-            
-            if (!_initialized)
-            {
-                return;
-            }
-            
-            _machine.RemoveMachineFromChain();
         }
 
         // ------------------------------------------------------------------------- CONTEXTUAL ACTIONS ---------------------------------------------------------------

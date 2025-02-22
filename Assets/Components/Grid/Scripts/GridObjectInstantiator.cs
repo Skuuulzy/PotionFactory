@@ -183,9 +183,10 @@ namespace Components.Grid
             }
             
             // Place the current preview on the grid.
+            Debug.Log($"Adding machine: {_currentMachinePreview.name} to grid.");
+            
             _currentMachinePreview.AddToGrid(chosenCell, Grid, _gridObjectsHolder);
             _currentMachinePreview.Machine.Select(false);
-            Debug.Log($"Adding machine: {_currentMachinePreview.name} to grid.");
 
             // If this is not a move mode take a machine from player inventory.
             if (!_moveMode)
@@ -559,13 +560,14 @@ namespace Components.Grid
 
                 linkedCell.RemoveNodeFromCell();
             }
-			
-            // Potential remove from tickables
-            TickSystem.RemoveTickable(machineToClear);
+            
+            machineToClear.RemoveMachineFromChain();
         }
 
         private void RetrieveMachine(Machine machineToSell, bool giveBack)
         {
+            Debug.Log($"Retrieving machine: {machineToSell.Controller.name}");
+            
             ClearMachineGridData(machineToSell);
 			
             // Remove 3D objects
