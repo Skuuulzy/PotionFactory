@@ -205,7 +205,7 @@ namespace Components.Grid
             }
 
             //Instantiate the same machine type if we have enough in the inventory.
-            _currentMachinePreview = InstantiateMachine(_currentMachinePreview.Machine.Template, _currentInputRotation);
+            InstantiateNewPreviewFrom(_currentMachinePreview, _currentPreviewRotation);
         }
 
         private void MovePreview()
@@ -441,15 +441,23 @@ namespace Components.Grid
             OnPreview?.Invoke(false);
             
             TryDestroyPreview();
-            _currentMachinePreview = InstantiateMachine(template, rotation);
+            _currentMachinePreview = (MachineController)InstantiateGridObject(template, rotation);
             _currentPreviewRotation = rotation;
             
             SwitchInputState(InputState.PLACEMENT);
             
-            Debug.Log($"Selecting {_currentMachinePreview.name} with rotation: {rotation}°.");
+            Debug.Log($"Instantiate {_currentMachinePreview.name} with rotation: {rotation}°.");
+        }
+
+        private void InstantiateNewPreviewFrom(MachineController preview, int rotation)
+        {
+            _currentMachinePreview = (MachineController)InstantiateGridObject(preview.Machine.Template, rotation);
+            _currentPreviewRotation = rotation;
+            
+            Debug.Log($"Instantiate {_currentMachinePreview.name} with rotation: {rotation}°.");
         }
         
-        private MachineController InstantiateMachine(MachineTemplate template, int rotation)
+        private GridObjectController InstantiateGridObject(GridObjectTemplate template, int rotation)
         {
             var gridObjectController = GridObjectController.InstantiateFromTemplate(template, Grid.GetCellSize(), _previewHolder);
             if (gridObjectController is MachineController machineController)
@@ -479,6 +487,7 @@ namespace Components.Grid
 
             if (ScanForPotentialConnection(cell.Coordinates, leftLocalAngle.SideFromAngle(), Way.OUT))
             {
+                Debug.Log($"Found good connection for curved conveyor: LeftToUp at {rightLocalAngle}°");
                 InstantiatePreview(ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("ConveyorLeftToUp"), rightLocalAngle);
                 
                 return;
@@ -486,6 +495,7 @@ namespace Components.Grid
 
             if (ScanForPotentialConnection(cell.Coordinates, rightLocalAngle.SideFromAngle(), Way.OUT))
             {
+                Debug.Log($"Found good connection for curved conveyor: LeftToDown at {leftLocalAngle}°");
                 InstantiatePreview(ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("ConveyorLeftToDown"), leftLocalAngle);
 
                 return;
