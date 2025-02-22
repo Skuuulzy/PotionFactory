@@ -447,21 +447,21 @@ namespace Components.Grid
             _currentPreviewRotation = rotation;
             
             SwitchInputState(InputState.PLACEMENT);
-            
-            Debug.Log($"Instantiate {_currentMachinePreview.name} with rotation: {rotation}°.");
         }
 
         private void InstantiateNewPreviewFrom(MachineController preview, int rotation)
         {
             _currentMachinePreview = (MachineController)InstantiateGridObject(preview.Machine.Template, rotation);
             _currentPreviewRotation = rotation;
-            
-            Debug.Log($"Instantiate {_currentMachinePreview.name} with rotation: {rotation}°.");
         }
         
         private GridObjectController InstantiateGridObject(GridObjectTemplate template, int rotation)
         {
             var gridObjectController = GridObjectController.InstantiateFromTemplate(template, Grid.GetCellSize(), _previewHolder);
+            gridObjectController.transform.name = $"{template.Name}_{_gridObjectsHolder.childCount}";
+
+            Debug.Log($"Instantiate grid object: {gridObjectController.transform.name}.");
+            
             if (gridObjectController is MachineController machineController)
             {
                 machineController.RotatePreview(rotation);

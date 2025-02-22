@@ -178,7 +178,7 @@ namespace Components.Tick
         
         // ------------------------------------------------------------------------- DEBUG -------------------------------------------------------------------------
 
-        [Button]
+        [Button(ButtonSizes.Small)]
         public void ToggleLogs()
         {
             _log = !_log;

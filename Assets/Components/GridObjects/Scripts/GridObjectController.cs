@@ -70,7 +70,6 @@ namespace Components.Grid
 			var cellSize = grid.GetCellSize();
 
 			transform.position = grid.GetWorldPosition(originCell.Coordinates) + new Vector3(cellSize / 2, 0, cellSize / 2);
-            transform.name = $"{Template.Name}_{parent.childCount}";
             transform.parent = parent;
         }
 	}
