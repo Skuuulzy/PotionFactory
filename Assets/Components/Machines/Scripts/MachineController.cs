@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Components.Grid;
-using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Components.Machines
@@ -13,17 +11,8 @@ namespace Components.Machines
         [SerializeField] private GameObject _inPreview;
         [SerializeField] private GameObject _outPreview;
         
-        [Header("Outline")]
-        [SerializeField] private Color _placableColor = Color.green;
-        [SerializeField] private Color _unPlacableColor = Color.red;
-        [SerializeField] private Color _selectedColor = Color.blue;
-        [SerializeField] private Color _hoveredColor = Color.white;
-
         [Header("Animator")]
         [SerializeField] private Animator _animator;
-        
-        [Header("Blueprint")]
-        [SerializeField] private Material _bluePrintMaterial;
 
         [Header("DEBUG")]
         [SerializeField] private Machine _machine;
@@ -46,7 +35,8 @@ namespace Components.Machines
         {
             base.InstantiateView(template, localRotation, localScale);
             
-            _animator = View.GetComponentInChildren<Animator>();
+            _animator = GridObjectView.GetComponentInChildren<Animator>();
+            
             if (Template is MachineTemplate machineTemplate)
             {
                 _machine = new Machine(machineTemplate, this);
@@ -57,10 +47,7 @@ namespace Components.Machines
                 Debug.LogError("Please give a machine template to instantiate a machine preview.");
             }
             
-            SetupBlueprintRenderers();
-            
-            _outline = View.AddComponent<Outline>();
-            _outline.OutlineWidth = 8;
+            GridObjectView.ToggleBlueprintMaterials(true);
             
             // Instantiate grid components
             for (int i = 0; i < _machine.Template.GridComponents.Count; i++)
@@ -83,7 +70,7 @@ namespace Components.Machines
 
 		public void RotatePreview(int angle)
         {
-            View.transform.rotation = Quaternion.Euler(new Vector3(0, angle, 0));
+            GridObjectView.transform.rotation = Quaternion.Euler(new Vector3(0, angle, 0));
             _machine.UpdateNodesRotation(angle);
 
             for (int i = 0; i < _gridComponents.Count; i++)
@@ -98,11 +85,10 @@ namespace Components.Machines
             Machine.OnHovered += HandleMachineHovered;
             
             _machine.LinkNodeData();
-
             _machine.AddMachineToChain();
             
             ToggleDirectionalArrows(false);
-            ToggleOutlines(false);
+            GridObjectView.ToggleBlueprintMaterials(false);
         }
 
         public override void AddToGrid(Cell originCell, Grid.Grid grid, Transform holder)
@@ -167,26 +153,25 @@ namespace Components.Machines
             if (Machine != machine)
             {
                 ToggleDirectionalArrows(false);
-                ToggleOutlines(false);
-                
+                GridObjectView.ToggleBlueprintMaterials(false);
                 return;
             }
 
             ToggleDirectionalArrows(selected);
-            ToggleOutlines(selected, _selectedColor);
+            GridObjectView.ToggleBlueprintMaterials(selected);
         }
         
         private void HandleMachineHovered(Machine machine, bool hovered)
         {
             if (Machine != machine)
             {
-                ToggleOutlines(false);
+                GridObjectView.ToggleHoverOutlines(false);
                 ToggleDirectionalArrows(false);
                 return;
             }
             
             ToggleDirectionalArrows(hovered);
-            ToggleOutlines(hovered, _hoveredColor);
+            GridObjectView.ToggleHoverOutlines(hovered);
         }
         
         // ------------------------------------------------------------------------- DIRECTIONAL ARROWS ---------------------------------------------------------------
@@ -198,7 +183,7 @@ namespace Components.Machines
             {
                 foreach (var port in node.Ports)
                 {
-                    var previewArrow = Instantiate(port.Way == Way.IN ? _inPreview : _outPreview, View.transform);
+                    var previewArrow = Instantiate(port.Way == Way.IN ? _inPreview : _outPreview, GridObjectView.transform);
                     
                     previewArrow.transform.localPosition = new Vector3(node.LocalPosition.x, previewArrow.transform.position.y, node.LocalPosition.y);
                     
@@ -220,67 +205,6 @@ namespace Components.Machines
             for (int i = 0; i < _directionalArrows.Count; i++)
             {
                 _directionalArrows[i].SetActive(toggle);
-            }
-        }
-        
-        // ------------------------------------------------------------------------- OUTLINES -------------------------------------------------------------------------
-        private void ToggleOutlines(bool toggle, Color outlineColor = default)
-        {
-            if (!_outline)
-            {
-                return;
-            }
-            
-            _outline.enabled = toggle;
-            _outline.OutlineColor = outlineColor;
-        }
-        
-        public void UpdateOutlineState(bool placable)
-        {
-            if (!_outline)
-            {
-                return;
-            }
-            
-            _outline.OutlineColor = placable ? _placableColor : _unPlacableColor;
-        }
-        
-        // ------------------------------------------------------------------------- BLUEPRINT -------------------------------------------------------------------------
-
-        private void SetupBlueprintRenderers()
-        {
-            // Cache renderers
-            var foundRenderers = GetComponentsInChildren<Renderer>();
-        
-            for (int i = 0; i < foundRenderers.Length; i++)
-            {
-                if (foundRenderers[i].CompareTag("Outlined"))
-                {
-                    _machineRenderers.Add(foundRenderers[i]);
-                }
-            }
-
-            if (_machineRenderers.Count == 0)
-            {
-                return;
-            }
-
-            // Save associated renderers materials
-            _originalMaterials = new Dictionary<Renderer, List<Material>>();
-            
-            for (int i = 0; i < _machineRenderers.Count; i++)
-            {
-                _originalMaterials.Add(_machineRenderers[i], _machineRenderers[i].materials.ToList());
-            }
-        }
-
-        [Button]
-        public void ToggleBlueprintMaterials(bool toggle)
-        {
-            foreach (var machineRenderer in _machineRenderers)
-            {
-                List<Material> materialsToApply = toggle ? new List<Material> {_bluePrintMaterial} : _originalMaterials[machineRenderer];
-                machineRenderer.SetMaterials(materialsToApply);
             }
         }
     }

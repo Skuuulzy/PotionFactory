@@ -23,7 +23,7 @@ namespace Components.Grid.Tile
         
         public void SetLockedState(bool locked)
         {
-            if (View.TryGetComponent(out MeshRenderer meshRenderer))
+            if (ViewGO.TryGetComponent(out MeshRenderer meshRenderer))
             {
                 meshRenderer.material = locked ? TileTemplate.LockedMaterial : TileTemplate.UnlockedMaterial;
             }

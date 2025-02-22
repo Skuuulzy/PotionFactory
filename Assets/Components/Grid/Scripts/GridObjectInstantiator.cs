@@ -187,7 +187,6 @@ namespace Components.Grid
             
             _currentMachinePreview.AddToGrid(chosenCell, Grid, _gridObjectsHolder);
             _currentMachinePreview.Machine.Select(false);
-            _currentMachinePreview.ToggleBlueprintMaterials(false);
 
             // If this is not a move mode take a machine from player inventory.
             if (!_moveMode)
@@ -239,8 +238,7 @@ namespace Components.Grid
 
                     if (_currentMachinePreview)
                     {
-                        _currentMachinePreview.UpdateOutlineState(IsMachinePlacable(cell) || _currentMachinePreview.Machine.CanOverwrite(cell));
-                        _currentMachinePreview.ToggleBlueprintMaterials(true);
+                        _currentMachinePreview.UpdateGridViewPlacableState(IsMachinePlacable(cell) || _currentMachinePreview.Machine.CanOverwrite(cell));
                     }
                 }
             }
@@ -467,8 +465,6 @@ namespace Components.Grid
             if (gridObjectController is MachineController machineController)
             {
                 machineController.RotatePreview(rotation);
-                machineController.ToggleBlueprintMaterials(true);
-
                 return machineController;
             }
             

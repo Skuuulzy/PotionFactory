@@ -21,7 +21,7 @@ namespace Components.Grid.Decorations
 
 		public void OverrideGridPosition(Vector3 decorationPosition)
 		{
-			View.transform.position = decorationPosition;
+			ViewGO.transform.position = decorationPosition;
 		}
     }
 

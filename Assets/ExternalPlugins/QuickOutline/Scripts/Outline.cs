@@ -82,29 +82,15 @@ public class Outline : MonoBehaviour
 
     private bool needsUpdate;
 
-    private void Awake()
+    public void Initialize(List<Renderer> renderersToOutline)
     {
-        // Cache renderers
-        var foundRenderers = GetComponentsInChildren<Renderer>();
-        List<Renderer> potentialRenderers = new();
-        
-        for (int i = 0; i < foundRenderers.Length; i++)
+        if (renderersToOutline.Count == 0)
         {
-            if (foundRenderers[i].CompareTag("Outlined"))
-            {
-                potentialRenderers.Add(foundRenderers[i]);
-            }
-        }
-
-        if (potentialRenderers.Count == 0)
-        {
-            Debug.LogError("No renderer with tag Outlined found.");
-            Destroy(this);
-            
+            enabled = false;
             return;
         }
-
-        renderers = potentialRenderers.ToArray();
+        
+        renderers = renderersToOutline.ToArray();
 
         // Instantiate outline materials
         outlineMaskMaterial = Instantiate(Resources.Load<Material>(@"Materials/OutlineMask"));

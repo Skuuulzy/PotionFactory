@@ -7,7 +7,8 @@ namespace Components.Grid
 		[SerializeField] protected Transform _3dViewHolder;
 
 		protected bool Instanced;
-		protected GameObject View;
+		protected GameObject ViewGO;
+		protected GridObjectViewController GridObjectView;
 		protected GridObjectTemplate Template;
 		
 		// ----------------------------------------- STATIC METHODS ------------------------------------------
@@ -50,7 +51,17 @@ namespace Components.Grid
 		
 		protected virtual void InstantiateView(GridObjectTemplate template, Quaternion localRotation, Vector3 localScale)
 		{
-			View = Instantiate(template.GridView, _3dViewHolder);
+			if (!template.GridView)
+			{
+				Debug.LogError($"No grid view on template: {template.name}");
+				return;
+			}
+			
+			ViewGO = Instantiate(template.GridView, _3dViewHolder);
+			if (ViewGO.TryGetComponent(out GridObjectViewController gridObjectController))
+			{
+				GridObjectView = gridObjectController;
+			}
 			Template = template;
 
 			transform.localScale = localScale;
@@ -72,5 +83,13 @@ namespace Components.Grid
 			transform.position = grid.GetWorldPosition(originCell.Coordinates) + new Vector3(cellSize / 2, 0, cellSize / 2);
             transform.parent = parent;
         }
+
+		public void UpdateGridViewPlacableState(bool isMachinePlacable)
+		{
+			if (GridObjectView)
+			{
+				GridObjectView.UpdateBlueprintColor(isMachinePlacable);
+			}
+		}
 	}
 }

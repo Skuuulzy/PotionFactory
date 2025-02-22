@@ -177,6 +177,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2887850016876806838}
+  - component: {fileID: -105367084222187842}
+  - component: {fileID: -3275921697243377459}
   m_Layer: 0
   m_Name: Mixer3D
   m_TagString: Untagged
@@ -207,6 +209,46 @@ Transform:
   - {fileID: 499283919267849388}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &-105367084222187842
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2546896531206445068}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce08283f96b545eb8196618cb9c92dfe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _outline: {fileID: 5965967907881026788, guid: 113670807ae43d94d9e624eb601fbbe4,
+    type: 3}
+  _outlineWidth: 8
+  _outlineColor: {r: 1, g: 1, b: 1, a: 1}
+  _renderersToOutline: []
+  _bluePrintMaterial: {fileID: 2100000, guid: f679eacbf2287a84d8cccf4d6c777fa2, type: 2}
+  _placableColor: {r: 0.60784316, g: 0.9647059, b: 1, a: 0.2}
+  _unPlacableColor: {r: 1, g: 0.6784314, b: 0.6784314, a: 0.2}
+  _renderersToBlueprint: []
+--- !u!114 &-3275921697243377459
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2546896531206445068}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  outlineMode: 0
+  outlineColor: {r: 1, g: 1, b: 1, a: 1}
+  outlineWidth: 2
+  renderers: []
+  precomputeOutline: 0
+  bakeKeys: []
+  bakeValues: []
 --- !u!1 &2619079208394792898
 GameObject:
   m_ObjectHideFlags: 0
@@ -809,6 +851,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Mixer
+      objectReference: {fileID: 0}
+    - target: {fileID: 6529079669818037849, guid: 6cfc66b45996af64ba07ded4a8d31eba,
+        type: 3}
+      propertyPath: m_TagString
+      value: Outlined
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

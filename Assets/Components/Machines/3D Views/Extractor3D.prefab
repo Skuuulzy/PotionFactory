@@ -9,6 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8601786384891474986}
+  - component: {fileID: 1947047820054689510}
+  - component: {fileID: 959801781409915760}
   m_Layer: 0
   m_Name: Extractor3D
   m_TagString: Untagged
@@ -33,6 +35,53 @@ Transform:
   - {fileID: 573403938258988652}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1947047820054689510
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5776661972514393347}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce08283f96b545eb8196618cb9c92dfe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _outline: {fileID: 5965967907881026788, guid: 113670807ae43d94d9e624eb601fbbe4,
+    type: 3}
+  _outlineWidth: 8
+  _outlineColor: {r: 1, g: 1, b: 1, a: 1}
+  _renderersToOutline:
+  - {fileID: 8863245134799431458}
+  - {fileID: 1710821421130929411}
+  _bluePrintMaterial: {fileID: 2100000, guid: f679eacbf2287a84d8cccf4d6c777fa2, type: 2}
+  _placableColor: {r: 0.60784316, g: 0.9647059, b: 1, a: 0.2}
+  _unPlacableColor: {r: 1, g: 0.6784314, b: 0.6784314, a: 0.2}
+  _renderersToBlueprint:
+  - {fileID: 8863245134799431458}
+  - {fileID: 1710821421130929411}
+  - {fileID: 6504664023024464043}
+  - {fileID: 5833211830193431901}
+  - {fileID: 4830631470936305240}
+--- !u!114 &959801781409915760
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5776661972514393347}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  outlineMode: 0
+  outlineColor: {r: 1, g: 1, b: 1, a: 1}
+  outlineWidth: 2
+  renderers: []
+  precomputeOutline: 0
+  bakeKeys: []
+  bakeValues: []
 --- !u!1001 &695889706364418281
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -45,11 +94,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Treadmill
-      objectReference: {fileID: 0}
-    - target: {fileID: 366690927311277119, guid: 45f501eccf3b68a449d73fa05c69dc18,
-        type: 3}
-      propertyPath: m_TagString
-      value: Outlined
       objectReference: {fileID: 0}
     - target: {fileID: 1035106463842768517, guid: 45f501eccf3b68a449d73fa05c69dc18,
         type: 3}
@@ -106,11 +150,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7898782783177050915, guid: 45f501eccf3b68a449d73fa05c69dc18,
-        type: 3}
-      propertyPath: m_TagString
-      value: Outlined
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -130,6 +169,18 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 695889706364418281}
   m_PrefabAsset: {fileID: 0}
+--- !u!23 &1710821421130929411 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 2167993957602094570, guid: 45f501eccf3b68a449d73fa05c69dc18,
+    type: 3}
+  m_PrefabInstance: {fileID: 695889706364418281}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &6504664023024464043 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 6047623426721531970, guid: 45f501eccf3b68a449d73fa05c69dc18,
+    type: 3}
+  m_PrefabInstance: {fileID: 695889706364418281}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &5477983596632346336
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -142,11 +193,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Treadmill_End
-      objectReference: {fileID: 0}
-    - target: {fileID: 573912352556485224, guid: 734ca1f1abddb31428ba5db5e497abe8,
-        type: 3}
-      propertyPath: m_TagString
-      value: Outlined
       objectReference: {fileID: 0}
     - target: {fileID: 917927913421459666, guid: 734ca1f1abddb31428ba5db5e497abe8,
         type: 3}
@@ -206,6 +252,12 @@ PrefabInstance:
 --- !u!4 &4663644111794265650 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 917927913421459666, guid: 734ca1f1abddb31428ba5db5e497abe8,
+    type: 3}
+  m_PrefabInstance: {fileID: 5477983596632346336}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &5833211830193431901 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 2086871206660221885, guid: 734ca1f1abddb31428ba5db5e497abe8,
     type: 3}
   m_PrefabInstance: {fileID: 5477983596632346336}
   m_PrefabAsset: {fileID: 0}
@@ -272,11 +324,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Dispancer
       objectReference: {fileID: 0}
-    - target: {fileID: 4241635231609825122, guid: 8b57e00bf6bd2864fa3ddc0e67d8caf0,
-        type: 3}
-      propertyPath: m_TagString
-      value: Outlined
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -285,6 +332,12 @@ PrefabInstance:
 --- !u!4 &7731482784898882637 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3573184545045020120, guid: 8b57e00bf6bd2864fa3ddc0e67d8caf0,
+    type: 3}
+  m_PrefabInstance: {fileID: 6547458464944284053}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &8863245134799431458 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 2440296467169871543, guid: 8b57e00bf6bd2864fa3ddc0e67d8caf0,
     type: 3}
   m_PrefabInstance: {fileID: 6547458464944284053}
   m_PrefabAsset: {fileID: 0}
@@ -300,11 +353,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Treadmill_End (1)
-      objectReference: {fileID: 0}
-    - target: {fileID: 573912352556485224, guid: 734ca1f1abddb31428ba5db5e497abe8,
-        type: 3}
-      propertyPath: m_TagString
-      value: Outlined
       objectReference: {fileID: 0}
     - target: {fileID: 917927913421459666, guid: 734ca1f1abddb31428ba5db5e497abe8,
         type: 3}
@@ -361,6 +409,12 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 734ca1f1abddb31428ba5db5e497abe8, type: 3}
+--- !u!23 &4830631470936305240 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 2086871206660221885, guid: 734ca1f1abddb31428ba5db5e497abe8,
+    type: 3}
+  m_PrefabInstance: {fileID: 6917484999478478309}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &5999627472279491895 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 917927913421459666, guid: 734ca1f1abddb31428ba5db5e497abe8,
