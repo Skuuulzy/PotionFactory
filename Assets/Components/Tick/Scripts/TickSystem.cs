@@ -82,7 +82,6 @@ namespace Components.Tick
         {
             if (TICKABLES.Contains(tickable))
             {
-                Debug.LogError($"You try to add a tickable but it was already found in the tickable list.");
                 return;
             }
             

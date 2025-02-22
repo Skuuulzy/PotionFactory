@@ -39,9 +39,6 @@ namespace Components.Machines
         [SerializeField] private string _uiGameplayDescription;
         [SerializeField] private string _uiLoreDescription;
         [SerializeField] private int _contextMenuHeight = 2;
-        [SerializeField] private bool _canRetrieve = true;
-        [SerializeField] private bool _canMove = true;
-        [SerializeField] private bool _canConfigure = true;
         
         public MachineType Type => _type;
 
@@ -66,9 +63,7 @@ namespace Components.Machines
         public List<UIContextualComponent> ContextualComponents => _contextualComponents;
         public string UIGameplayDescription => _uiGameplayDescription;
         public string UILoreDescription => _uiLoreDescription;
-        public bool CanRetrieve => _canRetrieve;
-        public bool CanMove => _canMove;
-        public bool CanConfigure => _canConfigure;
+
 
         private List<Node> GetNodeInstance()
         {

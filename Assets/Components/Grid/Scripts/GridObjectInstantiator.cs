@@ -59,7 +59,6 @@ namespace Components.Grid
             _inputState = InputState.SELECTION;
 
             MachineManager.OnChangeSelectedMachine += InstantiatePreview;
-            GrimoireButton.OnGrimoireButtonDeselect += HandleGrimoireDeselect;
             
             ResolutionFactoryState.OnResolutionFactoryStateStarted += HandleResolutionFactoryState;
             EndOfDayState.OnEndOfDayStateStarted += HandleShopState;
@@ -68,7 +67,6 @@ namespace Components.Grid
         private void OnDestroy()
         {
             MachineManager.OnChangeSelectedMachine -= InstantiatePreview;
-            GrimoireButton.OnGrimoireButtonDeselect -= HandleGrimoireDeselect;
             
             ResolutionFactoryState.OnResolutionFactoryStateStarted -= HandleResolutionFactoryState;
             EndOfDayState.OnEndOfDayStateStarted -= HandleShopState;
@@ -175,7 +173,13 @@ namespace Components.Grid
             // Check if the machine can be placed on the grid. 
             if (!IsMachinePlacable(chosenCell))
             {
-                return;
+                if (!_currentMachinePreview.Machine.CanOverwrite(chosenCell))
+                {
+                    return;
+                }
+
+                // Retrieve the machine under it.
+                RetrieveMachine(chosenCell.Node.Machine, true);
             }
             
             // Place the current preview on the grid.
@@ -233,7 +237,7 @@ namespace Components.Grid
 
                     if (_currentMachinePreview)
                     {
-                        _currentMachinePreview.UpdateOutlineState(IsMachinePlacable(cell));
+                        _currentMachinePreview.UpdateOutlineState(IsMachinePlacable(cell) || _currentMachinePreview.Machine.CanOverwrite(cell));
                     }
                 }
             }
@@ -277,12 +281,14 @@ namespace Components.Grid
                 {
                     return false;
                 }
+                Debug.Log($"Destroying current preview: {_currentMachinePreview.Machine.Template.Type}");
                 
                 Destroy(_currentMachinePreview.gameObject);
                 _currentMachinePreview = null;
                 _skipFrame = true;
                 
                 OnPreview?.Invoke(false);
+                
             }
 
             return true;
@@ -415,11 +421,6 @@ namespace Components.Grid
         private void HandleShopState(EndOfDayState _)
         {
             _enabled = false;
-        }
-
-        private void HandleGrimoireDeselect()
-        {
-            TryDestroyPreview();
         }
         
         // ------------------------------------------------------------------------- HELPERS -------------------------------------------------------------------------------- 

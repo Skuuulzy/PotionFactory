@@ -18,6 +18,10 @@ MonoBehaviour:
   _uiView: {fileID: 21300000, guid: 75cedda08e6e045498ba6316811961d1, type: 3}
   _gridObjectControllerPrefab: {fileID: 2567407675386972328, guid: 859503caaa5f96242b5ba83dccd721c9,
     type: 3}
+  _canOverwriteOnPlacement: 1
+  _canRetrieve: 0
+  _canMove: 1
+  _canConfigure: 1
   _type: 4
   _gridComponents:
   - {fileID: 1085624917457900550, guid: cff6497d14e847e43888d93eee477349, type: 3}
@@ -44,6 +48,3 @@ MonoBehaviour:
   _uiLoreDescription: Were does it come from ? We do not know yet, but it works why
     bother ?
   _contextMenuHeight: 3
-  _canRetrieve: 0
-  _canMove: 1
-  _canConfigure: 1

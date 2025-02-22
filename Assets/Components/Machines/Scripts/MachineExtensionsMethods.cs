@@ -252,5 +252,26 @@ namespace Components.Machines
             potentialPort = null;
             return false;
         }
+        
+        // ----------------------------------------------------------------------- PLACEMENT -------------------------------------------------------------
+        
+        public static bool CanOverwrite(this Machine machineThatOverwrite, Cell cellToOverwrite)
+        {
+            // If the cell does not contain a machine it cannot be overwritten.
+            if (!cellToOverwrite.ContainsNode)
+            {
+                return false;
+            }
+
+            var machineToOverwrite = cellToOverwrite.Node.Machine;
+
+            // Check if the machine to overwrite can be retrieved and the machine to place can overwrite.
+            if (!machineToOverwrite.Template.CanRetrieve || !machineThatOverwrite.Template.CanOverwriteOnPlacement)
+            {
+                return false;
+            }
+
+            return true;
+        }
     }
 }
