@@ -118,7 +118,7 @@ namespace Components.Grid
             {
                 PlacePreview();
             }
-            if (Input.GetMouseButtonUp(1))
+            if (Input.GetMouseButtonUp(1) || Input.GetKeyUp(KeyCode.Escape))
             {
                 // If we can destroy the preview we go to selection mode.
                 if (TryDestroyPreview())
