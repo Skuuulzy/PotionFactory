@@ -37,7 +37,7 @@ namespace VComponents.InputSystem
             }
         }
 
-        protected void Update()
+        protected virtual void Update()
         {
             if (!IsUsingKeyboard())
             {

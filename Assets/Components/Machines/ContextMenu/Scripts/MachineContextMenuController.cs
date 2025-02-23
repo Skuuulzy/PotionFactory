@@ -53,19 +53,17 @@ namespace Components.Machines.ContextMenu
         
         private void HandleMachineSelected(Machine machine, bool selected)
         {
-            return;
-            
-            if (machine != _controller.Machine)
-            {
-                _window.SetActive(false);
-                return;
-            }
-
-            transform.localPosition = new Vector3(0, machine.Template.ContextMenuHeight, 0);
-            _configureBtn.interactable = machine.Template.CanConfigure;
-            _moveBtn.interactable = machine.Template.CanMove;
-            _retrieveBtn.interactable = machine.Template.CanRetrieve;
-            _window.SetActive(selected);
+            // if (machine != _controller.Machine)
+            // {
+            //     _window.SetActive(false);
+            //     return;
+            // }
+            //
+            // transform.localPosition = new Vector3(0, machine.Template.ContextMenuHeight, 0);
+            // _configureBtn.interactable = machine.Template.CanConfigure;
+            // _moveBtn.interactable = machine.Template.CanMove;
+            // _retrieveBtn.interactable = machine.Template.CanRetrieve;
+            // _window.SetActive(selected);
         }
 
         public void ConfigureMachine()

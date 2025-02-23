@@ -52,8 +52,10 @@ namespace VComponents.InputSystem.Examples
             UnsubscribeFromAction(JUMP_ACTION_NAME, OnJump);
         }
 
-        private void Update()
+        protected override void Update()
         {
+            base.Update();
+            
             if (!IsActionMapEnabled(LEVEL_ACTION_MAP_NAME))
             {
                 return;
