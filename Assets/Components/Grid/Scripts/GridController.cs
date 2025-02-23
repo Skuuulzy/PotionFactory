@@ -409,8 +409,6 @@ namespace Components.Grid
 			{
 				//Add ingredient as special ingredient 
 				var ingredient = selectedIngredients.Dequeue();
-
-
 				behavior.SetFavoriteIngredient(ingredient);
 			}
 		}

@@ -7,20 +7,10 @@ namespace Components.Machines.Behaviors
     public class MarchandMachineBehaviour : MachineBehavior
     {
         public IngredientTemplate FavoriteIngredient { get; private set; }
-        public Action<IngredientTemplate> OnSpecialIngredientChanged;
         
         public MarchandMachineBehaviour(Machine machine) : base(machine) { }
 
-        public static Action<IngredientTemplate> OnIngredientSold;
-        public void SetFavoriteIngredient(IngredientTemplate specialIngredient)
-        {
-            //Clear it for now 
-            FavoriteIngredient = null;
-            return;
-
-            FavoriteIngredient = specialIngredient;
-            OnSpecialIngredientChanged?.Invoke(specialIngredient);
-        }
+        public static Action<MarchandMachineBehaviour ,IngredientTemplate> OnIngredientSold;
         
         protected override void ProcessAction()
         {
@@ -44,14 +34,21 @@ namespace Components.Machines.Behaviors
                 {
 					sellPrice += ingredientTemplate.Price;
 				}
-				OnIngredientSold?.Invoke(ingredientTemplate);
+
+                OnIngredientSold?.Invoke(this, ingredientTemplate);
             }
             
             EconomyController.Instance.AddScore(sellPrice);
-            Machine.OnItemSell?.Invoke();
             
             // Clear the machine items
             Machine.ClearSlot(Way.IN);
+        }
+        
+        //public Action<IngredientTemplate> OnSpecialIngredientChanged;
+        public void SetFavoriteIngredient(IngredientTemplate specialIngredient)
+        {
+            // FavoriteIngredient = specialIngredient;
+            // OnSpecialIngredientChanged?.Invoke(specialIngredient);
         }
     }
 }

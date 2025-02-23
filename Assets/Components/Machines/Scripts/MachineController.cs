@@ -7,6 +7,8 @@ namespace Components.Machines
 {
     public class MachineController : GridObjectController
     {
+        private static readonly int MACHINE_PROCESSING = Animator.StringToHash(PLAY_MACHINE_ANIM);
+
         [Header("Arrow Preview")]
         [SerializeField] private GameObject _inPreview;
         [SerializeField] private GameObject _outPreview;
@@ -20,12 +22,6 @@ namespace Components.Machines
         private const string PLAY_MACHINE_ANIM = "MachineProcessing";
 
         private List<GameObject> _directionalArrows;
-        
-        private Outline _outline;
-        
-        private Dictionary<Renderer, List<Material>> _originalMaterials;
-        private readonly List<Renderer> _machineRenderers = new();
-        
         private readonly List<MachineGridComponent> _gridComponents = new();
         
         public Machine Machine => _machine;
@@ -62,9 +58,9 @@ namespace Components.Machines
 
         private void HandleProcessMachine(Machine machine, bool value)
 		{
-            if(machine == Machine && _animator != null)
+            if(machine == Machine && _animator)
 			{
-                _animator.SetBool(PLAY_MACHINE_ANIM, value);
+                _animator.SetBool(MACHINE_PROCESSING, value);
             }
         }
 

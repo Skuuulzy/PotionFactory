@@ -13,7 +13,7 @@ namespace Components.Machines
     public class Machine : ITickable
     {
         // ----------------------------------------------------------------------- PRIVATE FIELDS -------------------------------------------------------------------------
-        // TODO: Should be a dictionary ?
+        
         [SerializeField] private List<IngredientTemplate> _inIngredients;
         [SerializeField] private List<IngredientTemplate> _outIngredients;
         [SerializeField] private List<Node> _nodes;
@@ -30,7 +30,6 @@ namespace Components.Machines
         public MachineBehavior Behavior => _behavior;
         public List<IngredientTemplate> InIngredients => _inIngredients;
         public List<IngredientTemplate> OutIngredients => _outIngredients;
-        public List<IngredientTemplate> AllIngredients => _inIngredients.Concat(_outIngredients).ToList();
         public virtual List<Node> Nodes => _nodes;
 
         // ------------------------------------------------------------------------- ACTIONS -------------------------------------------------------------------------
@@ -41,9 +40,7 @@ namespace Components.Machines
         public static Action<Machine, bool> OnHovered;
         public static Action<Machine> OnConfigure;
         public static Action<Machine, bool> OnProcess;
-
-        // TODO: This should not be here, some machine have specific event linked with specifics views.
-        public Action OnItemSell;
+        
         public int Rotation { get; private set; }
         
         // --------------------------------------------------------------------- INITIALISATION -------------------------------------------------------------------------

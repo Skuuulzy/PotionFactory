@@ -1,11 +1,9 @@
 using Components.Bundle;
-using Components.Economy;
 using Components.Ingredients;
 using Components.Machines;
 using Components.Machines.Behaviors;
 using Components.Shop.ShopItems;
 using SoWorkflow.SharedValues;
-using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -42,7 +40,7 @@ public class UIGameOverController : MonoBehaviour
 	{
         GameOverState.OnGameOverStarted += HandleGameOver;
         BundleChoiceGenerator.OnBundleChoiceConfirm += HandleBundleChoice;
-		UIIngredientShopItemViewController.OnIngredientBuyed += HandleIngredientBuyed;
+		UIIngredientShopItemViewController.OnIngredientBuyed += HandleIngredientBuy;
 		MarchandMachineBehaviour.OnIngredientSold += HandleIngredientSold;
 		UIMachineShopItemViewController.OnMachineBuyed += HandleMachineAdded;
 	}
@@ -51,13 +49,11 @@ public class UIGameOverController : MonoBehaviour
 	{
         GameOverState.OnGameOverStarted -= HandleGameOver;
         BundleChoiceGenerator.OnBundleChoiceConfirm -= HandleBundleChoice;
-        UIIngredientShopItemViewController.OnIngredientBuyed -= HandleIngredientBuyed;
+        UIIngredientShopItemViewController.OnIngredientBuyed -= HandleIngredientBuy;
         MarchandMachineBehaviour.OnIngredientSold -= HandleIngredientSold;
 		UIMachineShopItemViewController.OnMachineBuyed -= HandleMachineAdded;
 
 	}
-
-
 
     private void HandleGameOver(GameOverState state)
 	{
@@ -138,15 +134,15 @@ public class UIGameOverController : MonoBehaviour
 			_startingIngredientBundle = bundle;
 		}
 	}
-    private void HandleIngredientBuyed(IngredientTemplate template)
+    private void HandleIngredientBuy(IngredientTemplate template)
     {
 		_otherIngredientsList.Add(template);
     }
 
-    private void HandleIngredientSold(IngredientTemplate template)
+    private void HandleIngredientSold(MarchandMachineBehaviour _, IngredientTemplate ingredientTemplate)
 	{
-		_recipesSold.TryAdd(template,0);
-		_recipesSold[template]++;
+		_recipesSold.TryAdd(ingredientTemplate, 0);
+		_recipesSold[ingredientTemplate]++;
 	}
 
 	private void HandleMachineAdded(MachineTemplate template)

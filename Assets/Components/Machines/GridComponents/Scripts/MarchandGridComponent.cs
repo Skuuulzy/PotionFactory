@@ -1,4 +1,6 @@
 using System.Collections;
+using Components.Ingredients;
+using Components.Machines.Behaviors;
 using UnityEngine;
 
 namespace Components.Machines
@@ -8,19 +10,30 @@ namespace Components.Machines
         [SerializeField] private Transform _sellFeedbackHolder;
         [SerializeField] private GameObject _sellFeedback;
 
+        private MarchandMachineBehaviour _marchandBehaviour;
+        
         protected override void SetUp()
         {
-            Machine.OnItemSell += ShowSellFeedback;
+            if (Machine.Behavior is MarchandMachineBehaviour marchandBehaviour)
+            {
+                _marchandBehaviour = marchandBehaviour;
+                MarchandMachineBehaviour.OnIngredientSold += ShowSellFeedback;
+            }
         }
 
         private void OnDestroy()
         {
-            Machine.OnItemSell -= ShowSellFeedback;
+            MarchandMachineBehaviour.OnIngredientSold -= ShowSellFeedback;
         }
         
         // ------------------------------------------------------------------------- SELL FEEDBACK -----------------------------------------------------------------------------
-        private void ShowSellFeedback()
+        private void ShowSellFeedback(MarchandMachineBehaviour sender, IngredientTemplate ingredientTemplate)
         {
+            if (_marchandBehaviour != sender)
+            {
+                return;
+            }
+            
             // TODO: Change for pool system
             var feedback = Instantiate(_sellFeedback, _sellFeedbackHolder);
             StartCoroutine(DestroyAfter(feedback, 1f));
