@@ -135,21 +135,19 @@ namespace Components.Machines
             Machine.OnSelected -= HandleMachineSelected;
             Machine.OnHovered -= HandleMachineHovered;
         }
-
-        // ------------------------------------------------------------------------- CONTEXTUAL ACTIONS ---------------------------------------------------------------
-
-        public void Configure()
-        {
-            Machine.OnConfigure?.Invoke(Machine);
-        }
         
         // ------------------------------------------------------------------------- HANDLERS -------------------------------------------------------------------------
         private void HandleMachineSelected(Machine machine, bool selected)
         {
+            if (!this)
+            {
+                return;
+            }
+            
             if (Machine != machine)
             {
-                ToggleDirectionalArrows(false);
                 GridObjectView.ToggleBlueprintMaterials(false);
+                ToggleDirectionalArrows(false);
                 return;
             }
 
@@ -159,6 +157,11 @@ namespace Components.Machines
         
         private void HandleMachineHovered(Machine machine, bool hovered)
         {
+            if (!this)
+            {
+                return;
+            }
+            
             if (Machine != machine)
             {
                 GridObjectView.ToggleHoverOutlines(false);
@@ -193,11 +196,6 @@ namespace Components.Machines
         
         private void ToggleDirectionalArrows(bool toggle)
         {
-            if (!this)
-            {
-                return;
-            }
-            
             for (int i = 0; i < _directionalArrows.Count; i++)
             {
                 _directionalArrows[i].SetActive(toggle);

@@ -70,7 +70,7 @@ namespace Components.Machines.ContextMenu
 
         public void ConfigureMachine()
         {
-            _controller.Configure();
+            _controller.Machine.Configure();
         }
     }
 }

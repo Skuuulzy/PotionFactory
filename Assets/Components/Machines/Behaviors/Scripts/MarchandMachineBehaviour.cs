@@ -16,11 +16,11 @@ namespace Components.Machines.Behaviors
         {
             if (Machine.InIngredients.Count == 0)
             {
-                Machine.OnProcess?.Invoke(Machine, false);
+                Machine.Process(false);
                 return;
             }
 
-            Machine.OnProcess?.Invoke(Machine, true);
+            Machine.Process(true);
 
             // Sell items
             int sellPrice = 0;

@@ -54,19 +54,38 @@ namespace Components.Grid
             
             foreach (var machineRenderer in _renderersToBlueprint)
             {
-                List<Material> materialsToApply = toggle ? new List<Material> {_bluePrintMaterial} : _originalMaterials[machineRenderer];
+                var materialsToApply = new List<Material>();
+
+                if (toggle)
+                {
+                    // We need to apply the same amount of materials if the renderer have multiple materials.
+                    for (int i = 0; i < _originalMaterials[machineRenderer].Count; i++)
+                    {
+                        materialsToApply.Add(_bluePrintMaterial);
+                    }
+                }
+                else
+                {
+                    materialsToApply = _originalMaterials[machineRenderer];
+                }
+                
+                // Applying materials
                 machineRenderer.SetMaterials(materialsToApply);
                 
-                // Caching blueprint materials
-                var materialsInstances = new List<Material>();
-                machineRenderer.GetMaterials(materialsInstances);
-                _bluePrintMaterialInstances.AddRange(materialsInstances);
-            }
-
-            // If we toggle the blueprints materials, set the first state as placable.
-            if (toggle)
-            {
-                UpdateBlueprintColor(true);
+                // Caching used blueprint materials to update their colors.
+                if (toggle)
+                {
+                    var materialsInstances = new List<Material>();
+                    machineRenderer.GetMaterials(materialsInstances);
+                    _bluePrintMaterialInstances.AddRange(materialsInstances);
+                    
+                    // If we toggle the blueprints materials, set the first state as placable.
+                    UpdateBlueprintColor(true);
+                }
+                else
+                {
+                    _bluePrintMaterialInstances.Clear();
+                }
             }
         }
         

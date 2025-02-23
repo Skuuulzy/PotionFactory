@@ -19,36 +19,33 @@ namespace Components.Machines
         [SerializeField] private List<Node> _nodes;
         
         [SerializeField, ReadOnly] private MachineController _controller;
-        
-        private MachineBehavior _behavior;
-        private readonly MachineTemplate _template;
+
         private int _outMachineTickCount;
         
-        // ----------------------------------------------------------------------- PUBLIC FIELDS -------------------------------------------------------------------------
-        public MachineTemplate Template => _template;
+        // ----------------------------------------------------------------------- GETTERS -------------------------------------------------------------------------
+        
+        public MachineBehavior Behavior { get; }
+        public MachineTemplate Template { get; }
+        public int Rotation { get; private set; }
+
         public MachineController Controller => _controller;
-        public MachineBehavior Behavior => _behavior;
         public List<IngredientTemplate> InIngredients => _inIngredients;
         public List<IngredientTemplate> OutIngredients => _outIngredients;
         public virtual List<Node> Nodes => _nodes;
 
         // ------------------------------------------------------------------------- ACTIONS -------------------------------------------------------------------------
-        public Action OnTick;
-        public Action OnPropagateTick;
-        public Action OnSlotUpdated;
-        public static Action<Machine, bool> OnSelected;
-        public static Action<Machine, bool> OnHovered;
-        public static Action<Machine> OnConfigure;
-        public static Action<Machine, bool> OnProcess;
-        
-        public int Rotation { get; private set; }
+        public event Action OnSlotUpdated;
+        public static event Action<Machine, bool> OnSelected;
+        public static event Action<Machine, bool> OnHovered;
+        public static event Action<Machine> OnConfigure;
+        public static event Action<Machine, bool> OnProcess;
         
         // --------------------------------------------------------------------- INITIALISATION -------------------------------------------------------------------------
         
         public Machine(MachineTemplate template, MachineController controller)
         {
-            _template = template;
-            _behavior = GetBehavior(template.Type);
+            Template = template;
+            Behavior = GetBehavior(template.Type);
             _controller = controller;
 
             UpdateNodesRotation(0);
@@ -85,6 +82,28 @@ namespace Components.Machines
         public void UpdateNodesRotation(int rotation)
         {
             ReplaceNodesViaRotation(rotation, true);
+        }
+        
+        // ------------------------------------------------------------------------- EVENT RAISERS -------------------------------------------------------------------------
+        
+        public void Select(bool select)
+        {
+            OnSelected?.Invoke(this, select);
+        }
+
+        public void Hover(bool hovered)
+        {
+            OnHovered?.Invoke(this, hovered);
+        }
+        
+        public void Configure()
+        {
+            OnConfigure?.Invoke(this);
+        }
+
+        public void Process(bool process)
+        {
+            OnProcess?.Invoke(this, process);
         }
         
         // ------------------------------------------------------------------------- NODES -------------------------------------------------------------------------
@@ -161,7 +180,55 @@ namespace Components.Machines
             return false;
         }
 
+        // ------------------------------------------------------------------------- TICK -------------------------------------------------------------------------
+        
+        public void Tick()
+        {
+            Behavior.Execute();
+
+            // Propagate tick
+            if (TryGetInMachine(out List<Machine> previousMachines))
+            {
+                foreach (var previousMachine in previousMachines)
+                {
+                    previousMachine.PropagateTick();
+                }
+            }
+        }
+        
+        public void PropagateTick()
+        {
+            if (!TryGetOutMachines(out var connectedMachines))
+            {
+                return;            
+            }
+
+            _outMachineTickCount++;
+            
+            // The machine has not received the propagation of all his next machine.
+            if (_outMachineTickCount < connectedMachines.Count)
+            {
+                return;
+            }
+            
+            _outMachineTickCount = 0;
+            
+            Behavior.Execute();
+
+            // Propagate tick
+            if (!TryGetInMachine(out List<Machine> previousMachines))
+            {
+                return;
+            }
+            
+            foreach (var previousMachine in previousMachines)
+            {
+                previousMachine.PropagateTick();
+            }
+        }
+        
         // ------------------------------------------------------------------------- TICK CHAIN ----------------------------------------------------------------------------
+        
         public void AddMachineToChain()
         {
             bool hasInMachine = TryGetInMachine(out List<Machine> inMachines);
@@ -344,53 +411,6 @@ namespace Components.Machines
             int remainingSlot = Template.InSlotIngredientCount - _inIngredients.GroupedByTypeAndCount().Count;
             return remainingSlot < 0 ? 0 : remainingSlot;
         }
-
-        // ------------------------------------------------------------------------- TICK -------------------------------------------------------------------------
-        
-        public void Tick()
-        {
-            Behavior.Execute();
-            OnTick?.Invoke();
-            // Propagate tick
-            if (TryGetInMachine(out List<Machine> previousMachines))
-            {
-                foreach (var previousMachine in previousMachines)
-                {
-                    previousMachine.PropagateTick();
-                }
-            }
-        }
-        
-        public void PropagateTick()
-        {
-            if (!TryGetOutMachines(out var connectedMachines))
-            {
-                return;            
-            }
-
-            _outMachineTickCount++;
-            
-            // The machine has not received the propagation of all his next machine.
-            if (_outMachineTickCount < connectedMachines.Count)
-            {
-                return;
-            }
-            
-            _outMachineTickCount = 0;
-            
-            Behavior.Execute();
-
-            // Propagate tick
-            if (!TryGetInMachine(out List<Machine> previousMachines))
-            {
-                return;
-            }
-            
-            foreach (var previousMachine in previousMachines)
-            {
-                previousMachine.PropagateTick();
-            }
-        }
         
         // ------------------------------------------------------------------- PORTS & ROTATIONS -------------------------------------------------------------------------
         
@@ -406,24 +426,13 @@ namespace Components.Machines
             // The machine has no rotation so the ports are the base one.
             if (angle == 0)
             {
-                _nodes = _template.Nodes;
+                _nodes = Template.Nodes;
                 
                 return;
             }
 
             _nodes = Template.Nodes.RotateNodes(angle);
             Rotation = angle;
-        }
-        // ------------------------------------------------------------------------- SELECT BEHAVIOUR -------------------------------------------------------------------------
-        
-        public void Select(bool select)
-        {
-            OnSelected?.Invoke(this, select);
-        }
-
-        public void Hover(bool hovered)
-        {
-            OnHovered?.Invoke(this, hovered);
         }
     }
 }
