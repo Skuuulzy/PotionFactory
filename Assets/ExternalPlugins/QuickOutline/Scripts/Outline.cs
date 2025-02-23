@@ -82,12 +82,12 @@ public class Outline : MonoBehaviour
 
     private bool needsUpdate;
 
-    public void Initialize(List<Renderer> renderersToOutline)
+    public bool Initialized(List<Renderer> renderersToOutline)
     {
         if (renderersToOutline.Count == 0)
         {
-            enabled = false;
-            return;
+            Destroy(this);
+            return false;
         }
         
         renderers = renderersToOutline.ToArray();
@@ -104,6 +104,8 @@ public class Outline : MonoBehaviour
 
         // Apply material properties immediately
         needsUpdate = true;
+
+        return true;
     }
 
     private void OnEnable()

@@ -49,11 +49,13 @@ MonoBehaviour:
   _outline: {fileID: 5965967907881026788}
   _outlineWidth: 8
   _outlineColor: {r: 1, g: 1, b: 1, a: 1}
-  _renderersToOutline: []
+  _renderersToOutline:
+  - {fileID: 624652935593068831}
   _bluePrintMaterial: {fileID: 2100000, guid: f679eacbf2287a84d8cccf4d6c777fa2, type: 2}
   _placableColor: {r: 0.60784316, g: 0.9647059, b: 1, a: 0.2}
-  _unPlacableColor: {r: 1, g: 0.6784314, b: 0.6784314, a: 0.2}
-  _renderersToBlueprint: []
+  _unPlacableColor: {r: 1, g: 0.6784314, b: 0.6784314, a: 0.6039216}
+  _renderersToBlueprint:
+  - {fileID: 624652935593068831}
 --- !u!114 &5965967907881026788
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -61,7 +63,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1691528847705169943}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
   m_Name: 
@@ -138,16 +140,17 @@ PrefabInstance:
       propertyPath: m_Name
       value: Treadmill_Turn_R
       objectReference: {fileID: 0}
-    - target: {fileID: 3023624925635077388, guid: 06bbb089bd0c3bd4bb501b836bdcac7e,
-        type: 3}
-      propertyPath: m_TagString
-      value: Outlined
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 06bbb089bd0c3bd4bb501b836bdcac7e, type: 3}
+--- !u!23 &624652935593068831 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 3672384958683497689, guid: 06bbb089bd0c3bd4bb501b836bdcac7e,
+    type: 3}
+  m_PrefabInstance: {fileID: 4205755261689744838}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1792461606784987760 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2503370775668375478, guid: 06bbb089bd0c3bd4bb501b836bdcac7e,

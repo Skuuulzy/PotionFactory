@@ -221,15 +221,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce08283f96b545eb8196618cb9c92dfe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _outline: {fileID: 5965967907881026788, guid: 113670807ae43d94d9e624eb601fbbe4,
-    type: 3}
+  _outline: {fileID: -3275921697243377459}
   _outlineWidth: 8
   _outlineColor: {r: 1, g: 1, b: 1, a: 1}
-  _renderersToOutline: []
+  _renderersToOutline:
+  - {fileID: 7356215578621816966}
+  - {fileID: 4345905885974493075}
   _bluePrintMaterial: {fileID: 2100000, guid: f679eacbf2287a84d8cccf4d6c777fa2, type: 2}
   _placableColor: {r: 0.60784316, g: 0.9647059, b: 1, a: 0.2}
-  _unPlacableColor: {r: 1, g: 0.6784314, b: 0.6784314, a: 0.2}
-  _renderersToBlueprint: []
+  _unPlacableColor: {r: 1, g: 0.6784314, b: 0.6784314, a: 0.6039216}
+  _renderersToBlueprint:
+  - {fileID: 7356215578621816966}
+  - {fileID: 4345905885974493075}
+  - {fileID: 3535278239770301823}
 --- !u!114 &-3275921697243377459
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -787,11 +791,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2887850016876806838}
     m_Modifications:
-    - target: {fileID: 700851935109265827, guid: 6cfc66b45996af64ba07ded4a8d31eba,
-        type: 3}
-      propertyPath: m_TagString
-      value: Outlined
-      objectReference: {fileID: 0}
     - target: {fileID: 3052010070170225435, guid: 6cfc66b45996af64ba07ded4a8d31eba,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -842,20 +841,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5282061513898489555, guid: 6cfc66b45996af64ba07ded4a8d31eba,
-        type: 3}
-      propertyPath: m_TagString
-      value: Outlined
-      objectReference: {fileID: 0}
     - target: {fileID: 5589199154165053587, guid: 6cfc66b45996af64ba07ded4a8d31eba,
         type: 3}
       propertyPath: m_Name
       value: Mixer
-      objectReference: {fileID: 0}
-    - target: {fileID: 6529079669818037849, guid: 6cfc66b45996af64ba07ded4a8d31eba,
-        type: 3}
-      propertyPath: m_TagString
-      value: Outlined
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -865,6 +854,24 @@ PrefabInstance:
 --- !u!4 &499283919267849388 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3052010070170225435, guid: 6cfc66b45996af64ba07ded4a8d31eba,
+    type: 3}
+  m_PrefabInstance: {fileID: 3222108832309129143}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &3535278239770301823 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 2141723570030672584, guid: 6cfc66b45996af64ba07ded4a8d31eba,
+    type: 3}
+  m_PrefabInstance: {fileID: 3222108832309129143}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &4345905885974493075 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 1223000570045323300, guid: 6cfc66b45996af64ba07ded4a8d31eba,
+    type: 3}
+  m_PrefabInstance: {fileID: 3222108832309129143}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &7356215578621816966 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 5377788274446016305, guid: 6cfc66b45996af64ba07ded4a8d31eba,
     type: 3}
   m_PrefabInstance: {fileID: 3222108832309129143}
   m_PrefabAsset: {fileID: 0}

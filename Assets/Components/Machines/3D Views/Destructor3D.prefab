@@ -140,14 +140,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce08283f96b545eb8196618cb9c92dfe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _outline: {fileID: 5965967907881026788, guid: 113670807ae43d94d9e624eb601fbbe4,
-    type: 3}
+  _outline: {fileID: 6581490107482058323}
   _outlineWidth: 8
   _outlineColor: {r: 1, g: 1, b: 1, a: 1}
-  _renderersToOutline: []
+  _renderersToOutline:
+  - {fileID: 8353929909639245515}
+  - {fileID: 7195839785489171587}
   _bluePrintMaterial: {fileID: 2100000, guid: f679eacbf2287a84d8cccf4d6c777fa2, type: 2}
   _placableColor: {r: 0.60784316, g: 0.9647059, b: 1, a: 0.2}
-  _unPlacableColor: {r: 1, g: 0.6784314, b: 0.6784314, a: 0.2}
+  _unPlacableColor: {r: 1, g: 0.6784314, b: 0.6784314, a: 0.6039216}
   _renderersToBlueprint: []
 --- !u!114 &6581490107482058323
 MonoBehaviour:
@@ -937,11 +938,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Merger
       objectReference: {fileID: 0}
-    - target: {fileID: 241426667999315381, guid: 8a2856561b0280b4ebad2d5774aa7504,
-        type: 3}
-      propertyPath: m_TagString
-      value: Outlined
-      objectReference: {fileID: 0}
     - target: {fileID: 581642656582967055, guid: 8a2856561b0280b4ebad2d5774aa7504,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1007,6 +1003,12 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8a2856561b0280b4ebad2d5774aa7504, type: 3}
+--- !u!23 &7195839785489171587 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 1754508531639805024, guid: 8a2856561b0280b4ebad2d5774aa7504,
+    type: 3}
+  m_PrefabInstance: {fileID: 8900667703409041635}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &8329388768904314860 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 581642656582967055, guid: 8a2856561b0280b4ebad2d5774aa7504,
@@ -1025,11 +1027,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Character_3D_01
-      objectReference: {fileID: 0}
-    - target: {fileID: 2853379076306863026, guid: 49692f9f4a8c6374abf015b192c045a0,
-        type: 3}
-      propertyPath: m_TagString
-      value: Outlined
       objectReference: {fileID: 0}
     - target: {fileID: 2937032370332336177, guid: 49692f9f4a8c6374abf015b192c045a0,
         type: 3}
@@ -1109,6 +1106,12 @@ PrefabInstance:
 --- !u!4 &6325695883908513286 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2937032370332336177, guid: 49692f9f4a8c6374abf015b192c045a0,
+    type: 3}
+  m_PrefabInstance: {fileID: 9154425532492807735}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &8353929909639245515 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 928888833094783228, guid: 49692f9f4a8c6374abf015b192c045a0,
     type: 3}
   m_PrefabInstance: {fileID: 9154425532492807735}
   m_PrefabAsset: {fileID: 0}

@@ -46,15 +46,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce08283f96b545eb8196618cb9c92dfe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _outline: {fileID: 5965967907881026788, guid: 113670807ae43d94d9e624eb601fbbe4,
-    type: 3}
+  _outline: {fileID: -870508903573206967}
   _outlineWidth: 8
   _outlineColor: {r: 1, g: 1, b: 1, a: 1}
-  _renderersToOutline: []
+  _renderersToOutline:
+  - {fileID: 2787812437640620932}
   _bluePrintMaterial: {fileID: 2100000, guid: f679eacbf2287a84d8cccf4d6c777fa2, type: 2}
   _placableColor: {r: 0.60784316, g: 0.9647059, b: 1, a: 0.2}
-  _unPlacableColor: {r: 1, g: 0.6784314, b: 0.6784314, a: 0.2}
-  _renderersToBlueprint: []
+  _unPlacableColor: {r: 1, g: 0.6784314, b: 0.6784314, a: 0.6039216}
+  _renderersToBlueprint:
+  - {fileID: 2787812437640620932}
 --- !u!114 &-870508903573206967
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -86,11 +87,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Splitter
-      objectReference: {fileID: 0}
-    - target: {fileID: 3597164067675005921, guid: a82e91a24c33b0f408ca4b16f98d78e8,
-        type: 3}
-      propertyPath: m_TagString
-      value: Outlined
       objectReference: {fileID: 0}
     - target: {fileID: 4224483127497668955, guid: a82e91a24c33b0f408ca4b16f98d78e8,
         type: 3}
@@ -147,6 +143,12 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a82e91a24c33b0f408ca4b16f98d78e8, type: 3}
+--- !u!23 &2787812437640620932 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 3092651163560886836, guid: a82e91a24c33b0f408ca4b16f98d78e8,
+    type: 3}
+  m_PrefabInstance: {fileID: 890306988788083120}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &3961866368162451691 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4224483127497668955, guid: a82e91a24c33b0f408ca4b16f98d78e8,

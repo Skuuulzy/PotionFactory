@@ -46,15 +46,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce08283f96b545eb8196618cb9c92dfe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _outline: {fileID: 5965967907881026788, guid: 113670807ae43d94d9e624eb601fbbe4,
-    type: 3}
+  _outline: {fileID: 2351396778501400422}
   _outlineWidth: 8
   _outlineColor: {r: 1, g: 1, b: 1, a: 1}
-  _renderersToOutline: []
+  _renderersToOutline:
+  - {fileID: 7716768499726284005}
   _bluePrintMaterial: {fileID: 2100000, guid: f679eacbf2287a84d8cccf4d6c777fa2, type: 2}
   _placableColor: {r: 0.60784316, g: 0.9647059, b: 1, a: 0.2}
-  _unPlacableColor: {r: 1, g: 0.6784314, b: 0.6784314, a: 0.2}
-  _renderersToBlueprint: []
+  _unPlacableColor: {r: 1, g: 0.6784314, b: 0.6784314, a: 0.6039216}
+  _renderersToBlueprint:
+  - {fileID: 7716768499726284005}
+  - {fileID: 2804689661637316941}
 --- !u!114 &2351396778501400422
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -86,11 +88,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Treadmill
-      objectReference: {fileID: 0}
-    - target: {fileID: 366690927311277119, guid: 45f501eccf3b68a449d73fa05c69dc18,
-        type: 3}
-      propertyPath: m_TagString
-      value: Outlined
       objectReference: {fileID: 0}
     - target: {fileID: 1035106463842768517, guid: 45f501eccf3b68a449d73fa05c69dc18,
         type: 3}
@@ -147,6 +144,18 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 45f501eccf3b68a449d73fa05c69dc18, type: 3}
+--- !u!23 &2804689661637316941 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 6047623426721531970, guid: 45f501eccf3b68a449d73fa05c69dc18,
+    type: 3}
+  m_PrefabInstance: {fileID: 8431084935272143119}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &7716768499726284005 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 2167993957602094570, guid: 45f501eccf3b68a449d73fa05c69dc18,
+    type: 3}
+  m_PrefabInstance: {fileID: 8431084935272143119}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &8889073000008388490 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1035106463842768517, guid: 45f501eccf3b68a449d73fa05c69dc18,

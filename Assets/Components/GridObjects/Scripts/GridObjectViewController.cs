@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Components.Grid
@@ -21,31 +22,15 @@ namespace Components.Grid
         private static readonly int GHOST_COLOR = Shader.PropertyToID("_Ghost_Color");
         private Dictionary<Renderer,List<Material>> _originalMaterials;
         private List<Material> _bluePrintMaterialInstances;
+        private bool _outlineSetup;
 
         private void Awake()
         {
-            SetupOutlines();
             SetupBlueprintRenderers();
+            SetupOutlines();
         }
 
         // ------------------------------------------------------------------------- BLUEPRINTS -----------------------------------------------------------------------------
-        
-        public void ToggleBlueprintMaterials(bool toggle)
-        {
-            _bluePrintMaterialInstances = new List<Material>();
-            
-            foreach (var machineRenderer in _renderersToBlueprint)
-            {
-                List<Material> materialsToApply = toggle ? new List<Material> {_bluePrintMaterial} : _originalMaterials[machineRenderer];
-                machineRenderer.SetMaterials(materialsToApply);
-                Debug.Log($"Applying blueprints on {machineRenderer.name}: {toggle}");
-                
-                // Caching blueprint materials
-                var materialsInstances = new List<Material>();
-                machineRenderer.GetMaterials(materialsInstances);
-                _bluePrintMaterialInstances.AddRange(materialsInstances);
-            }
-        }
         
         private void SetupBlueprintRenderers()
         {
@@ -63,6 +48,28 @@ namespace Components.Grid
             }
         }
         
+        public void ToggleBlueprintMaterials(bool toggle)
+        {
+            _bluePrintMaterialInstances = new List<Material>();
+            
+            foreach (var machineRenderer in _renderersToBlueprint)
+            {
+                List<Material> materialsToApply = toggle ? new List<Material> {_bluePrintMaterial} : _originalMaterials[machineRenderer];
+                machineRenderer.SetMaterials(materialsToApply);
+                
+                // Caching blueprint materials
+                var materialsInstances = new List<Material>();
+                machineRenderer.GetMaterials(materialsInstances);
+                _bluePrintMaterialInstances.AddRange(materialsInstances);
+            }
+
+            // If we toggle the blueprints materials, set the first state as placable.
+            if (toggle)
+            {
+                UpdateBlueprintColor(true);
+            }
+        }
+        
         public void UpdateBlueprintColor(bool placable)
         {
             foreach (var bluePrintMaterial in _bluePrintMaterialInstances)
@@ -75,15 +82,22 @@ namespace Components.Grid
         
         private void SetupOutlines()
         {
+            if (!_outline.Initialized(_renderersToOutline)) 
+                return;
+            
             _outline.OutlineWidth = _outlineWidth;
             _outline.OutlineColor = _outlineColor;
-            _outline.Initialize(_renderersToOutline);
+            _outlineSetup = true;
+            
+            ToggleHoverOutlines(false);
         }
         
         public void ToggleHoverOutlines(bool toggle)
         {
-            Debug.Log($"Toggle outline: {toggle}");
-            _outline.enabled = toggle;
+            if (_outlineSetup)
+            {
+                _outline.enabled = toggle;
+            }
         }
     }
 }
