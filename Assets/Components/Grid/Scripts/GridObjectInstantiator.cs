@@ -233,6 +233,7 @@ namespace Components.Grid
                         return;
                     }
 
+                    _currentMachinePreview.gameObject.SetActive(true);
                     _previewHolder.transform.position = cellPosition;
                     _lastCellPosition = cellPosition;
 
@@ -240,6 +241,10 @@ namespace Components.Grid
                     {
                         _currentMachinePreview.UpdateGridViewPlacableState(IsMachinePlacable(cell) || _currentMachinePreview.Machine.CanOverwrite(cell));
                     }
+                }
+                else
+                {
+                    _currentMachinePreview.gameObject.SetActive(false);
                 }
             }
             else
