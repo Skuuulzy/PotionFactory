@@ -1,9 +1,10 @@
+using SoWorkflow.SharedValues;
 using System;
 using UnityEngine;
 
 public class UIOptionsController : MonoBehaviour
 {
-    public static Action<int> OnTickSpeedUpdated;
+    [SerializeField] private SOSharedFloat _currentTickDuration;
     public static Action OnClearGrid;
 
     private bool _canUpdateTickSpeed;
@@ -29,8 +30,7 @@ public class UIOptionsController : MonoBehaviour
 		{
             return;
 		}
-
-        OnTickSpeedUpdated?.Invoke(value);
+        _currentTickDuration.Set(value);
     }
 
     public void ClearGrid()

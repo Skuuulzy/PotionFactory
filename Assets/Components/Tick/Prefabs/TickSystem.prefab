@@ -44,4 +44,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c49f80b71aa547c4c9393c52eb8396ed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _tickDuration: 2
+  _initialTickDuration: 0.2
+  _currentTickDuration: {fileID: 11400000, guid: 6e4214961a7c8e24a84adea814405886,
+    type: 2}
+  _currentTickMultiplier: {fileID: 11400000, guid: 98076d46cfed8f34ab18160865cfcd09,
+    type: 2}
