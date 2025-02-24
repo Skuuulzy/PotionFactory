@@ -48,7 +48,7 @@ namespace Components.Machines
             _localPosition = newPosition;
         }
 
-        public Vector2Int SetGridPosition(Vector2Int originCoordinates)
+        public Vector2Int GetGridPosition(Vector2Int originCoordinates)
         {
             _gridPosition = originCoordinates + _localPosition;
             return _gridPosition;

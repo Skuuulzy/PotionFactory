@@ -28,10 +28,14 @@ namespace Components.Machines
         //Call by machine in player inventory
         public void Select()
         {
+<<<<<<< HEAD
             if(InventoryController.Instance.PlayerMachinesDictionary[_machine] > 0)
+			{
+=======
             if(GrimoireController.Instance.PlayerMachinesDictionary[_machine] > 0)
             {
                 GrimoireController.Instance.DecreaseMachineToPlayerInventory(_machine, 1);
+>>>>>>> main
                 OnSelected?.Invoke(_machine);
             }
         }
