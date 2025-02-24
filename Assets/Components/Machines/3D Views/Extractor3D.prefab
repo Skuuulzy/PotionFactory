@@ -54,17 +54,14 @@ MonoBehaviour:
   - {fileID: 8863245134799431458}
   - {fileID: 1710821421130929411}
   _bluePrintMaterial: {fileID: 2100000, guid: f679eacbf2287a84d8cccf4d6c777fa2, type: 2}
-  _placableColor: {r: 0, g: 0.9100001, b: 1, a: 0.105882354}
-  _unPlacableColor: {r: 1, g: 0, b: 0, a: 0.101960786}
+  _placableColor: {r: 0.60784316, g: 0.9647059, b: 1, a: 0.2}
+  _unPlacableColor: {r: 1, g: 0.6784314, b: 0.6784314, a: 0.6039216}
   _renderersToBlueprint:
   - {fileID: 8863245134799431458}
   - {fileID: 1710821421130929411}
   - {fileID: 6504664023024464043}
   - {fileID: 5833211830193431901}
   - {fileID: 4830631470936305240}
-  _placedObject:
-  - {fileID: 6715039290051052643}
-  - {fileID: 7226814893190806943}
 --- !u!114 &959801781409915760
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -331,18 +328,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8b57e00bf6bd2864fa3ddc0e67d8caf0, type: 3}
---- !u!1 &6715039290051052643 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 571291263646049782, guid: 8b57e00bf6bd2864fa3ddc0e67d8caf0,
-    type: 3}
-  m_PrefabInstance: {fileID: 6547458464944284053}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &7226814893190806943 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 4510340817289944074, guid: 8b57e00bf6bd2864fa3ddc0e67d8caf0,
-    type: 3}
-  m_PrefabInstance: {fileID: 6547458464944284053}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &7731482784898882637 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3573184545045020120, guid: 8b57e00bf6bd2864fa3ddc0e67d8caf0,

@@ -29,9 +29,7 @@ namespace Components.Machines
         public void Select()
         {
             if(InventoryController.Instance.PlayerMachinesDictionary[_machine] > 0)
-            if(GrimoireController.Instance.PlayerMachinesDictionary[_machine] > 0)
-            {
-                GrimoireController.Instance.DecreaseMachineToPlayerInventory(_machine, 1);
+			{
                 OnSelected?.Invoke(_machine);
             }
         }
