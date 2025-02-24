@@ -55,7 +55,7 @@ namespace Components.Shop.ShopItems
 				}
 			}
 			OnMachineBuyed?.Invoke(_shopItem.MachineTemplate);
-			InventoryController.Instance.AddMachineToPlayerInventory(_shopItem.MachineTemplate, 1);
+			InventoryController.Instance.AddGridObjectTemplateToInventory(_shopItem.MachineTemplate, 1);
 
 		}
 	}

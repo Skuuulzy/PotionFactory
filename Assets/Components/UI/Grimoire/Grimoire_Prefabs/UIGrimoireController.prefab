@@ -76,6 +76,7 @@ GameObject:
   - component: {fileID: 958236694856085713}
   - component: {fileID: 8429977346331430961}
   - component: {fileID: 7473428711343809870}
+  - component: {fileID: 7911194502373786758}
   m_Layer: 5
   m_Name: UIGrimoireController
   m_TagString: Untagged
@@ -120,13 +121,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _machineSelectorViewPrefab: {fileID: 8004550218260356378, guid: a1ebecacbd2e9c24d909fa7cd4e434fb,
     type: 3}
-  _consumableSelectorViewPrefab: {fileID: 8888690622200023719, guid: 4e76f1b3cc658d7448bc51c764453d65,
-    type: 3}
-  _relicSelectorViewPrefab: {fileID: 7913925984338699187, guid: 32619e6fb2f89854cbb1a17a44cff17e,
-    type: 3}
   _machineSelectorViewParent: {fileID: 711401917948206118}
-  _consumableSelectorViewParent: {fileID: 3684326132131776473}
-  _relicSelectorViewParent: {fileID: 5105743033124730703}
   _animator: {fileID: 7473428711343809870}
 --- !u!95 &7473428711343809870
 Animator:
@@ -149,6 +144,34 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &7911194502373786758
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2334945615775813677}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f81bf72334877240a39c89b3f5b22bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _gameEvent: {fileID: 11400000, guid: ba60c4349d8538d4b89238d07ca49815, type: 2}
+  _unityEvent:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8429977346331430961}
+        m_TargetAssemblyTypeName: Components.Inventory.UIGrimoireController, Assembly-CSharp
+        m_MethodName: UpdateGrimoireView
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &4027435627168870600
 GameObject:
   m_ObjectHideFlags: 0

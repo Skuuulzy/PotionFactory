@@ -34,7 +34,7 @@ namespace Components.Machines
             }
         }
 
-		public void UpdateNumberOfAvailableMachine(int number)
+		public void UpdateMachineNumber(int number)
 		{
             _grimoireInventoryButton.UpdateNumberOfAvailableMachine(number);
 		}

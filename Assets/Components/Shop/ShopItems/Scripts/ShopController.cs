@@ -53,39 +53,6 @@ namespace Components.Shop
 			return allMachineShopItemList;
 		}
 
-		private List<ShopItem> GenerateConsumablesInShop()
-		{
-			List<ShopItem> allConsumableShopItemList = new List<ShopItem>();
-			List<ShopItem> shopItemListToGenerate = new List<ShopItem>();
-			List<ConsumableTemplate> allConsumableTemplate = ScriptableObjectDatabase.GetAllScriptableObjectOfType<ConsumableTemplate>();
-
-			for (int i = 0; i < allConsumableTemplate.Count; i++)
-			{
-				ShopItem shopItem = new ShopItem(allConsumableTemplate[i]);
-				allConsumableShopItemList.Add(shopItem);
-			}
-			//Generate random list of shop items
-			shopItemListToGenerate.AddRange(GetRandomItemList(_numberOfConsumableItemInShop, allConsumableShopItemList));
-			return shopItemListToGenerate;
-		}
-
-		private List<ShopItem> GenerateRelicsInShop()
-		{
-			List<ShopItem> allRelicShopItemList = new List<ShopItem>();
-			List<ShopItem> shopItemListToGenerate = new List<ShopItem>();
-			List<RelicTemplate> allRelicTemplate = ScriptableObjectDatabase.GetAllScriptableObjectOfType<RelicTemplate>();
-
-			for (int i = 0; i < allRelicTemplate.Count; i++)
-			{
-				ShopItem shopItem = new ShopItem(allRelicTemplate[i]);
-				allRelicShopItemList.Add(shopItem);
-			}
-
-			//Generate random list of shop items
-			shopItemListToGenerate.AddRange(GetRandomItemList(_numberOfRelicItemInShop, allRelicShopItemList));
-
-			return shopItemListToGenerate;
-		}
 
 		/// <summary>
 		/// Selects a random item from the list based on spawn probability.
