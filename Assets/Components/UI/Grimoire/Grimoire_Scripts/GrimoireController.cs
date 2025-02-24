@@ -47,7 +47,12 @@ namespace Components.Inventory
 		{
 			BundleChoiceGenerator.OnBundleChoiceConfirm -= HandleBundleChoice;
 		}
-		
+
+		private void Update()
+		{
+			Debug.Log($"{PlayerMachinesDictionary[ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("Mixer")]}");
+		}
+
 		//--------------------------------------------------------- ADDING AND REMOVING MACHINES CONSUMABLE AND RELICS --------------------------------------------------------------
 
 		public void AddMachineToPlayerInventory(MachineTemplate machineTemplate, int numberOfMachine, bool inform = true)
