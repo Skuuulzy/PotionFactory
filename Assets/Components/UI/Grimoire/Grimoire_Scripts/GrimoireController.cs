@@ -5,6 +5,7 @@ using Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using VComponent.Tools.Singletons;
 
@@ -18,7 +19,7 @@ namespace Components.Inventory
         private Dictionary<MachineTemplate, int> _playerMachinesDictionary;
 		private List<ConsumableTemplate> _consumableTemplatesList;
 		private List<RelicTemplate> _relicTemplatesList;
-        public Dictionary<MachineTemplate, int> PlayerMachinesDictionary => _playerMachinesDictionary;
+        [ShowInInspector] public Dictionary<MachineTemplate, int> PlayerMachinesDictionary => _playerMachinesDictionary;
 		public List<ConsumableTemplate> ConsumableTemplates => _consumableTemplatesList;
 		public List<RelicTemplate> RelicTemplates => _relicTemplatesList;
 
@@ -46,11 +47,6 @@ namespace Components.Inventory
 		private void OnDestroy()
 		{
 			BundleChoiceGenerator.OnBundleChoiceConfirm -= HandleBundleChoice;
-		}
-
-		private void Update()
-		{
-			Debug.Log($"{PlayerMachinesDictionary[ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("Mixer")]}");
 		}
 
 		//--------------------------------------------------------- ADDING AND REMOVING MACHINES CONSUMABLE AND RELICS --------------------------------------------------------------
