@@ -1,4 +1,5 @@
 using Components.Bundle;
+using Components.Grid;
 using Components.Machines;
 using Components.Map;
 using Database;
@@ -10,7 +11,7 @@ using VComponent.Tools.Singletons;
 
 namespace Components.Inventory
 {
-    public class GrimoireController : Singleton<GrimoireController>
+    public class InventoryController : Singleton<InventoryController>
     {
 		[SerializeField] private InventoryTemplate _defaultPlayerInventory;
 
@@ -23,8 +24,8 @@ namespace Components.Inventory
 		public List<RelicTemplate> RelicTemplates => _relicTemplatesList;
 
 		//Actions 
-		public static Action<MachineTemplate,int> OnMachineAddedOrRemoved;
-		public static Action<ConsumableTemplate> OnConsumableAdded;
+		public static Action<GridObjectTemplate, int> OnMachineAddedOrRemoved;
+		public static Action<GridObjectTemplate> OnConsumableAdded;
 		public static Action<ConsumableTemplate> OnConsumableRemoved;
 		public static Action<RelicTemplate> OnRelicAdded;
 		public static Action<RelicTemplate> OnRelicRemoved;

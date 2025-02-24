@@ -36,7 +36,7 @@ namespace Components.Shop.ShopItems
 				}
 			}
 
-			GrimoireController.Instance.AddConsumableToPlayerInventory(_shopItem.ConsumableTemplate, 1);
+			InventoryController.Instance.AddConsumableToPlayerInventory(_shopItem.ConsumableTemplate, 1);
 
 		}
 	}

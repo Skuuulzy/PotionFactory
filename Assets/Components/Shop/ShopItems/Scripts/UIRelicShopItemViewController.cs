@@ -37,7 +37,7 @@ namespace Components.Shop.ShopItems
 				}
 			}
 
-			GrimoireController.Instance.AddRelicToPlayerInventory(_shopItem.RelicTemplate, 1);
+			InventoryController.Instance.AddRelicToPlayerInventory(_shopItem.RelicTemplate, 1);
 
 		}
 	}

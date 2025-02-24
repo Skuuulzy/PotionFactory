@@ -28,7 +28,7 @@ namespace Components.Machines
         //Call by machine in player inventory
         public void Select()
         {
-            if(GrimoireController.Instance.PlayerMachinesDictionary[_machine] > 0)
+            if(InventoryController.Instance.PlayerMachinesDictionary[_machine] > 0)
 			{
                 OnSelected?.Invoke(_machine);
             }

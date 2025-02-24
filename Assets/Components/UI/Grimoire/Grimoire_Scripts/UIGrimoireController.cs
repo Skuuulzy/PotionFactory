@@ -31,23 +31,23 @@ namespace Components.Inventory
             _inventoryConsumableList = new List<ConsumableSelectorView>();
             _inventoryRelicList = new List<RelicSelectorView>();
 
-            GrimoireController.OnBaseInventoryGenerated += HandleBaseInventoryCreated;
-            GrimoireController.OnMachineAddedOrRemoved += UpdateMachineUIView;
-            GrimoireController.OnConsumableAdded += AddConsumableToInventory;
-            GrimoireController.OnConsumableRemoved += RemoveConsumableFromInventory;
-            GrimoireController.OnRelicAdded += AddRelicToInventory;
-            GrimoireController.OnRelicRemoved += RemoveRelicFromInventory;
+            InventoryController.OnBaseInventoryGenerated += HandleBaseInventoryCreated;
+            InventoryController.OnMachineAddedOrRemoved += UpdateMachineUIView;
+            InventoryController.OnConsumableAdded += AddConsumableToInventory;
+            InventoryController.OnConsumableRemoved += RemoveConsumableFromInventory;
+            InventoryController.OnRelicAdded += AddRelicToInventory;
+            InventoryController.OnRelicRemoved += RemoveRelicFromInventory;
             StateController.OnStateStarted += HandleStateStarted;
         }
 
         private void OnDestroy()
         {
-            GrimoireController.OnBaseInventoryGenerated -= HandleBaseInventoryCreated;
-            GrimoireController.OnMachineAddedOrRemoved -= UpdateMachineUIView;
-            GrimoireController.OnConsumableAdded -= AddConsumableToInventory;
-            GrimoireController.OnConsumableRemoved -= RemoveConsumableFromInventory;
-            GrimoireController.OnRelicAdded -= AddRelicToInventory;
-            GrimoireController.OnRelicRemoved -= RemoveRelicFromInventory;
+            InventoryController.OnBaseInventoryGenerated -= HandleBaseInventoryCreated;
+            InventoryController.OnMachineAddedOrRemoved -= UpdateMachineUIView;
+            InventoryController.OnConsumableAdded -= AddConsumableToInventory;
+            InventoryController.OnConsumableRemoved -= RemoveConsumableFromInventory;
+            InventoryController.OnRelicAdded -= AddRelicToInventory;
+            InventoryController.OnRelicRemoved -= RemoveRelicFromInventory;
             StateController.OnStateStarted -= HandleStateStarted;
         }
 
@@ -80,7 +80,7 @@ namespace Components.Inventory
 
         private void HandleBaseInventoryCreated()
         {
-            foreach (var machine in GrimoireController.Instance.PlayerMachinesDictionary)
+            foreach (var machine in InventoryController.Instance.PlayerMachinesDictionary)
             {
                 UpdateMachineUIView(machine.Key, machine.Value);
             }

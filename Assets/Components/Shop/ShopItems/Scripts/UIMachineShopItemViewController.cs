@@ -55,7 +55,7 @@ namespace Components.Shop.ShopItems
 				}
 			}
 			OnMachineBuyed?.Invoke(_shopItem.MachineTemplate);
-			GrimoireController.Instance.AddMachineToPlayerInventory(_shopItem.MachineTemplate, 1);
+			InventoryController.Instance.AddMachineToPlayerInventory(_shopItem.MachineTemplate, 1);
 
 		}
 	}

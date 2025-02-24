@@ -191,7 +191,7 @@ namespace Components.Grid
             // If this is not a move mode take a machine from player inventory.
             if (!_moveMode)
             {
-                GrimoireController.Instance.DecreaseMachineToPlayerInventory(_currentMachinePreview.Machine.Template, 1);
+                InventoryController.Instance.DecreaseMachineToPlayerInventory(_currentMachinePreview.Machine.Template, 1);
                 Debug.Log($"Taking {_currentMachinePreview.Machine.Template.Type} from player inventory.");
             }
             else
@@ -200,7 +200,7 @@ namespace Components.Grid
             }
             
             // If there is no machine of this type in the inventory go back in selection mode.
-            if (GrimoireController.Instance.CountMachineOfType(_currentMachinePreview.Machine.Template.Type) <= 0)
+            if (InventoryController.Instance.CountMachineOfType(_currentMachinePreview.Machine.Template.Type) <= 0)
             {
                 Debug.Log($"No more machine of type {_currentMachinePreview.Machine.Template.Type} in player inventory.");
                 _currentMachinePreview = null;
@@ -580,7 +580,7 @@ namespace Components.Grid
             // Give back to the player
             if (giveBack)
             {
-                GrimoireController.Instance.AddMachineToPlayerInventory(machineToSell.Template, 1);
+                InventoryController.Instance.AddMachineToPlayerInventory(machineToSell.Template, 1);
             }
 			
             // For destroying the class instance, not sure if this a good way.
