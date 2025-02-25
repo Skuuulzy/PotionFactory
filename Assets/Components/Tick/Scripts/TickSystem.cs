@@ -56,14 +56,14 @@ namespace Components.Tick
 
         private void Update()
         {
-            if(_isPause)
+            if(_isPause )
 			{
                 return;
 			}
 
             _tickTimer += Time.deltaTime;
             
-            while (_tickTimer >= _currentTickDuration.Value)
+            while (_tickTimer >= _currentTickDuration.Value && _currentTickDuration.Value != 0)
             {
                 _tickTimer -= _currentTickDuration.Value;
                 
