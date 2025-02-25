@@ -109,8 +109,26 @@ namespace Components.Grid
             {
                 TryRetrieveMachine();
             }
+            if (Input.GetMouseButtonUp(2))
+            {
+                TrySelectMachine();
+            }
         }
-        
+
+        private void TrySelectMachine()
+        {
+            if (_hoveredMachine == null) 
+                return;
+
+            if (GrimoireController.Instance.PlayerMachinesDictionary[_hoveredMachine.Template] <= 0) 
+                return;
+            
+            //TODO: Harmonize the code with MachineSelectorView.
+            GrimoireController.Instance.DecreaseMachineToPlayerInventory(_hoveredMachine.Template, 1);
+            MachineManager.OnChangeSelectedMachine?.Invoke(_hoveredMachine.Template);
+            _currentMachinePreview.Machine.Hover(false);
+        }
+
         private void HandlePlacementMode()
         {
             MovePreview();
@@ -238,6 +256,7 @@ namespace Components.Grid
                 else
                 {
                     _currentMachinePreview.gameObject.SetActive(false);
+                    _currentMachinePreview.Machine.Hover(false);
                 }
             }
             else
