@@ -1,6 +1,3 @@
-using SoWorkflow.SharedValues;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace SoWorkflow.SharedValues

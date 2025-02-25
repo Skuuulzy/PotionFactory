@@ -981,7 +981,6 @@ MonoBehaviour:
     type: 3}
   _previewHolder: {fileID: 250993072}
   _gridObjectsHolder: {fileID: 1262894017}
-  _useSubMachine: 1
   _subMachineRotation:
     m_Dictionnary:
     - m_key: {fileID: 11400000, guid: be2720edb85e97a40995d1a0c846772a, type: 2}
@@ -990,6 +989,14 @@ MonoBehaviour:
         Machine: {fileID: 11400000, guid: 90292e707a4abae45b7448b177ce587f, type: 2}
       - TargetInputRotation: 270
         Machine: {fileID: 11400000, guid: c121c9fa5531042449b8e215f2019e5f, type: 2}
+  _isPlacementModeSharedValue: {fileID: 11400000, guid: db27f27aeab8b9a4c857a7adc8be6d59,
+    type: 2}
+  _enabled: 1
+  _inputState: 0
+  _currentMachinePreview: {fileID: 0}
+  _currentInputRotation: 0
+  _currentPreviewRotation: 0
+  _skipFrame: 0
 --- !u!4 &943281390
 Transform:
   m_ObjectHideFlags: 0

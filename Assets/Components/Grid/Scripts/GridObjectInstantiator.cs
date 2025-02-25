@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using CodeMonkey.Utils;
 using Components.Inventory;
 using Components.Machines;
-using Components.Tick;
 using Database;
+using SoWorkflow.SharedValues;
 using UnityEngine;
+using VComponent.InputSystem;
 
 namespace Components.Grid
 {
@@ -24,6 +25,9 @@ namespace Components.Grid
         [Header("Special Rotation Behaviour")]
         [SerializeField] private SerializableDictionary<MachineTemplate, List<RotationSubMachine>> _subMachineRotation;
 
+        [Header("Shared Values")] 
+        [SerializeField] private SOSharedBool _isPlacementModeSharedValue;
+        
         [Header("Debug")]
         [SerializeField] private bool _enabled = true;
         [SerializeField] private InputState _inputState = InputState.SELECTION;
@@ -126,14 +130,15 @@ namespace Components.Grid
                     SetPlacementRotations(0);
                 }
             }
-            if (Input.GetKeyDown(KeyCode.R))
+            if (Input.GetKeyDown(KeyCode.R) || InputsManager.Instance.ScrollMouse != 0)
             {
-                RotatePreview();
+                RotatePreview(InputsManager.Instance.ScrollMouse < 0);
             }
         }
 
         private void SwitchInputState(InputState newState)
         {
+            _isPlacementModeSharedValue.Set(newState == InputState.PLACEMENT);
             _inputState = newState;
         }
 
@@ -243,15 +248,15 @@ namespace Components.Grid
             CheckForAutoConveyorOrientation(worldMousePosition);
         }
 
-        private void RotatePreview()
+        private void RotatePreview(bool clockwise)
         {
             if (!_currentMachinePreview)
             {
                 return;
             }
 
-            _currentInputRotation += 90;
-            _currentInputRotation %= 360;
+            _currentInputRotation = clockwise ? _currentInputRotation + 90 : _currentInputRotation - 90;
+            _currentInputRotation = _currentInputRotation.NormalizeAngle();
             
             if (_currentMachinePreview != null)
             {

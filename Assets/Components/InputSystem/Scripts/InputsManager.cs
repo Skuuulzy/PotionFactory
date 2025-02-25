@@ -15,7 +15,7 @@ namespace VComponent.InputSystem
         [ShowInInspector] public bool QuickMoveCamera { get; private set; }
         [ShowInInspector] public bool ClockwiseRotationCamera { get; private set; }
         [ShowInInspector] public bool AntiClockwiseRotationCamera { get; private set; }
-        [ShowInInspector] public int ZoomCamera { get; private set; }
+        [ShowInInspector] public int ScrollMouse { get; private set; }
         [ShowInInspector] public bool DragMovementCamera { get; private set; }
         [ShowInInspector] public bool DragRotationCamera { get; private set; }
         [ShowInInspector] public bool ShowLobbyInformation { get; private set; }
@@ -75,15 +75,15 @@ namespace VComponent.InputSystem
             var scrollValue = context.ReadValue<float>();
             if (scrollValue > 0)
             {
-                ZoomCamera = 1;
+                ScrollMouse = 1;
             }
             else if (scrollValue < 0)
             {
-                ZoomCamera = -1;
+                ScrollMouse = -1;
             }
             else
             {
-                ZoomCamera = 0;
+                ScrollMouse = 0;
             }
         }
         
