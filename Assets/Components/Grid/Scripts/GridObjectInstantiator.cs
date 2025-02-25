@@ -120,7 +120,7 @@ namespace Components.Grid
             if (_hoveredMachine == null) 
                 return;
 
-            if (GrimoireController.Instance.PlayerMachinesDictionary[_hoveredMachine.Template] <= 0) 
+            if (GrimoireController.Instance.PlayerMachinesDictionary.ContainsKey(_hoveredMachine.Template) && GrimoireController.Instance.PlayerMachinesDictionary[_hoveredMachine.Template] <= 0) 
                 return;
             
             //TODO: Harmonize the code with MachineSelectorView.
