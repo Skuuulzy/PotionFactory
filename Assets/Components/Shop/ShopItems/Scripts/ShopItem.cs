@@ -10,18 +10,13 @@ namespace Components.Shop.ShopItems
     {
         // ----------------------------------------------------------------------- PRIVATE FIELDS -------------------------------------------------------------------------
         private MachineTemplate _machineTemplate;
-        private ConsumableTemplate _consumableTemplate;
-        private RelicTemplate _relicTemplate;
+
         private IngredientTemplate _ingredientTemplate;
         private float _spawnProbability;
         private int _numberOfItemToSell;
 
-
-
         // ----------------------------------------------------------------------- PUBLIC FIELDS -------------------------------------------------------------------------
         public MachineTemplate MachineTemplate => _machineTemplate;
-        public ConsumableTemplate ConsumableTemplate => _consumableTemplate;
-        public RelicTemplate RelicTemplate => _relicTemplate;
         public IngredientTemplate IngredientTemplate => _ingredientTemplate;
         public float SpawnProbability => _spawnProbability;
         public int NumberOfItemToSell => _numberOfItemToSell;
@@ -32,20 +27,6 @@ namespace Components.Shop.ShopItems
             _spawnProbability = machineTemplate.ShopSpawnProbability;
             _numberOfItemToSell = numberOfItemToSell;
         }
-
-        public ShopItem(ConsumableTemplate consumableTemplate, int numberOfItemToSell = 1)
-        {
-            _consumableTemplate = consumableTemplate;
-			_numberOfItemToSell = numberOfItemToSell;
-            _spawnProbability = consumableTemplate.SpawnProbability;
-		}
-
-		public ShopItem(RelicTemplate relicTemplate, int numberOfItemToSell = 1)
-		{
-			_relicTemplate = relicTemplate;
-			_numberOfItemToSell = numberOfItemToSell;
-            _spawnProbability = relicTemplate.SpawnProbability;
-		}
 
         public ShopItem(IngredientTemplate ingredientTemplate, int numberOfItemToSell = 1)
         {

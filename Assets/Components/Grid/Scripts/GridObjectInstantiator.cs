@@ -34,6 +34,7 @@ namespace Components.Grid
         [SerializeField] private MachineController _currentMachinePreview;
         [SerializeField] private int _currentInputRotation;
         [SerializeField] private int _currentPreviewRotation;
+        [SerializeField] private bool _moveMode;
         [SerializeField] private bool _skipFrame;
         
         // ------------------------------------------------------------------------- PRIVATE FIELDS -------------------------------------------------------------------------------- 
@@ -120,11 +121,11 @@ namespace Components.Grid
             if (_hoveredMachine == null) 
                 return;
 
-            if (GrimoireController.Instance.PlayerMachinesDictionary.ContainsKey(_hoveredMachine.Template) && GrimoireController.Instance.PlayerMachinesDictionary[_hoveredMachine.Template] <= 0) 
+            if (InventoryController.Instance.PlayerMachinesDictionary[_hoveredMachine.Template] <= 0) 
                 return;
-            
+
             //TODO: Harmonize the code with MachineSelectorView.
-            GrimoireController.Instance.DecreaseMachineToPlayerInventory(_hoveredMachine.Template, 1);
+            InventoryController.Instance.DecreaseGridObjectTemplate(_hoveredMachine.Template, 1);
             MachineManager.OnChangeSelectedMachine?.Invoke(_hoveredMachine.Template);
             _currentMachinePreview.Machine.Hover(false);
         }
@@ -193,15 +194,15 @@ namespace Components.Grid
             }
 
             // Check if the machine can be placed on the grid. 
-            if (!_currentMachinePreview.Machine.IsPlacable(Grid,chosenCell, out var machinesOverwritten))
+            if (!IsMachinePlacable(chosenCell))
             {
-                return;
-            }
-            
-            // Clean the overwritten machines
-            for (int i = 0; i < machinesOverwritten.Count; i++)
-            {
-                RetrieveMachine(machinesOverwritten[i], true);
+                if (!_currentMachinePreview.Machine.CanOverwrite(chosenCell))
+                {
+                    return;
+                }
+
+                // Retrieve the machine under it.
+                RetrieveMachine(chosenCell.Node.Machine, true);
             }
             
             // Place the current preview on the grid.
@@ -209,9 +210,20 @@ namespace Components.Grid
             
             _currentMachinePreview.AddToGrid(chosenCell, Grid, _gridObjectsHolder);
             _currentMachinePreview.Machine.Select(false);
+
+            // If this is not a move mode take a machine from player inventory.
+            if (!_moveMode)
+            {
+                InventoryController.Instance.DecreaseGridObjectTemplate(_currentMachinePreview.Machine.Template, 1);
+                Debug.Log($"Taking {_currentMachinePreview.Machine.Template.Type} from player inventory.");
+            }
+            else
+            {
+                _moveMode = false;
+            }
             
             // If there is no machine of this type in the inventory go back in selection mode.
-            if (GrimoireController.Instance.CountMachineOfType(_currentMachinePreview.Machine.Template.Type) <= 0)
+            if (InventoryController.Instance.CountGridObject(_currentMachinePreview.Machine.Template) <= 0)
             {
                 Debug.Log($"No more machine of type {_currentMachinePreview.Machine.Template.Type} in player inventory.");
                 _currentMachinePreview = null;
@@ -250,7 +262,7 @@ namespace Components.Grid
 
                     if (_currentMachinePreview)
                     {
-                        _currentMachinePreview.UpdateGridViewPlacableState(_currentMachinePreview.Machine.IsPlacable(Grid, cell, out _));
+                        _currentMachinePreview.UpdateGridViewPlacableState(IsMachinePlacable(cell) || _currentMachinePreview.Machine.CanOverwrite(cell));
                     }
                 }
                 else
@@ -299,23 +311,17 @@ namespace Components.Grid
                 {
                     return false;
                 }
-                
                 Debug.Log($"Destroying current preview: {_currentMachinePreview.Machine.Template.Type}");
                 
-                // Give back the machine to the player if it comes from a move mode.
-                GrimoireController.Instance.AddMachineToPlayerInventory(_currentMachinePreview.Machine.Template, 1);
-                
-                // Destroy the preview
                 Destroy(_currentMachinePreview.gameObject);
                 _currentMachinePreview = null;
                 _skipFrame = true;
                 
                 OnPreview?.Invoke(false);
-
-                return true;
+                
             }
 
-            return false;
+            return true;
         }
         
         // ------------------------------------------------------------------------- SELECTION BEHAVIOUR -------------------------------------------------------------------------------- 
@@ -362,6 +368,7 @@ namespace Components.Grid
                 machine.Controller.transform.localPosition = Vector3.zero;
                 machine.Select(true);
 
+                _moveMode = true;
                 SetPlacementRotations(machine.Rotation);
                 
                 SwitchInputState(InputState.PLACEMENT);
@@ -548,6 +555,27 @@ namespace Components.Grid
             return false;
         }
         
+        private bool IsMachinePlacable(Cell originCell)
+        {
+            foreach (var node in _currentMachinePreview.Machine.Nodes)
+            {
+                var nodeGridPosition = node.SetGridPosition(originCell.Coordinates);
+
+                // One node does not overlap a constructable cell. 
+                if (!Grid.TryGetCellByCoordinates(nodeGridPosition.x, nodeGridPosition.y, out Cell overlapCell))
+                {
+                    return false;
+                }
+                
+                if (!overlapCell.IsConstructable())
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+        
         private void ClearMachineGridData(Machine machineToClear)
         {
             //Reset all cell linked to the machine.
@@ -576,7 +604,7 @@ namespace Components.Grid
             // Give back to the player
             if (giveBack)
             {
-                GrimoireController.Instance.AddMachineToPlayerInventory(machineToSell.Template, 1);
+                InventoryController.Instance.AddGridObjectTemplateToInventory(machineToSell.Template, 1);
             }
 			
             // For destroying the class instance, not sure if this a good way.

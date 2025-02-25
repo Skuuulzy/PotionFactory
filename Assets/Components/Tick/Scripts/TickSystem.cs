@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using Components.Machines;
 using Sirenix.OdinInspector;
+using SoWorkflow.SharedValues;
 using UnityEngine;
 using VComponent.Tools.Singletons;
+using VTools.SoWorkflow.EventSystem;
 using static UnityEngine.Rendering.DebugUI;
 
 namespace Components.Tick
@@ -14,15 +16,14 @@ namespace Components.Tick
         [ShowInInspector] private static readonly List<ITickable> TICKABLES = new();
         
         private float _tickTimer;
-        private float _currentTickDuration;
+
+        [SerializeField] private SOSharedFloat _currentTickDuration;
+        [SerializeField] private SOSharedInt _currentTickMultiplier;
 		private bool _isPause;
 
         private static bool _log;
 
         public float InitialTickDuration => _initialTickDuration;
-        public float CurrentTickDuration => _currentTickDuration;
-
-        public static Action<int> OnTickMultiplierChanged;
         // ------------------------------------------------------------------------- MONO -------------------------------------------------------------------------
 		protected override void Awake()
         {
@@ -38,11 +39,10 @@ namespace Components.Tick
 
 		private void Start()
 		{
-            _currentTickDuration = _initialTickDuration;
+            _currentTickDuration.Set(_initialTickDuration);
             PlanningFactoryState.OnPlanningFactoryStateStarted += HandlePlanningFactoryState;
             ResolutionFactoryState.OnResolutionFactoryStateStarted += HandleResolutionFactoryState;
             EndOfDayState.OnEndOfDayStateStarted += HandleEndOfDayState;
-            UIOptionsController.OnTickSpeedUpdated += ChangeTimeSpeed;
             GameOverState.OnGameOverStarted += HandleGameOverState;
         }
 
@@ -63,9 +63,9 @@ namespace Components.Tick
 
             _tickTimer += Time.deltaTime;
             
-            while (_tickTimer >= _currentTickDuration)
+            while (_tickTimer >= _currentTickDuration.Value)
             {
-                _tickTimer -= _currentTickDuration;
+                _tickTimer -= _currentTickDuration.Value;
                 
                 TickAll();
             }
@@ -132,14 +132,15 @@ namespace Components.Tick
 
         public void ChangeTimeSpeed(int value)
         {
-            OnTickMultiplierChanged?.Invoke(value);
+            _currentTickMultiplier.Set(value);
+
             if (value == 0)
 			{
                 _isPause = true;
                 return;
 			}
 
-            _currentTickDuration =  _initialTickDuration / value;
+            _currentTickDuration.Set(_initialTickDuration / value);
             _isPause = false;
         }
 

@@ -10,7 +10,7 @@ using UnityEngine.Rendering;
 public class GrimoireButton : MonoBehaviour
 {
     [SerializeField] private ShopItemType _type;
-    [SerializeField] private UIGrimoireController _uiGrimoireController;
+    [SerializeField] private UIInventoryController _uiGrimoireController;
     [SerializeField] private Animator _animator;
     private bool _isSelected = false;
 

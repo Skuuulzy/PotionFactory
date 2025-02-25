@@ -18,11 +18,6 @@ MonoBehaviour:
   _uiView: {fileID: 21300000, guid: 594e3d775749e4e408f130f73e565ac9, type: 3}
   _gridObjectControllerPrefab: {fileID: 2567407675386972328, guid: 859503caaa5f96242b5ba83dccd721c9,
     type: 3}
-  _canOverwrite: 1
-  _isOverwritable: 0
-  _canRetrieve: 1
-  _canMove: 1
-  _canConfigure: 1
   _type: 5
   _gridComponents:
   - {fileID: 1085624917457900550, guid: cff6497d14e847e43888d93eee477349, type: 3}
@@ -78,3 +73,6 @@ MonoBehaviour:
   _uiGameplayDescription: 
   _uiLoreDescription: 
   _contextMenuHeight: 4
+  _canRetrieve: 1
+  _canMove: 1
+  _canConfigure: 1

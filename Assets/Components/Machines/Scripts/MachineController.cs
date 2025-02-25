@@ -94,7 +94,7 @@ namespace Components.Machines
             // Adding nodes to the cells.
             foreach (var node in Machine.Nodes)
             {
-                var nodeGridPosition = node.GetGridPosition(originCell.Coordinates);
+                var nodeGridPosition = node.SetGridPosition(originCell.Coordinates);
 
                 if (grid.TryGetCellByCoordinates(nodeGridPosition.x, nodeGridPosition.y, out Cell overlapCell))
                 {

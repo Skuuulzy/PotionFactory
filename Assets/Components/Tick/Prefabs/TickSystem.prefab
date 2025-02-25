@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 70365663088397671}
   - component: {fileID: 8041915659534501184}
+  - component: {fileID: 444406876380189679}
   m_Layer: 0
   m_Name: TickSystem
   m_TagString: Untagged
@@ -44,4 +45,36 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c49f80b71aa547c4c9393c52eb8396ed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _tickDuration: 2
+  _initialTickDuration: 0.2
+  _currentTickDuration: {fileID: 11400000, guid: 6e4214961a7c8e24a84adea814405886,
+    type: 2}
+  _currentTickMultiplier: {fileID: 11400000, guid: 98076d46cfed8f34ab18160865cfcd09,
+    type: 2}
+--- !u!114 &444406876380189679
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 65846483522322162}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a47969ee0bc45a94abb4af3e094cbe3e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _gameEvent: {fileID: 11400000, guid: c167ec726849a654b9720625d9310795, type: 2}
+  _unityEvent:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8041915659534501184}
+        m_TargetAssemblyTypeName: Components.Tick.TickSystem, Assembly-CSharp
+        m_MethodName: ChangeTimeSpeed
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2

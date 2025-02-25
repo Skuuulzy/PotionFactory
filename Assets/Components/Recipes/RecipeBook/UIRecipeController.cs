@@ -66,7 +66,7 @@ namespace Components.Recipes.Grimoire
                 return;
             }
 
-            if (GrimoireController.Instance.PlayerMachinesDictionary.Count == 0)
+            if (InventoryController.Instance.PlayerMachinesDictionary.Count == 0)
             {
                 return;
             }
@@ -87,7 +87,7 @@ namespace Components.Recipes.Grimoire
         private List<RecipeTemplate> GetPotentialRecipes()
         {
             // Get player machines
-            var playerMachines = GrimoireController.Instance.PlayerMachinesDictionary.Keys.ToList();
+            var playerMachines = InventoryController.Instance.PlayerMachinesDictionary.Keys.ToList();
 
             // Get extracted resources
             var playerResources = GridController.Instance.ExtractedIngredients;

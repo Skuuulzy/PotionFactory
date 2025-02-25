@@ -1,10 +1,11 @@
+using SoWorkflow.SharedValues;
 using System;
 using UnityEngine;
+using VTools.SoWorkflow.EventSystem;
 
 public class UIOptionsController : MonoBehaviour
 {
-    public static Action<int> OnTickSpeedUpdated;
-    public static Action OnClearGrid;
+    [SerializeField] private IntGameEvent _onTickMultiply;
 
     private bool _canUpdateTickSpeed;
 
@@ -29,12 +30,6 @@ public class UIOptionsController : MonoBehaviour
 		{
             return;
 		}
-
-        OnTickSpeedUpdated?.Invoke(value);
-    }
-
-    public void ClearGrid()
-    {
-        OnClearGrid?.Invoke();
+        _onTickMultiply.Raise(value);
     }
 }

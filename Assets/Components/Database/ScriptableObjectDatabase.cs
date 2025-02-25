@@ -30,8 +30,6 @@ namespace Database
             LoadAllScriptableObjects<IngredientTemplate>();
             LoadAllScriptableObjects<RecipeTemplate>();
             LoadAllScriptableObjects<MachineTemplate>();
-            LoadAllScriptableObjects<ConsumableTemplate>();
-            LoadAllScriptableObjects<RelicTemplate>();
             LoadAllScriptableObjects<ObstacleTemplate>();
             LoadAllScriptableObjects<DecorationTemplate>();
             LoadAllScriptableObjects<TileTemplate>();

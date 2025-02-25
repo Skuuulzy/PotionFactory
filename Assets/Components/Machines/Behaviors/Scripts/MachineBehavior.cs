@@ -110,10 +110,5 @@ namespace Components.Machines.Behaviors
             return !Machine.TryGetOutMachines(out var outMachines) ? null : outMachines[0];
         }
         
-        // ------------------------------------------------------------------------- RELICS -------------------------------------------------------------------------
-        public void AddRelicEffect(RelicEffect effect)
-        {
-            
-        }
     }
 }
