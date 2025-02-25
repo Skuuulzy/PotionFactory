@@ -71,7 +71,7 @@ namespace Components.Inventory
 			switch (gridObject)
 			{
 				case MachineTemplate machineTemplate:
-					return _playerMachinesDictionary.Where(entry => entry.Key == machineTemplate).Sum(entry => entry.Value);
+					return _playerMachinesDictionary.Where(entry => entry.Key.Type == machineTemplate.Type).Sum(entry => entry.Value);
 			}
 			return 0;
 		}
