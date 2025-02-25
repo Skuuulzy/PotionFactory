@@ -121,11 +121,11 @@ namespace Components.Grid
             if (_hoveredMachine == null) 
                 return;
 
-            if (GrimoireController.Instance.PlayerMachinesDictionary[_hoveredMachine.Template] <= 0) 
+            if (InventoryController.Instance.PlayerMachinesDictionary[_hoveredMachine.Template] <= 0) 
                 return;
-            
+
             //TODO: Harmonize the code with MachineSelectorView.
-            GrimoireController.Instance.DecreaseMachineToPlayerInventory(_hoveredMachine.Template, 1);
+            InventoryController.Instance.DecreaseGridObjectTemplate(_hoveredMachine.Template, 1);
             MachineManager.OnChangeSelectedMachine?.Invoke(_hoveredMachine.Template);
             _currentMachinePreview.Machine.Hover(false);
         }
