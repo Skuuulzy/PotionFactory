@@ -121,7 +121,12 @@ namespace Components.Grid
             if (_hoveredMachine == null) 
                 return;
 
-            if (InventoryController.Instance.PlayerMachinesDictionary[_hoveredMachine.Template] <= 0) 
+            // Cast into standard conveyor if curved one.
+            var template = _hoveredMachine.Template.Type == MachineType.CONVEYOR
+                ? ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("ConveyorLeftToRight")
+                : _hoveredMachine.Template;       
+            
+            if (!InventoryController.Instance.PlayerMachinesDictionary.ContainsKey(template) || InventoryController.Instance.PlayerMachinesDictionary[template] <= 0) 
                 return;
 
             //TODO: Harmonize the code with MachineSelectorView.
