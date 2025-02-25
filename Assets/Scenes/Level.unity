@@ -685,7 +685,7 @@ GameObject:
   m_Component:
   - component: {fileID: 663179701}
   m_Layer: 0
-  m_Name: ----- CAMERA -----
+  m_Name: '----- CAMERA -----'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -927,13 +927,15 @@ MonoBehaviour:
         Machine: {fileID: 11400000, guid: 90292e707a4abae45b7448b177ce587f, type: 2}
       - TargetInputRotation: 270
         Machine: {fileID: 11400000, guid: c121c9fa5531042449b8e215f2019e5f, type: 2}
+  _isPlacementModeSharedValue: {fileID: 11400000, guid: db27f27aeab8b9a4c857a7adc8be6d59,
+    type: 2}
   _enabled: 1
   _inputState: 0
   _currentMachinePreview: {fileID: 0}
   _currentInputRotation: 0
   _currentPreviewRotation: 0
-  _moveMode: 0
   _skipFrame: 0
+  _moveMode: 0
 --- !u!4 &943281390
 Transform:
   m_ObjectHideFlags: 0
@@ -1133,7 +1135,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1247665283}
   m_Layer: 0
-  m_Name: ----- MANAGERS -----
+  m_Name: '----- MANAGERS -----'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -20526,7 +20528,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1922617410}
   m_Layer: 0
-  m_Name: ----- ENVIRONEMENT -----
+  m_Name: '----- ENVIRONEMENT -----'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

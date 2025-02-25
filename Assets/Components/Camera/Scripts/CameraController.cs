@@ -1,3 +1,4 @@
+using SoWorkflow.SharedValues;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using VComponent.InputSystem;
@@ -11,6 +12,9 @@ namespace VComponent.CameraSystem
         
         [Header("Components")]
         [SerializeField] private Transform _cameraTransform;
+
+        [Header("Shared Values")] 
+        [SerializeField] private SOSharedBool _isPlacementModeSharedValue;
         
         private Camera _mainCam;
         
@@ -179,9 +183,9 @@ namespace VComponent.CameraSystem
             }
 
             // Zoom
-            if (InputsManager.Instance.ZoomCamera != 0)
+            if (InputsManager.Instance.ScrollMouse != 0 && !_isPlacementModeSharedValue.IsTrue)
             {
-                var zoomDelta = new Vector3(0, InputsManager.Instance.ZoomCamera * _parameters.ZoomSpeed, 0);
+                var zoomDelta = new Vector3(0, InputsManager.Instance.ScrollMouse * _parameters.ZoomSpeed, 0);
 
                 _newZoom = _parameters.InvertZoom ? _cameraTransform.position + zoomDelta : _cameraTransform.position - zoomDelta;
                 _newZoom.y = Mathf.Clamp(_newZoom.y, _parameters.ZoomClamp.x, _parameters.ZoomClamp.y);
