@@ -38,6 +38,7 @@ namespace Components.Bundle
 		private void OnDestroy()
 		{
 			BundleChoiceState.OnBundleStateStarted -= Init;
+			UIBundleChoiceController.OnBundleSelected -= SelectCurrentBundle;
 		}
 
 		private void Init(BundleChoiceState state)
