@@ -30,7 +30,7 @@ namespace Components.Machines
         {
             if(InventoryController.Instance.PlayerMachinesDictionary[_machine] > 0)
             {
-                GrimoireController.Instance.DecreaseMachineToPlayerInventory(_machine, 1);
+                InventoryController.Instance.DecreaseGridObjectTemplate(_machine, 1);
                 OnSelected?.Invoke(_machine);
             }
         }

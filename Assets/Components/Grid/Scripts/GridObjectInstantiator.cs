@@ -115,25 +115,6 @@ namespace Components.Grid
             }
         }
 
-        private void TrySelectMachine()
-        {
-            if (_hoveredMachine == null) 
-                return;
-
-            // Cast into standard conveyor if curved one.
-            var template = _hoveredMachine.Template.Type == MachineType.CONVEYOR
-                ? ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("ConveyorLeftToRight")
-                : _hoveredMachine.Template;       
-            
-            if (!InventoryController.Instance.PlayerMachinesDictionary.ContainsKey(template) || InventoryController.Instance.PlayerMachinesDictionary[template] <= 0) 
-                return;
-
-            //TODO: Harmonize the code with MachineSelectorView.
-            InventoryController.Instance.DecreaseGridObjectTemplate(_hoveredMachine.Template, 1);
-            MachineManager.OnChangeSelectedMachine?.Invoke(_hoveredMachine.Template);
-            _currentMachinePreview.Machine.Hover(false);
-        }
-
         private void HandlePlacementMode()
         {
             MovePreview();
@@ -153,9 +134,15 @@ namespace Components.Grid
                     SetPlacementRotations(0);
                 }
             }
-            if (Input.GetKeyDown(KeyCode.R) || InputsManager.Instance.ScrollMouse != 0)
+            
+            if (Input.GetKeyDown(KeyCode.R))
+            {
+                RotatePreview(true);
+            }
+            else if (InputsManager.Instance.ScrollMouse != 0)
             {
                 RotatePreview(InputsManager.Instance.ScrollMouse < 0);
+
             }
         }
 
@@ -222,11 +209,13 @@ namespace Components.Grid
                 _currentMachinePreview = null;
                 _skipFrame = true;
                 SwitchInputState(InputState.SELECTION);
+                
                 return;
             }
 
             //Instantiate the same machine type if we have enough in the inventory.
             InstantiateNewPreviewFrom(_currentMachinePreview, _currentPreviewRotation);
+            InventoryController.Instance.DecreaseGridObjectTemplate(_currentMachinePreview.Machine.Template, 1);
         }
 
         private void MovePreview()
@@ -308,7 +297,7 @@ namespace Components.Grid
                 Debug.Log($"Destroying current preview: {_currentMachinePreview.Machine.Template.Type}");
                 
                 // Give back the machine to the player if it comes from a move mode.
-                GrimoireController.Instance.AddMachineToPlayerInventory(_currentMachinePreview.Machine.Template, 1);
+                InventoryController.Instance.AddGridObjectTemplateToInventory(_currentMachinePreview.Machine.Template, 1);
                 
                 // Destroy the preview
                 Destroy(_currentMachinePreview.gameObject);
@@ -438,6 +427,25 @@ namespace Components.Grid
             // Hover current machine
             _hoveredMachine = chosenCell.Node.Machine;
             _hoveredMachine.Hover(true);
+        }
+        
+        private void TrySelectMachine()
+        {
+            if (_hoveredMachine == null) 
+                return;
+
+            // Cast into standard conveyor if curved one.
+            var template = _hoveredMachine.Template.Type == MachineType.CONVEYOR
+                ? ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("ConveyorLeftToRight")
+                : _hoveredMachine.Template;       
+            
+            if (!InventoryController.Instance.PlayerMachinesDictionary.ContainsKey(template) || InventoryController.Instance.PlayerMachinesDictionary[template] <= 0) 
+                return;
+
+            //TODO: Harmonize the code with MachineSelectorView.
+            InventoryController.Instance.DecreaseGridObjectTemplate(_hoveredMachine.Template, 1);
+            MachineManager.OnChangeSelectedMachine?.Invoke(_hoveredMachine.Template);
+            _currentMachinePreview.Machine.Hover(false);
         }
         
         // ------------------------------------------------------------------------- EVENT HANDLERS -------------------------------------------------------------------------------- 
