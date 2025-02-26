@@ -34,7 +34,6 @@ namespace Components.Grid
         [SerializeField] private MachineController _currentMachinePreview;
         [SerializeField] private int _currentInputRotation;
         [SerializeField] private int _currentPreviewRotation;
-        [SerializeField] private bool _moveMode;
         [SerializeField] private bool _skipFrame;
         
         // ------------------------------------------------------------------------- PRIVATE FIELDS -------------------------------------------------------------------------------- 
@@ -116,25 +115,6 @@ namespace Components.Grid
             }
         }
 
-        private void TrySelectMachine()
-        {
-            if (_hoveredMachine == null) 
-                return;
-
-            // Cast into standard conveyor if curved one.
-            var template = _hoveredMachine.Template.Type == MachineType.CONVEYOR
-                ? ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("ConveyorLeftToRight")
-                : _hoveredMachine.Template;       
-            
-            if (!InventoryController.Instance.PlayerMachinesDictionary.ContainsKey(template) || InventoryController.Instance.PlayerMachinesDictionary[template] <= 0) 
-                return;
-
-            //TODO: Harmonize the code with MachineSelectorView.
-            InventoryController.Instance.DecreaseGridObjectTemplate(_hoveredMachine.Template, 1);
-            MachineManager.OnChangeSelectedMachine?.Invoke(_hoveredMachine.Template);
-            _currentMachinePreview.Machine.Hover(false);
-        }
-
         private void HandlePlacementMode()
         {
             MovePreview();
@@ -154,9 +134,15 @@ namespace Components.Grid
                     SetPlacementRotations(0);
                 }
             }
-            if (Input.GetKeyDown(KeyCode.R) || InputsManager.Instance.ScrollMouse != 0)
+            
+            if (Input.GetKeyDown(KeyCode.R))
+            {
+                RotatePreview(true);
+            }
+            else if (InputsManager.Instance.ScrollMouse != 0)
             {
                 RotatePreview(InputsManager.Instance.ScrollMouse < 0);
+
             }
         }
 
@@ -199,15 +185,15 @@ namespace Components.Grid
             }
 
             // Check if the machine can be placed on the grid. 
-            if (!IsMachinePlacable(chosenCell))
+            if (!_currentMachinePreview.Machine.IsPlacable(Grid,chosenCell, out var machinesOverwritten))
             {
-                if (!_currentMachinePreview.Machine.CanOverwrite(chosenCell))
-                {
-                    return;
-                }
-
-                // Retrieve the machine under it.
-                RetrieveMachine(chosenCell.Node.Machine, true);
+                return;
+            }
+            
+            // Clean the overwritten machines
+            for (int i = 0; i < machinesOverwritten.Count; i++)
+            {
+                RetrieveMachine(machinesOverwritten[i], true);
             }
             
             // Place the current preview on the grid.
@@ -215,17 +201,6 @@ namespace Components.Grid
             
             _currentMachinePreview.AddToGrid(chosenCell, Grid, _gridObjectsHolder);
             _currentMachinePreview.Machine.Select(false);
-
-            // If this is not a move mode take a machine from player inventory.
-            if (!_moveMode)
-            {
-                InventoryController.Instance.DecreaseGridObjectTemplate(_currentMachinePreview.Machine.Template, 1);
-                Debug.Log($"Taking {_currentMachinePreview.Machine.Template.Type} from player inventory.");
-            }
-            else
-            {
-                _moveMode = false;
-            }
             
             // If there is no machine of this type in the inventory go back in selection mode.
             if (InventoryController.Instance.CountGridObject(_currentMachinePreview.Machine.Template) <= 0)
@@ -234,11 +209,13 @@ namespace Components.Grid
                 _currentMachinePreview = null;
                 _skipFrame = true;
                 SwitchInputState(InputState.SELECTION);
+                
                 return;
             }
 
             //Instantiate the same machine type if we have enough in the inventory.
             InstantiateNewPreviewFrom(_currentMachinePreview, _currentPreviewRotation);
+            InventoryController.Instance.DecreaseGridObjectTemplate(_currentMachinePreview.Machine.Template, 1);
         }
 
         private void MovePreview()
@@ -267,7 +244,7 @@ namespace Components.Grid
 
                     if (_currentMachinePreview)
                     {
-                        _currentMachinePreview.UpdateGridViewPlacableState(IsMachinePlacable(cell) || _currentMachinePreview.Machine.CanOverwrite(cell));
+                        _currentMachinePreview.UpdateGridViewPlacableState(_currentMachinePreview.Machine.IsPlacable(Grid, cell, out _));
                     }
                 }
                 else
@@ -316,17 +293,23 @@ namespace Components.Grid
                 {
                     return false;
                 }
+                
                 Debug.Log($"Destroying current preview: {_currentMachinePreview.Machine.Template.Type}");
                 
+                // Give back the machine to the player if it comes from a move mode.
+                InventoryController.Instance.AddGridObjectTemplateToInventory(_currentMachinePreview.Machine.Template, 1);
+                
+                // Destroy the preview
                 Destroy(_currentMachinePreview.gameObject);
                 _currentMachinePreview = null;
                 _skipFrame = true;
                 
                 OnPreview?.Invoke(false);
-                
+
+                return true;
             }
 
-            return true;
+            return false;
         }
         
         // ------------------------------------------------------------------------- SELECTION BEHAVIOUR -------------------------------------------------------------------------------- 
@@ -373,7 +356,6 @@ namespace Components.Grid
                 machine.Controller.transform.localPosition = Vector3.zero;
                 machine.Select(true);
 
-                _moveMode = true;
                 SetPlacementRotations(machine.Rotation);
                 
                 SwitchInputState(InputState.PLACEMENT);
@@ -445,6 +427,25 @@ namespace Components.Grid
             // Hover current machine
             _hoveredMachine = chosenCell.Node.Machine;
             _hoveredMachine.Hover(true);
+        }
+        
+        private void TrySelectMachine()
+        {
+            if (_hoveredMachine == null) 
+                return;
+
+            // Cast into standard conveyor if curved one.
+            var template = _hoveredMachine.Template.Type == MachineType.CONVEYOR
+                ? ScriptableObjectDatabase.GetScriptableObject<MachineTemplate>("ConveyorLeftToRight")
+                : _hoveredMachine.Template;       
+            
+            if (!InventoryController.Instance.PlayerMachinesDictionary.ContainsKey(template) || InventoryController.Instance.PlayerMachinesDictionary[template] <= 0) 
+                return;
+
+            //TODO: Harmonize the code with MachineSelectorView.
+            InventoryController.Instance.DecreaseGridObjectTemplate(_hoveredMachine.Template, 1);
+            MachineManager.OnChangeSelectedMachine?.Invoke(_hoveredMachine.Template);
+            _currentMachinePreview.Machine.Hover(false);
         }
         
         // ------------------------------------------------------------------------- EVENT HANDLERS -------------------------------------------------------------------------------- 
@@ -558,27 +559,6 @@ namespace Components.Grid
             }
 
             return false;
-        }
-        
-        private bool IsMachinePlacable(Cell originCell)
-        {
-            foreach (var node in _currentMachinePreview.Machine.Nodes)
-            {
-                var nodeGridPosition = node.SetGridPosition(originCell.Coordinates);
-
-                // One node does not overlap a constructable cell. 
-                if (!Grid.TryGetCellByCoordinates(nodeGridPosition.x, nodeGridPosition.y, out Cell overlapCell))
-                {
-                    return false;
-                }
-                
-                if (!overlapCell.IsConstructable())
-                {
-                    return false;
-                }
-            }
-
-            return true;
         }
         
         private void ClearMachineGridData(Machine machineToClear)

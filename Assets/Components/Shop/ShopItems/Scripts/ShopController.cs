@@ -10,9 +10,6 @@ namespace Components.Shop
 {
 	public class ShopController : MonoBehaviour
 	{
-		[SerializeField] private int _numberOfConsumableItemInShop = 3;
-		[SerializeField] private int _numberOfRelicItemInShop = 2;
-		
 		public static Action<List<ShopItem>> OnShopGenerated;
 
 		private void Start()
