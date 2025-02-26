@@ -18,10 +18,11 @@ MonoBehaviour:
   _uiView: {fileID: 21300000, guid: 43baf03b300ee9646901e425eedf19f3, type: 3}
   _gridObjectControllerPrefab: {fileID: 2567407675386972328, guid: 859503caaa5f96242b5ba83dccd721c9,
     type: 3}
-  _canOverwriteOnPlacement: 1
+  _canOverwrite: 1
+  _isOverwritable: 1
   _canRetrieve: 1
   _canMove: 1
-  _canConfigure: 1
+  _canConfigure: 0
   _type: 1
   _gridComponents:
   - {fileID: 9044706959645954946, guid: b514072cd8aa2bf4886873ee9a28c452, type: 3}

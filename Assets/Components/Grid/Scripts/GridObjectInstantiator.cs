@@ -199,15 +199,15 @@ namespace Components.Grid
             }
 
             // Check if the machine can be placed on the grid. 
-            if (!IsMachinePlacable(chosenCell))
+            if (!_currentMachinePreview.Machine.IsPlacable(Grid,chosenCell, out var machinesOverwritten))
             {
-                if (!_currentMachinePreview.Machine.CanOverwrite(chosenCell))
-                {
-                    return;
-                }
-
-                // Retrieve the machine under it.
-                RetrieveMachine(chosenCell.Node.Machine, true);
+                return;
+            }
+            
+            // Clean the overwritten machines
+            for (int i = 0; i < machinesOverwritten.Count; i++)
+            {
+                RetrieveMachine(machinesOverwritten[i], true);
             }
             
             // Place the current preview on the grid.
@@ -267,7 +267,7 @@ namespace Components.Grid
 
                     if (_currentMachinePreview)
                     {
-                        _currentMachinePreview.UpdateGridViewPlacableState(IsMachinePlacable(cell) || _currentMachinePreview.Machine.CanOverwrite(cell));
+                        _currentMachinePreview.UpdateGridViewPlacableState(_currentMachinePreview.Machine.IsPlacable(Grid, cell, out _));
                     }
                 }
                 else
@@ -558,27 +558,6 @@ namespace Components.Grid
             }
 
             return false;
-        }
-        
-        private bool IsMachinePlacable(Cell originCell)
-        {
-            foreach (var node in _currentMachinePreview.Machine.Nodes)
-            {
-                var nodeGridPosition = node.SetGridPosition(originCell.Coordinates);
-
-                // One node does not overlap a constructable cell. 
-                if (!Grid.TryGetCellByCoordinates(nodeGridPosition.x, nodeGridPosition.y, out Cell overlapCell))
-                {
-                    return false;
-                }
-                
-                if (!overlapCell.IsConstructable())
-                {
-                    return false;
-                }
-            }
-
-            return true;
         }
         
         private void ClearMachineGridData(Machine machineToClear)

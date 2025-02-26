@@ -254,23 +254,63 @@ namespace Components.Machines
         }
         
         // ----------------------------------------------------------------------- PLACEMENT -------------------------------------------------------------
+        //TODO: This should be on grid object extensions.
+        public static bool IsPlacable(this Machine machineToPlace, Grid.Grid grid, Cell originCell, out List<Machine> machinesOverwritten)
+        {
+            machinesOverwritten = new List<Machine>();
+            
+            foreach (var node in machineToPlace.Nodes)
+            {
+                var nodeGridPosition = node.GetGridPosition(originCell.Coordinates);
+
+                // One node does not overlap a constructable cell. 
+                if (!grid.TryGetCellByCoordinates(nodeGridPosition.x, nodeGridPosition.y, out Cell overlapCell))
+                {
+                    return false;
+                }
+                
+                if (!overlapCell.IsConstructable())
+                {
+                    if (!machineToPlace.CanOverwriteCell(overlapCell, out var machineOverwritten))
+                    {
+                        return false;
+                    }
+                    
+                    machinesOverwritten.Add(machineOverwritten);
+                }
+            }
+
+            return true;
+        }
         
-        public static bool CanOverwrite(this Machine machineThatOverwrite, Cell cellToOverwrite)
+        
+        //TODO: This should be on grid object extensions.
+        private static bool CanOverwriteCell(this Machine machineThatOverwrite, Cell cell, out Machine machineOverwritten)
         {
             // If the cell does not contain a machine it cannot be overwritten.
-            if (!cellToOverwrite.ContainsNode)
+            if (!cell.ContainsNode)
             {
+                machineOverwritten = null;
                 return false;
             }
 
-            var machineToOverwrite = cellToOverwrite.Node.Machine;
+            var machineToOverwrite = cell.Node.Machine;
             
-            // Check if the machine to overwrite can be retrieved and the machine to place can overwrite.
-            if (!machineToOverwrite.Template.CanRetrieve || !machineThatOverwrite.Template.CanOverwriteOnPlacement)
+            // Cannot overwrite if we cannot retrieve the object (Marchand, Extractors, ...).
+            if (!machineToOverwrite.Template.CanRetrieve)
             {
+                machineOverwritten = null;
                 return false;
             }
 
+            // Check if the machine to overwrite can be retrieved and the machine to place can overwrite.
+            if (!machineThatOverwrite.Template.CanOverwrite || !machineToOverwrite.Template.IsOverwritable)
+            {
+                machineOverwritten = null;
+                return false;
+            }
+
+            machineOverwritten = machineToOverwrite;
             return true;
         }
     }
