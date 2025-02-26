@@ -250,7 +250,7 @@ namespace Components.Grid
                 else
                 {
                     _currentMachinePreview.gameObject.SetActive(false);
-                    _currentMachinePreview.Machine.Hover(false);
+                    //_currentMachinePreview.Machine.Hover(false);
                 }
             }
             else
@@ -420,6 +420,11 @@ namespace Components.Grid
             }
 
             if (_hoveredMachine == chosenCell.Node.Machine)
+            {
+                return;
+            }
+
+            if (_currentMachinePreview && _hoveredMachine == _currentMachinePreview.Machine)
             {
                 return;
             }

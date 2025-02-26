@@ -95,6 +95,7 @@ namespace Components.Grid
                     // If we toggle the blueprints materials, set the first state as placable.
                     UpdateBlueprintColor(true);
                     TogglePlacedObject(false);
+                    ToggleHoverOutlines(false);
                 }
                 else
                 {

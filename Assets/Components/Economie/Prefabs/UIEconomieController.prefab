@@ -222,6 +222,7 @@ GameObject:
   - component: {fileID: 8056239088055902869}
   - component: {fileID: 3843862231742239365}
   - component: {fileID: 7508105325948610892}
+  - component: {fileID: 969939146535504457}
   m_Layer: 5
   m_Name: GuildPoint_Icon
   m_TagString: Untagged
@@ -342,6 +343,19 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &969939146535504457
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2735337599346405898}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52430af109f70e64dba17581c0b1d68d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _componentToDisable: {fileID: 7508105325948610892}
 --- !u!1 &3830121459653031851
 GameObject:
   m_ObjectHideFlags: 0
@@ -564,6 +578,7 @@ GameObject:
   - component: {fileID: 5400719829622877635}
   - component: {fileID: 2629020184736788110}
   - component: {fileID: 2849373613102078209}
+  - component: {fileID: 714220719353585694}
   m_Layer: 5
   m_Name: Gold_icon
   m_TagString: Untagged
@@ -684,6 +699,19 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &714220719353585694
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3976714679429058496}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52430af109f70e64dba17581c0b1d68d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _componentToDisable: {fileID: 2849373613102078209}
 --- !u!1 &4790575904660653494
 GameObject:
   m_ObjectHideFlags: 0
