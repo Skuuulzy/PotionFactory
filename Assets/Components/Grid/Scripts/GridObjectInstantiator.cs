@@ -34,7 +34,6 @@ namespace Components.Grid
         [SerializeField] private MachineController _currentMachinePreview;
         [SerializeField] private int _currentInputRotation;
         [SerializeField] private int _currentPreviewRotation;
-        [SerializeField] private bool _moveMode;
         [SerializeField] private bool _skipFrame;
         
         // ------------------------------------------------------------------------- PRIVATE FIELDS -------------------------------------------------------------------------------- 
@@ -215,17 +214,6 @@ namespace Components.Grid
             
             _currentMachinePreview.AddToGrid(chosenCell, Grid, _gridObjectsHolder);
             _currentMachinePreview.Machine.Select(false);
-
-            // If this is not a move mode take a machine from player inventory.
-            if (!_moveMode)
-            {
-                InventoryController.Instance.DecreaseGridObjectTemplate(_currentMachinePreview.Machine.Template, 1);
-                Debug.Log($"Taking {_currentMachinePreview.Machine.Template.Type} from player inventory.");
-            }
-            else
-            {
-                _moveMode = false;
-            }
             
             // If there is no machine of this type in the inventory go back in selection mode.
             if (InventoryController.Instance.CountGridObject(_currentMachinePreview.Machine.Template) <= 0)
@@ -316,17 +304,24 @@ namespace Components.Grid
                 {
                     return false;
                 }
+                
                 Debug.Log($"Destroying current preview: {_currentMachinePreview.Machine.Template.Type}");
                 
+                // Give back the machine to the player if it comes from a move mode.
+                GrimoireController.Instance.AddMachineToPlayerInventory(_currentMachinePreview.Machine.Template, 1);
+                
+                // Destroy the preview
                 Destroy(_currentMachinePreview.gameObject);
                 _currentMachinePreview = null;
                 _skipFrame = true;
                 
                 OnPreview?.Invoke(false);
-                
+
+                return true;
             }
 
-            return true;
+            Debug.LogError("No preview to destroy !");
+            return false;
         }
         
         // ------------------------------------------------------------------------- SELECTION BEHAVIOUR -------------------------------------------------------------------------------- 
@@ -373,7 +368,6 @@ namespace Components.Grid
                 machine.Controller.transform.localPosition = Vector3.zero;
                 machine.Select(true);
 
-                _moveMode = true;
                 SetPlacementRotations(machine.Rotation);
                 
                 SwitchInputState(InputState.PLACEMENT);
