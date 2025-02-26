@@ -13,9 +13,6 @@ public class UIStateController : MonoBehaviour
 
 	[SerializeField] private SOSharedFloat _stateCountdownTime;
 
-	[Header("EndGame")]
-	[SerializeField] private GameObject _endGameGO;
-
 
 	private static readonly int DISPLAY_STATE = Animator.StringToHash("DisplayState");
 	private BaseState _currentState;
@@ -49,7 +46,6 @@ public class UIStateController : MonoBehaviour
 				break;
 			case EndGameState endGameState:
 				HideCountdown();
-				DisplayEndGameState();
 				break;
 			case GameOverState gameOverState:
 				HideCountdown();
@@ -78,22 +74,9 @@ public class UIStateController : MonoBehaviour
 		_stateCountdownText.text = $"--";
 	}
 
-	
-
-
 	public void OnEndCurrentState()
 	{
 		_currentState.SetStateFinished();
 	}
 
-	public void DisplayEndGameState()
-	{
-		_endGameGO.SetActive(true);
-	}
-
-	// TODO: Is it supposed to be here ? 
-	public void ReturnToMainMenu()
-	{
-		SceneLoader.LoadMainMenu();
-	}
 }

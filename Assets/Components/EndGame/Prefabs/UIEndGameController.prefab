@@ -2400,7 +2400,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 283.62177}
+  m_SizeDelta: {x: 0, y: 283.4643}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &2456362160761769470
 MonoBehaviour:
@@ -2563,7 +2563,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 3961145897201291789}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.63994133
+  m_Size: 0.6401413
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -3168,7 +3168,7 @@ GameObject:
   - component: {fileID: 7535651672170461509}
   - component: {fileID: 3483872144876097126}
   m_Layer: 5
-  m_Name: UIGameOverController
+  m_Name: UIEndGameController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3211,7 +3211,10 @@ MonoBehaviour:
   _objectsToHide:
   - {fileID: 5657919282004589417}
   _showViewToggle: {fileID: 1880939294434523159}
-  _defeatExplicationText: {fileID: 4102956746608332450}
+  _endGameText: {fileID: 4154432089006318171}
+  _titleBackground: {fileID: 1679274545000670029}
+  _contentBackground: {fileID: 239089574420957668}
+  _endGameExplicationText: {fileID: 4102956746608332450}
   _bundleViewPrefab: {fileID: 9081442003740483395, guid: ab59c3518920f9f419ba976b198f2212,
     type: 3}
   _startingBundleTransform: {fileID: 5741636295412970030}
@@ -3221,6 +3224,8 @@ MonoBehaviour:
   _dayIndex: {fileID: 11400000, guid: a117a294dda3cb744838d3f4ab02d41b, type: 2}
   _playerScore: {fileID: 11400000, guid: bbc41854e4b33f34e93c0ae9df411e40, type: 2}
   _playerObjective: {fileID: 11400000, guid: eef0c6b166b831b408bee7773e1841c2, type: 2}
+  _defeatBackground: {fileID: 21300000, guid: 36549254252044776a3dbf162aa51f62, type: 3}
+  _victoryBackground: {fileID: 21300000, guid: 186645ba07ea64608abc3eadef21858d, type: 3}
 --- !u!1 &8599775497186010087
 GameObject:
   m_ObjectHideFlags: 0
@@ -3486,7 +3491,7 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1742543202117444115}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0.36005867}
+  m_AnchorMin: {x: 0, y: 0.3598587}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 20}

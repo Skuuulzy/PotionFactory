@@ -10,14 +10,17 @@ using UnityEngine;
 using UnityEngine.UI;
 using VComponent.Tools.SceneLoader;
 
-public class UIGameOverController : MonoBehaviour
+public class UIEndGameController : MonoBehaviour
 {
 	[SerializeField] private GameObject _view;
 	[SerializeField] private List<GameObject> _objectsToHide;
 	[SerializeField] private Toggle _showViewToggle;
+	[SerializeField] private TextMeshProUGUI _endGameText;
+	[SerializeField] private Image _titleBackground;
+	[SerializeField] private Image _contentBackground;
 
     [Header("Defeat")]
-    [SerializeField] private TextMeshProUGUI _defeatExplicationText;
+    [SerializeField] private TextMeshProUGUI _endGameExplicationText;
 	[SerializeField] private UIBundleView _bundleViewPrefab;
 
 	[Header("Holders")]
@@ -29,7 +32,11 @@ public class UIGameOverController : MonoBehaviour
 	[Header("SharedValues")]
 	[SerializeField] private SOSharedInt _dayIndex; 
 	[SerializeField] private SOSharedInt _playerScore; 
-	[SerializeField] private SOSharedInt _playerObjective; 
+	[SerializeField] private SOSharedInt _playerObjective;
+
+	[Header("Assets")]
+	[SerializeField] private Sprite _defeatBackground;
+	[SerializeField] private Sprite _victoryBackground;
 
 	private IngredientsBundle _startingIngredientBundle;
 	private readonly List<IngredientTemplate> _otherIngredientsList = new();
@@ -39,6 +46,7 @@ public class UIGameOverController : MonoBehaviour
 	private void Start()
 	{
         GameOverState.OnGameOverStarted += HandleGameOver;
+        EndGameState.OnEndGameStateStarted += HandleVictory;
         BundleChoiceGenerator.OnBundleChoiceConfirm += HandleBundleChoice;
 		UIIngredientShopItemViewController.OnIngredientBuyed += HandleIngredientBuy;
 		MarchandMachineBehaviour.OnIngredientSold += HandleIngredientSold;
@@ -48,6 +56,8 @@ public class UIGameOverController : MonoBehaviour
 	private void OnDestroy()
 	{
         GameOverState.OnGameOverStarted -= HandleGameOver;
+        EndGameState.OnEndGameStateStarted -= HandleVictory;
+
         BundleChoiceGenerator.OnBundleChoiceConfirm -= HandleBundleChoice;
         UIIngredientShopItemViewController.OnIngredientBuyed -= HandleIngredientBuy;
         MarchandMachineBehaviour.OnIngredientSold -= HandleIngredientSold;
@@ -58,18 +68,36 @@ public class UIGameOverController : MonoBehaviour
     private void HandleGameOver(GameOverState state)
 	{
         GameOverState.OnGameOverStarted -= HandleGameOver;
+		_endGameText.text = $"Game Over";
+		_endGameExplicationText.text = $"Defeated at Day {_dayIndex.Value}.\nYour goal was to reach {_playerObjective.Value} gold, and you’ve achieved only {_playerScore.Value}...";
+		_titleBackground.sprite = _defeatBackground;
+		_contentBackground.sprite = _defeatBackground;
+        SetView();
+    }
 
+	private void HandleVictory(EndGameState state)
+	{
+        EndGameState.OnEndGameStateStarted -= HandleVictory;
+
+        _endGameText.text = $"Victory";
+		_endGameExplicationText.text = $"You've done it! You've made it to the end of the 16 days!";
+
+        _titleBackground.sprite = _victoryBackground;
+        _contentBackground.sprite = _victoryBackground;
+        SetView();
+    }
+
+	private void SetView()
+	{
         _view.SetActive(true);
-		_showViewToggle.gameObject.SetActive(true);
-		_defeatExplicationText.text = $"Defeated at Day {_dayIndex.Value}.\nYour goal was to reach {_playerObjective.Value} gold, and you’ve achieved only {_playerScore.Value}...";
+        _showViewToggle.gameObject.SetActive(true);
+        SetUpStartingBundle();
+        SetUpOtherIngredients();
+        SetUpMachinesPurchased();
+        SetUpRecipesSold();
+    }
 
-		SetUpStartingBundle();
-		SetUpOtherIngredients();
-		SetUpMachinesPurchased();
-		SetUpRecipesSold();
-	}
-
-	public void ReturnToMainMenu()
+    public void ReturnToMainMenu()
 	{
 		SceneLoader.LoadMainMenu();
 	}
