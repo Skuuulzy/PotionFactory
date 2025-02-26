@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Components.Grid
@@ -18,6 +17,10 @@ namespace Components.Grid
         [SerializeField] private Color _placableColor = Color.green;
         [SerializeField] private Color _unPlacableColor = Color.red;
         [SerializeField] private List<Renderer> _renderersToBlueprint;
+
+        [Header("Placed Object")] 
+        [SerializeField, Tooltip("Object that are un active on preview and activated when the object is placed.")] 
+        private List<GameObject> _placedObject;
         
         private static readonly int GHOST_COLOR = Shader.PropertyToID("_Ghost_Color");
         private Dictionary<Renderer,List<Material>> _originalMaterials;
@@ -29,7 +32,17 @@ namespace Components.Grid
             SetupBlueprintRenderers();
             SetupOutlines();
         }
+        
+        // ------------------------------------------------------------------------- PLACED OBJECT -------------------------------------------------------------------------
 
+        private void TogglePlacedObject(bool toggle)
+        {
+            for (int i = 0; i < _placedObject.Count; i++)
+            {
+                _placedObject[i].SetActive(toggle);
+            }
+        }
+        
         // ------------------------------------------------------------------------- BLUEPRINTS -----------------------------------------------------------------------------
         
         private void SetupBlueprintRenderers()
@@ -81,10 +94,12 @@ namespace Components.Grid
                     
                     // If we toggle the blueprints materials, set the first state as placable.
                     UpdateBlueprintColor(true);
+                    TogglePlacedObject(false);
                 }
                 else
                 {
                     _bluePrintMaterialInstances.Clear();
+                    TogglePlacedObject(true);
                 }
             }
         }

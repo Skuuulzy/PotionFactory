@@ -320,7 +320,6 @@ namespace Components.Grid
                 return true;
             }
 
-            Debug.LogError("No preview to destroy !");
             return false;
         }
         
