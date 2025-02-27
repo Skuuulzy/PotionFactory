@@ -97,6 +97,11 @@ public class StateController : MonoBehaviour
 			
 			_initialTime.Set(_timer.InitialTime);
 			_currentTime.Set(_timer.Time);
+
+			if (Input.GetKeyDown(KeyCode.T) && CurrentGameMode == GameMode.SANDBOX && _timer is TickableStopWatchTimer stopWatchTimer)
+			{
+				stopWatchTimer.Reset();
+			}
 		}
 	}
 
