@@ -1,5 +1,65 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2227687345297215530
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3700821044225641978}
+  - component: {fileID: 1404462823086414073}
+  m_Layer: 5
+  m_Name: IngredientsNeeded
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &3700821044225641978
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2227687345297215530}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4738106466677760851}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -45.913864, y: -68.99705}
+  m_SizeDelta: {x: 258.1723, y: 58.006}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1404462823086414073
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2227687345297215530}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a8695521f0d02e499659fee002a26c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Padding:
+    m_Left: 0
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 0
+  m_ChildAlignment: 0
+  m_StartCorner: 0
+  m_StartAxis: 0
+  m_CellSize: {x: 60, y: 30}
+  m_Spacing: {x: 2, y: 0}
+  m_Constraint: 1
+  m_ConstraintCount: 4
 --- !u!1 &2269341238190521962
 GameObject:
   m_ObjectHideFlags: 0
@@ -474,7 +534,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &442089609136437215
 RectTransform:
   m_ObjectHideFlags: 0
@@ -626,6 +686,7 @@ RectTransform:
   - {fileID: 1408903313926697589}
   - {fileID: 716637412947580020}
   - {fileID: 442089609136437215}
+  - {fileID: 3700821044225641978}
   - {fileID: 2400146014418511045}
   - {fileID: 4252050689210222981}
   - {fileID: 4969985459621029228}
@@ -693,6 +754,9 @@ MonoBehaviour:
   _recipePriceTxt: {fileID: 3796043843923769396}
   _recipeTimeTxt: {fileID: 2961898766052290301}
   _recipeSprite: {fileID: 726553027553033130}
+  _recipeIngredientViewPrefab: {fileID: 6569991024953604891, guid: 609e92bc01c99ac4d81b548a8f108a27,
+    type: 3}
+  _ingredientsParent: {fileID: 3700821044225641978}
 --- !u!1 &6617608071169926465
 GameObject:
   m_ObjectHideFlags: 0

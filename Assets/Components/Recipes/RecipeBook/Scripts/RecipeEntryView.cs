@@ -16,6 +16,9 @@ namespace Components.Recipes.Grimoire
         [SerializeField] private TMP_Text _recipeTimeTxt;
         [SerializeField] private Image _recipeSprite;
 
+        [SerializeField] private RecipeIngredientView _recipeIngredientViewPrefab;
+        [SerializeField] private Transform _ingredientsParent;
+
         public string RecipeName { get; private set; }
         
         public void Initialize(RecipeTemplate recipeTemplate)
@@ -33,6 +36,9 @@ namespace Components.Recipes.Grimoire
             
             foreach (var recipeTemplateIngredient in recipeTemplate.Ingredients)
             {
+                RecipeIngredientView recipeIngredientView = Instantiate(_recipeIngredientViewPrefab, _ingredientsParent);
+                recipeIngredientView.Init(recipeTemplateIngredient.Key.Icon, recipeTemplateIngredient.Value, recipeTemplateIngredient.Key.Name);
+                
                 ingredientsNeeded += $"{recipeTemplateIngredient.Key.Name} x{recipeTemplateIngredient.Value}, ";
             }
             _recipeIngredientsTxt.text = ingredientsNeeded;
