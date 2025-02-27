@@ -16,9 +16,14 @@ namespace Components.Recipes.Grimoire
         [SerializeField] private Transform _entriesHolder;
         [SerializeField] private RecipeEntryView _entryViewPrefab;
         [SerializeField] private GameObject _recipeBookPanel;
-        
+
+        [SerializeField] private RecipeIngredientView _ingredienPrefab;
+        [SerializeField] private Transform _playerIngredientsHolder;
+
+
         private List<RecipeEntryView> _allEntryViews = new();
         private List<RecipeTemplate> _allRecipes;
+        private List<IngredientTemplate> _playerResources;
         private void Awake()
         {
             _allRecipes = ScriptableObjectDatabase.GetAllScriptableObjectOfType<RecipeTemplate>();
@@ -44,12 +49,31 @@ namespace Components.Recipes.Grimoire
                 _allEntryViews.Add(entryView);
             }
         }
+
+        private void SetPlayerIngredients()
+        {
+           
+            foreach (Transform child in _playerIngredientsHolder)
+            {
+                Destroy(child.gameObject);
+            }
+
+            foreach (var ingredient in _playerResources)
+            {
+                var ingredientView = Instantiate(_ingredienPrefab, _playerIngredientsHolder);
+                ingredientView.Init(ingredient.Icon, -1, ingredient.Name);
+            }
+        }
         public void DisplayRecipeBook(bool value)
         {
             _recipeBookPanel.SetActive(value);
             if (value)
             {
+                // Get extracted resources
+                _playerResources = GridController.Instance.ExtractedIngredients;
+
                 SetRecipesOrder();
+                SetPlayerIngredients();
             }
         }
 
@@ -88,11 +112,7 @@ namespace Components.Recipes.Grimoire
         {
             // Get player machines
             var playerMachines = InventoryController.Instance.PlayerMachinesDictionary.Keys.ToList();
-
-            // Get extracted resources
-            var playerResources = GridController.Instance.ExtractedIngredients;
-
-            var potentialRecipes = ScriptableObjectDatabase.FindAllPotentialRecipes(playerMachines, playerResources);
+            var potentialRecipes = ScriptableObjectDatabase.FindAllPotentialRecipes(playerMachines, _playerResources);
             return potentialRecipes;
         }
     }
