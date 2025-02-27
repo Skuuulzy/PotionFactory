@@ -1,8 +1,8 @@
 using SoWorkflow.SharedValues;
-using System;
 using UnityEngine;
 using VComponent.Tools.Singletons;
 using VTools.SoWorkflow.EventSystem;
+using static Components.GameParameters.GameParameters;
 
 namespace Components.Economy
 {
@@ -20,14 +20,17 @@ namespace Components.Economy
 		[SerializeField] private GameEvent _onPlayerScoreSuccess;
 
 		[SerializeField] private RunConfiguration _runConfiguration;
-
-
-
-
+		
 		private void Start()
 		{
 			ResolutionFactoryState.OnResolutionFactoryStateStarted += HandleResolutionFactoryStateStarted;
 			EndOfDayState.OnEndOfDayStateStarted += HandleEndOfDayStateStarted;
+			
+			Debug.Log($"Current gameMode: {CurrentGameMode}");
+			if (CurrentGameMode == GameMode.SANDBOX)
+			{
+				AddMoney(9999);
+			}
 		}
 		
 		private void OnDestroy()
@@ -40,13 +43,13 @@ namespace Components.Economy
 		public void AddMoney(int amount)
 		{
 			_playerGuildToken.Increment(amount);
-
 		}
 
 		public void AddScore(int amount)
 		{
 			_statePlayerScore.Increment(amount);
-			if(_statePlayerScore.Value >= _stateScoreObjective.Value)
+			
+			if(_statePlayerScore.Value >= _stateScoreObjective.Value && CurrentGameMode == GameMode.STANDARD)
 			{
 				_onPlayerScoreSuccess?.Raise();
 				_stateCurrentTime.OnValueUpdated += CheckInterest;
@@ -71,11 +74,22 @@ namespace Components.Economy
 				ResetValues();
 			}
 			_statePlayerScore.Set(0);
-			_stateScoreObjective.Set(_runConfiguration.RunStateList.Find(x => x.StateNumber == state.StateIndex).MoneyObjective);
+
+			_stateScoreObjective.Set
+			(
+				CurrentGameMode == GameMode.STANDARD 
+				? _runConfiguration.RunStateList.Find(x => x.StateNumber == state.StateIndex).MoneyObjective 
+				: 0
+			);
 		}
 
 		private void ResetValues()
 		{
+			if (CurrentGameMode == GameMode.SANDBOX)
+			{
+				return;
+			}
+			
 			_statePlayerScore.Set(0);
 			_playerGuildToken.Set(0);
 			_totalGuildToken.Set(0);

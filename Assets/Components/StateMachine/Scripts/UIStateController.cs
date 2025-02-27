@@ -1,3 +1,4 @@
+using Components.GameParameters;
 using Components.Tick;
 using SoWorkflow.SharedValues;
 using TMPro;
@@ -78,5 +79,4 @@ public class UIStateController : MonoBehaviour
 	{
 		_currentState.SetStateFinished();
 	}
-
 }

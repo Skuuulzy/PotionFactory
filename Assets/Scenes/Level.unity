@@ -267,12 +267,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 5280213544075544414, guid: 81a17b8c773d69a4d894a0f833556242,
-        type: 3}
-      propertyPath: OnShopUpdate
-      value: 
-      objectReference: {fileID: 11400000, guid: ba60c4349d8538d4b89238d07ca49815,
-        type: 2}
     - target: {fileID: 7114295549541747410, guid: 81a17b8c773d69a4d894a0f833556242,
         type: 3}
       propertyPath: m_Name
@@ -685,7 +679,7 @@ GameObject:
   m_Component:
   - component: {fileID: 663179701}
   m_Layer: 0
-  m_Name: '----- CAMERA -----'
+  m_Name: ----- CAMERA -----
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -935,7 +929,6 @@ MonoBehaviour:
   _currentInputRotation: 0
   _currentPreviewRotation: 0
   _skipFrame: 0
-  _moveMode: 0
 --- !u!4 &943281390
 Transform:
   m_ObjectHideFlags: 0
@@ -1135,7 +1128,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1247665283}
   m_Layer: 0
-  m_Name: '----- MANAGERS -----'
+  m_Name: ----- MANAGERS -----
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -20528,7 +20521,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1922617410}
   m_Layer: 0
-  m_Name: '----- ENVIRONEMENT -----'
+  m_Name: ----- ENVIRONEMENT -----
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

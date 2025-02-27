@@ -77,21 +77,22 @@ namespace VComponent.Tools.Timer
 
 	public class TickableCountdownTimer : CountdownTimer, ITickable
 	{
-
         public TickableCountdownTimer(float value) : base (value)
 		{
             Time = TickSystem.GetTickValueFromSeconds(value); 
             InitialTime = Time;
             TickSystem.AddTickable(this);
 		}
-		public void Tick()
-		{
+
+        public void Tick()
+        {
             Time--;
-            if(Time <= 0)
-			{
+
+            if (Time <= 0)
+            {
                 Stop();
-			}
-		}
+            }
+        }
 
 		public override void Tick(float deltaTime)
 		{
@@ -114,5 +115,26 @@ namespace VComponent.Tools.Timer
         }
 
         public void Reset() => Time = 0;
+    }
+    
+    public class TickableStopWatchTimer : StopwatchTimer, ITickable
+    {
+        public TickableStopWatchTimer()
+        {
+            TickSystem.AddTickable(this);
+        }
+
+        public void Tick()
+        {
+            if (IsRunning)
+            {
+                Time++;
+            }
+        }
+
+        public override void Tick(float deltaTime)
+        {
+			
+        }
     }
 }

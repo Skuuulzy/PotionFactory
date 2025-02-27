@@ -1,8 +1,6 @@
-using Components.Bundle;
 using Components.Order;
 using Database;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -18,8 +16,7 @@ namespace Components.Bundle
 
 		[Header("Helps")]
 		[SerializeField] private OrderDialogueController _orderDialogueController;
-
-
+		
 		private bool _isFirstGameChoice;
 
 		private List<IngredientsBundle> _startingGameIngredientsBundles;
@@ -29,8 +26,8 @@ namespace Components.Bundle
 
 		//Need to change this poor bool 
 		public static Action<IngredientsBundle, bool> OnBundleChoiceConfirm;
-		// Start is called before the first frame update
-		void Start()
+
+		private void Start()
 		{
 			BundleChoiceState.OnBundleStateStarted += Init;
 		}
@@ -68,16 +65,10 @@ namespace Components.Bundle
 		{
 			_currentBundleSelected = null;
 			_confirmButton.interactable = false;
-			var startingRoundIngredientsBundles = new List<IngredientsBundle>();
 
-			if (_isFirstGameChoice)
-			{
-				startingRoundIngredientsBundles = _startingGameIngredientsBundles.OrderBy(_ => UnityEngine.Random.value).ToList();
-			}
-			else
-			{
-				startingRoundIngredientsBundles = _startingRoundIngredientsBundles.OrderBy(_ => UnityEngine.Random.value).ToList();
-			}
+			var startingRoundIngredientsBundles = _isFirstGameChoice 
+				? _startingGameIngredientsBundles.OrderBy(_ => UnityEngine.Random.value).ToList() 
+				: _startingRoundIngredientsBundles.OrderBy(_ => UnityEngine.Random.value).ToList();
 			
 			for (int i = 0; i < _uiBundleChoiceList.Count; i++)
 			{

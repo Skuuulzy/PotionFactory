@@ -1,3 +1,4 @@
+using Components.GameParameters;
 using MyGameDevTools.SceneLoading;
 using UnityEngine;
 
@@ -29,6 +30,7 @@ namespace VComponent.Tools.SceneLoader
         {
             Debug.Log("[SCENE_LOADER] Loading main menu ...");
             await SCENE_LOADER.TransitionToSceneFromAllAsync(MAIN_MENU_SCENE_INFO, LOADING_SCREEN_SCENE_INFO);
+            GameParameters.PlayerCheated = false;
             Debug.Log("[SCENE_LOADER] Main menu loaded !");
         }
         

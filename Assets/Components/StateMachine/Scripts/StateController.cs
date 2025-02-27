@@ -6,6 +6,7 @@ using Cysharp.Threading.Tasks;
 using SoWorkflow.SharedValues;
 using UnityEngine;
 using VComponent.Tools.Timer;
+using static Components.GameParameters.GameParameters;
 
 public class StateController : MonoBehaviour
 {
@@ -15,13 +16,14 @@ public class StateController : MonoBehaviour
 
 	public string CurrentDebugStateName;
 	
-	private CountdownTimer _countdownTimer;
+	private Timer _timer;
 	private StateMachine _stateMachine;
 
 	[SerializeField] private SOSharedFloat _initialTime;
 	[SerializeField] private SOSharedFloat _currentTime;
 
 	public static Action<BaseState> OnStateStarted;
+	
 	
 	//------------------------------------------------------------------------ MONO -------------------------------------------------------------------------------------------- 
 	private void Start()
@@ -88,11 +90,13 @@ public class StateController : MonoBehaviour
 		}
 
 		_stateMachine.Update();
-		if (_countdownTimer != null)
+		
+		if (_timer != null)
 		{
-			_countdownTimer.Tick(Time.deltaTime);
-			_initialTime.Set(_countdownTimer.InitialTime);
-			_currentTime.Set(_countdownTimer.Time);
+			_timer.Tick(Time.deltaTime);
+			
+			_initialTime.Set(_timer.InitialTime);
+			_currentTime.Set(_timer.Time);
 		}
 	}
 
@@ -114,18 +118,28 @@ public class StateController : MonoBehaviour
 	private void HandleShopState(EndOfDayState state)
 	{
 		CurrentDebugStateName = "SHOP";
-		_countdownTimer = null;
+		_timer = null;
 		OnStateStarted?.Invoke(state);
 	}
 
 	private void HandlePlanningFactoryState(PlanningFactoryState state)
 	{
 		CurrentDebugStateName = "PLANNING";
-		
-		_countdownTimer = new CountdownTimer(_runConfiguration.PlanningFactoryStateTime);
-		BaseState.OnStateEnded += _countdownTimer.Stop;
-		_countdownTimer.OnTimerStop += state.SetStateFinished;
-		_countdownTimer.Start();
+
+		if (CurrentGameMode == GameMode.STANDARD)
+		{
+			Debug.Log("Starting countdown");
+			_timer = new CountdownTimer(_runConfiguration.PlanningFactoryStateTime);
+			BaseState.OnStateEnded += _timer.Stop;
+			_timer.OnTimerStop += state.SetStateFinished;
+			_timer.Start();
+		}
+		else
+		{
+			Debug.Log("Starting stop watch");
+			_timer = new StopwatchTimer();
+			_timer.Start();
+		}
 
 		OnStateStarted.Invoke(state);
 	}
@@ -133,12 +147,22 @@ public class StateController : MonoBehaviour
 	private void HandleResolutionFactoryState(ResolutionFactoryState state)
 	{
 		CurrentDebugStateName = "RESOLUTION";
+
+		if (CurrentGameMode == GameMode.STANDARD)
+		{
+			_timer = new TickableCountdownTimer(_runConfiguration.GetStateTime(state.StateIndex));
+			
+			BaseState.OnStateEnded += _timer.Stop;
+			_timer.OnTimerStop += state.SetStateFinished;
+		}
+		else
+		{
+			_timer = new TickableStopWatchTimer();
+		}
+
 		_dayIndex.Set(state.StateIndex);
-        _countdownTimer = new TickableCountdownTimer(_runConfiguration.GetStateTime(state.StateIndex));
-        _initialTime.Set(_countdownTimer.InitialTime);
-        BaseState.OnStateEnded += _countdownTimer.Stop;
-		_countdownTimer.OnTimerStop += state.SetStateFinished;
-		_countdownTimer.Start();
+		_initialTime.Set(_timer.InitialTime);
+		_timer.Start();
 		
 		OnStateStarted.Invoke(state);
 	}
@@ -146,14 +170,14 @@ public class StateController : MonoBehaviour
 	private void HandleEndGameState(EndGameState state)
 	{
 		CurrentDebugStateName = "END GAME";
-		_countdownTimer = null;
+		_timer = null;
 		OnStateStarted?.Invoke(state);
 	}
 
 	private void HandleGameOverState(GameOverState state)
 	{
 		CurrentDebugStateName = "GAME OVER";
-		_countdownTimer = null;
+		_timer = null;
 		OnStateStarted?.Invoke(state);
 	}
 

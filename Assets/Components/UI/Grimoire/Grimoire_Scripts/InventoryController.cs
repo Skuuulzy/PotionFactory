@@ -1,12 +1,9 @@
 using Components.Bundle;
 using Components.Grid;
 using Components.Machines;
-using Components.Map;
 using Database;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 using VComponent.Tools.Singletons;
 using VTools.SoWorkflow.EventSystem;
@@ -16,6 +13,7 @@ namespace Components.Inventory
     public class InventoryController : Singleton<InventoryController>
     {
 		[SerializeField] private InventoryTemplate _defaultPlayerInventory;
+		[SerializeField] private InventoryTemplate _sandBoxPlayerInventory;
 
 		//Machine, consumables and relics
         private Dictionary<MachineTemplate, int> _playerMachinesDictionary;
@@ -111,8 +109,9 @@ namespace Components.Inventory
 				return;
 			}
 			
-			//Creating the player inventory with a basic template
-			foreach(var kvp in _defaultPlayerInventory.MachineDictionary.ToDictionary())
+			var inventory = GameParameters.GameParameters.CurrentGameMode == GameParameters.GameParameters.GameMode.SANDBOX ? _sandBoxPlayerInventory : _defaultPlayerInventory;
+			
+			foreach(var kvp in inventory.MachineDictionary.ToDictionary())
 			{
                 AddGridObjectTemplateToInventory(kvp.Key, kvp.Value);
 			}

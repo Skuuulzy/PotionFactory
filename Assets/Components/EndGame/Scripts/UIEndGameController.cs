@@ -1,3 +1,4 @@
+using System;
 using Components.Bundle;
 using Components.Ingredients;
 using Components.Machines;
@@ -5,6 +6,7 @@ using Components.Machines.Behaviors;
 using Components.Shop.ShopItems;
 using SoWorkflow.SharedValues;
 using System.Collections.Generic;
+using Components.GameParameters;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -43,6 +45,7 @@ public class UIEndGameController : MonoBehaviour
 	private readonly Dictionary<MachineTemplate, int> _machinesPossessedByPlayer = new();
 	private readonly Dictionary<IngredientTemplate, int> _recipesSold = new();
 
+
 	private void Start()
 	{
         GameOverState.OnGameOverStarted += HandleGameOver;
@@ -73,7 +76,11 @@ public class UIEndGameController : MonoBehaviour
 		_titleBackground.sprite = _defeatBackground;
 		_contentBackground.sprite = _defeatBackground;
         SetView();
-    }
+        
+        GameParameters.SetBestScore(_playerScore.Value);
+	}
+
+
 
 	private void HandleVictory(EndGameState state)
 	{

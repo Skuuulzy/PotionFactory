@@ -1,9 +1,9 @@
 using SoWorkflow.SharedValues;
-using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using static Components.GameParameters.GameParameters;
 
 namespace Components.Economy
 {
@@ -30,11 +30,17 @@ namespace Components.Economy
 
         private void Start()
         {
-            _playerGuildTokenText.text = "0";
             _playerGuildToken.OnValueUpdated += UpdateUIPlayerGuildToken;
             _playerScore.OnValueUpdated += UpdateUIStatePlayerScore;
             _stateScoreObjective.OnValueUpdated += UpdateScoreStateObjective;
             _guildTokenTimeInterest.OnValueUpdated += UpdateGuildTokenInterest;
+
+            _currentPlayerMoney = _playerGuildToken.Value;
+            _currentPlayerScore = _playerScore.Value;
+            
+            UpdateUIPlayerGuildToken(_playerGuildToken.Value);
+            UpdateUIStatePlayerScore(_playerScore.Value);
+            UpdateScoreStateObjective(_stateScoreObjective.Value);
         }
 
         private void OnDestroy()
@@ -45,9 +51,7 @@ namespace Components.Economy
             _guildTokenTimeInterest.OnValueUpdated -= UpdateGuildTokenInterest;
 
         }
-
-
-
+        
         /// <summary>
         /// Updates the player's money display with an animated transition.
         /// </summary>
@@ -71,7 +75,7 @@ namespace Components.Economy
             _scoreCoroutine = StartCoroutine(AnimateValueCoroutine(_playerStateScoreText, _currentPlayerScore, score, _animDuration));
             _currentPlayerScore = score;
 
-            _finishStateButton.gameObject.SetActive(score != 0 && score >= _stateScoreObjective.Value);
+            _finishStateButton.gameObject.SetActive(score != 0 && score >= _stateScoreObjective.Value && CurrentGameMode == GameMode.STANDARD);
         }
 
         /// <summary>
@@ -86,6 +90,7 @@ namespace Components.Economy
         {
             _interestTokenText.text = $"+{value}";
         }
+        
         /// <summary>
         /// Animates the transition of a numerical value over time.
         /// </summary>
@@ -105,11 +110,22 @@ namespace Components.Economy
 
         public void DebugAddScore()
 		{
-			EconomyController.Instance.AddScore(1000);
-		}
+            if (CurrentGameMode == GameMode.SANDBOX)
+            {
+                EconomyController.Instance.AddScore(-_playerScore.Value);
+            }
+            else
+            { 
+                EconomyController.Instance.AddScore(1000);
+            }
+            
+            PlayerCheated = true;
+        }
+        
 		public void DebugAddMoney()
 		{
 			EconomyController.Instance.AddMoney(10);
+            PlayerCheated = true;
 		}
 	}
 }
