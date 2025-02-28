@@ -92,6 +92,8 @@ public class UIEndGameController : MonoBehaviour
         _titleBackground.sprite = _victoryBackground;
         _contentBackground.sprite = _victoryBackground;
         SetView();
+        
+        GameParameters.SetBestScore(_playerScore.Value);
     }
 
 	private void SetView()
