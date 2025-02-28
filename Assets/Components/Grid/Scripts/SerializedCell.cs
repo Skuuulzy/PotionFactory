@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Components.Grid.Decorations;
 using Components.Grid.Obstacle;
 using Components.Grid.Tile;
-using Newtonsoft.Json;
 using UnityEngine;
 
 namespace Components.Grid
@@ -11,47 +10,20 @@ namespace Components.Grid
     [Serializable]
     public class SerializedCell
     {
-        [JsonProperty("X")]
-        public int X { get; set; }
-
-        [JsonProperty("Y")]
-        public int Y { get; set; }
-
-        [JsonProperty("Size")]
-        public float Size { get; set; }
-
-        [JsonProperty("ContainsObject")]
-        public bool ContainsObject { get; set; }
-
-        [JsonProperty("ContainsObstacle")]
-        public bool ContainsObstacle { get; set; }
-
-        [JsonProperty("ContainsTile")]
-        public bool ContainsTile { get; set; }
-
-        [JsonProperty("TileType")]
-        public TileType TileType { get; set; }
-
-        [JsonProperty("ObstacleType")]
-        public ObstacleType ObstacleType { get; set; }
-
-        [JsonProperty("ObstacleRotation")]
-        public float[] ObstacleRotation { get; set; }
-
-        [JsonProperty("ObstacleScale")]
-        public float[] ObstacleScale { get; set; }
-
-        [JsonProperty("DecorationTypes")]
-        public DecorationType[] DecorationTypes { get; set; }
-
-        [JsonProperty("DecorationPositions")]
-        public List<float[]> DecorationPositions { get; set; }
-
-        [JsonProperty("DecorationRotations")]
-        public List<float[]> DecorationRotations { get; set; }
-
-        [JsonProperty("DecorationScales")]
-        public List<float[]> DecorationScales { get; set; }
+        public int X;
+        public int Y;
+        public float Size;
+        public bool ContainsObject;
+        public bool ContainsObstacle;
+        public bool ContainsTile;
+        public TileType TileType;
+        public ObstacleType ObstacleType;
+        public float[] ObstacleRotation;
+        public float[] ObstacleScale;
+        public DecorationType[] DecorationTypes;
+        public List<float[]> DecorationPositions;
+        public List<float[]> DecorationRotations;
+        public List<float[]> DecorationScales;
 
         public SerializedCell() { }
 
