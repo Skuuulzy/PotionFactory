@@ -7,7 +7,7 @@ using VComponent.Tools.Singletons;
 #if UNITY_2022
 using Cinemachine;
 #else
-using UnityEngine.Cinemachine;
+using Unity.Cinemachine;
 #endif
 
 namespace VComponent.CameraSystem
