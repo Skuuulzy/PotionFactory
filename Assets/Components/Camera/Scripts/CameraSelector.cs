@@ -1,9 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Cinemachine;
 using UnityEngine;
 using VComponent.Tools.Singletons;
+
+#if UNITY_2022
+using Cinemachine;
+#else
+using UnityEngine.Cinemachine;
+#endif
 
 namespace VComponent.CameraSystem
 {
