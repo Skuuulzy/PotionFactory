@@ -16,7 +16,8 @@ namespace Components.GameParameters
             SANDBOX,
             STANDARD
         }
-        
+
+#if UNITY_EDITOR
         // Reset the static values when the game starts.
         [InitializeOnLoadMethod]
         private static void Reset()
@@ -24,6 +25,7 @@ namespace Components.GameParameters
             CurrentGameMode = GameMode.SANDBOX;
             PlayerCheated = false;
         }
+#endif
 
         public static void SetBestScore(int score)
         {
@@ -41,4 +43,5 @@ namespace Components.GameParameters
             PlayerPrefs.SetInt(BEST_SCORE_KEY, score);
         }
     }
+
 }
